@@ -17,9 +17,12 @@ export type Database = {
       business_settings: {
         Row: {
           auto_hashtags: boolean | null
+          brand_voice: string | null
           business_name: string | null
           business_type: string | null
           created_at: string
+          default_platform: string | null
+          default_tone: string | null
           facebook_connected: boolean | null
           facebook_url: string | null
           follower_count: number | null
@@ -39,9 +42,12 @@ export type Database = {
         }
         Insert: {
           auto_hashtags?: boolean | null
+          brand_voice?: string | null
           business_name?: string | null
           business_type?: string | null
           created_at?: string
+          default_platform?: string | null
+          default_tone?: string | null
           facebook_connected?: boolean | null
           facebook_url?: string | null
           follower_count?: number | null
@@ -61,9 +67,12 @@ export type Database = {
         }
         Update: {
           auto_hashtags?: boolean | null
+          brand_voice?: string | null
           business_name?: string | null
           business_type?: string | null
           created_at?: string
+          default_platform?: string | null
+          default_tone?: string | null
           facebook_connected?: boolean | null
           facebook_url?: string | null
           follower_count?: number | null

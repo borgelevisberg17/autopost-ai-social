@@ -9,6 +9,8 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
+import ContentHistory from "./pages/ContentHistory";
+import BusinessSettings from "./pages/BusinessSettings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +31,22 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/history" 
+              element={
+                <ProtectedRoute>
+                  <ContentHistory />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/settings" 
+              element={
+                <ProtectedRoute>
+                  <BusinessSettings />
                 </ProtectedRoute>
               } 
             />
