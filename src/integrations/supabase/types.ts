@@ -14,7 +14,123 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      business_settings: {
+        Row: {
+          business_name: string | null
+          business_type: string | null
+          created_at: string
+          facebook_connected: boolean | null
+          follower_count: number | null
+          id: string
+          instagram_connected: boolean | null
+          linkedin_connected: boolean | null
+          target_audience: string | null
+          tiktok_connected: boolean | null
+          tone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          business_name?: string | null
+          business_type?: string | null
+          created_at?: string
+          facebook_connected?: boolean | null
+          follower_count?: number | null
+          id?: string
+          instagram_connected?: boolean | null
+          linkedin_connected?: boolean | null
+          target_audience?: string | null
+          tiktok_connected?: boolean | null
+          tone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          business_name?: string | null
+          business_type?: string | null
+          created_at?: string
+          facebook_connected?: boolean | null
+          follower_count?: number | null
+          id?: string
+          instagram_connected?: boolean | null
+          linkedin_connected?: boolean | null
+          target_audience?: string | null
+          tiktok_connected?: boolean | null
+          tone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      content_history: {
+        Row: {
+          content_type: string
+          created_at: string
+          generated_content: string
+          id: string
+          platform: string
+          published_at: string | null
+          scheduled_at: string | null
+          status: string | null
+          topic: string | null
+          user_id: string
+        }
+        Insert: {
+          content_type: string
+          created_at?: string
+          generated_content: string
+          id?: string
+          platform: string
+          published_at?: string | null
+          scheduled_at?: string | null
+          status?: string | null
+          topic?: string | null
+          user_id: string
+        }
+        Update: {
+          content_type?: string
+          created_at?: string
+          generated_content?: string
+          id?: string
+          platform?: string
+          published_at?: string | null
+          scheduled_at?: string | null
+          status?: string | null
+          topic?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
