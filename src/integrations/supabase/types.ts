@@ -16,47 +16,68 @@ export type Database = {
     Tables: {
       business_settings: {
         Row: {
+          auto_hashtags: boolean | null
           business_name: string | null
           business_type: string | null
           created_at: string
           facebook_connected: boolean | null
+          facebook_url: string | null
           follower_count: number | null
           id: string
+          include_cta: boolean | null
+          include_emojis: boolean | null
           instagram_connected: boolean | null
+          instagram_handle: string | null
           linkedin_connected: boolean | null
+          linkedin_url: string | null
           target_audience: string | null
           tiktok_connected: boolean | null
           tone: string | null
+          twitter_handle: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          auto_hashtags?: boolean | null
           business_name?: string | null
           business_type?: string | null
           created_at?: string
           facebook_connected?: boolean | null
+          facebook_url?: string | null
           follower_count?: number | null
           id?: string
+          include_cta?: boolean | null
+          include_emojis?: boolean | null
           instagram_connected?: boolean | null
+          instagram_handle?: string | null
           linkedin_connected?: boolean | null
+          linkedin_url?: string | null
           target_audience?: string | null
           tiktok_connected?: boolean | null
           tone?: string | null
+          twitter_handle?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          auto_hashtags?: boolean | null
           business_name?: string | null
           business_type?: string | null
           created_at?: string
           facebook_connected?: boolean | null
+          facebook_url?: string | null
           follower_count?: number | null
           id?: string
+          include_cta?: boolean | null
+          include_emojis?: boolean | null
           instagram_connected?: boolean | null
+          instagram_handle?: string | null
           linkedin_connected?: boolean | null
+          linkedin_url?: string | null
           target_audience?: string | null
           tiktok_connected?: boolean | null
           tone?: string | null
+          twitter_handle?: string | null
           updated_at?: string
           user_id?: string
         }
