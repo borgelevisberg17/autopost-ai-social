@@ -14,10 +14,9 @@ import {
   Facebook,
   Linkedin,
   Twitter,
-  ChevronDown,
   Loader2
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   Select,
@@ -29,7 +28,9 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 const businessTypes = [
   "Pet Shop",
@@ -67,9 +68,10 @@ const platforms = [
 ];
 
 const Dashboard = () => {
-  const { toast } = useToast();
+  const { user, signOut } = useAuth();
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedContent, setGeneratedContent] = useState("");
+  const [profile, setProfile] = useState<{ full_name: string } | null>(null);
   
   // Form state
   const [businessType, setBusinessType] = useState("");
@@ -80,48 +82,82 @@ const Dashboard = () => {
   const [platform, setPlatform] = useState("");
   const [topic, setTopic] = useState("");
 
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (user) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        
+        if (data) {
+          setProfile(data);
+        }
+      }
+    };
+    
+    fetchProfile();
+  }, [user]);
+
   const handleGenerate = async () => {
     if (!businessType || !tone || !contentType || !platform) {
-      toast({
-        title: "Preencha todos os campos obrigatórios",
+      toast.error("Preencha todos os campos obrigatórios", {
         description: "Tipo de negócio, tom, tipo de conteúdo e plataforma são necessários.",
-        variant: "destructive",
       });
       return;
     }
 
     setIsGenerating(true);
     
-    // Simulate AI generation (will be replaced with actual API call)
-    setTimeout(() => {
-      const mockContent = `🐾 Seu pet merece o melhor cuidado do mundo!
-
-Na nossa Pet Shop, cada patinha é tratada com amor e carinho. 💕
-
-✨ Banho relaxante com produtos premium
-✨ Tosa personalizada para cada raça
-✨ Ambiente climatizado e seguro
-
-📍 Venha nos visitar e dê ao seu amiguinho o tratamento VIP que ele merece!
-
-💬 Agende agora pelo WhatsApp (link na bio)
-
-#PetShop #AmordePets #Banhoetosa #CuidadoAnimal #PetLovers`;
-
-      setGeneratedContent(mockContent);
-      setIsGenerating(false);
-      
-      toast({
-        title: "Conteúdo gerado com sucesso! ✨",
-        description: "Revise e copie o texto gerado.",
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-content', {
+        body: {
+          businessType,
+          audience: audience || 'público geral',
+          followerCount: followers || '1000',
+          tone,
+          contentType,
+          platform,
+          topic: topic || 'geral sobre o negócio'
+        }
       });
-    }, 2000);
+
+      if (error) {
+        throw error;
+      }
+
+      if (data.error) {
+        toast.error(data.error);
+        return;
+      }
+
+      setGeneratedContent(data.content);
+
+      // Save to content history
+      if (user) {
+        await supabase.from('content_history').insert({
+          user_id: user.id,
+          content_type: contentType,
+          platform,
+          topic,
+          generated_content: data.content,
+          status: 'generated'
+        });
+      }
+      
+      toast.success("Conteúdo gerado com sucesso! ✨");
+    } catch (error) {
+      console.error('Error generating content:', error);
+      toast.error("Erro ao gerar conteúdo. Tente novamente.");
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleCopy = () => {
     navigator.clipboard.writeText(generatedContent);
-    toast({
-      title: "Copiado! 📋",
+    toast.success("Copiado! 📋", {
       description: "O texto foi copiado para a área de transferência.",
     });
   };
@@ -129,6 +165,13 @@ Na nossa Pet Shop, cada patinha é tratada com amor e carinho. 💕
   const handleRegenerate = () => {
     handleGenerate();
   };
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
+  const userName = profile?.full_name || user?.email?.split('@')[0] || 'Usuário';
+  const userInitial = userName.charAt(0).toUpperCase();
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -184,13 +227,16 @@ Na nossa Pet Shop, cada patinha é tratada com amor e carinho. 💕
         <div className="p-4 border-t border-border">
           <div className="flex items-center gap-3 px-4 py-3">
             <div className="w-10 h-10 rounded-full gradient-primary flex items-center justify-center text-primary-foreground font-medium">
-              U
+              {userInitial}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-medium truncate">Usuário</p>
+              <p className="font-medium truncate">{userName}</p>
               <p className="text-sm text-muted-foreground truncate">Plano Free</p>
             </div>
-            <button className="text-muted-foreground hover:text-foreground">
+            <button 
+              className="text-muted-foreground hover:text-foreground"
+              onClick={handleSignOut}
+            >
               <LogOut className="w-5 h-5" />
             </button>
           </div>
@@ -360,7 +406,7 @@ Na nossa Pet Shop, cada patinha é tratada com amor e carinho. 💕
                   <h2 className="font-display font-semibold text-lg">Resultado</h2>
                   {generatedContent && (
                     <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm" onClick={handleRegenerate}>
+                      <Button variant="outline" size="sm" onClick={handleRegenerate} disabled={isGenerating}>
                         <RefreshCw className="w-4 h-4 mr-1" />
                         Regenerar
                       </Button>
