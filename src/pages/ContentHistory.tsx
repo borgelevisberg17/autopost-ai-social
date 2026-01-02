@@ -3,9 +3,16 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { 
   History, 
   Copy, 
@@ -16,7 +23,9 @@ import {
   Instagram,
   Linkedin,
   Twitter,
-  Facebook
+  Facebook,
+  Clock,
+  CalendarIcon
 } from "lucide-react";
 import {
   Dialog,
@@ -24,6 +33,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -35,6 +45,7 @@ interface ContentItem {
   topic: string;
   status: string;
   created_at: string;
+  scheduled_at: string | null;
 }
 
 const platformIcons: Record<string, React.ReactNode> = {
@@ -51,6 +62,9 @@ const ContentHistory = () => {
   const [loading, setLoading] = useState(true);
   const [editingItem, setEditingItem] = useState<ContentItem | null>(null);
   const [editedContent, setEditedContent] = useState("");
+  const [schedulingItem, setSchedulingItem] = useState<ContentItem | null>(null);
+  const [scheduleDate, setScheduleDate] = useState<Date | undefined>(undefined);
+  const [scheduleTime, setScheduleTime] = useState("12:00");
 
   useEffect(() => {
     if (user) {
@@ -67,7 +81,7 @@ const ContentHistory = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setHistory(data || []);
+      setHistory((data || []) as ContentItem[]);
     } catch (error) {
       console.error("Error fetching history:", error);
       toast({
@@ -149,10 +163,90 @@ const ContentHistory = () => {
   };
 
   const handleSchedule = (item: ContentItem) => {
-    toast({
-      title: "Em breve!",
-      description: "Funcionalidade de agendamento disponível no plano Pro.",
-    });
+    setSchedulingItem(item);
+    if (item.scheduled_at) {
+      const scheduledDate = new Date(item.scheduled_at);
+      setScheduleDate(scheduledDate);
+      setScheduleTime(format(scheduledDate, "HH:mm"));
+    } else {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      setScheduleDate(tomorrow);
+      setScheduleTime("12:00");
+    }
+  };
+
+  const handleSaveSchedule = async () => {
+    if (!schedulingItem || !scheduleDate) return;
+
+    try {
+      const [hours, minutes] = scheduleTime.split(":").map(Number);
+      const scheduledAt = new Date(scheduleDate);
+      scheduledAt.setHours(hours, minutes, 0, 0);
+
+      const { error } = await supabase
+        .from("content_history")
+        .update({ 
+          scheduled_at: scheduledAt.toISOString(),
+          status: "scheduled"
+        })
+        .eq("id", schedulingItem.id);
+
+      if (error) throw error;
+
+      setHistory(prev =>
+        prev.map(item =>
+          item.id === schedulingItem.id 
+            ? { ...item, scheduled_at: scheduledAt.toISOString(), status: "scheduled" } 
+            : item
+        )
+      );
+      setSchedulingItem(null);
+      toast({
+        title: "Agendado!",
+        description: `Conteúdo agendado para ${format(scheduledAt, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}.`,
+      });
+    } catch (error) {
+      console.error("Error scheduling content:", error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível agendar o conteúdo.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleCancelSchedule = async (item: ContentItem) => {
+    try {
+      const { error } = await supabase
+        .from("content_history")
+        .update({ 
+          scheduled_at: null,
+          status: "generated"
+        })
+        .eq("id", item.id);
+
+      if (error) throw error;
+
+      setHistory(prev =>
+        prev.map(i =>
+          i.id === item.id 
+            ? { ...i, scheduled_at: null, status: "generated" } 
+            : i
+        )
+      );
+      toast({
+        title: "Cancelado!",
+        description: "Agendamento cancelado com sucesso.",
+      });
+    } catch (error) {
+      console.error("Error canceling schedule:", error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível cancelar o agendamento.",
+        variant: "destructive",
+      });
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -163,6 +257,22 @@ const ContentHistory = () => {
       hour: "2-digit",
       minute: "2-digit",
     });
+  };
+
+  const getStatusBadge = (item: ContentItem) => {
+    if (item.status === "scheduled" && item.scheduled_at) {
+      return (
+        <Badge variant="default" className="bg-blue-500 hover:bg-blue-600">
+          <Clock className="h-3 w-3 mr-1" />
+          Agendado para {format(new Date(item.scheduled_at), "dd/MM 'às' HH:mm")}
+        </Badge>
+      );
+    }
+    return (
+      <Badge variant="outline" className="capitalize">
+        {item.status}
+      </Badge>
+    );
   };
 
   return (
@@ -199,8 +309,8 @@ const ContentHistory = () => {
             {history.map((item) => (
               <Card key={item.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       {platformIcons[item.platform] || null}
                       <Badge variant="secondary" className="capitalize">
                         {item.platform}
@@ -208,9 +318,7 @@ const ContentHistory = () => {
                       <Badge variant="outline" className="capitalize">
                         {item.content_type}
                       </Badge>
-                      <Badge variant="outline" className="capitalize">
-                        {item.status}
-                      </Badge>
+                      {getStatusBadge(item)}
                     </div>
                     <span className="text-sm text-muted-foreground">
                       {formatDate(item.created_at)}
@@ -238,14 +346,25 @@ const ContentHistory = () => {
                       <Edit className="h-4 w-4 mr-2" />
                       Editar
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleSchedule(item)}
-                    >
-                      <Calendar className="h-4 w-4 mr-2" />
-                      Agendar
-                    </Button>
+                    {item.status === "scheduled" ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleCancelSchedule(item)}
+                      >
+                        <Calendar className="h-4 w-4 mr-2" />
+                        Cancelar Agendamento
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleSchedule(item)}
+                      >
+                        <Calendar className="h-4 w-4 mr-2" />
+                        Agendar
+                      </Button>
+                    )}
                     <Button
                       variant="ghost"
                       size="sm"
@@ -263,6 +382,7 @@ const ContentHistory = () => {
         )}
       </div>
 
+      {/* Edit Dialog */}
       <Dialog open={!!editingItem} onOpenChange={() => setEditingItem(null)}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
@@ -278,6 +398,87 @@ const ContentHistory = () => {
               Cancelar
             </Button>
             <Button onClick={handleSaveEdit}>Salvar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Schedule Dialog */}
+      <Dialog open={!!schedulingItem} onOpenChange={() => setSchedulingItem(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Calendar className="h-5 w-5" />
+              Agendar Publicação
+            </DialogTitle>
+            <DialogDescription>
+              Selecione a data e horário para publicar este conteúdo automaticamente.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Data</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !scheduleDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {scheduleDate ? (
+                      format(scheduleDate, "PPP", { locale: ptBR })
+                    ) : (
+                      <span>Selecione uma data</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <CalendarComponent
+                    mode="single"
+                    selected={scheduleDate}
+                    onSelect={setScheduleDate}
+                    disabled={(date) => date < new Date()}
+                    initialFocus
+                    className={cn("p-3 pointer-events-auto")}
+                    locale={ptBR}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="schedule-time">Horário</Label>
+              <Input
+                id="schedule-time"
+                type="time"
+                value={scheduleTime}
+                onChange={(e) => setScheduleTime(e.target.value)}
+              />
+            </div>
+
+            {scheduleDate && (
+              <div className="bg-muted p-3 rounded-lg">
+                <p className="text-sm text-muted-foreground">
+                  O conteúdo será publicado em:
+                </p>
+                <p className="font-medium">
+                  {format(scheduleDate, "EEEE, dd 'de' MMMM 'de' yyyy", { locale: ptBR })} às {scheduleTime}
+                </p>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSchedulingItem(null)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleSaveSchedule} disabled={!scheduleDate}>
+              <Clock className="h-4 w-4 mr-2" />
+              Confirmar Agendamento
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
