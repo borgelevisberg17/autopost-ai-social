@@ -29,10 +29,11 @@ import { Textarea } from "@/components/ui/textarea";
 
 interface ContentItem {
   id: string;
-  content: string;
+  generated_content: string;
   platform: string;
   content_type: string;
-  tone: string;
+  topic: string;
+  status: string;
   created_at: string;
 }
 
@@ -79,8 +80,8 @@ const ContentHistory = () => {
     }
   };
 
-  const handleCopy = async (content: string) => {
-    await navigator.clipboard.writeText(content);
+  const handleCopy = async (generated_content: string) => {
+    await navigator.clipboard.writeText(generated_content);
     toast({
       title: "Copiado!",
       description: "Conteúdo copiado para a área de transferência.",
@@ -89,7 +90,7 @@ const ContentHistory = () => {
 
   const handleEdit = (item: ContentItem) => {
     setEditingItem(item);
-    setEditedContent(item.content);
+    setEditedContent(item.generated_content);
   };
 
   const handleSaveEdit = async () => {
@@ -98,14 +99,14 @@ const ContentHistory = () => {
     try {
       const { error } = await supabase
         .from("content_history")
-        .update({ content: editedContent })
+        .update({ generated_content: editedContent })
         .eq("id", editingItem.id);
 
       if (error) throw error;
 
       setHistory(prev =>
         prev.map(item =>
-          item.id === editingItem.id ? { ...item, content: editedContent } : item
+          item.id === editingItem.id ? { ...item, generated_content: editedContent } : item
         )
       );
       setEditingItem(null);
@@ -198,7 +199,7 @@ const ContentHistory = () => {
             {history.map((item) => (
               <Card key={item.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       {platformIcons[item.platform] || null}
                       <Badge variant="secondary" className="capitalize">
@@ -208,7 +209,7 @@ const ContentHistory = () => {
                         {item.content_type}
                       </Badge>
                       <Badge variant="outline" className="capitalize">
-                        {item.tone}
+                        {item.status}
                       </Badge>
                     </div>
                     <span className="text-sm text-muted-foreground">
@@ -218,13 +219,13 @@ const ContentHistory = () => {
                 </CardHeader>
                 <CardContent>
                   <p className="text-foreground whitespace-pre-wrap mb-4">
-                    {item.content}
+                    {item.generated_content}
                   </p>
                   <div className="flex gap-2 flex-wrap">
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleCopy(item.content)}
+                      onClick={() => handleCopy(item.generated_content)}
                     >
                       <Copy className="h-4 w-4 mr-2" />
                       Copiar

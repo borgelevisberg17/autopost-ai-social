@@ -80,26 +80,28 @@ const BusinessSettings = () => {
         .from("business_settings")
         .select("*")
         .eq("user_id", user?.id)
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== "PGRST116") throw error;
+      if (error) throw error;
 
       if (data) {
+        // Cast data to any to handle new columns not yet in types
+        const settingsData = data as Record<string, unknown>;
         setSettings(prev => ({
           ...prev,
-          business_name: data.business_name || "",
-          business_type: data.business_type || "",
-          target_audience: data.target_audience || "",
-          brand_voice: data.brand_voice || "",
-          default_tone: data.default_tone || "Profissional",
-          default_platform: data.default_platform || "instagram",
-          instagram_handle: data.instagram_handle || "",
-          linkedin_url: data.linkedin_url || "",
-          twitter_handle: data.twitter_handle || "",
-          facebook_url: data.facebook_url || "",
-          auto_hashtags: data.auto_hashtags ?? true,
-          include_emojis: data.include_emojis ?? true,
-          include_cta: data.include_cta ?? true,
+          business_name: (settingsData.business_name as string) || "",
+          business_type: (settingsData.business_type as string) || "",
+          target_audience: (settingsData.target_audience as string) || "",
+          brand_voice: (settingsData.brand_voice as string) || "",
+          default_tone: (settingsData.default_tone as string) || "Profissional",
+          default_platform: (settingsData.default_platform as string) || "instagram",
+          instagram_handle: (settingsData.instagram_handle as string) || "",
+          linkedin_url: (settingsData.linkedin_url as string) || "",
+          twitter_handle: (settingsData.twitter_handle as string) || "",
+          facebook_url: (settingsData.facebook_url as string) || "",
+          auto_hashtags: (settingsData.auto_hashtags as boolean) ?? true,
+          include_emojis: (settingsData.include_emojis as boolean) ?? true,
+          include_cta: (settingsData.include_cta as boolean) ?? true,
         }));
       }
     } catch (error) {
@@ -112,13 +114,28 @@ const BusinessSettings = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
+      // Cast to any to handle new columns not yet in types
+      const updateData = {
+        user_id: user?.id,
+        business_name: settings.business_name,
+        business_type: settings.business_type,
+        target_audience: settings.target_audience,
+        brand_voice: settings.brand_voice,
+        default_tone: settings.default_tone,
+        default_platform: settings.default_platform,
+        instagram_handle: settings.instagram_handle,
+        linkedin_url: settings.linkedin_url,
+        twitter_handle: settings.twitter_handle,
+        facebook_url: settings.facebook_url,
+        auto_hashtags: settings.auto_hashtags,
+        include_emojis: settings.include_emojis,
+        include_cta: settings.include_cta,
+        updated_at: new Date().toISOString(),
+      } as Record<string, unknown>;
+
       const { error } = await supabase
         .from("business_settings")
-        .upsert({
-          user_id: user?.id,
-          ...settings,
-          updated_at: new Date().toISOString(),
-        });
+        .upsert(updateData as never);
 
       if (error) throw error;
 
