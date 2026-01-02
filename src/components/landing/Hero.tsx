@@ -1,8 +1,12 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Play, Sparkles, Zap, Bot } from "lucide-react";
 import { Link } from "react-router-dom";
+import { DemoModal } from "./DemoModal";
 
 export const Hero = () => {
+  const [demoOpen, setDemoOpen] = useState(false);
+
   return (
     <section className="relative pt-32 pb-20 overflow-hidden">
       {/* Background Effects */}
@@ -41,7 +45,7 @@ export const Hero = () => {
                 <ArrowRight className="w-5 h-5" />
               </Link>
             </Button>
-            <Button variant="glass" size="xl">
+            <Button variant="glass" size="xl" onClick={() => setDemoOpen(true)}>
               <Play className="w-5 h-5" />
               Ver Demo
             </Button>
@@ -78,6 +82,8 @@ export const Hero = () => {
           </div>
         </div>
       </div>
+
+      <DemoModal open={demoOpen} onOpenChange={setDemoOpen} />
     </section>
   );
 };
