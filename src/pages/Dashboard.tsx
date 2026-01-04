@@ -418,8 +418,30 @@ const Dashboard = () => {
                   )}
                 </div>
 
-                {generatedContent ? (
-                  <div className="flex-1">
+                {isGenerating ? (
+                  <div className="flex-1 flex flex-col items-center justify-center text-center">
+                    <div className="relative w-24 h-24 mb-6">
+                      {/* Outer spinning ring */}
+                      <div className="absolute inset-0 rounded-full border-4 border-primary/20" />
+                      <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-primary animate-spin" />
+                      {/* Inner pulsing icon */}
+                      <div className="absolute inset-3 rounded-full gradient-primary flex items-center justify-center animate-pulse">
+                        <Sparkles className="w-8 h-8 text-primary-foreground" />
+                      </div>
+                    </div>
+                    <h3 className="font-display font-semibold text-lg mb-2">Gerando seu conteúdo...</h3>
+                    <p className="text-muted-foreground max-w-xs mb-6">
+                      Nossa IA está criando um post incrível para você
+                    </p>
+                    {/* Animated dots */}
+                    <div className="flex gap-2">
+                      <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }} />
+                    </div>
+                  </div>
+                ) : generatedContent ? (
+                  <div className="flex-1 animate-fade-in">
                     {/* Platform Preview */}
                     <div className="bg-secondary/50 rounded-xl p-4 mb-4">
                       <div className="flex items-center gap-2 mb-3">
