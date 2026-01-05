@@ -39,6 +39,9 @@ import { EditingToolbar } from "@/components/dashboard/EditingToolbar";
 import { ContentPreview } from "@/components/dashboard/ContentPreview";
 import { LoadingState } from "@/components/dashboard/LoadingState";
 import { EmptyState } from "@/components/dashboard/EmptyState";
+import { VideoScriptDialog } from "@/components/dashboard/VideoScriptDialog";
+import { ThumbnailDialog } from "@/components/dashboard/ThumbnailDialog";
+import { CCDialog } from "@/components/dashboard/CCDialog";
 import { cn } from "@/lib/utils";
 
 const businessTypes = [
@@ -83,6 +86,12 @@ const Dashboard = () => {
   const [originalContent, setOriginalContent] = useState("");
   const [profile, setProfile] = useState<{ full_name: string } | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [isEditProcessing, setIsEditProcessing] = useState(false);
+  
+  // Dialog states
+  const [showVideoScriptDialog, setShowVideoScriptDialog] = useState(false);
+  const [showThumbnailDialog, setShowThumbnailDialog] = useState(false);
+  const [showCCDialog, setShowCCDialog] = useState(false);
   
   // Form state
   const [businessType, setBusinessType] = useState("");
@@ -180,36 +189,54 @@ const Dashboard = () => {
     await signOut();
   };
 
+  // AI Edit helper function
+  const processAIEdit = async (action: string, extraParams: Record<string, any> = {}) => {
+    if (!generatedContent) return;
+    
+    setIsEditProcessing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-edit', {
+        body: {
+          action,
+          content: generatedContent,
+          platform,
+          ...extraParams
+        }
+      });
+
+      if (error) throw error;
+      if (data.error) {
+        toast.error(data.error);
+        return;
+      }
+
+      setGeneratedContent(data.result);
+      toast.success("Edição aplicada! ✨");
+    } catch (error) {
+      console.error('Error processing AI edit:', error);
+      toast.error("Erro ao processar edição. Tente novamente.");
+    } finally {
+      setIsEditProcessing(false);
+    }
+  };
+
   // Editing tool handlers
-  const handleAddHashtags = async () => {
-    toast.info("Adicionando hashtags...");
-    // TODO: Implement with AI
-    setGeneratedContent(prev => prev + "\n\n#marketing #negocios #empreendedorismo");
-    toast.success("Hashtags adicionadas!");
-  };
-
-  const handleAddEmojis = async () => {
-    toast.info("Adicionando emojis...");
-    // TODO: Implement with AI
-    toast.success("Emojis adicionados!");
-  };
-
-  const handleShorten = async () => {
-    toast.info("Resumindo texto...");
-    // TODO: Implement with AI
-    toast.success("Texto resumido!");
-  };
-
-  const handleExpand = async () => {
-    toast.info("Expandindo texto...");
-    // TODO: Implement with AI
-    toast.success("Texto expandido!");
-  };
+  const handleSplit = () => processAIEdit('split');
+  const handleAddHashtags = () => processAIEdit('hashtags');
+  const handleAddEmojis = () => processAIEdit('emojis');
+  const handleChangeTone = (targetTone: string) => processAIEdit('tone', { targetTone });
+  const handleTranslate = (targetLanguage: string) => processAIEdit('translate', { targetLanguage });
+  const handleShorten = () => processAIEdit('shorten');
+  const handleExpand = () => processAIEdit('expand');
 
   const handleReset = () => {
     setGeneratedContent(originalContent);
     toast.success("Texto restaurado!");
   };
+
+  const handleGenerateScript = () => setShowVideoScriptDialog(true);
+  const handleGenerateThumbnail = () => setShowThumbnailDialog(true);
+  const handleGenerateCC = () => setShowCCDialog(true);
 
   const handleContentChange = (newContent: string) => {
     setGeneratedContent(newContent);
@@ -544,11 +571,20 @@ const Dashboard = () => {
 
                     {/* Editing Toolbar */}
                     <EditingToolbar
+                      content={generatedContent}
+                      platform={platform}
+                      isProcessing={isEditProcessing}
+                      onSplit={handleSplit}
                       onAddHashtags={handleAddHashtags}
                       onAddEmojis={handleAddEmojis}
+                      onChangeTone={handleChangeTone}
+                      onTranslate={handleTranslate}
                       onShorten={handleShorten}
                       onExpand={handleExpand}
                       onReset={handleReset}
+                      onGenerateScript={handleGenerateScript}
+                      onGenerateThumbnail={handleGenerateThumbnail}
+                      onGenerateCC={handleGenerateCC}
                     />
 
                     {/* Action Buttons */}
@@ -572,6 +608,23 @@ const Dashboard = () => {
 
       {/* Mobile Navigation */}
       <MobileNav />
+
+      {/* Dialogs */}
+      <VideoScriptDialog 
+        open={showVideoScriptDialog} 
+        onOpenChange={setShowVideoScriptDialog}
+        initialTopic={topic || generatedContent.substring(0, 100)}
+      />
+      <ThumbnailDialog 
+        open={showThumbnailDialog} 
+        onOpenChange={setShowThumbnailDialog}
+        initialTitle={topic || "Seu Vídeo Incrível"}
+      />
+      <CCDialog 
+        open={showCCDialog} 
+        onOpenChange={setShowCCDialog}
+        initialContent={generatedContent}
+      />
     </div>
   );
 };
