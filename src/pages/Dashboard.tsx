@@ -14,7 +14,9 @@ import {
   Facebook,
   Linkedin,
   Twitter,
-  Loader2
+  Loader2,
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -31,6 +33,13 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { motion, AnimatePresence } from "framer-motion";
+import { MobileNav } from "@/components/dashboard/MobileNav";
+import { EditingToolbar } from "@/components/dashboard/EditingToolbar";
+import { ContentPreview } from "@/components/dashboard/ContentPreview";
+import { LoadingState } from "@/components/dashboard/LoadingState";
+import { EmptyState } from "@/components/dashboard/EmptyState";
+import { cn } from "@/lib/utils";
 
 const businessTypes = [
   "Pet Shop",
@@ -71,7 +80,9 @@ const Dashboard = () => {
   const { user, signOut } = useAuth();
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedContent, setGeneratedContent] = useState("");
+  const [originalContent, setOriginalContent] = useState("");
   const [profile, setProfile] = useState<{ full_name: string } | null>(null);
+  const [showAdvanced, setShowAdvanced] = useState(false);
   
   // Form state
   const [businessType, setBusinessType] = useState("");
@@ -133,6 +144,7 @@ const Dashboard = () => {
       }
 
       setGeneratedContent(data.content);
+      setOriginalContent(data.content);
 
       // Save to content history
       if (user) {
@@ -157,9 +169,7 @@ const Dashboard = () => {
 
   const handleCopy = () => {
     navigator.clipboard.writeText(generatedContent);
-    toast.success("Copiado! 📋", {
-      description: "O texto foi copiado para a área de transferência.",
-    });
+    toast.success("Copiado! 📋");
   };
 
   const handleRegenerate = () => {
@@ -170,13 +180,48 @@ const Dashboard = () => {
     await signOut();
   };
 
+  // Editing tool handlers
+  const handleAddHashtags = async () => {
+    toast.info("Adicionando hashtags...");
+    // TODO: Implement with AI
+    setGeneratedContent(prev => prev + "\n\n#marketing #negocios #empreendedorismo");
+    toast.success("Hashtags adicionadas!");
+  };
+
+  const handleAddEmojis = async () => {
+    toast.info("Adicionando emojis...");
+    // TODO: Implement with AI
+    toast.success("Emojis adicionados!");
+  };
+
+  const handleShorten = async () => {
+    toast.info("Resumindo texto...");
+    // TODO: Implement with AI
+    toast.success("Texto resumido!");
+  };
+
+  const handleExpand = async () => {
+    toast.info("Expandindo texto...");
+    // TODO: Implement with AI
+    toast.success("Texto expandido!");
+  };
+
+  const handleReset = () => {
+    setGeneratedContent(originalContent);
+    toast.success("Texto restaurado!");
+  };
+
+  const handleContentChange = (newContent: string) => {
+    setGeneratedContent(newContent);
+  };
+
   const userName = profile?.full_name || user?.email?.split('@')[0] || 'Usuário';
   const userInitial = userName.charAt(0).toUpperCase();
 
   return (
-    <div className="min-h-screen bg-background flex">
-      {/* Sidebar */}
-      <aside className="hidden lg:flex w-64 bg-card border-r border-border flex-col">
+    <div className="min-h-screen bg-background flex pb-16 lg:pb-0">
+      {/* Desktop Sidebar */}
+      <aside className="hidden lg:flex w-64 bg-card border-r border-border flex-col fixed inset-y-0 left-0 z-40">
         {/* Logo */}
         <div className="p-6 border-b border-border">
           <Link to="/" className="flex items-center gap-2">
@@ -191,34 +236,34 @@ const Dashboard = () => {
         <nav className="flex-1 p-4">
           <ul className="space-y-2">
             <li>
-              <a href="#" className="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 text-primary font-medium">
+              <Link to="/dashboard" className="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 text-primary font-medium">
                 <PenTool className="w-5 h-5" />
                 Criar Conteúdo
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="flex items-center gap-3 px-4 py-3 rounded-xl text-muted-foreground hover:bg-secondary transition-colors">
+              <Link to="/dashboard" className="flex items-center gap-3 px-4 py-3 rounded-xl text-muted-foreground hover:bg-secondary transition-colors">
                 <Home className="w-5 h-5" />
                 Dashboard
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="flex items-center gap-3 px-4 py-3 rounded-xl text-muted-foreground hover:bg-secondary transition-colors">
+              <Link to="/history" className="flex items-center gap-3 px-4 py-3 rounded-xl text-muted-foreground hover:bg-secondary transition-colors">
                 <Calendar className="w-5 h-5" />
                 Agendamentos
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="flex items-center gap-3 px-4 py-3 rounded-xl text-muted-foreground hover:bg-secondary transition-colors">
+              <Link to="/dashboard" className="flex items-center gap-3 px-4 py-3 rounded-xl text-muted-foreground hover:bg-secondary transition-colors">
                 <BarChart3 className="w-5 h-5" />
                 Analytics
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="flex items-center gap-3 px-4 py-3 rounded-xl text-muted-foreground hover:bg-secondary transition-colors">
+              <Link to="/settings" className="flex items-center gap-3 px-4 py-3 rounded-xl text-muted-foreground hover:bg-secondary transition-colors">
                 <Settings className="w-5 h-5" />
                 Configurações
-              </a>
+              </Link>
             </li>
           </ul>
         </nav>
@@ -244,143 +289,203 @@ const Dashboard = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto">
-        {/* Header */}
-        <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg border-b border-border px-6 py-4">
+      <main className="flex-1 lg:ml-64">
+        {/* Mobile Header */}
+        <header className="sticky top-0 z-30 bg-background/95 backdrop-blur-xl border-b border-border px-4 py-3 lg:px-6 lg:py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="font-display text-2xl font-bold">Criar Conteúdo</h1>
-              <p className="text-muted-foreground">Gere posts personalizados para suas redes sociais</p>
+            {/* Mobile Logo */}
+            <div className="flex items-center gap-2 lg:hidden">
+              <div className="w-8 h-8 rounded-xl gradient-primary flex items-center justify-center">
+                <Sparkles className="w-4 h-4 text-primary-foreground" />
+              </div>
+              <span className="font-display font-bold text-lg">AutoPost</span>
             </div>
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-muted-foreground">3/3 posts restantes esta semana</span>
-              <Button variant="gradient" size="sm">
-                <Plus className="w-4 h-4 mr-1" />
-                Upgrade
+            
+            {/* Desktop Title */}
+            <div className="hidden lg:block">
+              <h1 className="font-display text-2xl font-bold">Criar Conteúdo</h1>
+              <p className="text-muted-foreground text-sm">Gere posts personalizados para suas redes sociais</p>
+            </div>
+            
+            {/* Actions */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs sm:text-sm text-muted-foreground hidden sm:block">3/3 restantes</span>
+              <Button variant="gradient" size="sm" className="h-8 px-3 text-xs sm:text-sm">
+                <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                <span className="hidden sm:inline">Upgrade</span>
+                <span className="sm:hidden">Pro</span>
               </Button>
             </div>
           </div>
         </header>
 
         {/* Content */}
-        <div className="p-6">
-          <div className="grid lg:grid-cols-2 gap-8 max-w-6xl">
-            {/* Form */}
-            <div className="space-y-6">
-              <div className="bg-card rounded-2xl border border-border p-6 shadow-card">
-                <h2 className="font-display font-semibold text-lg mb-6">Configurações do Post</h2>
-                
-                <div className="space-y-5">
-                  {/* Business Type */}
-                  <div className="space-y-2">
-                    <Label>Tipo de Negócio *</Label>
-                    <Select value={businessType} onValueChange={setBusinessType}>
-                      <SelectTrigger className="h-12">
-                        <SelectValue placeholder="Selecione seu tipo de negócio" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {businessTypes.map((type) => (
-                          <SelectItem key={type} value={type.toLowerCase()}>
-                            {type}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Audience */}
-                  <div className="space-y-2">
-                    <Label>Público-alvo</Label>
-                    <Input
-                      placeholder="Ex: Donos de cães, Jovens 18-25 anos"
-                      className="h-12"
-                      value={audience}
-                      onChange={(e) => setAudience(e.target.value)}
-                    />
-                  </div>
-
-                  {/* Followers */}
-                  <div className="space-y-2">
-                    <Label>Quantidade de Seguidores</Label>
-                    <Input
-                      placeholder="Ex: 3000"
-                      type="number"
-                      className="h-12"
-                      value={followers}
-                      onChange={(e) => setFollowers(e.target.value)}
-                    />
-                  </div>
-
-                  {/* Tone */}
-                  <div className="space-y-2">
-                    <Label>Tom de Voz *</Label>
-                    <Select value={tone} onValueChange={setTone}>
-                      <SelectTrigger className="h-12">
-                        <SelectValue placeholder="Selecione o tom" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {tones.map((t) => (
-                          <SelectItem key={t.value} value={t.value}>
-                            {t.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Content Type */}
-                  <div className="space-y-2">
-                    <Label>Tipo de Conteúdo *</Label>
-                    <Select value={contentType} onValueChange={setContentType}>
-                      <SelectTrigger className="h-12">
-                        <SelectValue placeholder="Selecione o tipo" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {contentTypes.map((ct) => (
-                          <SelectItem key={ct.value} value={ct.value}>
-                            {ct.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Platform */}
-                  <div className="space-y-2">
-                    <Label>Plataforma *</Label>
-                    <Select value={platform} onValueChange={setPlatform}>
-                      <SelectTrigger className="h-12">
-                        <SelectValue placeholder="Selecione a rede social" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {platforms.map((p) => (
-                          <SelectItem key={p.value} value={p.value}>
-                            <div className="flex items-center gap-2">
-                              <p.icon className="w-4 h-4" />
-                              {p.label}
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Topic */}
-                  <div className="space-y-2">
-                    <Label>Tema ou Assunto (opcional)</Label>
-                    <Textarea
-                      placeholder="Ex: Promoção de banho e tosa no mês dos pets"
-                      className="min-h-[100px] resize-none"
-                      value={topic}
-                      onChange={(e) => setTopic(e.target.value)}
-                    />
-                  </div>
+        <div className="p-4 lg:p-6">
+          <div className="grid lg:grid-cols-2 gap-4 lg:gap-8 max-w-6xl mx-auto">
+            {/* Form - Collapsible on mobile when content exists */}
+            <motion.div 
+              layout
+              className={cn(
+                "space-y-4",
+                generatedContent && "order-2 lg:order-1"
+              )}
+            >
+              <div className="bg-card rounded-2xl border border-border p-4 lg:p-6 shadow-card">
+                {/* Mobile: Collapse form when content is generated */}
+                <div 
+                  className="flex items-center justify-between cursor-pointer lg:cursor-default"
+                  onClick={() => generatedContent && setShowAdvanced(!showAdvanced)}
+                >
+                  <h2 className="font-display font-semibold text-base lg:text-lg">
+                    Configurações
+                  </h2>
+                  {generatedContent && (
+                    <Button variant="ghost" size="sm" className="lg:hidden">
+                      {showAdvanced ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    </Button>
+                  )}
                 </div>
+                
+                <AnimatePresence initial={false}>
+                  {(!generatedContent || showAdvanced || window.innerWidth >= 1024) && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="space-y-4 pt-4">
+                        {/* Platform Selection - Prominent */}
+                        <div className="grid grid-cols-4 gap-2">
+                          {platforms.map((p) => (
+                            <button
+                              key={p.value}
+                              onClick={() => setPlatform(p.value)}
+                              className={cn(
+                                "flex flex-col items-center gap-1 p-3 rounded-xl border-2 transition-all",
+                                platform === p.value 
+                                  ? "border-primary bg-primary/10 text-primary" 
+                                  : "border-border bg-secondary/30 text-muted-foreground hover:border-primary/50"
+                              )}
+                            >
+                              <p.icon className="w-5 h-5" />
+                              <span className="text-[10px] font-medium">{p.label.split('/')[0]}</span>
+                            </button>
+                          ))}
+                        </div>
+
+                        {/* Business Type */}
+                        <div className="space-y-1.5">
+                          <Label className="text-sm">Tipo de Negócio *</Label>
+                          <Select value={businessType} onValueChange={setBusinessType}>
+                            <SelectTrigger className="h-11">
+                              <SelectValue placeholder="Selecione" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {businessTypes.map((type) => (
+                                <SelectItem key={type} value={type.toLowerCase()}>
+                                  {type}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {/* Tone & Content Type in grid */}
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="space-y-1.5">
+                            <Label className="text-sm">Tom *</Label>
+                            <Select value={tone} onValueChange={setTone}>
+                              <SelectTrigger className="h-11">
+                                <SelectValue placeholder="Tom" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {tones.map((t) => (
+                                  <SelectItem key={t.value} value={t.value}>
+                                    {t.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <Label className="text-sm">Tipo *</Label>
+                            <Select value={contentType} onValueChange={setContentType}>
+                              <SelectTrigger className="h-11">
+                                <SelectValue placeholder="Tipo" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {contentTypes.map((ct) => (
+                                  <SelectItem key={ct.value} value={ct.value}>
+                                    {ct.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+
+                        {/* Topic */}
+                        <div className="space-y-1.5">
+                          <Label className="text-sm">Tema (opcional)</Label>
+                          <Textarea
+                            placeholder="Ex: Promoção de verão"
+                            className="min-h-[80px] resize-none"
+                            value={topic}
+                            onChange={(e) => setTopic(e.target.value)}
+                          />
+                        </div>
+
+                        {/* Advanced Options Toggle */}
+                        <button
+                          onClick={() => setShowAdvanced(!showAdvanced)}
+                          className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          {showAdvanced ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                          Opções avançadas
+                        </button>
+
+                        <AnimatePresence>
+                          {showAdvanced && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: "auto", opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              className="space-y-4 overflow-hidden"
+                            >
+                              <div className="space-y-1.5">
+                                <Label className="text-sm">Público-alvo</Label>
+                                <Input
+                                  placeholder="Ex: Jovens 18-25 anos"
+                                  className="h-11"
+                                  value={audience}
+                                  onChange={(e) => setAudience(e.target.value)}
+                                />
+                              </div>
+                              <div className="space-y-1.5">
+                                <Label className="text-sm">Seguidores</Label>
+                                <Input
+                                  placeholder="Ex: 3000"
+                                  type="number"
+                                  className="h-11"
+                                  value={followers}
+                                  onChange={(e) => setFollowers(e.target.value)}
+                                />
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
                 <Button 
                   variant="hero" 
                   size="lg" 
-                  className="w-full mt-6"
+                  className="w-full mt-4"
                   onClick={handleGenerate}
                   disabled={isGenerating}
                 >
@@ -392,105 +497,81 @@ const Dashboard = () => {
                   ) : (
                     <>
                       <Sparkles className="w-5 h-5 mr-2" />
-                      Gerar Conteúdo
+                      {generatedContent ? "Regenerar" : "Gerar Conteúdo"}
                     </>
                   )}
                 </Button>
               </div>
-            </div>
+            </motion.div>
 
             {/* Result */}
-            <div className="space-y-6">
-              <div className="bg-card rounded-2xl border border-border p-6 shadow-card min-h-[600px] flex flex-col">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="font-display font-semibold text-lg">Resultado</h2>
-                  {generatedContent && (
-                    <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm" onClick={handleRegenerate} disabled={isGenerating}>
-                        <RefreshCw className="w-4 h-4 mr-1" />
-                        Regenerar
+            <motion.div 
+              layout
+              className={cn(
+                "space-y-4",
+                generatedContent && "order-1 lg:order-2"
+              )}
+            >
+              <div className="bg-card rounded-2xl border border-border p-4 lg:p-6 shadow-card min-h-[400px] lg:min-h-[600px] flex flex-col">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="font-display font-semibold text-base lg:text-lg">Resultado</h2>
+                  {generatedContent && !isGenerating && (
+                    <div className="flex items-center gap-1">
+                      <Button variant="ghost" size="sm" onClick={handleRegenerate} disabled={isGenerating} className="h-8 px-2">
+                        <RefreshCw className="w-4 h-4" />
                       </Button>
-                      <Button variant="gradient" size="sm" onClick={handleCopy}>
+                      <Button variant="gradient" size="sm" onClick={handleCopy} className="h-8 px-3">
                         <Copy className="w-4 h-4 mr-1" />
-                        Copiar
+                        <span className="hidden sm:inline">Copiar</span>
                       </Button>
                     </div>
                   )}
                 </div>
 
                 {isGenerating ? (
-                  <div className="flex-1 flex flex-col items-center justify-center text-center">
-                    <div className="relative w-24 h-24 mb-6">
-                      {/* Outer spinning ring */}
-                      <div className="absolute inset-0 rounded-full border-4 border-primary/20" />
-                      <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-primary animate-spin" />
-                      {/* Inner pulsing icon */}
-                      <div className="absolute inset-3 rounded-full gradient-primary flex items-center justify-center animate-pulse">
-                        <Sparkles className="w-8 h-8 text-primary-foreground" />
-                      </div>
-                    </div>
-                    <h3 className="font-display font-semibold text-lg mb-2">Gerando seu conteúdo...</h3>
-                    <p className="text-muted-foreground max-w-xs mb-6">
-                      Nossa IA está criando um post incrível para você
-                    </p>
-                    {/* Animated dots */}
-                    <div className="flex gap-2">
-                      <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }} />
-                    </div>
-                  </div>
+                  <LoadingState />
                 ) : generatedContent ? (
-                  <div className="flex-1 animate-fade-in">
-                    {/* Platform Preview */}
-                    <div className="bg-secondary/50 rounded-xl p-4 mb-4">
-                      <div className="flex items-center gap-2 mb-3">
-                        {platform === "instagram" && <Instagram className="w-5 h-5 text-pink-500" />}
-                        {platform === "facebook" && <Facebook className="w-5 h-5 text-blue-600" />}
-                        {platform === "linkedin" && <Linkedin className="w-5 h-5 text-blue-700" />}
-                        {platform === "twitter" && <Twitter className="w-5 h-5" />}
-                        <span className="font-medium capitalize">{platform}</span>
-                      </div>
-                      <div className="bg-card rounded-lg p-4 border border-border">
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className="w-10 h-10 rounded-full gradient-primary" />
-                          <div>
-                            <p className="font-medium">Seu Negócio</p>
-                            <p className="text-xs text-muted-foreground">Agora</p>
-                          </div>
-                        </div>
-                        <div className="whitespace-pre-wrap text-sm">
-                          {generatedContent}
-                        </div>
-                      </div>
-                    </div>
+                  <div className="flex-1 flex flex-col gap-4 animate-fade-in">
+                    {/* Content Preview */}
+                    <ContentPreview
+                      content={generatedContent}
+                      platform={platform}
+                      isEditable
+                      onContentChange={handleContentChange}
+                      onCopy={handleCopy}
+                      onRegenerate={handleRegenerate}
+                    />
 
-                    {/* Actions */}
-                    <div className="flex gap-3">
-                      <Button variant="outline" className="flex-1">
+                    {/* Editing Toolbar */}
+                    <EditingToolbar
+                      onAddHashtags={handleAddHashtags}
+                      onAddEmojis={handleAddEmojis}
+                      onShorten={handleShorten}
+                      onExpand={handleExpand}
+                      onReset={handleReset}
+                    />
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-3 mt-auto pt-4">
+                      <Button variant="outline" className="flex-1 h-12">
                         Agendar
                       </Button>
-                      <Button variant="gradient" className="flex-1">
+                      <Button variant="gradient" className="flex-1 h-12">
                         Publicar Agora
                       </Button>
                     </div>
                   </div>
                 ) : (
-                  <div className="flex-1 flex flex-col items-center justify-center text-center">
-                    <div className="w-20 h-20 rounded-2xl bg-secondary flex items-center justify-center mb-4">
-                      <Sparkles className="w-10 h-10 text-muted-foreground" />
-                    </div>
-                    <h3 className="font-display font-semibold text-lg mb-2">Nenhum conteúdo gerado</h3>
-                    <p className="text-muted-foreground max-w-xs">
-                      Preencha as configurações ao lado e clique em "Gerar Conteúdo" para começar.
-                    </p>
-                  </div>
+                  <EmptyState />
                 )}
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </main>
+
+      {/* Mobile Navigation */}
+      <MobileNav />
     </div>
   );
 };
