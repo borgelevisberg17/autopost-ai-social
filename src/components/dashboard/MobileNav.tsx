@@ -6,7 +6,7 @@ const navItems = [
   { icon: Home, label: "Home", href: "/dashboard" },
   { icon: Calendar, label: "Agenda", href: "/history" },
   { icon: PenTool, label: "Criar", href: "/dashboard", isMain: true },
-  { icon: BarChart3, label: "Analytics", href: "/dashboard" },
+  { icon: BarChart3, label: "Analytics", href: "/analytics" },
   { icon: Settings, label: "Config", href: "/settings" },
 ];
 
