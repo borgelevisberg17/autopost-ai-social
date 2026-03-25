@@ -12,6 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import ContentHistory from "./pages/ContentHistory";
 import BusinessSettings from "./pages/BusinessSettings";
 import Analytics from "./pages/Analytics";
+import Schedule from "./pages/Schedule";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -48,6 +49,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Analytics />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/schedule" 
+              element={
+                <ProtectedRoute>
+                  <Schedule />
                 </ProtectedRoute>
               } 
             />
