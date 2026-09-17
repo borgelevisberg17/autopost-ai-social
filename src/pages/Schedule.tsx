@@ -50,6 +50,8 @@ interface ScheduledItem {
   status: string | null;
   created_at: string;
   scheduled_at: string | null;
+  published_at?: string | null;
+  publish_error?: string | null;
 }
 
 const platformConfig: Record<string, { icon: React.ReactNode; color: string; bg: string }> = {
@@ -324,11 +326,24 @@ const Schedule = () => {
                                   </p>
                                 </div>
                               </div>
-                              <Badge variant="outline" className="text-[10px] capitalize">
-                                {item.content_type}
-                              </Badge>
+                              <div className="flex items-center gap-1.5">
+                                {item.status === "published" && (
+                                  <Badge className="text-[10px] bg-emerald-500/15 text-emerald-500 border-emerald-500/30">
+                                    Publicado
+                                  </Badge>
+                                )}
+                                {item.status === "failed" && (
+                                  <Badge variant="destructive" className="text-[10px]">Falhou</Badge>
+                                )}
+                                <Badge variant="outline" className="text-[10px] capitalize">
+                                  {item.content_type}
+                                </Badge>
+                              </div>
                             </div>
                             <p className="text-sm line-clamp-3">{item.generated_content}</p>
+                            {item.publish_error && (
+                              <p className="text-[10px] text-destructive line-clamp-2">{item.publish_error}</p>
+                            )}
                             <div className="flex gap-1.5">
                               <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => handleCopy(item.generated_content)}>
                                 <Copy className="h-3 w-3 mr-1" /> Copiar
