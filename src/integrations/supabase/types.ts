@@ -17,6 +17,7 @@ export type Database = {
       business_settings: {
         Row: {
           auto_hashtags: boolean | null
+          auto_publish: boolean
           brand_voice: string | null
           business_name: string | null
           business_type: string | null
@@ -42,6 +43,7 @@ export type Database = {
         }
         Insert: {
           auto_hashtags?: boolean | null
+          auto_publish?: boolean
           brand_voice?: string | null
           business_name?: string | null
           business_type?: string | null
@@ -67,6 +69,7 @@ export type Database = {
         }
         Update: {
           auto_hashtags?: boolean | null
+          auto_publish?: boolean
           brand_voice?: string | null
           business_name?: string | null
           business_type?: string | null
@@ -96,9 +99,12 @@ export type Database = {
         Row: {
           content_type: string
           created_at: string
+          external_post_id: string | null
           generated_content: string
           id: string
           platform: string
+          publish_attempts: number
+          publish_error: string | null
           published_at: string | null
           scheduled_at: string | null
           status: string | null
@@ -108,9 +114,12 @@ export type Database = {
         Insert: {
           content_type: string
           created_at?: string
+          external_post_id?: string | null
           generated_content: string
           id?: string
           platform: string
+          publish_attempts?: number
+          publish_error?: string | null
           published_at?: string | null
           scheduled_at?: string | null
           status?: string | null
@@ -120,9 +129,12 @@ export type Database = {
         Update: {
           content_type?: string
           created_at?: string
+          external_post_id?: string | null
           generated_content?: string
           id?: string
           platform?: string
+          publish_attempts?: number
+          publish_error?: string | null
           published_at?: string | null
           scheduled_at?: string | null
           status?: string | null
