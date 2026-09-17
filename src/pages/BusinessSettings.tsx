@@ -66,6 +66,7 @@ const BusinessSettings = () => {
     auto_hashtags: true,
     include_emojis: true,
     include_cta: true,
+    auto_publish: false,
   });
 
   useEffect(() => {
@@ -102,6 +103,7 @@ const BusinessSettings = () => {
           auto_hashtags: (settingsData.auto_hashtags as boolean) ?? true,
           include_emojis: (settingsData.include_emojis as boolean) ?? true,
           include_cta: (settingsData.include_cta as boolean) ?? true,
+          auto_publish: (settingsData.auto_publish as boolean) ?? false,
         }));
       }
     } catch (error) {
@@ -130,6 +132,7 @@ const BusinessSettings = () => {
         auto_hashtags: settings.auto_hashtags,
         include_emojis: settings.include_emojis,
         include_cta: settings.include_cta,
+        auto_publish: settings.auto_publish,
         updated_at: new Date().toISOString(),
       } as Record<string, unknown>;
 
@@ -404,6 +407,18 @@ const BusinessSettings = () => {
                 <Switch
                   checked={settings.include_cta}
                   onCheckedChange={(checked) => setSettings(prev => ({ ...prev, include_cta: checked }))}
+                />
+              </div>
+              <div className="flex items-center justify-between border-t border-border pt-4">
+                <div className="space-y-0.5">
+                  <Label>Publicação Automática</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Publicar seus posts agendados sozinho, no horário marcado (X e LinkedIn)
+                  </p>
+                </div>
+                <Switch
+                  checked={settings.auto_publish}
+                  onCheckedChange={(checked) => setSettings(prev => ({ ...prev, auto_publish: checked }))}
                 />
               </div>
             </CardContent>
