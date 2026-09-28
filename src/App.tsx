@@ -4,18 +4,23 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
+import { CompanyProvider } from "@/hooks/useCompany";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import Dashboard from "./pages/Dashboard";
-import ContentHistory from "./pages/ContentHistory";
-import BusinessSettings from "./pages/BusinessSettings";
-import Analytics from "./pages/Analytics";
-import Schedule from "./pages/Schedule";
+import Onboarding from "./pages/Onboarding";
+import Overview from "./pages/admin/Overview";
+import Products from "./pages/admin/Products";
+import Orders from "./pages/admin/Orders";
+import Agents from "./pages/admin/Agents";
+import CompanySettings from "./pages/admin/CompanySettings";
+import Store from "./pages/store/Store";
+import OrderStatus from "./pages/store/OrderStatus";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
+const P = ({ children }: { children: React.ReactNode }) => <ProtectedRoute>{children}</ProtectedRoute>;
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -24,53 +29,22 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route 
-              path="/dashboard" 
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/history" 
-              element={
-                <ProtectedRoute>
-                  <ContentHistory />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/analytics" 
-              element={
-                <ProtectedRoute>
-                  <Analytics />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/schedule" 
-              element={
-                <ProtectedRoute>
-                  <Schedule />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/settings" 
-              element={
-                <ProtectedRoute>
-                  <BusinessSettings />
-                </ProtectedRoute>
-              } 
-            />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <CompanyProvider>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/loja/:slug" element={<Store />} />
+              <Route path="/loja/:slug/pedido/:id" element={<OrderStatus />} />
+              <Route path="/onboarding" element={<P><Onboarding /></P>} />
+              <Route path="/dashboard" element={<P><Overview /></P>} />
+              <Route path="/admin/produtos" element={<P><Products /></P>} />
+              <Route path="/admin/pedidos" element={<P><Orders /></P>} />
+              <Route path="/admin/agentes" element={<P><Agents /></P>} />
+              <Route path="/admin/config" element={<P><CompanySettings /></P>} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </CompanyProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
