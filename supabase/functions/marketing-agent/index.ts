@@ -55,22 +55,45 @@ Deno.serve(async (req) => {
       stock: product.stock,
     };
     const system = `És o agente de marketing de uma loja. Usa APENAS os dados fornecidos; nunca inventes preços, stock, tamanhos ou características. Escreve em português. Cria um texto diferente e adaptado a cada rede: Instagram (visual, emojis, hashtags, até 150 palavras), Facebook (mais descritivo, até 120 palavras), WhatsApp (curto, direto, convite a responder para encomendar, sem hashtags). Mostra preços com a moeda indicada. Responde só com JSON: {"instagram": "...", "facebook": "...", "whatsapp": "..."} contendo apenas as redes pedidas.`;
-    const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const resp = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
       method: "POST",
-      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+      headers: { "Lovable-API-Key": key, "X-Lovable-AIG-SDK": "fetch", "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [{ role: "system", content: system }, { role: "user", content: `Redes pedidas: ${platforms.join(", ")}\nDados: ${JSON.stringify(facts)}` }],
+        model: "openai/gpt-6-astra",
+        stream: true,
+        store: false,
+        reasoning: { effort: "low" },
+        instructions: system,
+        input: `Redes pedidas: ${platforms.join(", ")}\nDados: ${JSON.stringify(facts)}`,
       }),
     });
-    if (!resp.ok) {
+    if (!resp.ok || !resp.body) {
       const status = resp.status;
       console.error("AI error", status, await resp.text());
-      const msg = status === 429 ? "Muitos pedidos, tente daqui a pouco." : status === 402 ? "Créditos de IA esgotados." : "Falha na IA";
+      const msg = status === 429 ? "Muitos pedidos, tente daqui a pouco." : status === 402 ? "Créditos de IA esgotados." : status === 403 ? "Acesso à IA bloqueado." : "Falha na IA";
       await log(platforms.map((p) => ({ action: "CREATE_POST", platform: p, status: "FAILED", reason: msg })));
-      return json({ error: msg }, status === 429 || status === 402 ? status : 500);
+      return json({ error: msg }, [402, 403, 429].includes(status) ? status : 500);
     }
-    const text: string = (await resp.json()).choices?.[0]?.message?.content ?? "";
+    // Consume the SSE stream and collect the output text.
+    let text = "";
+    const reader = resp.body.pipeThrough(new TextDecoderStream()).getReader();
+    let buf = "";
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buf += value;
+      const lines = buf.split("\n");
+      buf = lines.pop() ?? "";
+      for (const line of lines) {
+        if (!line.startsWith("data:")) continue;
+        const data = line.slice(5).trim();
+        if (!data || data === "[DONE]") continue;
+        try {
+          const ev = JSON.parse(data);
+          if (ev.type === "response.output_text.delta") text += ev.delta ?? "";
+        } catch { /* ignore partial */ }
+      }
+    }
     const match = text.match(/\{[\s\S]*\}/);
     let posts: Record<string, string> = {};
     try { posts = JSON.parse(match?.[0] ?? "{}"); } catch { /* handled below */ }
