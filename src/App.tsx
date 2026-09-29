@@ -16,8 +16,12 @@ import Onboarding from "./pages/Onboarding";
 
 import Overview from "./pages/admin/Overview";
 import Products from "./pages/admin/Products";
+import Inventory from "./pages/admin/Inventory";
 import Orders from "./pages/admin/Orders";
+import Customers from "./pages/admin/Customers";
 import Agents from "./pages/admin/Agents";
+import Approvals from "./pages/admin/Approvals";
+import Analytics from "./pages/admin/Analytics";
 import CompanySettings from "./pages/admin/CompanySettings";
 
 import Store from "./pages/store/Store";
@@ -91,6 +95,15 @@ const App = () => (
               />
 
               <Route
+                path="/admin/inventario"
+                element={
+                  <P>
+                    <Inventory />
+                  </P>
+                }
+              />
+
+              <Route
                 path="/admin/pedidos"
                 element={
                   <P>
@@ -100,10 +113,37 @@ const App = () => (
               />
 
               <Route
+                path="/admin/clientes"
+                element={
+                  <P>
+                    <Customers />
+                  </P>
+                }
+              />
+
+              <Route
                 path="/admin/agentes"
                 element={
                   <P>
                     <Agents />
+                  </P>
+                }
+              />
+
+              <Route
+                path="/admin/aprovacoes"
+                element={
+                  <P>
+                    <Approvals />
+                  </P>
+                }
+              />
+
+              <Route
+                path="/admin/analytics"
+                element={
+                  <P>
+                    <Analytics />
                   </P>
                 }
               />

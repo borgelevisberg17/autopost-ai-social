@@ -29,6 +29,14 @@ type OrderItem = {
   unit_price: number;
 };
 
+type OrderEvent = {
+  id: string;
+  type: string;
+  actor_type: string;
+  description: string;
+  created_at: string;
+};
+
 type Order = {
   id: string;
   customer_name: string;
@@ -37,12 +45,28 @@ type Order = {
   notes: string | null;
   channel: string;
   status: string;
+  payment_status: string;
+  fulfillment_status: string;
   total: number;
   created_at: string;
   order_items: OrderItem[];
 };
 
 type Filter = "all" | string;
+
+const PAYMENT_STATUS: Record<string, string> = {
+  pending: "Pendente",
+  paid: "Pago",
+  failed: "Falhou",
+  refunded: "Reembolsado",
+};
+
+const FULFILLMENT_STATUS: Record<string, string> = {
+  unfulfilled: "Não enviado",
+  preparing: "Em preparação",
+  shipped: "Enviado",
+  delivered: "Entregue",
+};
 
 function formatOrderId(id: string) {
   return `#${id.slice(0, 8).toUpperCase()}`;
@@ -139,8 +163,8 @@ export default function Orders() {
   const [search, setSearch] = useState("");
   const [channelFilter, setChannelFilter] = useState("all");
 
-  const [selectedOrder, setSelectedOrder] =
-    useState<Order | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [selectedOrderEvents, setSelectedOrderEvents] = useState<OrderEvent[]>([]);
 
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
@@ -156,7 +180,7 @@ export default function Orders() {
     const { data, error } = await supabase
       .from("orders")
       .select(
-        "id,customer_name,customer_phone,customer_email,notes,channel,status,total,created_at,order_items(product_name,quantity,unit_price)",
+        "id,customer_name,customer_phone,customer_email,notes,channel,status,payment_status,fulfillment_status,total,created_at,order_items(product_name,quantity,unit_price)",
       )
       .eq("company_id", company.id)
       .order("created_at", { ascending: false })
@@ -175,6 +199,23 @@ export default function Orders() {
   useEffect(() => {
     load();
   }, [company]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Load persistent order_events when selecting an order
+  useEffect(() => {
+    if (!selectedOrder || !company) return;
+
+    async function loadEvents() {
+      const { data } = await supabase
+        .from("order_events")
+        .select("id, type, actor_type, description, created_at")
+        .eq("order_id", selectedOrder.id)
+        .order("created_at", { ascending: true });
+
+      setSelectedOrderEvents((data as OrderEvent[]) ?? []);
+    }
+
+    loadEvents();
+  }, [selectedOrder, company]);
 
   const stats = useMemo(() => {
     return {
@@ -249,19 +290,18 @@ export default function Orders() {
     [orders, selectedIds],
   );
 
-  async function setStatus(order: Order, status: string) {
-    if (order.status === "cancelled") {
+  async function setStatus(
+    order: Order,
+    updates: { status?: string; payment_status?: string; fulfillment_status?: string }
+  ) {
+    if (order.status === "cancelled" && updates.status && updates.status !== "cancelled") {
       toast.error("Pedido cancelado não pode ser reaberto.");
       return;
     }
 
-    if (status === order.status) return;
-
     if (
-      status === "cancelled" &&
-      !window.confirm(
-        "Cancelar este pedido? O stock será reposto.",
-      )
+      updates.status === "cancelled" &&
+      !window.confirm("Cancelar este pedido? O stock será reposto.")
     ) {
       return;
     }
@@ -270,7 +310,7 @@ export default function Orders() {
 
     const { error } = await supabase
       .from("orders")
-      .update({ status })
+      .update(updates)
       .eq("id", order.id);
 
     if (error) {
@@ -279,25 +319,37 @@ export default function Orders() {
       return;
     }
 
+    // Log persistent order event
+    if (company) {
+      const desc = updates.status
+        ? `Estado do pedido alterado para ${ORDER_STATUS[updates.status] ?? updates.status}`
+        : updates.payment_status
+        ? `Estado do pagamento alterado para ${PAYMENT_STATUS[updates.payment_status] ?? updates.payment_status}`
+        : `Envio alterado para ${FULFILLMENT_STATUS[updates.fulfillment_status ?? ""] ?? updates.fulfillment_status}`;
+
+      await supabase.from("order_events").insert({
+        company_id: company.id,
+        order_id: order.id,
+        type: "order.updated",
+        actor_type: "user",
+        description: desc,
+      });
+    }
+
     const updated = {
       ...order,
-      status,
+      ...updates,
     };
 
     setOrders((current) =>
-      current.map((item) =>
-        item.id === order.id ? updated : item,
-      ),
+      current.map((item) => (item.id === order.id ? updated : item)),
     );
 
     setSelectedOrder((current) =>
       current?.id === order.id ? updated : current,
     );
 
-    toast.success(
-      `Pedido ${formatOrderId(order.id)} atualizado.`,
-    );
-
+    toast.success(`Pedido ${formatOrderId(order.id)} atualizado.`);
     setUpdating(false);
   }
 
@@ -418,6 +470,8 @@ export default function Orders() {
       "Total",
       "Canal",
       "Estado",
+      "Pagamento",
+      "Envio",
       "Data",
     ];
 
@@ -433,6 +487,8 @@ export default function Orders() {
       Number(order.total).toFixed(2),
       channelLabel(order.channel),
       ORDER_STATUS[order.status] ?? order.status,
+      PAYMENT_STATUS[order.payment_status] ?? order.payment_status,
+      FULFILLMENT_STATUS[order.fulfillment_status] ?? order.fulfillment_status,
       new Date(order.created_at).toISOString(),
     ]);
 
@@ -488,8 +544,7 @@ export default function Orders() {
             </h2>
 
             <p className="mt-2 text-sm leading-6 text-neutral-500">
-              Gerencie pedidos, clientes e o processamento das
-              vendas.
+              Gerencie pedidos, clientes, pagamentos e o envio das vendas.
             </p>
           </div>
 
@@ -714,7 +769,7 @@ export default function Orders() {
             <div className="hidden overflow-hidden border-y border-neutral-200 lg:block">
               <table className="w-full border-collapse text-left">
                 <thead>
-                  <tr className="border-b border-neutral-200">
+                  <tr className="border-b border-neutral-200 bg-neutral-50/50">
                     <th className="w-10 px-4 py-3">
                       <input
                         type="checkbox"
@@ -727,7 +782,8 @@ export default function Orders() {
 
                     <TableHead>Pedido</TableHead>
                     <TableHead>Cliente</TableHead>
-                    <TableHead>Itens</TableHead>
+                    <TableHead>Pagamento</TableHead>
+                    <TableHead>Envio</TableHead>
                     <TableHead>Canal</TableHead>
                     <TableHead>Data</TableHead>
                     <TableHead>Estado</TableHead>
@@ -742,13 +798,6 @@ export default function Orders() {
 
                 <tbody>
                   {filteredOrders.map((order) => {
-                    const itemCount =
-                      order.order_items?.reduce(
-                        (sum, item) =>
-                          sum + Number(item.quantity),
-                        0,
-                      ) ?? 0;
-
                     const selected = selectedIds.includes(
                       order.id,
                     );
@@ -787,7 +836,7 @@ export default function Orders() {
                           </span>
                         </td>
 
-                        <td className="max-w-[220px] px-4 py-4">
+                        <td className="max-w-[200px] px-4 py-4">
                           <p className="truncate text-sm font-medium">
                             {order.customer_name}
                           </p>
@@ -799,11 +848,16 @@ export default function Orders() {
                           </p>
                         </td>
 
-                        <td className="px-4 py-4 text-sm text-neutral-500">
-                          {itemCount}{" "}
-                          {itemCount === 1
-                            ? "item"
-                            : "itens"}
+                        <td className="px-4 py-4 text-xs font-medium text-neutral-700">
+                          <span className="inline-flex rounded-full bg-neutral-100 px-2 py-0.5 text-[10px]">
+                            {PAYMENT_STATUS[order.payment_status] ?? order.payment_status}
+                          </span>
+                        </td>
+
+                        <td className="px-4 py-4 text-xs font-medium text-neutral-700">
+                          <span className="inline-flex rounded-full bg-neutral-100 px-2 py-0.5 text-[10px]">
+                            {FULFILLMENT_STATUS[order.fulfillment_status] ?? order.fulfillment_status}
+                          </span>
                         </td>
 
                         <td className="px-4 py-4 text-sm text-neutral-500">
@@ -842,13 +896,6 @@ export default function Orders() {
             {/* MOBILE */}
             <div className="divide-y divide-neutral-200 border-y border-neutral-200 lg:hidden">
               {filteredOrders.map((order) => {
-                const itemCount =
-                  order.order_items?.reduce(
-                    (sum, item) =>
-                      sum + Number(item.quantity),
-                    0,
-                  ) ?? 0;
-
                 const selected = selectedIds.includes(
                   order.id,
                 );
@@ -911,10 +958,7 @@ export default function Orders() {
                           />
 
                           <span className="text-[11px] text-neutral-400">
-                            {itemCount}{" "}
-                            {itemCount === 1
-                              ? "item"
-                              : "itens"}
+                            {PAYMENT_STATUS[order.payment_status] ?? order.payment_status}
                           </span>
 
                           <span className="text-[11px] text-neutral-300">
@@ -923,16 +967,6 @@ export default function Orders() {
 
                           <span className="text-[11px] text-neutral-400">
                             {channelLabel(order.channel)}
-                          </span>
-
-                          <span className="text-[11px] text-neutral-300">
-                            ·
-                          </span>
-
-                          <span className="text-[11px] text-neutral-400">
-                            {formatShortDate(
-                              order.created_at,
-                            )}
                           </span>
                         </div>
                       </div>
@@ -951,6 +985,7 @@ export default function Orders() {
       {selectedOrder && (
         <OrderDrawer
           order={selectedOrder}
+          events={selectedOrderEvents}
           currency={company.currency}
           updating={updating}
           onClose={() => setSelectedOrder(null)}
@@ -1059,6 +1094,7 @@ function StatusBadge({ status }: { status: string }) {
 
 function OrderDrawer({
   order,
+  events,
   currency,
   updating,
   onClose,
@@ -1066,12 +1102,13 @@ function OrderDrawer({
   onCopy,
 }: {
   order: Order;
+  events: OrderEvent[];
   currency?: string;
   updating: boolean;
   onClose: () => void;
   onStatusChange: (
     order: Order,
-    status: string,
+    updates: { status?: string; payment_status?: string; fulfillment_status?: string }
   ) => void;
   onCopy: (id: string) => void;
 }) {
@@ -1087,31 +1124,6 @@ function OrderDrawer({
     (sum, item) => sum + Number(item.quantity),
     0,
   );
-
-  const timeline = [
-    {
-      label: "Pedido recebido",
-      active: true,
-    },
-    {
-      label: "Pedido confirmado",
-      active: [
-        "confirmed",
-        "shipped",
-        "completed",
-      ].includes(order.status),
-    },
-    {
-      label: "Pedido enviado",
-      active: ["shipped", "completed"].includes(
-        order.status,
-      ),
-    },
-    {
-      label: "Pedido concluído",
-      active: order.status === "completed",
-    },
-  ];
 
   return (
     <div className="fixed inset-0 z-[70]">
@@ -1158,52 +1170,51 @@ function OrderDrawer({
 
         {/* CONTENT */}
         <div className="min-h-0 flex-1 overflow-y-auto">
-          {/* STATUS */}
-          <section className="border-b border-neutral-200 px-5 py-6 sm:px-7">
-            <SectionLabel>
-              Estado do pedido
-            </SectionLabel>
-
-            <div className="relative">
+          {/* STATUS BREAKDOWN */}
+          <section className="border-b border-neutral-200 px-5 py-6 sm:px-7 space-y-4">
+            <div>
+              <SectionLabel>Estado do Pedido</SectionLabel>
               <select
                 value={order.status}
-                disabled={
-                  updating ||
-                  order.status === "cancelled"
-                }
-                onChange={(event) =>
-                  onStatusChange(
-                    order,
-                    event.target.value,
-                  )
-                }
-                className={cn(
-                  "h-11 w-full appearance-none border px-3 pr-10 text-sm font-medium outline-none transition",
-                  statusTone(order.status),
-                  "focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900",
-                )}
+                disabled={updating || order.status === "cancelled"}
+                onChange={(e) => onStatusChange(order, { status: e.target.value })}
+                className="h-10 w-full border border-neutral-200 px-3 text-sm font-medium outline-none bg-white focus:border-black"
               >
-                {Object.entries(ORDER_STATUS).map(
-                  ([key, label]) => (
-                    <option
-                      key={key}
-                      value={key}
-                    >
-                      {label}
-                    </option>
-                  ),
-                )}
+                {Object.entries(ORDER_STATUS).map(([key, label]) => (
+                  <option key={key} value={key}>{label}</option>
+                ))}
               </select>
-
-              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 opacity-50" />
             </div>
 
-            {order.status === "cancelled" && (
-              <p className="mt-3 text-xs leading-5 text-neutral-400">
-                Pedidos cancelados não podem ser
-                reabertos.
-              </p>
-            )}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <SectionLabel>Pagamento</SectionLabel>
+                <select
+                  value={order.payment_status}
+                  disabled={updating}
+                  onChange={(e) => onStatusChange(order, { payment_status: e.target.value })}
+                  className="h-10 w-full border border-neutral-200 px-3 text-xs font-medium outline-none bg-white focus:border-black"
+                >
+                  {Object.entries(PAYMENT_STATUS).map(([key, label]) => (
+                    <option key={key} value={key}>{label}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <SectionLabel>Envio (Fulfillment)</SectionLabel>
+                <select
+                  value={order.fulfillment_status}
+                  disabled={updating}
+                  onChange={(e) => onStatusChange(order, { fulfillment_status: e.target.value })}
+                  className="h-10 w-full border border-neutral-200 px-3 text-xs font-medium outline-none bg-white focus:border-black"
+                >
+                  {Object.entries(FULFILLMENT_STATUS).map(([key, label]) => (
+                    <option key={key} value={key}>{label}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
           </section>
 
           {/* CUSTOMER */}
@@ -1315,38 +1326,26 @@ function OrderDrawer({
             </div>
           </section>
 
-          {/* NOTES */}
-          {order.notes && (
-            <section className="border-b border-neutral-200 px-5 py-6 sm:px-7">
-              <SectionLabel>
-                Observações
-              </SectionLabel>
-
-              <div className="border-l-2 border-neutral-200 pl-4">
-                <p className="text-sm leading-6 text-neutral-600">
-                  {order.notes}
-                </p>
-              </div>
-            </section>
-          )}
-
-          {/* TIMELINE */}
+          {/* TIMELINE / EVENTS */}
           <section className="px-5 py-6 sm:px-7">
-            <SectionLabel>
-              Processamento
-            </SectionLabel>
+            <SectionLabel>Order Timeline (Eventos)</SectionLabel>
 
-            <div className="mt-5">
-              {timeline.map((item, index) => (
-                <TimelineItem
-                  key={item.label}
-                  label={item.label}
-                  active={item.active}
-                  last={
-                    index === timeline.length - 1
-                  }
-                />
-              ))}
+            <div className="mt-4 space-y-4 border-l-2 border-neutral-200 pl-4 text-xs text-neutral-600">
+              {events.length === 0 ? (
+                <div>
+                  <p className="font-semibold text-neutral-900">Pedido criado</p>
+                  <p className="text-neutral-400">{formatDate(order.created_at)} via {channelLabel(order.channel)}</p>
+                </div>
+              ) : (
+                events.map((evt) => (
+                  <div key={evt.id}>
+                    <p className="font-semibold text-neutral-900">{evt.description}</p>
+                    <p className="text-[10px] text-neutral-400">
+                      {formatDate(evt.created_at)} · {evt.actor_type}
+                    </p>
+                  </div>
+                ))
+              )}
             </div>
           </section>
         </div>
@@ -1380,17 +1379,15 @@ function OrderDrawer({
                           ? "shipped"
                           : "completed";
 
-                    onStatusChange(order, next);
+                    onStatusChange(order, { status: next });
                   }}
                   className="inline-flex min-h-11 items-center gap-2 bg-black px-5 text-sm font-medium text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
                 >
                   {updating
                     ? "A atualizar..."
-                    : order.status ===
-                        "pending"
+                    : order.status === "pending"
                       ? "Confirmar pedido"
-                      : order.status ===
-                          "confirmed"
+                      : order.status === "confirmed"
                         ? "Marcar como enviado"
                         : "Concluir pedido"}
 
@@ -1415,53 +1412,6 @@ function SectionLabel({
     <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-neutral-400">
       {children}
     </p>
-  );
-}
-
-function TimelineItem({
-  label,
-  active,
-  last,
-}: {
-  label: string;
-  active: boolean;
-  last: boolean;
-}) {
-  return (
-    <div className="relative flex items-start gap-3 pb-5 last:pb-0">
-      <div
-        className={cn(
-          "relative z-10 grid h-5 w-5 shrink-0 place-items-center rounded-full border",
-          active
-            ? "border-black bg-black text-white"
-            : "border-neutral-200 bg-white text-transparent",
-        )}
-      >
-        <Check className="h-3 w-3" />
-      </div>
-
-      {!last && (
-        <div
-          className={cn(
-            "absolute left-[9px] top-5 h-full w-px",
-            active
-              ? "bg-neutral-300"
-              : "bg-neutral-200",
-          )}
-        />
-      )}
-
-      <p
-        className={cn(
-          "pt-0.5 text-sm",
-          active
-            ? "font-medium text-neutral-900"
-            : "text-neutral-400",
-        )}
-      >
-        {label}
-      </p>
-    </div>
   );
 }
 

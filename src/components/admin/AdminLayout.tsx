@@ -1,19 +1,25 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { Link, NavLink, Navigate } from "react-router-dom";
 import {
-  LayoutDashboard,
-  Package,
-  ShoppingBag,
+  BarChart3,
   Bot,
-  Settings,
-  Store,
-  LogOut,
-  Loader2,
+  Box,
+  CheckSquare,
   ExternalLink,
+  LayoutDashboard,
+  Loader2,
+  LogOut,
+  Package,
+  Search,
+  Settings,
+  ShoppingBag,
+  Store,
+  Users,
 } from "lucide-react";
 
-import { useCompany } from "@/hooks/useCompany";
+import { CommandPalette } from "@/components/admin/CommandPalette";
 import { useAuth } from "@/hooks/useAuth";
+import { useCompany } from "@/hooks/useCompany";
 import { cn } from "@/lib/utils";
 
 const navSections = [
@@ -31,9 +37,19 @@ const navSections = [
         label: "Produtos",
       },
       {
+        to: "/admin/inventario",
+        icon: Box,
+        label: "Inventário",
+      },
+      {
         to: "/admin/pedidos",
         icon: ShoppingBag,
         label: "Pedidos",
+      },
+      {
+        to: "/admin/clientes",
+        icon: Users,
+        label: "Clientes",
       },
     ],
   },
@@ -44,6 +60,21 @@ const navSections = [
         to: "/admin/agentes",
         icon: Bot,
         label: "Agentes",
+      },
+      {
+        to: "/admin/aprovacoes",
+        icon: CheckSquare,
+        label: "Aprovações",
+      },
+    ],
+  },
+  {
+    label: "Análise",
+    items: [
+      {
+        to: "/admin/analytics",
+        icon: BarChart3,
+        label: "Analytics",
       },
     ],
   },
@@ -76,9 +107,9 @@ const mobileNav = [
     label: "Pedidos",
   },
   {
-    to: "/admin/agentes",
-    icon: Bot,
-    label: "Agentes",
+    to: "/admin/clientes",
+    icon: Users,
+    label: "Clientes",
   },
   {
     to: "/admin/config",
@@ -99,6 +130,8 @@ export function AdminLayout({
   const { company, companies, loading, select } = useCompany();
   const { signOut } = useAuth();
 
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+
   if (loading) {
     return (
       <div className="grid min-h-screen place-items-center bg-white">
@@ -113,10 +146,16 @@ export function AdminLayout({
 
   return (
     <div className="min-h-screen bg-white text-neutral-950">
+      {/* COMMAND PALETTE */}
+      <CommandPalette
+        open={commandPaletteOpen}
+        onClose={() => setCommandPaletteOpen(false)}
+      />
+
       {/* SIDEBAR */}
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-[240px] border-r border-neutral-200 bg-white lg:flex lg:flex-col">
         {/* BRAND */}
-        <div className="px-6 pb-7 pt-7">
+        <div className="px-6 pb-5 pt-6">
           <Link
             to="/dashboard"
             className="inline-flex items-center gap-3 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-4"
@@ -131,10 +170,24 @@ export function AdminLayout({
           </Link>
         </div>
 
-        {/* STORE */}
-        <div className="px-4">
-          <div className="border-b border-neutral-200 pb-5">
-            <p className="mb-2 px-2 text-[10px] font-medium uppercase tracking-[0.16em] text-neutral-400">
+        {/* STORE & COMMAND PALETTE BUTTON */}
+        <div className="px-4 space-y-2">
+          <button
+            type="button"
+            onClick={() => setCommandPaletteOpen(true)}
+            className="flex h-9 w-full items-center justify-between rounded-sm border border-neutral-200 bg-neutral-50 px-3 text-xs font-medium text-neutral-500 transition hover:bg-neutral-100 hover:text-black"
+          >
+            <span className="flex items-center gap-2">
+              <Search className="h-3.5 w-3.5 text-neutral-400" />
+              <span>Pesquisar...</span>
+            </span>
+            <kbd className="rounded border border-neutral-200 bg-white px-1.5 py-0.5 font-mono text-[10px] text-neutral-400">
+              ⌘K
+            </kbd>
+          </button>
+
+          <div className="border-b border-neutral-200 pb-4">
+            <p className="mb-1.5 px-2 text-[10px] font-medium uppercase tracking-[0.16em] text-neutral-400">
               Sua loja
             </p>
 
@@ -143,7 +196,7 @@ export function AdminLayout({
                 value={company.id}
                 onChange={(e) => select(e.target.value)}
                 aria-label="Selecionar loja"
-                className="h-10 w-full rounded-sm border border-neutral-200 bg-white px-3 text-sm font-medium text-neutral-900 outline-none transition focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
+                className="h-9 w-full rounded-sm border border-neutral-200 bg-white px-2.5 text-xs font-medium text-neutral-900 outline-none transition focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
               >
                 {companies.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -152,8 +205,8 @@ export function AdminLayout({
                 ))}
               </select>
             ) : (
-              <div className="flex h-10 items-center rounded-sm border border-neutral-200 px-3">
-                <span className="truncate text-sm font-medium">
+              <div className="flex h-9 items-center rounded-sm border border-neutral-200 px-3">
+                <span className="truncate text-xs font-semibold">
                   {company.name}
                 </span>
               </div>
@@ -162,11 +215,11 @@ export function AdminLayout({
         </div>
 
         {/* NAV */}
-        <nav className="flex-1 overflow-y-auto px-4 py-6">
-          <div className="space-y-7">
+        <nav className="flex-1 overflow-y-auto px-4 py-4">
+          <div className="space-y-6">
             {navSections.map((section) => (
               <section key={section.label}>
-                <p className="mb-2 px-2 text-[10px] font-medium uppercase tracking-[0.16em] text-neutral-400">
+                <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-neutral-400">
                   {section.label}
                 </p>
 
@@ -181,7 +234,7 @@ export function AdminLayout({
                         end
                         className={({ isActive }) =>
                           cn(
-                            "flex min-h-10 items-center gap-3 rounded-sm px-3 text-sm transition-colors",
+                            "flex min-h-9 items-center gap-3 rounded-sm px-3 text-xs transition-colors",
                             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2",
                             isActive
                               ? "bg-neutral-100 font-semibold text-neutral-950"
@@ -190,7 +243,7 @@ export function AdminLayout({
                         }
                       >
                         <Icon
-                          className="h-[17px] w-[17px] shrink-0"
+                          className="h-4 w-4 shrink-0"
                           strokeWidth={1.8}
                         />
 
@@ -205,27 +258,27 @@ export function AdminLayout({
         </nav>
 
         {/* BOTTOM */}
-        <div className="border-t border-neutral-200 px-4 py-4">
+        <div className="border-t border-neutral-200 px-4 py-3">
           <a
             href={`/loja/${company.slug}`}
             target="_blank"
             rel="noreferrer"
-            className="flex min-h-10 items-center gap-3 rounded-sm px-3 text-sm font-medium text-neutral-500 transition-colors hover:bg-neutral-50 hover:text-neutral-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+            className="flex min-h-9 items-center gap-3 rounded-sm px-3 text-xs font-medium text-neutral-500 transition-colors hover:bg-neutral-50 hover:text-neutral-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
           >
             <ExternalLink
-              className="h-[17px] w-[17px]"
+              className="h-4 w-4"
               strokeWidth={1.8}
             />
-            <span>Ver loja</span>
+            <span>Ver loja pública</span>
           </a>
 
           <button
             type="button"
             onClick={signOut}
-            className="mt-0.5 flex min-h-10 w-full items-center gap-3 rounded-sm px-3 text-sm font-medium text-neutral-400 transition-colors hover:bg-neutral-50 hover:text-neutral-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+            className="mt-0.5 flex min-h-9 w-full items-center gap-3 rounded-sm px-3 text-xs font-medium text-neutral-400 transition-colors hover:bg-neutral-50 hover:text-neutral-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
           >
             <LogOut
-              className="h-[17px] w-[17px]"
+              className="h-4 w-4"
               strokeWidth={1.8}
             />
             <span>Sair</span>
@@ -237,11 +290,20 @@ export function AdminLayout({
       <main className="min-w-0 pb-[76px] lg:ml-[240px] lg:pb-0">
         {/* HEADER */}
         <header className="sticky top-0 z-30 border-b border-neutral-200 bg-white">
-          <div className="flex min-h-[68px] items-center justify-between gap-4 px-5 sm:px-7 lg:px-10">
-            <div className="min-w-0">
-              <h1 className="truncate text-[20px] font-semibold tracking-[-0.035em]">
+          <div className="flex min-h-[64px] items-center justify-between gap-4 px-5 sm:px-7 lg:px-10">
+            <div className="flex items-center gap-3 min-w-0">
+              <h1 className="truncate text-[19px] font-semibold tracking-[-0.035em]">
                 {title}
               </h1>
+
+              <button
+                type="button"
+                onClick={() => setCommandPaletteOpen(true)}
+                className="hidden sm:inline-flex items-center gap-2 rounded border border-neutral-200 bg-neutral-50 px-2.5 py-1 text-xs text-neutral-500 hover:bg-neutral-100 hover:text-black"
+              >
+                <Search className="h-3.5 w-3.5" />
+                <span>⌘K</span>
+              </button>
             </div>
 
             {actions && (
@@ -253,7 +315,7 @@ export function AdminLayout({
         </header>
 
         {/* PAGE */}
-        <div className="mx-auto w-full max-w-[1440px] px-5 py-7 sm:px-7 lg:px-10 lg:py-9">
+        <div className="mx-auto w-full max-w-[1440px] px-5 py-7 sm:px-7 lg:px-10 lg:py-8">
           {children}
         </div>
       </main>

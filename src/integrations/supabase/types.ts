@@ -7,8 +7,6 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
@@ -70,6 +68,144 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      agent_permissions: {
+        Row: {
+          agent_id: string
+          allowed: boolean
+          company_id: string
+          created_at: string
+          id: string
+          permission: string
+        }
+        Insert: {
+          agent_id: string
+          allowed?: boolean
+          company_id: string
+          created_at?: string
+          id?: string
+          permission: string
+        }
+        Update: {
+          agent_id?: string
+          allowed?: boolean
+          company_id?: string
+          created_at?: string
+          id?: string
+          permission?: string
+        }
+        Relationships: []
+      }
+      agent_runs: {
+        Row: {
+          agent_id: string | null
+          agent_name: string
+          company_id: string
+          completed_at: string | null
+          id: string
+          metadata: Json | null
+          started_at: string
+          status: string
+          summary: string | null
+          trigger: string | null
+        }
+        Insert: {
+          agent_id?: string | null
+          agent_name: string
+          company_id: string
+          completed_at?: string | null
+          id?: string
+          metadata?: Json | null
+          started_at?: string
+          status: string
+          summary?: string | null
+          trigger?: string | null
+        }
+        Update: {
+          agent_id?: string | null
+          agent_name?: string
+          company_id?: string
+          completed_at?: string | null
+          id?: string
+          metadata?: Json | null
+          started_at?: string
+          status?: string
+          summary?: string | null
+          trigger?: string | null
+        }
+        Relationships: []
+      }
+      agents: {
+        Row: {
+          company_id: string
+          created_at: string
+          description: string | null
+          id: string
+          instructions: string | null
+          name: string
+          status: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          instructions?: string | null
+          name: string
+          status?: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          instructions?: string | null
+          name?: string
+          status?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      audit_logs: {
+        Row: {
+          action: string
+          actor_name: string
+          actor_type: string
+          changes: Json | null
+          company_id: string
+          created_at: string
+          id: string
+          target_id: string | null
+          target_type: string | null
+        }
+        Insert: {
+          action: string
+          actor_name: string
+          actor_type: string
+          changes?: Json | null
+          company_id: string
+          created_at?: string
+          id?: string
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Update: {
+          action?: string
+          actor_name?: string
+          actor_type?: string
+          changes?: Json | null
+          company_id?: string
+          created_at?: string
+          id?: string
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Relationships: []
       }
       business_settings: {
         Row: {
@@ -268,6 +404,174 @@ export type Database = {
         }
         Relationships: []
       }
+      customers: {
+        Row: {
+          channel: string | null
+          company_id: string
+          created_at: string
+          email: string | null
+          id: string
+          last_order_at: string | null
+          name: string
+          notes: string | null
+          orders_count: number
+          phone: string | null
+          total_spent: number
+          updated_at: string
+        }
+        Insert: {
+          channel?: string | null
+          company_id: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          last_order_at?: string | null
+          name: string
+          notes?: string | null
+          orders_count?: number
+          phone?: string | null
+          total_spent?: number
+          updated_at?: string
+        }
+        Update: {
+          channel?: string | null
+          company_id?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          last_order_at?: string | null
+          name?: string
+          notes?: string | null
+          orders_count?: number
+          phone?: string | null
+          total_spent?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customers_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inventory_movements: {
+        Row: {
+          company_id: string
+          created_at: string
+          id: string
+          product_id: string
+          quantity: number
+          reason: string | null
+          type: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          id?: string
+          product_id: string
+          quantity: number
+          reason?: string | null
+          type: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          id?: string
+          product_id?: string
+          quantity?: number
+          reason?: string | null
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_movements_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          company_id: string
+          created_at: string
+          id: string
+          link: string | null
+          message: string
+          read: boolean
+          title: string
+          type: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          id?: string
+          link?: string | null
+          message: string
+          read?: boolean
+          title: string
+          type: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          id?: string
+          link?: string | null
+          message?: string
+          read?: boolean
+          title?: string
+          type?: string
+        }
+        Relationships: []
+      }
+      order_events: {
+        Row: {
+          actor_id: string | null
+          actor_type: string
+          company_id: string
+          created_at: string
+          description: string
+          id: string
+          metadata: Json | null
+          order_id: string
+          type: string
+        }
+        Insert: {
+          actor_id?: string | null
+          actor_type?: string
+          company_id: string
+          created_at?: string
+          description: string
+          id?: string
+          metadata?: Json | null
+          order_id: string
+          type: string
+        }
+        Update: {
+          actor_id?: string | null
+          actor_type?: string
+          company_id?: string
+          created_at?: string
+          description?: string
+          id?: string
+          metadata?: Json | null
+          order_id?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_items: {
         Row: {
           created_at: string
@@ -321,8 +625,10 @@ export type Database = {
           customer_email: string | null
           customer_name: string
           customer_phone: string | null
+          fulfillment_status: string
           id: string
           notes: string | null
+          payment_status: string
           status: string
           total: number
           updated_at: string
@@ -334,8 +640,10 @@ export type Database = {
           customer_email?: string | null
           customer_name: string
           customer_phone?: string | null
+          fulfillment_status?: string
           id?: string
           notes?: string | null
+          payment_status?: string
           status?: string
           total?: number
           updated_at?: string
@@ -347,8 +655,10 @@ export type Database = {
           customer_email?: string | null
           customer_name?: string
           customer_phone?: string | null
+          fulfillment_status?: string
           id?: string
           notes?: string | null
+          payment_status?: string
           status?: string
           total?: number
           updated_at?: string
@@ -446,6 +756,42 @@ export type Database = {
           id?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      social_connections: {
+        Row: {
+          account_id: string | null
+          account_name: string | null
+          company_id: string
+          created_at: string
+          id: string
+          last_synced_at: string | null
+          provider: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          account_id?: string | null
+          account_name?: string | null
+          company_id: string
+          created_at?: string
+          id?: string
+          last_synced_at?: string | null
+          provider: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string | null
+          account_name?: string | null
+          company_id?: string
+          created_at?: string
+          id?: string
+          last_synced_at?: string | null
+          provider?: string
+          status?: string
+          updated_at?: string
         }
         Relationships: []
       }
