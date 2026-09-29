@@ -23,12 +23,13 @@ const CompanyContext = createContext<Ctx | undefined>(undefined);
 const KEY = "vendora.company";
 
 export function CompanyProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [companies, setCompanies] = useState<Company[]>([]);
   const [currentId, setCurrentId] = useState<string | null>(() => localStorage.getItem(KEY));
   const [loading, setLoading] = useState(true);
 
   const reload = useCallback(async () => {
+    if (authLoading) { setLoading(true); return; }
     if (!user) { setCompanies([]); setLoading(false); return; }
     setLoading(true);
     const { data: members } = await supabase.from("company_members").select("company_id").eq("user_id", user.id);
@@ -37,7 +38,7 @@ export function CompanyProvider({ children }: { children: ReactNode }) {
     const { data } = await supabase.from("companies").select("id,name,slug,currency,description,whatsapp").in("id", ids).order("created_at");
     setCompanies((data as Company[]) ?? []);
     setLoading(false);
-  }, [user]);
+  }, [user, authLoading]);
 
   useEffect(() => { reload(); }, [reload]);
 
