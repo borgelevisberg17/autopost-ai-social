@@ -1,19 +1,63 @@
-import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
+import {
+  useState,
+  useEffect,
+  createContext,
+  useContext,
+  ReactNode,
+} from "react";
+import { User, Session } from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
-  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signUp: (
+    email: string,
+    password: string,
+    fullName: string,
+  ) => Promise<{ error: Error | null }>;
+  signIn: (
+    email: string,
+    password: string,
+  ) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+function getAuthErrorMessage(message: string) {
+  const normalized = message.toLowerCase();
+
+  if (
+    normalized.includes("invalid login credentials") ||
+    normalized.includes("invalid credentials")
+  ) {
+    return "Email ou palavra-passe incorretos.";
+  }
+
+  if (
+    normalized.includes("already registered") ||
+    normalized.includes("user already registered")
+  ) {
+    return "Este email já está cadastrado. Tente entrar na sua conta.";
+  }
+
+  if (normalized.includes("email not confirmed")) {
+    return "Confirme o seu email antes de entrar.";
+  }
+
+  if (normalized.includes("password") && normalized.includes("weak")) {
+    return "Escolha uma palavra-passe mais forte.";
+  }
+
+  if (normalized.includes("rate limit")) {
+    return "Muitas tentativas. Aguarde alguns instantes e tente novamente.";
+  }
+
+  return message;
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -21,54 +65,72 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }
-    );
+    let mounted = true;
 
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, currentSession) => {
+      if (!mounted) return;
+
+      setSession(currentSession);
+      setUser(currentSession?.user ?? null);
+      setLoading(false);
+
+      if (event === "PASSWORD_RECOVERY") {
+        // A página /reset-password trata o fluxo de recuperação.
+      }
+    });
+
+    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      if (!mounted) return;
+
+      setSession(currentSession);
+      setUser(currentSession?.user ?? null);
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
-  const signUp = async (email: string, password: string, fullName: string) => {
+  const signUp = async (
+    email: string,
+    password: string,
+    fullName: string,
+  ) => {
     try {
       const redirectUrl = `${window.location.origin}/`;
-      
-      const { error } = await supabase.auth.signUp({
+
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           emailRedirectTo: redirectUrl,
           data: {
             full_name: fullName,
-          }
-        }
+          },
+        },
       });
 
       if (error) {
-        if (error.message.includes('already registered')) {
-          toast.error('Este email já está cadastrado. Tente fazer login.');
-        } else {
-          toast.error(error.message);
-        }
+        toast.error(getAuthErrorMessage(error.message));
         return { error };
       }
 
-      toast.success('Conta criada com sucesso! Você já pode usar o app.');
+      if (data.session) {
+        toast.success("Conta criada com sucesso.");
+      } else {
+        toast.success(
+          "Conta criada. Verifique o seu email para confirmar o acesso.",
+        );
+      }
+
       return { error: null };
     } catch (error) {
       const err = error as Error;
-      toast.error(err.message);
+      toast.error(getAuthErrorMessage(err.message));
       return { error: err };
     }
   };
@@ -81,30 +143,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       if (error) {
-        if (error.message.includes('Invalid login credentials')) {
-          toast.error('Email ou senha incorretos.');
-        } else {
-          toast.error(error.message);
-        }
+        toast.error(getAuthErrorMessage(error.message));
         return { error };
       }
 
-      toast.success('Login realizado com sucesso!');
       return { error: null };
     } catch (error) {
       const err = error as Error;
-      toast.error(err.message);
+      toast.error(getAuthErrorMessage(err.message));
       return { error: err };
     }
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    toast.success('Você saiu da sua conta.');
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      toast.error("Não foi possível terminar a sessão.");
+      return;
+    }
+
+    toast.success("Sessão terminada.");
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        session,
+        loading,
+        signUp,
+        signIn,
+        signOut,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -112,8 +184,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
+
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
+
   return context;
 }
