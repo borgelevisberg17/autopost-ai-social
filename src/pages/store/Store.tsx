@@ -3,7 +3,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
   ArrowRight,
-  ChevronRight,
   ImageOff,
   Loader2,
   Minus,
@@ -81,9 +80,7 @@ export default function Store() {
   const loadStore = async () => {
     const { data: store, error: storeError } = await supabase
       .from("companies")
-      .select(
-        "id,name,slug,currency,description,whatsapp",
-      )
+      .select("id,name,slug,currency,description,whatsapp")
       .eq("slug", slug)
       .maybeSingle();
 
@@ -100,15 +97,14 @@ export default function Store() {
 
     setCompany(store as Company);
 
-    const { data: productData, error: productError } =
-      await supabase
-        .from("products")
-        .select(
-          "id,name,description,category,price,promo_price,stock,images",
-        )
-        .eq("company_id", store.id)
-        .eq("active", true)
-        .order("created_at", { ascending: false });
+    const { data: productData, error: productError } = await supabase
+      .from("products")
+      .select(
+        "id,name,description,category,price,promo_price,stock,images",
+      )
+      .eq("company_id", store.id)
+      .eq("active", true)
+      .order("created_at", { ascending: false });
 
     if (productError) {
       toast.error("Erro ao carregar os produtos.");
@@ -120,6 +116,7 @@ export default function Store() {
 
   useEffect(() => {
     loadStore();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug]);
 
@@ -453,6 +450,7 @@ export default function Store() {
           </div>
 
           {/* HERO PRODUCT */}
+
           <div className="relative min-h-[420px] bg-neutral-200 lg:min-h-full">
             {featuredProducts[0]?.images?.[0] ? (
               <button
@@ -616,6 +614,7 @@ export default function Store() {
                   className="group min-w-0"
                 >
                   {/* IMAGE */}
+
                   <button
                     type="button"
                     onClick={() =>
@@ -648,7 +647,6 @@ export default function Store() {
                       </span>
                     )}
 
-                    {/* QUICK ACTION */}
                     {product.stock > 0 && (
                       <span className="absolute bottom-3 left-3 right-3 translate-y-2 bg-white px-4 py-3 text-center text-xs font-semibold opacity-0 shadow-sm transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
                         Ver produto
@@ -657,6 +655,7 @@ export default function Store() {
                   </button>
 
                   {/* PRODUCT INFO */}
+
                   <div className="pt-4">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
@@ -845,233 +844,375 @@ export default function Store() {
       <Sheet open={cartOpen} onOpenChange={setCartOpen}>
         <SheetContent
           side="right"
-          className="flex w-full flex-col border-l border-neutral-200 bg-white p-0 sm:max-w-md"
+          className="flex w-full flex-col border-l border-neutral-200 bg-white p-0 sm:max-w-lg"
         >
+          {/* HEADER */}
+
           <div className="border-b border-neutral-200 px-6 py-5">
             <SheetHeader>
-              <SheetTitle className="flex items-center justify-between text-xl font-semibold">
-                Carrinho
+              <div className="flex items-center justify-between">
+                <div>
+                  <SheetTitle className="text-xl font-semibold tracking-tight">
+                    Seu carrinho
+                  </SheetTitle>
+
+                  {cartCount > 0 && (
+                    <p className="mt-1 text-xs text-neutral-400">
+                      {cartCount}{" "}
+                      {cartCount === 1
+                        ? "produto"
+                        : "produtos"}{" "}
+                      selecionado
+                      {cartCount === 1 ? "" : "s"}
+                    </p>
+                  )}
+                </div>
 
                 {cartCount > 0 && (
-                  <span className="text-xs font-normal text-neutral-400">
-                    {cartCount}{" "}
-                    {cartCount === 1
-                      ? "item"
-                      : "itens"}
-                  </span>
+                  <div className="grid h-9 w-9 place-items-center rounded-full bg-neutral-100">
+                    <ShoppingBag className="h-4 w-4 text-neutral-700" />
+                  </div>
                 )}
-              </SheetTitle>
+              </div>
             </SheetHeader>
           </div>
 
           {cartItems.length === 0 ? (
-            <div className="flex flex-1 flex-col items-center justify-center px-8 text-center">
-              <ShoppingCart className="h-8 w-8 text-neutral-300" />
+            /* EMPTY CART */
 
-              <p className="mt-5 text-sm font-medium">
+            <div className="flex flex-1 flex-col items-center justify-center px-8 text-center">
+              <div className="grid h-16 w-16 place-items-center rounded-full bg-neutral-100">
+                <ShoppingCart className="h-6 w-6 text-neutral-400" />
+              </div>
+
+              <h3 className="mt-6 text-base font-semibold">
                 O seu carrinho está vazio
-              </p>
+              </h3>
 
               <p className="mt-2 max-w-xs text-sm leading-6 text-neutral-500">
-                Adicione alguns produtos para começar a
-                sua compra.
+                Explore o catálogo e adicione os produtos
+                que deseja comprar.
               </p>
 
-              <button
+              <Button
                 type="button"
                 onClick={() => setCartOpen(false)}
-                className="mt-6 text-xs font-semibold underline underline-offset-4"
+                className="mt-7 h-11 rounded-full bg-black px-6 text-sm font-medium hover:bg-neutral-800"
               >
                 Continuar a comprar
-              </button>
+              </Button>
             </div>
           ) : (
             <>
-              {/* ITEMS */}
-              <div className="flex-1 overflow-y-auto px-6">
-                <div className="divide-y divide-neutral-200">
-                  {cartItems.map(
-                    ({ product, quantity }) => (
-                      <div
-                        key={product.id}
-                        className="flex gap-4 py-5"
-                      >
-                        <div className="h-24 w-20 shrink-0 overflow-hidden bg-neutral-100">
-                          {product.images?.[0] ? (
-                            <img
-                              src={product.images[0]}
-                              alt={product.name}
-                              className="h-full w-full object-cover"
-                            />
-                          ) : (
-                            <div className="grid h-full place-items-center">
-                              <ImageOff className="h-5 w-5 text-neutral-300" />
+              {/* PRODUCTS */}
+
+              <div className="flex-1 overflow-y-auto">
+                <div className="px-6">
+                  <div className="divide-y divide-neutral-200">
+                    {cartItems.map(
+                      ({ product, quantity }) => {
+                        const unitPrice =
+                          priceOf(product);
+
+                        const itemTotal =
+                          unitPrice * quantity;
+
+                        const nearStockLimit =
+                          product.stock > 0 &&
+                          quantity >= product.stock;
+
+                        return (
+                          <div
+                            key={product.id}
+                            className="group py-6"
+                          >
+                            <div className="flex gap-4">
+
+                              {/* IMAGE */}
+
+                              <div className="relative h-28 w-24 shrink-0 overflow-hidden bg-neutral-100">
+                                {product.images?.[0] ? (
+                                  <img
+                                    src={
+                                      product.images[0]
+                                    }
+                                    alt={product.name}
+                                    className="h-full w-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="grid h-full place-items-center">
+                                    <ImageOff className="h-5 w-5 text-neutral-300" />
+                                  </div>
+                                )}
+
+                                {product.promo_price !=
+                                  null && (
+                                  <span className="absolute left-2 top-2 bg-white px-2 py-1 text-[9px] font-semibold uppercase tracking-wider">
+                                    Promoção
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* INFO */}
+
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-start justify-between gap-3">
+                                  <div className="min-w-0">
+                                    {product.category && (
+                                      <p className="mb-1 text-[9px] font-semibold uppercase tracking-[0.16em] text-neutral-400">
+                                        {product.category}
+                                      </p>
+                                    )}
+
+                                    <p className="line-clamp-2 text-sm font-medium leading-5">
+                                      {product.name}
+                                    </p>
+                                  </div>
+
+                                  {/* REMOVE */}
+
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const next = {
+                                        ...cart,
+                                      };
+
+                                      delete next[
+                                        product.id
+                                      ];
+
+                                      updateCart(next);
+                                    }}
+                                    aria-label={`Remover ${product.name}`}
+                                    className="grid h-7 w-7 shrink-0 place-items-center rounded-full text-neutral-400 transition hover:bg-neutral-100 hover:text-black"
+                                  >
+                                    <X className="h-3.5 w-3.5" />
+                                  </button>
+                                </div>
+
+                                {/* PRICE */}
+
+                                <div className="mt-2 flex items-baseline gap-2">
+                                  <span className="text-sm font-semibold">
+                                    {formatMoney(
+                                      itemTotal,
+                                      currency,
+                                    )}
+                                  </span>
+
+                                  {quantity > 1 && (
+                                    <span className="text-[11px] text-neutral-400">
+                                      {formatMoney(
+                                        unitPrice,
+                                        currency,
+                                      )}{" "}
+                                      / unidade
+                                    </span>
+                                  )}
+                                </div>
+
+                                {/* QUANTITY */}
+
+                                <div className="mt-4 flex items-center justify-between">
+                                  <div className="flex h-9 items-center rounded-full border border-neutral-200">
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        changeQuantity(
+                                          product,
+                                          -1,
+                                        )
+                                      }
+                                      aria-label="Diminuir quantidade"
+                                      className="grid h-9 w-9 place-items-center rounded-full transition hover:bg-neutral-100"
+                                    >
+                                      <Minus className="h-3 w-3" />
+                                    </button>
+
+                                    <span className="w-8 text-center text-xs font-medium">
+                                      {quantity}
+                                    </span>
+
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        changeQuantity(
+                                          product,
+                                          1,
+                                        )
+                                      }
+                                      aria-label="Aumentar quantidade"
+                                      className="grid h-9 w-9 place-items-center rounded-full transition hover:bg-neutral-100"
+                                    >
+                                      <Plus className="h-3 w-3" />
+                                    </button>
+                                  </div>
+
+                                  {nearStockLimit && (
+                                    <span className="text-[10px] font-medium text-neutral-400">
+                                      Últimas unidades
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
                             </div>
-                          )}
-                        </div>
-
-                        <div className="min-w-0 flex-1">
-                          <div className="flex justify-between gap-3">
-                            <p className="text-sm font-medium leading-5">
-                              {product.name}
-                            </p>
-
-                            <p className="shrink-0 text-sm font-semibold">
-                              {formatMoney(
-                                priceOf(product) *
-                                  quantity,
-                                currency,
-                              )}
-                            </p>
                           </div>
+                        );
+                      },
+                    )}
+                  </div>
+                </div>
 
-                          <p className="mt-1 text-xs text-neutral-400">
-                            {formatMoney(
-                              priceOf(product),
-                              currency,
-                            )}{" "}
-                            / unidade
-                          </p>
+                {/* CONTINUE SHOPPING */}
 
-                          <div className="mt-4 flex items-center justify-between">
-                            <div className="flex items-center border border-neutral-200">
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  changeQuantity(
-                                    product,
-                                    -1,
-                                  )
-                                }
-                                className="grid h-8 w-8 place-items-center hover:bg-neutral-50"
-                              >
-                                <Minus className="h-3 w-3" />
-                              </button>
-
-                              <span className="w-8 text-center text-xs">
-                                {quantity}
-                              </span>
-
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  changeQuantity(
-                                    product,
-                                    1,
-                                  )
-                                }
-                                className="grid h-8 w-8 place-items-center hover:bg-neutral-50"
-                              >
-                                <Plus className="h-3 w-3" />
-                              </button>
-                            </div>
-
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const next = {
-                                  ...cart,
-                                };
-
-                                delete next[product.id];
-
-                                updateCart(next);
-                              }}
-                              className="text-[11px] text-neutral-400 underline underline-offset-4 hover:text-black"
-                            >
-                              Remover
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    ),
-                  )}
+                <div className="border-t border-neutral-100 px-6 py-4">
+                  <button
+                    type="button"
+                    onClick={() => setCartOpen(false)}
+                    className="flex items-center gap-2 text-xs font-medium text-neutral-500 transition hover:text-black"
+                  >
+                    <ArrowLeft className="h-3.5 w-3.5" />
+                    Continuar a comprar
+                  </button>
                 </div>
               </div>
 
               {/* CHECKOUT */}
-              <div className="border-t border-neutral-200 bg-white px-6 py-6">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-neutral-500">
-                    Total
-                  </span>
 
-                  <span className="text-xl font-semibold tracking-tight">
-                    {formatMoney(
-                      cartTotal,
-                      currency,
-                    )}
-                  </span>
-                </div>
+              <div className="border-t border-neutral-200 bg-[#fafafa]">
+                <div className="px-6 py-5">
 
-                <p className="mt-2 text-xs leading-5 text-neutral-400">
-                  O pagamento será combinado com a loja
-                  após a confirmação do pedido.
-                </p>
+                  {/* SUMMARY */}
 
-                <div className="mt-5 space-y-3">
-                  <Input
-                    value={customer.name}
-                    onChange={(event) =>
-                      setCustomer({
-                        ...customer,
-                        name: event.target.value,
-                      })
-                    }
-                    placeholder="Nome completo"
-                    className="h-11 rounded-none border-neutral-200 focus-visible:ring-0"
-                    maxLength={120}
-                  />
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-neutral-500">
+                        Subtotal
+                      </span>
 
-                  <Input
-                    value={customer.phone}
-                    onChange={(event) =>
-                      setCustomer({
-                        ...customer,
-                        phone: event.target.value,
-                      })
-                    }
-                    placeholder="Telefone / WhatsApp"
-                    className="h-11 rounded-none border-neutral-200 focus-visible:ring-0"
-                    maxLength={40}
-                  />
+                      <span className="font-medium">
+                        {formatMoney(
+                          cartTotal,
+                          currency,
+                        )}
+                      </span>
+                    </div>
 
-                  <Input
-                    value={customer.email}
-                    onChange={(event) =>
-                      setCustomer({
-                        ...customer,
-                        email: event.target.value,
-                      })
-                    }
-                    placeholder="Email (opcional)"
-                    type="email"
-                    className="h-11 rounded-none border-neutral-200 focus-visible:ring-0"
-                    maxLength={160}
-                  />
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-neutral-500">
+                        Entrega
+                      </span>
 
-                  <Textarea
-                    value={customer.notes}
-                    onChange={(event) =>
-                      setCustomer({
-                        ...customer,
-                        notes: event.target.value,
-                      })
-                    }
-                    placeholder="Morada ou observações"
-                    className="min-h-[90px] resize-none rounded-none border-neutral-200 focus-visible:ring-0"
-                    maxLength={1000}
-                  />
+                      <span className="text-xs font-medium">
+                        A combinar
+                      </span>
+                    </div>
 
-                  <Button
-                    onClick={checkout}
-                    disabled={placing}
-                    className="h-12 w-full rounded-none bg-black text-sm font-medium hover:bg-neutral-800"
-                  >
-                    {placing
-                      ? "A processar..."
-                      : "Finalizar pedido"}
-                  </Button>
+                    <div className="my-4 h-px bg-neutral-200" />
+
+                    <div className="flex items-end justify-between">
+                      <span className="text-sm font-medium">
+                        Total
+                      </span>
+
+                      <span className="text-2xl font-semibold tracking-tight">
+                        {formatMoney(
+                          cartTotal,
+                          currency,
+                        )}
+                      </span>
+                    </div>
+                  </div>
+
+                  <p className="mt-3 text-[11px] leading-5 text-neutral-400">
+                    O pagamento e os custos de entrega
+                    serão combinados com a loja após a
+                    confirmação do pedido.
+                  </p>
+
+                  {/* CUSTOMER DETAILS */}
+
+                  <div className="mt-6">
+                    <div className="mb-3">
+                      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-neutral-400">
+                        Dados para o pedido
+                      </p>
+                    </div>
+
+                    <div className="space-y-2.5">
+                      <Input
+                        value={customer.name}
+                        onChange={(event) =>
+                          setCustomer({
+                            ...customer,
+                            name: event.target.value,
+                          })
+                        }
+                        placeholder="Nome completo"
+                        className="h-11 rounded-xl border-neutral-200 bg-white focus-visible:ring-0"
+                        maxLength={120}
+                      />
+
+                      <Input
+                        value={customer.phone}
+                        onChange={(event) =>
+                          setCustomer({
+                            ...customer,
+                            phone: event.target.value,
+                          })
+                        }
+                        placeholder="Telefone / WhatsApp"
+                        className="h-11 rounded-xl border-neutral-200 bg-white focus-visible:ring-0"
+                        maxLength={40}
+                      />
+
+                      <Input
+                        value={customer.email}
+                        onChange={(event) =>
+                          setCustomer({
+                            ...customer,
+                            email: event.target.value,
+                          })
+                        }
+                        placeholder="Email (opcional)"
+                        type="email"
+                        className="h-11 rounded-xl border-neutral-200 bg-white focus-visible:ring-0"
+                        maxLength={160}
+                      />
+
+                      <Textarea
+                        value={customer.notes}
+                        onChange={(event) =>
+                          setCustomer({
+                            ...customer,
+                            notes: event.target.value,
+                          })
+                        }
+                        placeholder="Morada ou observações"
+                        className="min-h-[78px] resize-none rounded-xl border-neutral-200 bg-white focus-visible:ring-0"
+                        maxLength={1000}
+                      />
+
+                      <Button
+                        onClick={checkout}
+                        disabled={placing}
+                        className="mt-2 h-12 w-full rounded-xl bg-black text-sm font-medium hover:bg-neutral-800"
+                      >
+                        {placing ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            A processar pedido...
+                          </>
+                        ) : (
+                          <>
+                            Finalizar pedido
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </>
