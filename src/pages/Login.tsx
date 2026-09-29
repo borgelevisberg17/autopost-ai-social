@@ -1,147 +1,199 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Sparkles, ArrowLeft, Mail, Lock, Eye, EyeOff } from "lucide-react";
-import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { FormEvent, useEffect, useState } from "react";
+import { ArrowRight, Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { AuthShell } from "@/components/auth/AuthShell";
 
-const Login = () => {
-  const [showPassword, setShowPassword] = useState(false);
+export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const { signIn, user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const from =
+    (location.state as { from?: { pathname?: string } } | null)?.from
+      ?.pathname || "/dashboard";
 
   useEffect(() => {
     if (user) {
-      navigate("/dashboard");
+      navigate(from, { replace: true });
     }
-  }, [user, navigate]);
+  }, [user, navigate, from]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!email.trim() || !password) return;
+
     setIsLoading(true);
-    
-    const { error } = await signIn(email, password);
-    
+
+    const { error } = await signIn(email.trim(), password);
+
     if (!error) {
-      navigate("/dashboard");
+      navigate(from, { replace: true });
     }
-    
+
     setIsLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left Side - Form */}
-      <div className="flex-1 flex flex-col justify-center px-8 lg:px-16 py-12">
-        <div className="max-w-md mx-auto w-full">
-          {/* Back Link */}
-          <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-8">
-            <ArrowLeft className="w-4 h-4" />
-            Voltar
+    <AuthShell
+      eyebrow="BEM-VINDO DE VOLTA"
+      title="Continue a gerir o seu negócio."
+      description="Entre para acompanhar pedidos, produtos, canais e tudo o que acontece na sua operação."
+      footer={
+        <div className="hidden items-center gap-2 text-sm text-[#666666] sm:flex">
+          <span>Não tem uma conta?</span>
+          <Link
+            to="/signup"
+            className="font-semibold text-[#111111] underline decoration-[#cccccc] underline-offset-4 transition-colors hover:decoration-[#111111]"
+          >
+            Criar conta
           </Link>
+        </div>
+      }
+    >
+      <div>
+        <div className="mb-9">
+          <p className="mb-3 text-[12px] font-medium uppercase tracking-[0.12em] text-[#999999]">
+            Aceder à conta
+          </p>
 
-          {/* Logo */}
-          <div className="flex items-center gap-2 mb-8">
-            <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center shadow-soft">
-              <Sparkles className="w-5 h-5 text-primary-foreground" />
+          <h1 className="text-[34px] font-semibold leading-[1.05] tracking-[-0.045em] text-[#111111] sm:text-[40px]">
+            Bem-vindo de volta.
+          </h1>
+
+          <p className="mt-3 text-[15px] leading-6 text-[#707070]">
+            Entre para continuar de onde parou.
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label
+              htmlFor="email"
+              className="mb-2 block text-[13px] font-medium text-[#333333]"
+            >
+              Email
+            </label>
+
+            <div className="relative">
+              <Mail
+                aria-hidden="true"
+                className="pointer-events-none absolute left-4 top-1/2 h-[17px] w-[17px] -translate-y-1/2 text-[#999999]"
+                strokeWidth={1.8}
+              />
+
+              <input
+                id="email"
+                name="email"
+                type="email"
+                inputMode="email"
+                autoComplete="email"
+                placeholder="nome@empresa.com"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                disabled={isLoading}
+                required
+                className="h-[52px] w-full rounded-[10px] border border-[#ddddda] bg-white pl-11 pr-4 text-[14px] text-[#111111] outline-none transition-all placeholder:text-[#aaaaaa] hover:border-[#c8c8c4] focus:border-[#111111] focus:ring-2 focus:ring-[#111111]/8 disabled:cursor-not-allowed disabled:bg-[#f7f7f5]"
+              />
             </div>
-            <span className="font-display font-bold text-2xl">Vendora</span>
           </div>
 
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="font-display text-3xl font-bold mb-2">Bem-vindo de volta!</h1>
-            <p className="text-muted-foreground">Entre na sua conta para continuar</p>
+          <div>
+            <div className="mb-2 flex items-center justify-between">
+              <label
+                htmlFor="password"
+                className="text-[13px] font-medium text-[#333333]"
+              >
+                Palavra-passe
+              </label>
+
+              <Link
+                to="/forgot-password"
+                className="text-[12px] font-medium text-[#666666] underline decoration-[#cccccc] underline-offset-4 transition-colors hover:text-[#111111] hover:decoration-[#111111]"
+              >
+                Esqueceu?
+              </Link>
+            </div>
+
+            <div className="relative">
+              <LockKeyhole
+                aria-hidden="true"
+                className="pointer-events-none absolute left-4 top-1/2 h-[17px] w-[17px] -translate-y-1/2 text-[#999999]"
+                strokeWidth={1.8}
+              />
+
+              <input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                autoComplete="current-password"
+                placeholder="A sua palavra-passe"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                disabled={isLoading}
+                required
+                className="h-[52px] w-full rounded-[10px] border border-[#ddddda] bg-white pl-11 pr-12 text-[14px] text-[#111111] outline-none transition-all placeholder:text-[#aaaaaa] hover:border-[#c8c8c4] focus:border-[#111111] focus:ring-2 focus:ring-[#111111]/8 disabled:cursor-not-allowed disabled:bg-[#f7f7f5]"
+              />
+
+              <button
+                type="button"
+                aria-label={
+                  showPassword
+                    ? "Ocultar palavra-passe"
+                    : "Mostrar palavra-passe"
+                }
+                onClick={() => setShowPassword((value) => !value)}
+                disabled={isLoading}
+                className="absolute right-3 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-md text-[#888888] transition-colors hover:bg-[#f5f5f3] hover:text-[#111111] disabled:opacity-50"
+              >
+                {showPassword ? (
+                  <EyeOff className="h-[17px] w-[17px]" strokeWidth={1.8} />
+                ) : (
+                  <Eye className="h-[17px] w-[17px]" strokeWidth={1.8} />
+                )}
+              </button>
+            </div>
           </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="seu@email.com"
-                  className="pl-10 h-12"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  disabled={isLoading}
-                />
-              </div>
-            </div>
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="group mt-2 flex h-[52px] w-full items-center justify-center gap-2 rounded-[10px] bg-[#111111] text-[14px] font-semibold text-white transition-all hover:bg-[#252525] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isLoading ? "A entrar..." : "Entrar na conta"}
 
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Senha</Label>
-                <a href="#" className="text-sm text-primary hover:underline">Esqueceu a senha?</a>
-              </div>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  className="pl-10 pr-10 h-12"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={isLoading}
-                />
-                <button
-                  type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-            </div>
+            {!isLoading && (
+              <ArrowRight
+                className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                strokeWidth={1.8}
+              />
+            )}
+          </button>
+        </form>
 
-            <Button type="submit" variant="hero" size="lg" className="w-full" disabled={isLoading}>
-              {isLoading ? "Entrando..." : "Entrar"}
-            </Button>
-          </form>
-
-          {/* Sign Up Link */}
-          <p className="text-center mt-8 text-muted-foreground">
+        <div className="mt-8 border-t border-[#eeeeeb] pt-7 text-center sm:hidden">
+          <p className="text-[13px] text-[#777777]">
             Não tem uma conta?{" "}
-            <Link to="/signup" className="text-primary font-medium hover:underline">
-              Criar conta grátis
+            <Link
+              to="/signup"
+              className="font-semibold text-[#111111] underline decoration-[#cccccc] underline-offset-4"
+            >
+              Criar conta
             </Link>
           </p>
         </div>
-      </div>
 
-      {/* Right Side - Decorative */}
-      <div className="hidden lg:flex flex-1 gradient-primary items-center justify-center p-16 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.1%22%3E%3Cpath%20d%3D%22M36%2034v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6%2034v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6%204V0H4v4H0v2h4v4h2V6h4V4H6z%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E')] opacity-30" />
-        
-        <div className="relative z-10 text-center text-primary-foreground max-w-md">
-          <div className="w-24 h-24 rounded-3xl bg-primary-foreground/20 flex items-center justify-center mx-auto mb-8 backdrop-blur-sm">
-            <Sparkles className="w-12 h-12" />
-          </div>
-          <h2 className="font-display text-3xl font-bold mb-4">
-            Automatize seu conteúdo
-          </h2>
-          <p className="text-primary-foreground/80 text-lg">
-            Deixe a IA cuidar dos seus posts enquanto você foca no que importa: seu negócio.
-          </p>
-        </div>
-
-        {/* Floating elements */}
-        <div className="absolute top-20 right-20 w-32 h-32 rounded-full bg-primary-foreground/10 blur-2xl animate-pulse-slow" />
-        <div className="absolute bottom-20 left-20 w-40 h-40 rounded-full bg-primary-foreground/10 blur-2xl animate-pulse-slow" style={{ animationDelay: '2s' }} />
+        <p className="mt-8 text-center text-[11px] leading-5 text-[#aaaaaa]">
+          O acesso é protegido e os dados da sua empresa permanecem isolados
+          da operação de outras contas.
+        </p>
       </div>
-    </div>
+    </AuthShell>
   );
-};
-
-export default Login;
+}
