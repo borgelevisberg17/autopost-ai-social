@@ -1,16 +1,4 @@
 project_id = "ecfxulsjdqcqavbaglwm"
 
-[functions.generate-content]
-verify_jwt = false
-
-[functions.ai-edit]
-verify_jwt = false
-
-[functions.generate-thumbnail]
-verify_jwt = false
-
-[functions.generate-video-script]
-verify_jwt = false
-
 [functions.marketing-agent]
 verify_jwt = false
