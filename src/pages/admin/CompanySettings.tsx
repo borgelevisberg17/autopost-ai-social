@@ -83,6 +83,17 @@ type Member = {
   } | null;
 };
 
+type AuditLog = {
+  id: string;
+  actor_type: string;
+  actor_name: string;
+  action: string;
+  target_type: string | null;
+  target_id: string | null;
+  changes: Record<string, unknown>;
+  created_at: string;
+};
+
 const NAVIGATION: Array<{
   group: string;
   items: Array<{
@@ -212,7 +223,7 @@ const NAVIGATION: Array<{
         label: "Audit Log",
         description: "Histórico administrativo",
         icon: LayoutDashboard,
-        available: false,
+        available: true,
       },
     ],
   },
@@ -449,8 +460,10 @@ export default function CompanySettings() {
   const [business, setBusiness] =
     useState<BusinessSettings>(DEFAULT_BUSINESS);
   const [members, setMembers] = useState<Member[]>([]);
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [loadingBusiness, setLoadingBusiness] = useState(true);
   const [loadingMembers, setLoadingMembers] = useState(true);
+  const [loadingAudit, setLoadingAudit] = useState(false);
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
 
@@ -565,6 +578,25 @@ export default function CompanySettings() {
   useEffect(() => {
     loadMembers();
   }, [company?.id]);
+
+  useEffect(() => {
+    if (section === "audit" && company) {
+      async function loadAudit() {
+        setLoadingAudit(true);
+        const { data } = await supabase
+          .from("audit_logs")
+          .select("*")
+          .eq("company_id", company.id)
+          .order("created_at", { ascending: false })
+          .limit(100);
+
+        setAuditLogs((data as AuditLog[]) ?? []);
+        setLoadingAudit(false);
+      }
+
+      loadAudit();
+    }
+  }, [section, company?.id]);
 
   const markDirty = () => setDirty(true);
 
@@ -1545,6 +1577,76 @@ export default function CompanySettings() {
     </>
   );
 
+  const renderAudit = () => (
+    <>
+      <SectionHeading
+        eyebrow="Sistema"
+        title="Audit Log"
+        description="Histórico de alterações, ações administrativas e atividades registadas no sistema."
+      />
+
+      <div className="space-y-6">
+        <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white">
+          <div className="hidden grid-cols-[140px_minmax(0,1fr)_140px] gap-4 border-b border-neutral-200 bg-neutral-50 px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-500 md:grid">
+            <span>Ator</span>
+            <span>Ação / Alteração</span>
+            <span>Data</span>
+          </div>
+
+          {loadingAudit ? (
+            <div className="space-y-3 p-5">
+              <div className="h-12 animate-pulse rounded-lg bg-neutral-100" />
+              <div className="h-12 animate-pulse rounded-lg bg-neutral-100" />
+            </div>
+          ) : auditLogs.length === 0 ? (
+            <div className="p-10 text-center">
+              <ShieldCheck className="mx-auto h-7 w-7 text-neutral-300" />
+              <p className="mt-3 text-sm font-semibold text-neutral-900">
+                Nenhum evento de auditoria registado
+              </p>
+              <p className="mt-1 text-xs text-neutral-400">
+                As ações sensíveis executadas por utilizadores e agentes aparecerão aqui.
+              </p>
+            </div>
+          ) : (
+            auditLogs.map((log) => (
+              <div
+                key={log.id}
+                className="grid gap-3 border-b border-neutral-100 px-5 py-4 last:border-0 md:grid-cols-[140px_minmax(0,1fr)_140px] md:items-center"
+              >
+                <div>
+                  <p className="text-sm font-semibold text-neutral-950">{log.actor_name}</p>
+                  <span className="inline-flex rounded bg-neutral-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-neutral-600">
+                    {log.actor_type}
+                  </span>
+                </div>
+
+                <div>
+                  <p className="text-sm font-medium text-neutral-900">{log.action}</p>
+                  {log.target_type && (
+                    <p className="text-xs text-neutral-400">
+                      Alvo: {log.target_type} {log.target_id ? `(#${log.target_id.slice(0, 8)})` : ""}
+                    </p>
+                  )}
+                </div>
+
+                <div className="text-xs text-neutral-500">
+                  {new Intl.DateTimeFormat("pt-PT", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  }).format(new Date(log.created_at))}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </>
+  );
+
   const renderPlaceholder = () => {
     const title = currentNavigation?.label || "Configuração";
 
@@ -1603,6 +1705,9 @@ export default function CompanySettings() {
 
       case "team":
         return renderTeam();
+
+      case "audit":
+        return renderAudit();
 
       default:
         return renderPlaceholder();
