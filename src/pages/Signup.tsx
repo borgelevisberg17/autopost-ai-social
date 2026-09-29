@@ -1,16 +1,22 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Sparkles, ArrowLeft, Mail, Lock, Eye, EyeOff, User } from "lucide-react";
-import { useState, useEffect } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import {
+  ArrowRight,
+  Check,
+  Eye,
+  EyeOff,
+  LockKeyhole,
+  Mail,
+  UserRound,
+} from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { AuthShell } from "@/components/auth/AuthShell";
 
-const Signup = () => {
-  const [showPassword, setShowPassword] = useState(false);
+export default function Signup() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const { signUp, user } = useAuth();
@@ -18,165 +24,249 @@ const Signup = () => {
 
   useEffect(() => {
     if (user) {
-      navigate("/dashboard");
+      navigate("/onboarding", { replace: true });
     }
   }, [user, navigate]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!name.trim() || !email.trim() || password.length < 8) return;
+
     setIsLoading(true);
-    
-    const { error } = await signUp(email, password, name);
-    
+
+    const { error } = await signUp(email.trim(), password, name.trim());
+
     if (!error) {
-      navigate("/dashboard");
+      navigate("/onboarding", { replace: true });
     }
-    
+
     setIsLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left Side - Decorative */}
-      <div className="hidden lg:flex flex-1 gradient-primary items-center justify-center p-16 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.1%22%3E%3Cpath%20d%3D%22M36%2034v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6%2034v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6%204V0H4v4H0v2h4v4h2V6h4V4H6z%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E')] opacity-30" />
-        
-        <div className="relative z-10 text-center text-primary-foreground max-w-md">
-          <div className="w-24 h-24 rounded-3xl bg-primary-foreground/20 flex items-center justify-center mx-auto mb-8 backdrop-blur-sm">
-            <Sparkles className="w-12 h-12" />
-          </div>
-          <h2 className="font-display text-3xl font-bold mb-4">
-            Comece sua jornada hoje
-          </h2>
-          <p className="text-primary-foreground/80 text-lg">
-            Milhares de empreendedores já economizam horas por semana com automação inteligente.
+    <AuthShell
+      eyebrow="COMEÇAR"
+      title="Construa a operação da sua loja."
+      description="Crie a sua conta e depois configure a empresa, catálogo e canais no seu ritmo."
+      footer={
+        <div className="hidden items-center gap-2 text-sm text-[#666666] sm:flex">
+          <span>Já tem uma conta?</span>
+          <Link
+            to="/login"
+            className="font-semibold text-[#111111] underline decoration-[#cccccc] underline-offset-4 transition-colors hover:decoration-[#111111]"
+          >
+            Entrar
+          </Link>
+        </div>
+      }
+    >
+      <div>
+        <div className="mb-8">
+          <p className="mb-3 text-[12px] font-medium uppercase tracking-[0.12em] text-[#999999]">
+            Nova conta
           </p>
-          
-          {/* Testimonial */}
-          <div className="mt-12 bg-primary-foreground/10 rounded-2xl p-6 backdrop-blur-sm text-left">
-            <p className="italic mb-4">"Reduzi meu tempo de criação de conteúdo de 5 horas para 30 minutos por semana!"</p>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary-foreground/20" />
-              <div>
-                <p className="font-semibold">Maria Santos</p>
-                <p className="text-sm text-primary-foreground/70">Dona de Pet Shop</p>
-              </div>
-            </div>
+
+          <h1 className="text-[34px] font-semibold leading-[1.05] tracking-[-0.045em] text-[#111111] sm:text-[40px]">
+            Comece por aqui.
+          </h1>
+
+          <p className="mt-3 max-w-[410px] text-[15px] leading-6 text-[#707070]">
+            Primeiro criamos a sua conta. Depois, configuramos a sua empresa e
+            a sua loja.
+          </p>
+        </div>
+
+        <div className="mb-8 flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <span className="grid h-6 w-6 place-items-center rounded-full bg-[#111111] text-[11px] font-semibold text-white">
+              1
+            </span>
+
+            <span className="text-[12px] font-medium text-[#333333]">
+              Conta
+            </span>
+          </div>
+
+          <div className="h-px flex-1 bg-[#e5e5e2]" />
+
+          <div className="flex items-center gap-2 text-[#aaaaaa]">
+            <span className="grid h-6 w-6 place-items-center rounded-full border border-[#ddddda] text-[11px] font-medium">
+              2
+            </span>
+
+            <span className="text-[12px]">Loja</span>
           </div>
         </div>
 
-        {/* Floating elements */}
-        <div className="absolute top-20 left-20 w-32 h-32 rounded-full bg-primary-foreground/10 blur-2xl animate-pulse-slow" />
-        <div className="absolute bottom-20 right-20 w-40 h-40 rounded-full bg-primary-foreground/10 blur-2xl animate-pulse-slow" style={{ animationDelay: '2s' }} />
-      </div>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label
+              htmlFor="name"
+              className="mb-2 block text-[13px] font-medium text-[#333333]"
+            >
+              Nome completo
+            </label>
 
-      {/* Right Side - Form */}
-      <div className="flex-1 flex flex-col justify-center px-8 lg:px-16 py-12">
-        <div className="max-w-md mx-auto w-full">
-          {/* Back Link */}
-          <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-8">
-            <ArrowLeft className="w-4 h-4" />
-            Voltar
-          </Link>
+            <div className="relative">
+              <UserRound
+                aria-hidden="true"
+                className="pointer-events-none absolute left-4 top-1/2 h-[17px] w-[17px] -translate-y-1/2 text-[#999999]"
+                strokeWidth={1.8}
+              />
 
-          {/* Logo */}
-          <div className="flex items-center gap-2 mb-8">
-            <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center shadow-soft">
-              <Sparkles className="w-5 h-5 text-primary-foreground" />
+              <input
+                id="name"
+                name="name"
+                type="text"
+                autoComplete="name"
+                placeholder="O seu nome"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                disabled={isLoading}
+                required
+                className="h-[52px] w-full rounded-[10px] border border-[#ddddda] bg-white pl-11 pr-4 text-[14px] text-[#111111] outline-none transition-all placeholder:text-[#aaaaaa] hover:border-[#c8c8c4] focus:border-[#111111] focus:ring-2 focus:ring-[#111111]/8 disabled:cursor-not-allowed disabled:bg-[#f7f7f5]"
+              />
             </div>
-            <span className="font-display font-bold text-2xl">Vendora</span>
           </div>
 
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="font-display text-3xl font-bold mb-2">Crie sua conta grátis</h1>
-            <p className="text-muted-foreground">Comece com 3 posts por semana, sem cartão de crédito</p>
+          <div>
+            <label
+              htmlFor="email"
+              className="mb-2 block text-[13px] font-medium text-[#333333]"
+            >
+              Email
+            </label>
+
+            <div className="relative">
+              <Mail
+                aria-hidden="true"
+                className="pointer-events-none absolute left-4 top-1/2 h-[17px] w-[17px] -translate-y-1/2 text-[#999999]"
+                strokeWidth={1.8}
+              />
+
+              <input
+                id="email"
+                name="email"
+                type="email"
+                inputMode="email"
+                autoComplete="email"
+                placeholder="nome@empresa.com"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                disabled={isLoading}
+                required
+                className="h-[52px] w-full rounded-[10px] border border-[#ddddda] bg-white pl-11 pr-4 text-[14px] text-[#111111] outline-none transition-all placeholder:text-[#aaaaaa] hover:border-[#c8c8c4] focus:border-[#111111] focus:ring-2 focus:ring-[#111111]/8 disabled:cursor-not-allowed disabled:bg-[#f7f7f5]"
+              />
+            </div>
           </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="name">Nome completo</Label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <Input
-                  id="name"
-                  type="text"
-                  placeholder="Seu nome"
-                  className="pl-10 h-12"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                  disabled={isLoading}
-                />
-              </div>
+          <div>
+            <label
+              htmlFor="password"
+              className="mb-2 block text-[13px] font-medium text-[#333333]"
+            >
+              Palavra-passe
+            </label>
+
+            <div className="relative">
+              <LockKeyhole
+                aria-hidden="true"
+                className="pointer-events-none absolute left-4 top-1/2 h-[17px] w-[17px] -translate-y-1/2 text-[#999999]"
+                strokeWidth={1.8}
+              />
+
+              <input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                autoComplete="new-password"
+                placeholder="Mínimo de 8 caracteres"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                disabled={isLoading}
+                required
+                minLength={8}
+                className="h-[52px] w-full rounded-[10px] border border-[#ddddda] bg-white pl-11 pr-12 text-[14px] text-[#111111] outline-none transition-all placeholder:text-[#aaaaaa] hover:border-[#c8c8c4] focus:border-[#111111] focus:ring-2 focus:ring-[#111111]/8 disabled:cursor-not-allowed disabled:bg-[#f7f7f5]"
+              />
+
+              <button
+                type="button"
+                aria-label={
+                  showPassword
+                    ? "Ocultar palavra-passe"
+                    : "Mostrar palavra-passe"
+                }
+                onClick={() => setShowPassword((value) => !value)}
+                disabled={isLoading}
+                className="absolute right-3 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-md text-[#888888] transition-colors hover:bg-[#f5f5f3] hover:text-[#111111] disabled:opacity-50"
+              >
+                {showPassword ? (
+                  <EyeOff className="h-[17px] w-[17px]" strokeWidth={1.8} />
+                ) : (
+                  <Eye className="h-[17px] w-[17px]" strokeWidth={1.8} />
+                )}
+              </button>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="seu@email.com"
-                  className="pl-10 h-12"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  disabled={isLoading}
-                />
-              </div>
+            <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5">
+              <span
+                className={`flex items-center gap-1.5 text-[11px] ${
+                  password.length >= 8 ? "text-[#333333]" : "text-[#aaaaaa]"
+                }`}
+              >
+                <Check className="h-3 w-3" strokeWidth={2} />
+                8 caracteres
+              </span>
+
+              <span
+                className={`flex items-center gap-1.5 text-[11px] ${
+                  password.length > 0
+                    ? /[A-Za-z]/.test(password) && /\d/.test(password)
+                      ? "text-[#333333]"
+                      : "text-[#aaaaaa]"
+                    : "text-[#aaaaaa]"
+                }`}
+              >
+                <Check className="h-3 w-3" strokeWidth={2} />
+                Letras e números
+              </span>
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password">Senha</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Mínimo 8 caracteres"
-                  className="pl-10 pr-10 h-12"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  minLength={8}
-                  disabled={isLoading}
-                />
-                <button
-                  type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-            </div>
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="group mt-2 flex h-[52px] w-full items-center justify-center gap-2 rounded-[10px] bg-[#111111] text-[14px] font-semibold text-white transition-all hover:bg-[#252525] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isLoading ? "A criar conta..." : "Criar conta"}
 
-            <Button type="submit" variant="hero" size="lg" className="w-full" disabled={isLoading}>
-              {isLoading ? "Criando conta..." : "Criar Conta Grátis"}
-            </Button>
+            {!isLoading && (
+              <ArrowRight
+                className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                strokeWidth={1.8}
+              />
+            )}
+          </button>
 
-            <p className="text-xs text-center text-muted-foreground">
-              Ao criar uma conta, você concorda com nossos{" "}
-              <a href="#" className="text-primary hover:underline">Termos de Uso</a>
-              {" "}e{" "}
-              <a href="#" className="text-primary hover:underline">Política de Privacidade</a>
-            </p>
-          </form>
+          <p className="text-center text-[11px] leading-5 text-[#aaaaaa]">
+            Ao criar uma conta, você concorda com os Termos de Uso e a Política
+            de Privacidade.
+          </p>
+        </form>
 
-          {/* Login Link */}
-          <p className="text-center mt-8 text-muted-foreground">
+        <div className="mt-8 border-t border-[#eeeeeb] pt-7 text-center sm:hidden">
+          <p className="text-[13px] text-[#777777]">
             Já tem uma conta?{" "}
-            <Link to="/login" className="text-primary font-medium hover:underline">
+            <Link
+              to="/login"
+              className="font-semibold text-[#111111] underline decoration-[#cccccc] underline-offset-4"
+            >
               Entrar
             </Link>
           </p>
         </div>
       </div>
-    </div>
+    </AuthShell>
   );
-};
-
-export default Signup;
+}
