@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
   ArrowRight,
+  Check,
   ImageOff,
   Loader2,
   Minus,
@@ -46,29 +47,44 @@ type Product = {
   images: string[];
 };
 
+type CartStep = "cart" | "checkout" | "success";
+
 export default function Store() {
   const { slug = "" } = useParams();
   const navigate = useNavigate();
 
-  const [company, setCompany] = useState<Company | null | undefined>(
-    undefined,
-  );
+  const [company, setCompany] = useState<
+    Company | null | undefined
+  >(undefined);
+
   const [products, setProducts] = useState<Product[]>([]);
 
   const [category, setCategory] = useState("Todos");
   const [search, setSearch] = useState("");
 
-  const [cart, setCart] = useState<Record<string, number>>(() => {
-    try {
-      return JSON.parse(localStorage.getItem(`cart.${slug}`) || "{}");
-    } catch {
-      return {};
-    }
-  });
+  const [cart, setCart] = useState<Record<string, number>>(
+    () => {
+      try {
+        return JSON.parse(
+          localStorage.getItem(`cart.${slug}`) || "{}",
+        );
+      } catch {
+        return {};
+      }
+    },
+  );
 
   const [cartOpen, setCartOpen] = useState(false);
-  const [productOpen, setProductOpen] = useState<Product | null>(null);
+  const [cartStep, setCartStep] =
+    useState<CartStep>("cart");
+
+  const [productOpen, setProductOpen] =
+    useState<Product | null>(null);
+
   const [placing, setPlacing] = useState(false);
+  const [orderId, setOrderId] = useState<string | null>(
+    null,
+  );
 
   const [customer, setCustomer] = useState({
     name: "",
@@ -78,11 +94,14 @@ export default function Store() {
   });
 
   const loadStore = async () => {
-    const { data: store, error: storeError } = await supabase
-      .from("companies")
-      .select("id,name,slug,currency,description,whatsapp")
-      .eq("slug", slug)
-      .maybeSingle();
+    const { data: store, error: storeError } =
+      await supabase
+        .from("companies")
+        .select(
+          "id,name,slug,currency,description,whatsapp",
+        )
+        .eq("slug", slug)
+        .maybeSingle();
 
     if (storeError) {
       toast.error("Erro ao carregar a loja.");
@@ -97,14 +116,19 @@ export default function Store() {
 
     setCompany(store as Company);
 
-    const { data: productData, error: productError } = await supabase
+    const {
+      data: productData,
+      error: productError,
+    } = await supabase
       .from("products")
       .select(
         "id,name,description,category,price,promo_price,stock,images",
       )
       .eq("company_id", store.id)
       .eq("active", true)
-      .order("created_at", { ascending: false });
+      .order("created_at", {
+        ascending: false,
+      });
 
     if (productError) {
       toast.error("Erro ao carregar os produtos.");
@@ -120,9 +144,14 @@ export default function Store() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug]);
 
-  const updateCart = (next: Record<string, number>) => {
+  const updateCart = (
+    next: Record<string, number>,
+  ) => {
     setCart(next);
-    localStorage.setItem(`cart.${slug}`, JSON.stringify(next));
+    localStorage.setItem(
+      `cart.${slug}`,
+      JSON.stringify(next),
+    );
   };
 
   const changeQuantity = (
@@ -133,10 +162,15 @@ export default function Store() {
 
     const nextQuantity = Math.max(
       0,
-      Math.min(product.stock, current + change),
+      Math.min(
+        product.stock,
+        current + change,
+      ),
     );
 
-    const next = { ...cart };
+    const next = {
+      ...cart,
+    };
 
     if (nextQuantity <= 0) {
       delete next[product.id];
@@ -144,8 +178,13 @@ export default function Store() {
       next[product.id] = nextQuantity;
     }
 
-    if (change > 0 && nextQuantity === current) {
-      toast.error("Quantidade máxima disponível atingida.");
+    if (
+      change > 0 &&
+      nextQuantity === current
+    ) {
+      toast.error(
+        "Quantidade máxima disponível atingida.",
+      );
       return;
     }
 
@@ -156,7 +195,9 @@ export default function Store() {
     const unique = Array.from(
       new Set(
         products
-          .map((product) => product.category)
+          .map(
+            (product) => product.category,
+          )
           .filter(Boolean),
       ),
     ) as string[];
@@ -165,7 +206,9 @@ export default function Store() {
   }, [products]);
 
   const filteredProducts = useMemo(() => {
-    const value = search.trim().toLowerCase();
+    const value = search
+      .trim()
+      .toLowerCase();
 
     return products.filter((product) => {
       const matchesCategory =
@@ -174,16 +217,29 @@ export default function Store() {
 
       const matchesSearch =
         !value ||
-        product.name.toLowerCase().includes(value) ||
-        product.description?.toLowerCase().includes(value);
+        product.name
+          .toLowerCase()
+          .includes(value) ||
+        product.description
+          ?.toLowerCase()
+          .includes(value);
 
-      return matchesCategory && matchesSearch;
+      return (
+        matchesCategory &&
+        matchesSearch
+      );
     });
-  }, [products, category, search]);
+  }, [
+    products,
+    category,
+    search,
+  ]);
 
   const cartItems = Object.entries(cart)
     .map(([id, quantity]) => ({
-      product: products.find((product) => product.id === id),
+      product: products.find(
+        (product) => product.id === id,
+      ),
       quantity,
     }))
     .filter(
@@ -196,66 +252,146 @@ export default function Store() {
     );
 
   const priceOf = (product: Product) =>
-    Number(product.promo_price ?? product.price);
+    Number(
+      product.promo_price ??
+        product.price,
+    );
 
   const cartTotal = cartItems.reduce(
     (sum, item) =>
-      sum + priceOf(item.product) * item.quantity,
+      sum +
+      priceOf(item.product) *
+        item.quantity,
     0,
   );
 
   const cartCount = cartItems.reduce(
-    (sum, item) => sum + item.quantity,
+    (sum, item) =>
+      sum + item.quantity,
     0,
   );
 
-  const featuredProducts = products.slice(0, 4);
+  const featuredProducts =
+    products.slice(0, 4);
 
-  const checkout = async () => {
-    if (!customer.name.trim()) {
-      toast.error("Indique o seu nome.");
+  const openCart = () => {
+    setCartStep("cart");
+    setOrderId(null);
+    setCartOpen(true);
+  };
+
+  const closeCart = () => {
+    setCartOpen(false);
+
+    window.setTimeout(() => {
+      setCartStep("cart");
+      setOrderId(null);
+    }, 180);
+  };
+
+  const goToCheckout = () => {
+    if (!cartItems.length) {
+      toast.error(
+        "O carrinho está vazio.",
+      );
       return;
     }
 
-    if (!customer.phone.trim() && !customer.email.trim()) {
-      toast.error("Indique o telefone ou email.");
+    setCartStep("checkout");
+  };
+
+  const goBackToCart = () => {
+    if (placing) return;
+
+    setCartStep("cart");
+  };
+
+  const checkout = async () => {
+    if (!customer.name.trim()) {
+      toast.error(
+        "Indique o seu nome.",
+      );
+      return;
+    }
+
+    if (
+      !customer.phone.trim() &&
+      !customer.email.trim()
+    ) {
+      toast.error(
+        "Indique o telefone ou email.",
+      );
       return;
     }
 
     if (!cartItems.length) {
-      toast.error("O carrinho está vazio.");
+      toast.error(
+        "O carrinho está vazio.",
+      );
       return;
     }
 
     setPlacing(true);
 
-    const { data, error } = await supabase.rpc(
+    const {
+      data,
+      error,
+    } = await supabase.rpc(
       "place_order",
       {
         _company_slug: slug,
-        _customer_name: customer.name,
-        _customer_phone: customer.phone,
-        _customer_email: customer.email,
-        _notes: customer.notes,
-        _items: cartItems.map((item) => ({
-          product_id: item.product.id,
-          quantity: item.quantity,
-        })),
+        _customer_name:
+          customer.name,
+        _customer_phone:
+          customer.phone,
+        _customer_email:
+          customer.email,
+        _notes:
+          customer.notes,
+        _items:
+          cartItems.map(
+            (item) => ({
+              product_id:
+                item.product.id,
+              quantity:
+                item.quantity,
+            }),
+          ),
       },
     );
 
     setPlacing(false);
 
     if (error) {
-      toast.error(error.message);
+      toast.error(
+        error.message,
+      );
+
       await loadStore();
       return;
     }
 
     updateCart({});
-    setCartOpen(false);
 
-    navigate(`/loja/${slug}/pedido/${data}`);
+    setOrderId(
+      String(data),
+    );
+
+    setCartStep("success");
+
+    await loadStore();
+  };
+
+  const continueShopping = () => {
+    closeCart();
+
+    window.setTimeout(() => {
+      document
+        .getElementById("produtos")
+        ?.scrollIntoView({
+          behavior: "smooth",
+        });
+    }, 220);
   };
 
   if (company === undefined) {
@@ -286,7 +422,8 @@ export default function Store() {
     );
   }
 
-  const currency = company.currency;
+  const currency =
+    company.currency;
 
   return (
     <div className="min-h-screen bg-white text-neutral-950">
@@ -307,7 +444,9 @@ export default function Store() {
           >
             <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-black text-white">
               <span className="text-sm font-bold">
-                {company.name.charAt(0).toUpperCase()}
+                {company.name
+                  .charAt(0)
+                  .toUpperCase()}
               </span>
             </div>
 
@@ -324,7 +463,9 @@ export default function Store() {
               type="button"
               onClick={() =>
                 document
-                  .getElementById("produtos")
+                  .getElementById(
+                    "produtos",
+                  )
                   ?.scrollIntoView({
                     behavior: "smooth",
                   })
@@ -334,14 +475,18 @@ export default function Store() {
               Produtos
             </button>
 
-            {categories.length > 1 && (
+            {categories.length >
+              1 && (
               <button
                 type="button"
                 onClick={() =>
                   document
-                    .getElementById("categorias")
+                    .getElementById(
+                      "categorias",
+                    )
                     ?.scrollIntoView({
-                      behavior: "smooth",
+                      behavior:
+                        "smooth",
                     })
                 }
                 className="rounded-md px-1 py-2 text-sm font-medium text-neutral-700 transition hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
@@ -353,7 +498,7 @@ export default function Store() {
 
           <button
             type="button"
-            onClick={() => setCartOpen(true)}
+            onClick={openCart}
             aria-label={
               cartCount > 0
                 ? `Abrir carrinho com ${cartCount} produtos`
@@ -394,7 +539,9 @@ export default function Store() {
 
               {company.description && (
                 <p className="mt-7 max-w-lg text-base font-normal leading-7 text-neutral-700 sm:text-[17px]">
-                  {company.description}
+                  {
+                    company.description
+                  }
                 </p>
               )}
 
@@ -402,9 +549,12 @@ export default function Store() {
                 <Button
                   onClick={() =>
                     document
-                      .getElementById("produtos")
+                      .getElementById(
+                        "produtos",
+                      )
                       ?.scrollIntoView({
-                        behavior: "smooth",
+                        behavior:
+                          "smooth",
                       })
                   }
                   className="h-12 rounded-full bg-black px-7 text-sm font-semibold text-white hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
@@ -413,10 +563,11 @@ export default function Store() {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
 
-                {cartCount > 0 && (
+                {cartCount >
+                  0 && (
                   <button
                     type="button"
-                    onClick={() => setCartOpen(true)}
+                    onClick={openCart}
                     className="h-12 rounded-full px-5 text-sm font-semibold text-neutral-800 transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
                   >
                     Ver carrinho
@@ -441,7 +592,9 @@ export default function Store() {
                   <p className="text-2xl font-bold tracking-tight text-neutral-950">
                     {
                       products.filter(
-                        (product) => product.stock > 0,
+                        (product) =>
+                          product.stock >
+                          0,
                       ).length
                     }
                   </p>
@@ -454,21 +607,28 @@ export default function Store() {
             </div>
           </div>
 
-          {/* HERO PRODUCT */}
-
           <div className="relative min-h-[420px] bg-neutral-200 lg:min-h-full">
-            {featuredProducts[0]?.images?.[0] ? (
+            {featuredProducts[0]
+              ?.images?.[0] ? (
               <button
                 type="button"
                 onClick={() =>
-                  setProductOpen(featuredProducts[0])
+                  setProductOpen(
+                    featuredProducts[0],
+                  )
                 }
                 aria-label={`Ver ${featuredProducts[0].name}`}
                 className="group relative h-full w-full overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-black"
               >
                 <img
-                  src={featuredProducts[0].images[0]}
-                  alt={featuredProducts[0].name}
+                  src={
+                    featuredProducts[0]
+                      .images[0]
+                  }
+                  alt={
+                    featuredProducts[0]
+                      .name
+                  }
                   className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.025]"
                 />
 
@@ -478,7 +638,10 @@ export default function Store() {
                   </p>
 
                   <p className="mt-2 text-xl font-semibold">
-                    {featuredProducts[0].name}
+                    {
+                      featuredProducts[0]
+                        .name
+                    }
                   </p>
 
                   <p className="mt-1 text-sm font-medium text-white/90">
@@ -497,7 +660,8 @@ export default function Store() {
 
       {/* CATEGORIES */}
 
-      {categories.length > 1 && (
+      {categories.length >
+        1 && (
         <section
           id="categorias"
           className="border-b border-neutral-200 bg-white"
@@ -508,34 +672,47 @@ export default function Store() {
               role="tablist"
               aria-label="Categorias de produtos"
             >
-              {categories.map((item) => {
-                const active = category === item;
+              {categories.map(
+                (item) => {
+                  const active =
+                    category ===
+                    item;
 
-                return (
-                  <button
-                    key={item}
-                    type="button"
-                    onClick={() => {
-                      setCategory(item);
+                  return (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => {
+                        setCategory(
+                          item,
+                        );
 
-                      document
-                        .getElementById("produtos")
-                        ?.scrollIntoView({
-                          behavior: "smooth",
-                        });
-                    }}
-                    role="tab"
-                    aria-selected={active}
-                    className={`min-h-10 whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black ${
-                      active
-                        ? "bg-black text-white"
-                        : "text-neutral-700 hover:bg-neutral-100 hover:text-black"
-                    }`}
-                  >
-                    {item}
-                  </button>
-                );
-              })}
+                        document
+                          .getElementById(
+                            "produtos",
+                          )
+                          ?.scrollIntoView(
+                            {
+                              behavior:
+                                "smooth",
+                            },
+                          );
+                      }}
+                      role="tab"
+                      aria-selected={
+                        active
+                      }
+                      className={`min-h-10 whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black ${
+                        active
+                          ? "bg-black text-white"
+                          : "text-neutral-700 hover:bg-neutral-100 hover:text-black"
+                      }`}
+                    >
+                      {item}
+                    </button>
+                  );
+                },
+              )}
             </div>
           </div>
         </section>
@@ -554,14 +731,18 @@ export default function Store() {
             </p>
 
             <h2 className="mt-2 text-3xl font-bold tracking-[-0.035em] text-neutral-950 sm:text-4xl">
-              {category === "Todos"
+              {category ===
+              "Todos"
                 ? "Todos os produtos"
                 : category}
             </h2>
 
             <p className="mt-2 text-sm text-neutral-600">
-              {filteredProducts.length}{" "}
-              {filteredProducts.length === 1
+              {
+                filteredProducts.length
+              }{" "}
+              {filteredProducts.length ===
+              1
                 ? "produto encontrado"
                 : "produtos encontrados"}
             </p>
@@ -576,7 +757,10 @@ export default function Store() {
             <Input
               value={search}
               onChange={(event) =>
-                setSearch(event.target.value)
+                setSearch(
+                  event.target
+                    .value,
+                )
               }
               placeholder="Pesquisar produtos..."
               aria-label="Pesquisar produtos"
@@ -586,7 +770,9 @@ export default function Store() {
             {search && (
               <button
                 type="button"
-                onClick={() => setSearch("")}
+                onClick={() =>
+                  setSearch("")
+                }
                 aria-label="Limpar pesquisa"
                 className="absolute right-0 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full text-neutral-700 transition hover:bg-neutral-100 hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
               >
@@ -596,7 +782,8 @@ export default function Store() {
           </div>
         </div>
 
-        {filteredProducts.length === 0 ? (
+        {filteredProducts.length ===
+        0 ? (
           <div className="rounded-2xl border border-neutral-200 bg-neutral-50 py-24 text-center">
             <ShoppingBag className="mx-auto h-8 w-8 text-neutral-600" />
 
@@ -605,15 +792,16 @@ export default function Store() {
             </p>
 
             <p className="mt-2 text-sm text-neutral-600">
-              Tente alterar a pesquisa ou selecionar outra
-              categoria.
+              Tente alterar a pesquisa ou selecionar outra categoria.
             </p>
 
             <button
               type="button"
               onClick={() => {
                 setSearch("");
-                setCategory("Todos");
+                setCategory(
+                  "Todos",
+                );
               }}
               className="mt-5 text-sm font-semibold text-neutral-950 underline underline-offset-4 hover:text-neutral-600"
             >
@@ -622,141 +810,181 @@ export default function Store() {
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-x-4 gap-y-12 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-6 lg:gap-y-16">
-            {filteredProducts.map((product) => {
-              const price = priceOf(product);
+            {filteredProducts.map(
+              (product) => {
+                const price =
+                  priceOf(
+                    product,
+                  );
 
-              const discount =
-                product.promo_price != null &&
-                product.price > 0
-                  ? Math.round(
-                      ((product.price -
-                        product.promo_price) /
-                        product.price) *
-                        100,
-                    )
-                  : 0;
+                const discount =
+                  product.promo_price !=
+                    null &&
+                  product.price >
+                    0
+                    ? Math.round(
+                        ((product.price -
+                          product.promo_price) /
+                          product.price) *
+                          100,
+                      )
+                    : 0;
 
-              const lowStock =
-                product.stock > 0 &&
-                product.stock <= 3;
+                const lowStock =
+                  product.stock >
+                    0 &&
+                  product.stock <=
+                    3;
 
-              return (
-                <article
-                  key={product.id}
-                  className="group min-w-0"
-                >
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setProductOpen(product)
+                return (
+                  <article
+                    key={
+                      product.id
                     }
-                    aria-label={`Ver detalhes de ${product.name}`}
-                    className="relative block aspect-[4/5] w-full overflow-hidden bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+                    className="group min-w-0"
                   >
-                    {product.images?.[0] ? (
-                      <img
-                        src={product.images[0]}
-                        alt={product.name}
-                        loading="lazy"
-                        className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.035]"
-                      />
-                    ) : (
-                      <div className="grid h-full place-items-center">
-                        <ImageOff className="h-7 w-7 text-neutral-500" />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setProductOpen(
+                          product,
+                        )
+                      }
+                      aria-label={`Ver detalhes de ${product.name}`}
+                      className="relative block aspect-[4/5] w-full overflow-hidden bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+                    >
+                      {product
+                        .images?.[0] ? (
+                        <img
+                          src={
+                            product
+                              .images[0]
+                          }
+                          alt={
+                            product.name
+                          }
+                          loading="lazy"
+                          className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.035]"
+                        />
+                      ) : (
+                        <div className="grid h-full place-items-center">
+                          <ImageOff className="h-7 w-7 text-neutral-500" />
+                        </div>
+                      )}
+
+                      {discount >
+                        0 && (
+                        <span className="absolute left-3 top-3 rounded-sm bg-white px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-neutral-950 shadow-sm">
+                          -{discount}%
+                        </span>
+                      )}
+
+                      {product.stock ===
+                        0 && (
+                        <span className="absolute right-3 top-3 rounded-sm bg-black px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white">
+                          Esgotado
+                        </span>
+                      )}
+
+                      {lowStock && (
+                        <span className="absolute right-3 top-3 rounded-sm bg-white px-2.5 py-1.5 text-[10px] font-bold text-neutral-950 shadow-sm">
+                          Últimas unidades
+                        </span>
+                      )}
+
+                      {product.stock >
+                        0 && (
+                        <span className="absolute bottom-3 left-3 right-3 hidden translate-y-2 bg-white px-4 py-3 text-center text-xs font-bold text-neutral-950 opacity-0 shadow-sm transition duration-300 group-hover:translate-y-0 group-hover:opacity-100 sm:block">
+                          Ver produto
+                        </span>
+                      )}
+                    </button>
+
+                    <div className="pt-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          {product.category && (
+                            <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-600">
+                              {
+                                product.category
+                              }
+                            </p>
+                          )}
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setProductOpen(
+                                product,
+                              )
+                            }
+                            className="line-clamp-2 text-left text-sm font-semibold leading-5 text-neutral-950 transition hover:text-neutral-600 focus-visible:outline-none focus-visible:underline focus-visible:underline-offset-4"
+                          >
+                            {
+                              product.name
+                            }
+                          </button>
+                        </div>
+
+                        <p className="shrink-0 text-sm font-bold text-neutral-950">
+                          {formatMoney(
+                            price,
+                            currency,
+                          )}
+                        </p>
                       </div>
-                    )}
 
-                    {discount > 0 && (
-                      <span className="absolute left-3 top-3 rounded-sm bg-white px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-neutral-950 shadow-sm">
-                        -{discount}%
-                      </span>
-                    )}
+                      {product.promo_price !=
+                        null && (
+                        <div className="mt-1">
+                          <span className="text-xs font-medium text-neutral-600 line-through">
+                            {formatMoney(
+                              product.price,
+                              currency,
+                            )}
+                          </span>
+                        </div>
+                      )}
 
-                    {product.stock === 0 && (
-                      <span className="absolute right-3 top-3 rounded-sm bg-black px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white">
-                        Esgotado
-                      </span>
-                    )}
-
-                    {lowStock && (
-                      <span className="absolute right-3 top-3 rounded-sm bg-white px-2.5 py-1.5 text-[10px] font-bold text-neutral-950 shadow-sm">
-                        Últimas unidades
-                      </span>
-                    )}
-
-                    {product.stock > 0 && (
-                      <span className="absolute bottom-3 left-3 right-3 hidden translate-y-2 bg-white px-4 py-3 text-center text-xs font-bold text-neutral-950 opacity-0 shadow-sm transition duration-300 group-hover:translate-y-0 group-hover:opacity-100 sm:block">
-                        Ver produto
-                      </span>
-                    )}
-                  </button>
-
-                  <div className="pt-4">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        {product.category && (
-                          <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-600">
-                            {product.category}
-                          </p>
-                        )}
+                      <div className="mt-4 flex items-center justify-between gap-3">
+                        <span
+                          className={`text-xs font-medium ${
+                            product.stock ===
+                            0
+                              ? "text-neutral-700"
+                              : lowStock
+                                ? "text-neutral-950"
+                                : "text-neutral-600"
+                          }`}
+                        >
+                          {product.stock >
+                          0
+                            ? `${product.stock} em stock`
+                            : "Sem stock"}
+                        </span>
 
                         <button
                           type="button"
-                          onClick={() =>
-                            setProductOpen(product)
+                          disabled={
+                            product.stock ===
+                            0
                           }
-                          className="line-clamp-2 text-left text-sm font-semibold leading-5 text-neutral-950 transition hover:text-neutral-600 focus-visible:outline-none focus-visible:underline focus-visible:underline-offset-4"
+                          onClick={() =>
+                            changeQuantity(
+                              product,
+                              1,
+                            )
+                          }
+                          className="min-h-9 rounded-md px-1 text-xs font-bold text-neutral-950 underline underline-offset-4 transition hover:text-neutral-600 disabled:cursor-not-allowed disabled:text-neutral-400 disabled:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
                         >
-                          {product.name}
+                          Adicionar
                         </button>
                       </div>
-
-                      <p className="shrink-0 text-sm font-bold text-neutral-950">
-                        {formatMoney(price, currency)}
-                      </p>
                     </div>
-
-                    {product.promo_price != null && (
-                      <div className="mt-1">
-                        <span className="text-xs font-medium text-neutral-600 line-through">
-                          {formatMoney(
-                            product.price,
-                            currency,
-                          )}
-                        </span>
-                      </div>
-                    )}
-
-                    <div className="mt-4 flex items-center justify-between gap-3">
-                      <span
-                        className={`text-xs font-medium ${
-                          product.stock === 0
-                            ? "text-neutral-700"
-                            : lowStock
-                              ? "text-neutral-950"
-                              : "text-neutral-600"
-                        }`}
-                      >
-                        {product.stock > 0
-                          ? `${product.stock} em stock`
-                          : "Sem stock"}
-                      </span>
-
-                      <button
-                        type="button"
-                        disabled={product.stock === 0}
-                        onClick={() =>
-                          changeQuantity(product, 1)
-                        }
-                        className="min-h-9 rounded-md px-1 text-xs font-bold text-neutral-950 underline underline-offset-4 transition hover:text-neutral-600 disabled:cursor-not-allowed disabled:text-neutral-400 disabled:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
-                      >
-                        Adicionar
-                      </button>
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
+                  </article>
+                );
+              },
+            )}
           </div>
         )}
       </section>
@@ -766,7 +994,9 @@ export default function Store() {
       <Sheet
         open={!!productOpen}
         onOpenChange={(open) => {
-          if (!open) setProductOpen(null);
+          if (!open) {
+            setProductOpen(null);
+          }
         }}
       >
         <SheetContent
@@ -776,10 +1006,16 @@ export default function Store() {
           {productOpen && (
             <div>
               <div className="relative aspect-[4/5] bg-neutral-100">
-                {productOpen.images?.[0] ? (
+                {productOpen
+                  .images?.[0] ? (
                   <img
-                    src={productOpen.images[0]}
-                    alt={productOpen.name}
+                    src={
+                      productOpen
+                        .images[0]
+                    }
+                    alt={
+                      productOpen.name
+                    }
                     className="h-full w-full object-cover"
                   />
                 ) : (
@@ -790,7 +1026,11 @@ export default function Store() {
 
                 <button
                   type="button"
-                  onClick={() => setProductOpen(null)}
+                  onClick={() =>
+                    setProductOpen(
+                      null,
+                    )
+                  }
                   aria-label="Fechar detalhes do produto"
                   className="absolute right-4 top-4 grid h-11 w-11 place-items-center rounded-full bg-white text-neutral-950 shadow-md transition hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
                 >
@@ -802,24 +1042,31 @@ export default function Store() {
                 <SheetHeader className="space-y-3 text-left">
                   {productOpen.category && (
                     <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-neutral-700">
-                      {productOpen.category}
+                      {
+                        productOpen.category
+                      }
                     </p>
                   )}
 
                   <SheetTitle className="text-2xl font-bold tracking-tight text-neutral-950 sm:text-3xl">
-                    {productOpen.name}
+                    {
+                      productOpen.name
+                    }
                   </SheetTitle>
                 </SheetHeader>
 
                 <div className="mt-5 flex flex-wrap items-baseline gap-3">
                   <span className="text-2xl font-bold text-neutral-950">
                     {formatMoney(
-                      priceOf(productOpen),
+                      priceOf(
+                        productOpen,
+                      ),
                       currency,
                     )}
                   </span>
 
-                  {productOpen.promo_price != null && (
+                  {productOpen.promo_price !=
+                    null && (
                     <span className="text-sm font-medium text-neutral-600 line-through">
                       {formatMoney(
                         productOpen.price,
@@ -831,7 +1078,9 @@ export default function Store() {
 
                 {productOpen.description && (
                   <p className="mt-6 whitespace-pre-wrap text-[15px] leading-7 text-neutral-700">
-                    {productOpen.description}
+                    {
+                      productOpen.description
+                    }
                   </p>
                 )}
 
@@ -843,12 +1092,14 @@ export default function Store() {
 
                     <span
                       className={`text-sm font-bold ${
-                        productOpen.stock > 0
+                        productOpen.stock >
+                        0
                           ? "text-neutral-950"
                           : "text-neutral-700"
                       }`}
                     >
-                      {productOpen.stock > 0
+                      {productOpen.stock >
+                      0
                         ? `${productOpen.stock} unidades disponíveis`
                         : "Esgotado"}
                     </span>
@@ -856,14 +1107,24 @@ export default function Store() {
                 </div>
 
                 <Button
-                  disabled={productOpen.stock === 0}
+                  disabled={
+                    productOpen.stock ===
+                    0
+                  }
                   onClick={() => {
-                    changeQuantity(productOpen, 1);
-                    setProductOpen(null);
+                    changeQuantity(
+                      productOpen,
+                      1,
+                    );
+
+                    setProductOpen(
+                      null,
+                    );
                   }}
                   className="mt-6 h-12 w-full rounded-xl bg-black text-sm font-bold text-white hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
                 >
-                  {productOpen.stock > 0
+                  {productOpen.stock >
+                  0
                     ? "Adicionar ao carrinho"
                     : "Produto esgotado"}
                 </Button>
@@ -871,8 +1132,10 @@ export default function Store() {
                 <button
                   type="button"
                   onClick={() => {
-                    setProductOpen(null);
-                    setCartOpen(true);
+                    setProductOpen(
+                      null,
+                    );
+                    openCart();
                   }}
                   className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 text-sm font-semibold text-neutral-700 transition hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
                 >
@@ -885,44 +1148,83 @@ export default function Store() {
         </SheetContent>
       </Sheet>
 
-      {/* CART */}
+      {/* CART / CHECKOUT / SUCCESS */}
 
-      <Sheet open={cartOpen} onOpenChange={setCartOpen}>
+      <Sheet
+        open={cartOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            closeCart();
+          } else {
+            openCart();
+          }
+        }}
+      >
         <SheetContent
           side="right"
           className="flex h-[100dvh] max-h-[100dvh] w-full flex-col overflow-hidden border-l border-neutral-200 bg-white p-0 sm:max-w-lg"
         >
-          {/* CART HEADER */}
+          {/* HEADER */}
 
           <div className="shrink-0 border-b border-neutral-200 bg-white px-5 py-5 sm:px-6">
             <SheetHeader>
-              <div className="flex items-center justify-between gap-4">
-                <div>
+              <div className="flex items-center gap-3">
+                {cartStep ===
+                  "checkout" && (
+                  <button
+                    type="button"
+                    onClick={
+                      goBackToCart
+                    }
+                    aria-label="Voltar ao carrinho"
+                    className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-neutral-200 text-neutral-800 transition hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                  </button>
+                )}
+
+                <div className="min-w-0">
                   <SheetTitle className="text-xl font-bold tracking-tight text-neutral-950">
-                    Seu carrinho
+                    {cartStep ===
+                    "cart"
+                      ? "Carrinho"
+                      : cartStep ===
+                          "checkout"
+                        ? "Finalizar pedido"
+                        : "Pedido confirmado"}
                   </SheetTitle>
 
-                  {cartCount > 0 && (
+                  {cartStep ===
+                    "cart" &&
+                    cartCount >
+                      0 && (
+                      <p className="mt-1 text-sm font-medium text-neutral-600">
+                        {cartCount}{" "}
+                        {cartCount ===
+                        1
+                          ? "item"
+                          : "itens"}
+                      </p>
+                    )}
+
+                  {cartStep ===
+                    "checkout" && (
                     <p className="mt-1 text-sm font-medium text-neutral-600">
-                      {cartCount}{" "}
-                      {cartCount === 1
-                        ? "produto selecionado"
-                        : "produtos selecionados"}
+                      Dados para contacto
                     </p>
                   )}
                 </div>
-
-                {cartCount > 0 && (
-                  <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-neutral-100">
-                    <ShoppingBag className="h-4 w-4 text-neutral-800" />
-                  </div>
-                )}
               </div>
             </SheetHeader>
           </div>
 
-          {cartItems.length === 0 ? (
-            <div className="flex min-h-0 flex-1 flex-col items-center justify-center overflow-y-auto px-8 text-center">
+          {/* EMPTY CART */}
+
+          {cartItems.length ===
+            0 &&
+          cartStep ===
+            "cart" ? (
+            <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-8 text-center">
               <div className="grid h-16 w-16 place-items-center rounded-full bg-neutral-100">
                 <ShoppingCart className="h-6 w-6 text-neutral-700" />
               </div>
@@ -932,341 +1234,478 @@ export default function Store() {
               </h3>
 
               <p className="mt-2 max-w-xs text-sm leading-6 text-neutral-600">
-                Explore o catálogo e adicione os produtos que
-                deseja comprar.
+                Adicione produtos para continuar.
               </p>
 
               <Button
                 type="button"
-                onClick={() => setCartOpen(false)}
+                onClick={
+                  continueShopping
+                }
                 className="mt-7 h-11 rounded-full bg-black px-6 text-sm font-bold text-white hover:bg-neutral-800"
               >
-                Continuar a comprar
+                Ver produtos
               </Button>
             </div>
           ) : (
             <>
-              {/* CART PRODUCTS
-                  Este bloco possui scroll independente.
-              */}
+              {/* SINGLE SCROLL AREA */}
 
-              <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-                <div className="px-5 sm:px-6">
-                  <div className="divide-y divide-neutral-200">
-                    {cartItems.map(
-                      ({ product, quantity }) => {
-                        const unitPrice =
-                          priceOf(product);
+              {cartStep !==
+                "success" && (
+                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+                  {cartStep ===
+                    "cart" && (
+                    <div className="px-5 sm:px-6">
+                      <div className="divide-y divide-neutral-200">
+                        {cartItems.map(
+                          ({
+                            product,
+                            quantity,
+                          }) => {
+                            const unitPrice =
+                              priceOf(
+                                product,
+                              );
 
-                        const itemTotal =
-                          unitPrice * quantity;
+                            const itemTotal =
+                              unitPrice *
+                              quantity;
 
-                        const nearStockLimit =
-                          product.stock > 0 &&
-                          quantity >= product.stock;
-
-                        return (
-                          <div
-                            key={product.id}
-                            className="py-5 sm:py-6"
-                          >
-                            <div className="flex gap-3.5 sm:gap-4">
-                              {/* IMAGE */}
-
-                              <div className="relative h-24 w-20 shrink-0 overflow-hidden rounded-md bg-neutral-100 sm:h-28 sm:w-24">
-                                {product.images?.[0] ? (
-                                  <img
-                                    src={product.images[0]}
-                                    alt={product.name}
-                                    className="h-full w-full object-cover"
-                                  />
-                                ) : (
-                                  <div className="grid h-full place-items-center">
-                                    <ImageOff className="h-5 w-5 text-neutral-500" />
-                                  </div>
-                                )}
-
-                                {product.promo_price !=
-                                  null && (
-                                  <span className="absolute left-1.5 top-1.5 rounded-sm bg-white px-1.5 py-1 text-[9px] font-bold uppercase tracking-wide text-neutral-950 shadow-sm">
-                                    Promoção
-                                  </span>
-                                )}
-                              </div>
-
-                              {/* INFO */}
-
-                              <div className="min-w-0 flex-1">
-                                <div className="flex items-start justify-between gap-2">
-                                  <div className="min-w-0">
-                                    {product.category && (
-                                      <p className="mb-1 text-[9px] font-bold uppercase tracking-[0.16em] text-neutral-600">
-                                        {product.category}
-                                      </p>
+                            return (
+                              <div
+                                key={
+                                  product.id
+                                }
+                                className="py-5"
+                              >
+                                <div className="flex gap-4">
+                                  <div className="h-24 w-20 shrink-0 overflow-hidden rounded-lg bg-neutral-100 sm:h-28 sm:w-24">
+                                    {product
+                                      .images?.[0] ? (
+                                      <img
+                                        src={
+                                          product
+                                            .images[0]
+                                        }
+                                        alt={
+                                          product.name
+                                        }
+                                        className="h-full w-full object-cover"
+                                      />
+                                    ) : (
+                                      <div className="grid h-full place-items-center">
+                                        <ImageOff className="h-5 w-5 text-neutral-500" />
+                                      </div>
                                     )}
-
-                                    <p className="line-clamp-2 text-sm font-semibold leading-5 text-neutral-950">
-                                      {product.name}
-                                    </p>
                                   </div>
 
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      const next = {
-                                        ...cart,
-                                      };
+                                  <div className="min-w-0 flex-1">
+                                    <div className="flex items-start justify-between gap-3">
+                                      <div className="min-w-0">
+                                        {product.category && (
+                                          <p className="mb-1 text-[9px] font-bold uppercase tracking-[0.16em] text-neutral-500">
+                                            {
+                                              product.category
+                                            }
+                                          </p>
+                                        )}
 
-                                      delete next[
-                                        product.id
-                                      ];
+                                        <p className="line-clamp-2 text-sm font-semibold leading-5 text-neutral-950">
+                                          {
+                                            product.name
+                                          }
+                                        </p>
+                                      </div>
 
-                                      updateCart(next);
-                                    }}
-                                    aria-label={`Remover ${product.name} do carrinho`}
-                                    className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-neutral-700 transition hover:bg-neutral-100 hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
-                                  >
-                                    <X className="h-4 w-4" />
-                                  </button>
-                                </div>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          const next =
+                                            {
+                                              ...cart,
+                                            };
 
-                                {/* PRICE */}
+                                          delete next[
+                                            product.id
+                                          ];
 
-                                <div className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                                  <span className="text-sm font-bold text-neutral-950">
-                                    {formatMoney(
-                                      itemTotal,
-                                      currency,
-                                    )}
-                                  </span>
+                                          updateCart(
+                                            next,
+                                          );
+                                        }}
+                                        aria-label={`Remover ${product.name}`}
+                                        className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-neutral-600 transition hover:bg-neutral-100 hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+                                      >
+                                        <X className="h-4 w-4" />
+                                      </button>
+                                    </div>
 
-                                  {quantity > 1 && (
-                                    <span className="text-xs font-medium text-neutral-600">
+                                    <p className="mt-2 text-sm font-bold text-neutral-950">
                                       {formatMoney(
-                                        unitPrice,
+                                        itemTotal,
                                         currency,
-                                      )}{" "}
-                                      / unidade
-                                    </span>
-                                  )}
-                                </div>
+                                      )}
+                                    </p>
 
-                                {/* QUANTITY */}
+                                    <div className="mt-4">
+                                      <div className="inline-flex h-9 items-center rounded-full border border-neutral-300">
+                                        <button
+                                          type="button"
+                                          onClick={() =>
+                                            changeQuantity(
+                                              product,
+                                              -1,
+                                            )
+                                          }
+                                          aria-label={`Diminuir quantidade de ${product.name}`}
+                                          className="grid h-9 w-9 place-items-center rounded-full text-neutral-800 transition hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+                                        >
+                                          <Minus className="h-3.5 w-3.5" />
+                                        </button>
 
-                                <div className="mt-4 flex items-center justify-between gap-3">
-                                  <div
-                                    className="flex h-10 items-center rounded-full border border-neutral-300 bg-white"
-                                    aria-label="Quantidade"
-                                  >
-                                    <button
-                                      type="button"
-                                      onClick={() =>
-                                        changeQuantity(
-                                          product,
-                                          -1,
-                                        )
-                                      }
-                                      aria-label={`Diminuir quantidade de ${product.name}`}
-                                      className="grid h-10 w-10 place-items-center rounded-full text-neutral-800 transition hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
-                                    >
-                                      <Minus className="h-3.5 w-3.5" />
-                                    </button>
+                                        <span className="w-7 text-center text-sm font-bold text-neutral-950">
+                                          {
+                                            quantity
+                                          }
+                                        </span>
 
-                                    <span className="w-8 text-center text-sm font-bold text-neutral-950">
-                                      {quantity}
-                                    </span>
-
-                                    <button
-                                      type="button"
-                                      onClick={() =>
-                                        changeQuantity(
-                                          product,
-                                          1,
-                                        )
-                                      }
-                                      aria-label={`Aumentar quantidade de ${product.name}`}
-                                      className="grid h-10 w-10 place-items-center rounded-full text-neutral-800 transition hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
-                                    >
-                                      <Plus className="h-3.5 w-3.5" />
-                                    </button>
+                                        <button
+                                          type="button"
+                                          onClick={() =>
+                                            changeQuantity(
+                                              product,
+                                              1,
+                                            )
+                                          }
+                                          aria-label={`Aumentar quantidade de ${product.name}`}
+                                          className="grid h-9 w-9 place-items-center rounded-full text-neutral-800 transition hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+                                        >
+                                          <Plus className="h-3.5 w-3.5" />
+                                        </button>
+                                      </div>
+                                    </div>
                                   </div>
-
-                                  {nearStockLimit && (
-                                    <span className="text-right text-xs font-semibold text-neutral-700">
-                                      Últimas unidades
-                                    </span>
-                                  )}
                                 </div>
                               </div>
-                            </div>
-                          </div>
-                        );
-                      },
+                            );
+                          },
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {cartStep ===
+                    "checkout" && (
+                    <div className="px-5 py-6 sm:px-6">
+                      <div className="mb-7">
+                        <p className="text-2xl font-bold tracking-tight text-neutral-950">
+                          Quase concluído.
+                        </p>
+
+                        <p className="mt-2 text-sm leading-6 text-neutral-600">
+                          Preencha os seus dados para receber o contacto da loja.
+                        </p>
+                      </div>
+
+                      <div className="space-y-4">
+                        <div>
+                          <label
+                            htmlFor="customer-name"
+                            className="mb-2 block text-sm font-semibold text-neutral-950"
+                          >
+                            Nome completo
+                          </label>
+
+                          <Input
+                            id="customer-name"
+                            value={
+                              customer.name
+                            }
+                            onChange={(
+                              event,
+                            ) =>
+                              setCustomer(
+                                {
+                                  ...customer,
+                                  name: event
+                                    .target
+                                    .value,
+                                },
+                              )
+                            }
+                            placeholder="O seu nome"
+                            className="h-12 rounded-xl border-neutral-300 bg-white text-sm font-medium text-neutral-950 placeholder:text-neutral-500 focus-visible:border-black focus-visible:ring-2 focus-visible:ring-black"
+                            maxLength={
+                              120
+                            }
+                            autoComplete="name"
+                          />
+                        </div>
+
+                        <div>
+                          <label
+                            htmlFor="customer-phone"
+                            className="mb-2 block text-sm font-semibold text-neutral-950"
+                          >
+                            Telefone / WhatsApp
+                          </label>
+
+                          <Input
+                            id="customer-phone"
+                            value={
+                              customer.phone
+                            }
+                            onChange={(
+                              event,
+                            ) =>
+                              setCustomer(
+                                {
+                                  ...customer,
+                                  phone: event
+                                    .target
+                                    .value,
+                                },
+                              )
+                            }
+                            placeholder="+244 9xx xxx xxx"
+                            className="h-12 rounded-xl border-neutral-300 bg-white text-sm font-medium text-neutral-950 placeholder:text-neutral-500 focus-visible:border-black focus-visible:ring-2 focus-visible:ring-black"
+                            maxLength={
+                              40
+                            }
+                            autoComplete="tel"
+                            inputMode="tel"
+                          />
+                        </div>
+
+                        <div>
+                          <label
+                            htmlFor="customer-email"
+                            className="mb-2 block text-sm font-semibold text-neutral-950"
+                          >
+                            Email
+                            <span className="ml-1 font-normal text-neutral-500">
+                              opcional
+                            </span>
+                          </label>
+
+                          <Input
+                            id="customer-email"
+                            value={
+                              customer.email
+                            }
+                            onChange={(
+                              event,
+                            ) =>
+                              setCustomer(
+                                {
+                                  ...customer,
+                                  email: event
+                                    .target
+                                    .value,
+                                },
+                              )
+                            }
+                            placeholder="seu@email.com"
+                            type="email"
+                            className="h-12 rounded-xl border-neutral-300 bg-white text-sm font-medium text-neutral-950 placeholder:text-neutral-500 focus-visible:border-black focus-visible:ring-2 focus-visible:ring-black"
+                            maxLength={
+                              160
+                            }
+                            autoComplete="email"
+                          />
+                        </div>
+
+                        <div>
+                          <label
+                            htmlFor="customer-notes"
+                            className="mb-2 block text-sm font-semibold text-neutral-950"
+                          >
+                            Morada / observações
+                            <span className="ml-1 font-normal text-neutral-500">
+                              opcional
+                            </span>
+                          </label>
+
+                          <Textarea
+                            id="customer-notes"
+                            value={
+                              customer.notes
+                            }
+                            onChange={(
+                              event,
+                            ) =>
+                              setCustomer(
+                                {
+                                  ...customer,
+                                  notes: event
+                                    .target
+                                    .value,
+                                },
+                              )
+                            }
+                            placeholder="Morada, referência ou alguma observação"
+                            className="min-h-[110px] resize-none rounded-xl border-neutral-300 bg-white text-sm font-medium text-neutral-950 placeholder:text-neutral-500 focus-visible:border-black focus-visible:ring-2 focus-visible:ring-black"
+                            maxLength={
+                              1000
+                            }
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* SUCCESS */}
+
+              {cartStep ===
+                "success" && (
+                <div className="min-h-0 flex-1 overflow-y-auto">
+                  <div className="flex min-h-full flex-col items-center justify-center px-7 py-12 text-center sm:px-10">
+                    <div className="grid h-20 w-20 place-items-center rounded-full bg-black text-white">
+                      <Check className="h-9 w-9 stroke-[2.5]" />
+                    </div>
+
+                    <p className="mt-8 text-xs font-bold uppercase tracking-[0.2em] text-neutral-500">
+                      Pedido recebido
+                    </p>
+
+                    <h2 className="mt-3 text-3xl font-bold tracking-[-0.04em] text-neutral-950">
+                      Tudo certo.
+                    </h2>
+
+                    <p className="mt-4 max-w-sm text-sm leading-6 text-neutral-600">
+                      O seu pedido foi registado com sucesso. A loja poderá entrar em contacto consigo para combinar os próximos passos.
+                    </p>
+
+                    {orderId && (
+                      <div className="mt-7 rounded-xl border border-neutral-200 bg-neutral-50 px-5 py-4">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-neutral-500">
+                          Pedido
+                        </p>
+
+                        <p className="mt-1 font-mono text-sm font-bold text-neutral-950">
+                          #{orderId}
+                        </p>
+                      </div>
                     )}
                   </div>
                 </div>
+              )}
 
-                {/* CONTINUE SHOPPING */}
+              {/* FIXED FOOTER */}
 
-                <div className="border-t border-neutral-200 px-5 py-5 sm:px-6">
+              {cartStep ===
+                "cart" && (
+                <div className="shrink-0 border-t border-neutral-200 bg-white px-5 py-5 sm:px-6">
+                  <div className="flex items-end justify-between gap-5">
+                    <div>
+                      <p className="text-xs font-medium text-neutral-600">
+                        Total
+                      </p>
+
+                      <p className="mt-1 text-xl font-bold tracking-tight text-neutral-950">
+                        {formatMoney(
+                          cartTotal,
+                          currency,
+                        )}
+                      </p>
+                    </div>
+
+                    <Button
+                      type="button"
+                      onClick={
+                        goToCheckout
+                      }
+                      className="h-12 rounded-xl bg-black px-5 text-sm font-bold text-white hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+                    >
+                      Finalizar pedido
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {cartStep ===
+                "checkout" && (
+                <div className="shrink-0 border-t border-neutral-200 bg-white px-5 py-5 sm:px-6">
+                  <div className="mb-4 flex items-center justify-between gap-4">
+                    <span className="text-sm font-medium text-neutral-600">
+                      Total
+                    </span>
+
+                    <span className="text-lg font-bold text-neutral-950">
+                      {formatMoney(
+                        cartTotal,
+                        currency,
+                      )}
+                    </span>
+                  </div>
+
+                  <Button
+                    type="button"
+                    onClick={
+                      checkout
+                    }
+                    disabled={
+                      placing
+                    }
+                    className="h-12 w-full rounded-xl bg-black text-sm font-bold text-white hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+                  >
+                    {placing ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        A processar pedido...
+                      </>
+                    ) : (
+                      <>
+                        Confirmar pedido
+                        <Check className="ml-2 h-4 w-4" />
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
+
+              {cartStep ===
+                "success" && (
+                <div className="shrink-0 border-t border-neutral-200 bg-white px-5 py-5 sm:px-6">
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      if (
+                        orderId
+                      ) {
+                        closeCart();
+
+                        window.setTimeout(
+                          () => {
+                            navigate(
+                              `/loja/${slug}/pedido/${orderId}`,
+                            );
+                          },
+                          180,
+                        );
+                      }
+                    }}
+                    className="h-12 w-full rounded-xl bg-black text-sm font-bold text-white hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+                  >
+                    Ver pedido
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+
                   <button
                     type="button"
-                    onClick={() => setCartOpen(false)}
-                    className="flex min-h-10 items-center gap-2 text-sm font-semibold text-neutral-700 transition hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+                    onClick={
+                      continueShopping
+                    }
+                    className="mt-3 flex min-h-10 w-full items-center justify-center text-sm font-semibold text-neutral-700 transition hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
                   >
-                    <ArrowLeft className="h-4 w-4" />
                     Continuar a comprar
                   </button>
                 </div>
-              </div>
-
-              {/* CHECKOUT
-                  Também pode ter scroll próprio em telas pequenas.
-              */}
-
-              <div className="max-h-[58dvh] shrink-0 overflow-y-auto overscroll-contain border-t border-neutral-300 bg-[#fafafa]">
-                <div className="px-5 py-5 sm:px-6 sm:py-6">
-                  {/* SUMMARY */}
-
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between gap-4 text-sm">
-                      <span className="font-medium text-neutral-700">
-                        Subtotal
-                      </span>
-
-                      <span className="font-bold text-neutral-950">
-                        {formatMoney(
-                          cartTotal,
-                          currency,
-                        )}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center justify-between gap-4 text-sm">
-                      <span className="font-medium text-neutral-700">
-                        Entrega
-                      </span>
-
-                      <span className="text-sm font-semibold text-neutral-950">
-                        A combinar
-                      </span>
-                    </div>
-
-                    <div className="my-4 h-px bg-neutral-300" />
-
-                    <div className="flex items-end justify-between gap-4">
-                      <span className="text-sm font-bold text-neutral-950">
-                        Total
-                      </span>
-
-                      <span className="text-2xl font-bold tracking-tight text-neutral-950">
-                        {formatMoney(
-                          cartTotal,
-                          currency,
-                        )}
-                      </span>
-                    </div>
-                  </div>
-
-                  <p className="mt-3 text-xs leading-5 text-neutral-600">
-                    O pagamento e os custos de entrega serão
-                    combinados com a loja após a confirmação
-                    do pedido.
-                  </p>
-
-                  {/* CUSTOMER DETAILS */}
-
-                  <div className="mt-6">
-                    <div className="mb-3">
-                      <p className="text-xs font-bold uppercase tracking-[0.16em] text-neutral-700">
-                        Dados para o pedido
-                      </p>
-
-                      <p className="mt-1 text-xs text-neutral-600">
-                        Precisamos destes dados para entrar em
-                        contacto consigo.
-                      </p>
-                    </div>
-
-                    <div className="space-y-3">
-                      <Input
-                        value={customer.name}
-                        onChange={(event) =>
-                          setCustomer({
-                            ...customer,
-                            name: event.target.value,
-                          })
-                        }
-                        placeholder="Nome completo"
-                        aria-label="Nome completo"
-                        className="h-12 rounded-xl border-neutral-300 bg-white text-sm font-medium text-neutral-950 placeholder:text-neutral-600 focus-visible:border-black focus-visible:ring-2 focus-visible:ring-black"
-                        maxLength={120}
-                      />
-
-                      <Input
-                        value={customer.phone}
-                        onChange={(event) =>
-                          setCustomer({
-                            ...customer,
-                            phone: event.target.value,
-                          })
-                        }
-                        placeholder="Telefone / WhatsApp"
-                        aria-label="Telefone ou WhatsApp"
-                        className="h-12 rounded-xl border-neutral-300 bg-white text-sm font-medium text-neutral-950 placeholder:text-neutral-600 focus-visible:border-black focus-visible:ring-2 focus-visible:ring-black"
-                        maxLength={40}
-                      />
-
-                      <Input
-                        value={customer.email}
-                        onChange={(event) =>
-                          setCustomer({
-                            ...customer,
-                            email: event.target.value,
-                          })
-                        }
-                        placeholder="Email (opcional)"
-                        aria-label="Email"
-                        type="email"
-                        className="h-12 rounded-xl border-neutral-300 bg-white text-sm font-medium text-neutral-950 placeholder:text-neutral-600 focus-visible:border-black focus-visible:ring-2 focus-visible:ring-black"
-                        maxLength={160}
-                      />
-
-                      <Textarea
-                        value={customer.notes}
-                        onChange={(event) =>
-                          setCustomer({
-                            ...customer,
-                            notes: event.target.value,
-                          })
-                        }
-                        placeholder="Morada ou observações"
-                        aria-label="Morada ou observações"
-                        className="min-h-[90px] resize-none rounded-xl border-neutral-300 bg-white text-sm font-medium text-neutral-950 placeholder:text-neutral-600 focus-visible:border-black focus-visible:ring-2 focus-visible:ring-black"
-                        maxLength={1000}
-                      />
-
-                      <Button
-                        onClick={checkout}
-                        disabled={placing}
-                        className="mt-1 h-12 w-full rounded-xl bg-black text-sm font-bold text-white hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
-                      >
-                        {placing ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            A processar pedido...
-                          </>
-                        ) : (
-                          <>
-                            Finalizar pedido
-                            <ArrowRight className="ml-2 h-4 w-4" />
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              )}
             </>
           )}
         </SheetContent>
@@ -1274,27 +1713,35 @@ export default function Store() {
 
       {/* MOBILE CART */}
 
-      {cartCount > 0 && !cartOpen && (
-        <button
-          type="button"
-          onClick={() => setCartOpen(true)}
-          aria-label={`Abrir carrinho. Total ${formatMoney(
-            cartTotal,
-            currency,
-          )}`}
-          className="fixed bottom-4 left-1/2 z-40 flex min-h-12 -translate-x-1/2 items-center gap-3 rounded-full bg-black px-5 py-3 text-sm font-bold text-white shadow-2xl transition hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black sm:bottom-5 md:hidden"
-        >
-          <ShoppingBag className="h-4 w-4" />
+      {cartCount > 0 &&
+        !cartOpen && (
+          <button
+            type="button"
+            onClick={
+              openCart
+            }
+            aria-label={`Abrir carrinho. Total ${formatMoney(
+              cartTotal,
+              currency,
+            )}`}
+            className="fixed bottom-4 left-1/2 z-40 flex min-h-12 -translate-x-1/2 items-center gap-3 rounded-full bg-black px-5 py-3 text-sm font-bold text-white shadow-2xl transition hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black sm:bottom-5 md:hidden"
+          >
+            <ShoppingBag className="h-4 w-4" />
 
-          <span>Ver carrinho</span>
+            <span>
+              Ver carrinho
+            </span>
 
-          <span className="h-4 w-px bg-white/40" />
+            <span className="h-4 w-px bg-white/40" />
 
-          <span>
-            {formatMoney(cartTotal, currency)}
-          </span>
-        </button>
-      )}
+            <span>
+              {formatMoney(
+                cartTotal,
+                currency,
+              )}
+            </span>
+          </button>
+        )}
 
       {/* FOOTER */}
 
@@ -1308,7 +1755,9 @@ export default function Store() {
 
               {company.description && (
                 <p className="mt-2 max-w-md text-sm leading-6 text-neutral-700">
-                  {company.description}
+                  {
+                    company.description
+                  }
                 </p>
               )}
             </div>
@@ -1319,7 +1768,8 @@ export default function Store() {
               </p>
 
               <p className="mt-2 text-sm font-medium text-neutral-600">
-                © {new Date().getFullYear()}{" "}
+                ©{" "}
+                {new Date().getFullYear()}{" "}
                 {company.name}
               </p>
             </div>
