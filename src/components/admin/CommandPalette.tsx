@@ -1,0 +1,224 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  BarChart3,
+  Box,
+  CheckCircle2,
+  FileText,
+  LayoutDashboard,
+  Package,
+  Search,
+  Settings,
+  ShoppingBag,
+  Users,
+  X,
+} from "lucide-react";
+
+import { useCompany } from "@/hooks/useCompany";
+import { supabase } from "@/integrations/supabase/client";
+
+type SearchResult = {
+  id: string;
+  type: "product" | "order" | "customer" | "nav";
+  title: string;
+  subtitle: string;
+  url: string;
+};
+
+export function CommandPalette({
+  open,
+  onClose,
+}: {
+  open: boolean;
+  onClose: () => void;
+}) {
+  const { company } = useCompany();
+  const navigate = useNavigate();
+
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        if (open) onClose();
+        else setQuery("");
+      }
+      if (e.key === "Escape" && open) {
+        onClose();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [open, onClose]);
+
+  useEffect(() => {
+    if (!open || !company) return;
+
+    const navShortcuts: SearchResult[] = [
+      { id: "nav-dash", type: "nav", title: "Visão Geral", subtitle: "Navegação", url: "/dashboard" },
+      { id: "nav-prod", type: "nav", title: "Produtos", subtitle: "Navegação", url: "/admin/produtos" },
+      { id: "nav-inv", type: "nav", title: "Inventário", subtitle: "Navegação", url: "/admin/inventario" },
+      { id: "nav-ord", type: "nav", title: "Pedidos", subtitle: "Navegação", url: "/admin/pedidos" },
+      { id: "nav-cust", type: "nav", title: "Clientes", subtitle: "Navegação", url: "/admin/clientes" },
+      { id: "nav-ag", type: "nav", title: "Agentes", subtitle: "Navegação", url: "/admin/agentes" },
+      { id: "nav-appr", type: "nav", title: "Central de Aprovações", subtitle: "Navegação", url: "/admin/aprovacoes" },
+      { id: "nav-analytics", type: "nav", title: "Analytics", subtitle: "Navegação", url: "/admin/analytics" },
+      { id: "nav-[#nav-config]", type: "nav", title: "Configurações", subtitle: "Navegação", url: "/admin/config" },
+    ];
+
+    if (!query.trim()) {
+      setResults(navShortcuts);
+      return;
+    }
+
+    async function performSearch() {
+      setLoading(true);
+      const q = query.trim().toLowerCase();
+
+      // Search products, orders, customers
+      const [pRes, oRes, cRes] = await Promise.all([
+        supabase
+          .from("products")
+          .select("id, name, sku")
+          .eq("company_id", company.id)
+          .ilike("name", `%${q}%`)
+          .limit(4),
+
+        supabase
+          .from("orders")
+          .select("id, customer_name, total")
+          .eq("company_id", company.id)
+          .ilike("customer_name", `%${q}%`)
+          .limit(4),
+
+        supabase
+          .from("customers")
+          .select("id, name, phone, email")
+          .eq("company_id", company.id)
+          .ilike("name", `%${q}%`)
+          .limit(4),
+      ]);
+
+      const items: SearchResult[] = [];
+
+      // Filtered Nav
+      const matchedNav = navShortcuts.filter(
+        (n) => n.title.toLowerCase().includes(q) || n.url.toLowerCase().includes(q)
+      );
+      items.push(...matchedNav);
+
+      if (pRes.data) {
+        pRes.data.forEach((p) => {
+          items.push({
+            id: p.id,
+            type: "product",
+            title: p.name,
+            subtitle: p.sku ? `SKU: ${p.sku}` : "Produto",
+            url: "/admin/produtos",
+          });
+        });
+      }
+
+      if (oRes.data) {
+        oRes.data.forEach((o) => {
+          items.push({
+            id: o.id,
+            type: "order",
+            title: `Pedido #${o.id.slice(0, 8).toUpperCase()}`,
+            subtitle: `Cliente: ${o.customer_name}`,
+            url: "/admin/pedidos",
+          });
+        });
+      }
+
+      if (cRes.data) {
+        cRes.data.forEach((c) => {
+          items.push({
+            id: c.id,
+            type: "customer",
+            title: c.name,
+            subtitle: c.email || c.phone || "Cliente",
+            url: "/admin/clientes",
+          });
+        });
+      }
+
+      setResults(items);
+      setLoading(false);
+    }
+
+    performSearch();
+  }, [query, open, company]);
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] grid place-items-start pt-[12vh] justify-center bg-black/40 backdrop-blur-sm px-4">
+      <div className="w-full max-w-xl overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-2xl">
+        <div className="flex items-center border-b border-neutral-200 px-4">
+          <Search className="h-4 w-4 shrink-0 text-neutral-400" />
+          <input
+            autoFocus
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Pesquisar em Vendora (produtos, pedidos, clientes, navegar...)"
+            className="h-12 w-full bg-transparent px-3 text-sm text-neutral-950 outline-none placeholder:text-neutral-400"
+          />
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded p-1 text-neutral-400 hover:text-black"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="max-h-[340px] overflow-y-auto p-2">
+          {loading ? (
+            <p className="p-4 text-center text-xs text-neutral-400">A pesquisar...</p>
+          ) : results.length === 0 ? (
+            <p className="p-4 text-center text-xs text-neutral-400">Nenhum resultado para "{query}"</p>
+          ) : (
+            <div className="space-y-0.5">
+              {results.map((res) => (
+                <button
+                  key={`${res.type}-${res.id}`}
+                  type="button"
+                  onClick={() => {
+                    navigate(res.url);
+                    onClose();
+                  }}
+                  className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left transition hover:bg-neutral-100"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="grid h-7 w-7 place-items-center rounded bg-neutral-100 text-neutral-700">
+                      {res.type === "product" && <Package className="h-3.5 w-3.5" />}
+                      {res.type === "order" && <ShoppingBag className="h-3.5 w-3.5" />}
+                      {res.type === "customer" && <Users className="h-3.5 w-3.5" />}
+                      {res.type === "nav" && <LayoutDashboard className="h-3.5 w-3.5" />}
+                    </span>
+                    <div>
+                      <p className="text-sm font-semibold text-neutral-950">{res.title}</p>
+                      <p className="text-[11px] text-neutral-400">{res.subtitle}</p>
+                    </div>
+                  </div>
+
+                  <span className="text-[10px] uppercase font-mono text-neutral-400">{res.type}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="flex items-center justify-between border-t border-neutral-100 bg-neutral-50 px-4 py-2 text-[10px] text-neutral-400">
+          <span>Dica: Use <strong>⌘ K</strong> para abrir/fechar</span>
+          <span>Vendora Commerce OS</span>
+        </div>
+      </div>
+    </div>
+  );
+}
