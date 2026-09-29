@@ -1,6 +1,4 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { createOpenAI } from "npm:@ai-sdk/openai";
-import { streamText } from "npm:ai";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -49,11 +47,6 @@ Deno.serve(async (req) => {
 
     const key = Deno.env.get("LOVABLE_API_KEY");
     if (!key) return json({ error: "IA não configurada" }, 500);
-    const provider = createOpenAI({
-      baseURL: "https://ai.gateway.lovable.dev/v1",
-      apiKey: key,
-      headers: { "Lovable-API-Key": key, "X-Lovable-AIG-SDK": "vercel-ai-sdk" },
-    });
     const c = product.companies;
     const facts = {
       loja: c?.name, sobre: c?.description, moeda: c?.currency,
@@ -61,19 +54,23 @@ Deno.serve(async (req) => {
       preco: Number(product.price), preco_promocional: product.promo_price != null ? Number(product.promo_price) : null,
       stock: product.stock,
     };
-    const result = streamText({
-      model: provider.responses("openai/gpt-6-astra"),
-      system: `És o agente de marketing de uma loja. Usa APENAS os dados fornecidos; nunca inventes preços, stock, tamanhos ou características. Escreve em português. Cria um texto diferente e adaptado a cada rede: Instagram (visual, emojis, hashtags, até 150 palavras), Facebook (mais descritivo, até 120 palavras), WhatsApp (curto, direto, convite a responder para encomendar, sem hashtags). Mostra preços com a moeda indicada. Responde só com JSON: {"instagram": "...", "facebook": "...", "whatsapp": "..."} contendo apenas as redes pedidas.`,
-      prompt: `Redes pedidas: ${platforms.join(", ")}\nDados: ${JSON.stringify(facts)}`,
-      providerOptions: { openai: { forceReasoning: true, reasoningEffort: "low", reasoningSummary: "auto", store: false, include: ["reasoning.encrypted_content"] } },
+    const system = `És o agente de marketing de uma loja. Usa APENAS os dados fornecidos; nunca inventes preços, stock, tamanhos ou características. Escreve em português. Cria um texto diferente e adaptado a cada rede: Instagram (visual, emojis, hashtags, até 150 palavras), Facebook (mais descritivo, até 120 palavras), WhatsApp (curto, direto, convite a responder para encomendar, sem hashtags). Mostra preços com a moeda indicada. Responde só com JSON: {"instagram": "...", "facebook": "...", "whatsapp": "..."} contendo apenas as redes pedidas.`;
+    const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash",
+        messages: [{ role: "system", content: system }, { role: "user", content: `Redes pedidas: ${platforms.join(", ")}\nDados: ${JSON.stringify(facts)}` }],
+      }),
     });
-    let text: string;
-    try { text = await result.text; } catch (e) {
-      const status = (e as { statusCode?: number }).statusCode ?? 500;
+    if (!resp.ok) {
+      const status = resp.status;
+      console.error("AI error", status, await resp.text());
       const msg = status === 429 ? "Muitos pedidos, tente daqui a pouco." : status === 402 ? "Créditos de IA esgotados." : "Falha na IA";
       await log(platforms.map((p) => ({ action: "CREATE_POST", platform: p, status: "FAILED", reason: msg })));
-      return json({ error: msg }, status);
+      return json({ error: msg }, status === 429 || status === 402 ? status : 500);
     }
+    const text: string = (await resp.json()).choices?.[0]?.message?.content ?? "";
     const match = text.match(/\{[\s\S]*\}/);
     let posts: Record<string, string> = {};
     try { posts = JSON.parse(match?.[0] ?? "{}"); } catch { /* handled below */ }
