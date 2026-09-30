@@ -1,0 +1,29 @@
+{
+  "routes": [
+    { "path": "/", "title": "Home" },
+    { "path": "/pricing", "title": "Pricing" },
+    { "path": "/login", "title": "Sign in" },
+    { "path": "/signup", "title": "Create account" },
+    { "path": "/forgot-password", "title": "Forgot password" },
+    { "path": "/reset-password", "title": "Reset password" },
+    { "path": "/loja/:slug", "title": "Store" },
+    { "path": "/loja/:slug/pedido/:id", "title": "Order status" },
+    { "path": "/onboarding", "title": "Onboarding" },
+    { "path": "/dashboard", "title": "Operations" },
+    { "path": "/admin/produtos", "title": "Products" },
+    { "path": "/admin/inventario", "title": "Inventory" },
+    { "path": "/admin/pedidos", "title": "Orders" },
+    { "path": "/admin/clientes", "title": "Customers" },
+    { "path": "/admin/agentes", "title": "Agents" },
+    { "path": "/admin/aprovacoes", "title": "Approvals" },
+    { "path": "/admin/analytics", "title": "Analytics" },
+    { "path": "/admin/config", "title": "Settings" },
+    { "path": "/admin/canais", "title": "Channels" },
+    { "path": "/admin/equipa", "title": "Team" },
+    { "path": "/admin/atividade", "title": "Activity" },
+    { "path": "/admin/auditoria", "title": "Audit log" },
+    { "path": "/admin/conteudo", "title": "Content" },
+    { "path": "/admin/automacoes", "title": "Automations" },
+    { "path": "/admin/pagamentos", "title": "Payments" }
+  ]
+}

@@ -251,3 +251,28 @@ html {
     line-height: 1;
   }
 }
+
+/* Operational admin pages use spacing and surface contrast before rules. */
+.admin-workspace--quiet [class~="border-b"][class~="border-[#ded9d0]"],
+.admin-workspace--quiet [class~="border-t"][class~="border-[#ded9d0]"],
+.admin-workspace--quiet [class~="border-l"][class~="border-[#ded9d0]"],
+.admin-workspace--quiet [class~="border-r"][class~="border-[#ded9d0]"],
+.admin-workspace--quiet [class~="border-b"][class~="border-[#ebe7df]"],
+.admin-workspace--quiet [class~="border-t"][class~="border-[#ebe7df]"],
+.admin-workspace--quiet [class~="border-b"][class~="border-[#eeeae2]"],
+.admin-workspace--quiet [class~="border-t"][class~="border-[#eeeae2]"],
+.admin-workspace--quiet [class~="border-b"][class~="border-[#e3dfd6]"],
+.admin-workspace--quiet [class~="border-t"][class~="border-[#e3dfd6]"] {
+  border-color: rgba(32, 37, 34, 0.07);
+}
+
+.admin-workspace--quiet [class~="border-y"][class~="border-[#ded9d0]"],
+.admin-workspace--quiet [class~="border-y"][class~="border-[#ebe7df]"],
+.admin-workspace--quiet [class~="border-y"][class~="border-[#eeeae2]"] {
+  border-top-color: transparent;
+  border-bottom-color: transparent;
+}
+
+.admin-workspace--quiet [class~="divide-y"] > :not(:first-child) {
+  border-top-color: rgba(32, 37, 34, 0.055);
+}

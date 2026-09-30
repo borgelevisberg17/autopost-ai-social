@@ -602,7 +602,12 @@ export function AdminLayout({
         </header>
 
         {/* PAGE */}
-        <div className="admin-workspace mx-auto w-full max-w-[1480px] px-4 py-6 sm:px-7 sm:py-8 lg:px-10 lg:py-10">
+        <div
+          className={cn(
+            "admin-workspace mx-auto w-full max-w-[1480px] px-4 py-6 sm:px-7 sm:py-8 lg:px-10 lg:py-10",
+            title !== "Configurações" && "admin-workspace--quiet",
+          )}
+        >
           {children}
         </div>
       </main>
@@ -693,7 +698,7 @@ export function AdminLayout({
               if (event.key !== "Tab" || !moreDialogRef.current) return;
               const focusable = Array.from(
                 moreDialogRef.current.querySelectorAll<HTMLElement>(
-                  'a[href], button:not([disabled]), select:not([disabled]), input:not([disabled])',
+                  "a[href], button:not([disabled]), select:not([disabled]), input:not([disabled])",
                 ),
               );
               if (focusable.length === 0) return;

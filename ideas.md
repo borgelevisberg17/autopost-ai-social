@@ -60,3 +60,7 @@ A captura enviada pelo utilizador é a referência visual para `/admin/canais`: 
 
 - **Navegação pública:** header fixo com presença suficiente, links legíveis e alvos de toque confortáveis; no desktop manter hierarquia simples e no mobile menu recolhível, respeitando a altura do conteúdo seguinte.
 - **Cookies:** cartão compacto flutuante, com escolhas explícitas e preferência de movimento reduzido. Informar só as categorias realmente usadas; não sugerir analytics/publicidade quando não estão ativos.
+
+## Coerência entre Planos, Landing e Painel (2026-09)
+
+A página de planos partilha o header e footer públicos, o carvão e terracota do hero da landing, fundos de papel/sálvia nos cartões e o idioma principal da experiência. Os preços e fluxos de cadastro permanecem os existentes. No admin, o acabamento operacional privilegia espaço, planos de fundo e bordas suaves; Settings continua intacta. A revisão mobile deve preservar conteúdo, navegação e alvos de toque sem overflow.

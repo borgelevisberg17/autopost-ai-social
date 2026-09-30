@@ -62,20 +62,20 @@ const plans = [
 
 const FAQ_PRICING = [
   {
-    q: "Posso alterar o meu plano mais tarde?",
-    a: "Sim. Pode fazer upgrade, downgrade ou cancelar o seu plano a qualquer momento diretamente nas configurações da sua empresa.",
+    q: "Can I change my plan later?",
+    a: "Yes. Upgrade, downgrade or cancel at any time from your company settings.",
   },
   {
-    q: "Existe período de fidelização?",
-    a: "Não. Os planos mensais podem ser cancelados mensalmente sem custos de penalização. Os planos anuais são faturados uma vez por ano com desconto.",
+    q: "Is there a long-term commitment?",
+    a: "No. Monthly plans can be cancelled at any time. Annual plans are billed once a year at a discounted rate.",
   },
   {
-    q: "Preciso de cartão de crédito para experimentar?",
-    a: "Não é necessário cartão para iniciar a configuração da sua conta e testar o sistema.",
+    q: "Do I need a credit card to get started?",
+    a: "No card is needed to set up your account and explore the platform.",
   },
   {
-    q: "Como funciona o suporte?",
-    a: "Todos os planos contam com suporte por email e documentação. Os planos Growth e Scale têm prioridade e acompanhamento dedicado.",
+    q: "What support is included?",
+    a: "Every plan includes email support and documentation. Growth and Scale include priority support and dedicated guidance.",
   },
 ];
 
@@ -89,25 +89,24 @@ export default function Pricing() {
     <div className="min-h-screen overflow-x-hidden bg-[#f6f3ed] text-[#202522]">
       <SiteHeader ctaHref={startPath} />
 
-      {/* Main Content */}
       <main className="pt-[72px] sm:pt-[76px]">
-        {/* Editorial Hero with Background Image */}
-        <section className="relative overflow-hidden bg-[#202522] text-white">
-          <img
-            src="/media/optimized/pricing-hero-editorial.webp"
-            alt="Loja comercial Vendora"
-            className="absolute inset-0 h-full w-full object-cover object-center opacity-60"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#101512]/90 via-[#101512]/80 to-[#101512]" />
+        <section className="relative isolate overflow-hidden bg-[#202522] text-white">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 overflow-hidden"
+          >
+            <div className="absolute left-1/2 top-1/2 h-[300px] w-[300px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/[0.07] sm:h-[430px] sm:w-[430px]" />
+            <div className="absolute left-1/2 top-1/2 hidden h-[570px] w-[570px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#e36c3f]/[0.16] sm:block" />
+          </div>
 
-          <div className="relative mx-auto max-w-[1240px] px-5 py-16 lg:px-8 lg:py-24">
+          <div className="relative mx-auto max-w-[1240px] px-5 py-14 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
             <div className="mx-auto max-w-3xl text-center">
               <div className="mb-6 inline-flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-[#f3b08e]">
                 <span className="h-1.5 w-1.5 rounded-full bg-[#e36c3f]" />
-                Transparent Pricing
+                Transparent pricing
               </div>
 
-              <h1 className="text-balance text-5xl font-semibold leading-[0.92] tracking-[-0.075em] text-white sm:text-6xl lg:text-7xl">
+              <h1 className="text-balance text-[clamp(2.7rem,9vw,4.8rem)] font-semibold leading-[0.94] tracking-[-0.075em] text-white sm:text-6xl lg:text-7xl">
                 A calmer way to <br className="hidden sm:inline" />
                 <span className="text-[#f3b08e]">keep selling.</span>
               </h1>
@@ -117,114 +116,118 @@ export default function Pricing() {
                 channels, people and control as your business grows.
               </p>
 
-              {/* Billing Toggle */}
-              <div className="mt-9 inline-flex items-center gap-1 rounded-full border border-white/20 bg-black/40 p-1.5 text-xs font-semibold backdrop-blur-sm">
+              <div
+                role="group"
+                aria-label="Billing frequency"
+                className="mx-auto mt-9 grid w-full max-w-[440px] grid-cols-2 gap-1 rounded-[4px] border border-white/15 bg-white/[0.06] p-1.5 text-xs font-semibold sm:inline-flex sm:w-auto sm:max-w-none sm:rounded-full sm:bg-black/30"
+              >
                 <button
                   type="button"
+                  aria-pressed={!annual}
                   onClick={() => setAnnual(false)}
-                  className={`rounded-full px-5 py-2.5 transition ${
+                  className={`min-h-11 rounded-[3px] px-2.5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] sm:rounded-full sm:px-5 ${
                     !annual
                       ? "bg-white text-[#202522] shadow-sm"
                       : "text-white/70 hover:text-white"
                   }`}
                 >
-                  Faturação Mensal
+                  Monthly
                 </button>
                 <button
                   type="button"
+                  aria-pressed={annual}
                   onClick={() => setAnnual(true)}
-                  className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 transition ${
+                  className={`inline-flex min-h-11 items-center justify-center gap-1.5 whitespace-nowrap rounded-[3px] px-2 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] sm:gap-2 sm:rounded-full sm:px-5 ${
                     annual
                       ? "bg-white text-[#202522] shadow-sm"
                       : "text-white/70 hover:text-white"
                   }`}
                 >
-                  Faturação Anual
-                  <span className="rounded-full bg-[#e36c3f] px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider text-white">
-                    Poupe 20%
+                  Annual
+                  <span className="rounded-full bg-[#e36c3f] px-1.5 py-0.5 font-mono text-[8px] font-bold uppercase tracking-wider text-white sm:px-2 sm:text-[9px]">
+                    Save 20%
                   </span>
                 </button>
               </div>
 
-              {/* Launch Promo Banner */}
-              <div className="mx-auto mt-6 max-w-md flex items-center justify-center gap-2 border border-[#e6d4aa]/30 bg-[#fbf3dd]/10 px-4 py-2.5 text-xs text-[#f3b08e] backdrop-blur-sm">
+              <div className="mx-auto mt-5 flex max-w-md items-center justify-center gap-2 border border-[#e6d4aa]/25 bg-white/[0.04] px-4 py-3 text-xs leading-5 text-[#f3b08e]">
                 <Sparkles className="h-4 w-4 shrink-0 text-[#e36c3f]" />
                 <span>
-                  <strong>Promoção de lançamento:</strong> 30% de desconto nos
-                  primeiros 3 meses no plano anual.
+                  <strong>Launch offer:</strong> 30% off your first 3 months
+                  with annual billing.
                 </span>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Plans Grid Section */}
-        <section className="border-b border-[#e2ded5] bg-[#fffdf9]">
-          <div className="mx-auto max-w-[1240px] px-5 py-16 lg:px-8 lg:py-20">
-            <div className="grid gap-6 lg:grid-cols-3">
+        <section aria-label="Available plans" className="bg-[#f6f3ed]">
+          <div className="mx-auto max-w-[1240px] px-5 py-14 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 lg:gap-5">
               {plans.map((plan) => {
                 const price = Math.round(plan.monthly * discount);
                 return (
                   <article
                     key={plan.name}
-                    className={`relative flex flex-col justify-between border p-7 transition duration-300 ${
+                    className={`relative flex h-full flex-col justify-between rounded-[4px] border p-6 shadow-[0_6px_24px_rgba(32,37,34,0.035)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_16px_38px_rgba(32,37,34,0.09)] sm:p-7 ${
                       plan.featured
-                        ? "border-[#2c6457] bg-[#d9e7de] shadow-[0_20px_50px_rgba(44,100,87,0.12)]"
-                        : "border-[#d8d3c8] bg-[#fffdf9]"
+                        ? "border-[#b9cabe] bg-[#d9e7de]"
+                        : "border-[#e2ded5] bg-[#fffdf9]"
                     }`}
                   >
                     {plan.featured && (
-                      <div className="absolute right-0 top-0 bg-[#e36c3f] px-3.5 py-1.5 font-mono text-[9px] font-bold uppercase tracking-[0.14em] text-white">
-                        Mais escolhido
+                      <div className="absolute right-0 top-0 rounded-bl-[4px] bg-[#e36c3f] px-3.5 py-1.5 font-mono text-[9px] font-bold uppercase tracking-[0.14em] text-white">
+                        Most popular
                       </div>
                     )}
 
                     <div>
-                      <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#2c6457]">
+                      <h2 className="font-serif text-[26px] font-medium tracking-[-0.04em] text-[#202522]">
                         {plan.name}
-                      </div>
-
-                      <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.12em] text-[#8f8a80]">
+                      </h2>
+                      <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.12em] text-[#2c6457]">
                         {plan.kicker}
                       </p>
-
-                      <h2 className="mt-2 text-2xl font-semibold leading-snug tracking-[-0.04em]">
+                      <p className="mt-3 min-h-[48px] text-[15px] leading-6 text-[#6e716b]">
                         {plan.description}
-                      </h2>
+                      </p>
 
-                      <div className="mt-6 flex items-end gap-2 border-b border-black/10 pb-6">
-                        <span className="text-5xl font-semibold tracking-[-0.08em]">
+                      <div
+                        aria-live="polite"
+                        className="mt-6 flex items-end gap-2 rounded-[4px] bg-white/55 px-4 py-4"
+                      >
+                        <span className="font-serif text-5xl font-medium tracking-[-0.08em]">
                           ${price}
                         </span>
                         <span className="pb-1 text-xs text-[#6e716b]">
-                          /mês{annual ? " (faturado anualmente)" : ""}
+                          /month{annual ? " (billed annually)" : ""}
                         </span>
                       </div>
 
-                      <ul className="mt-6 space-y-3.5 text-xs leading-5 text-[#5f625d]">
+                      <ul className="mt-6 space-y-3.5 text-sm leading-6 text-[#5f625d]">
                         {plan.features.map((feature) => (
                           <li
                             key={feature}
                             className="flex items-start gap-2.5"
                           >
-                            <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#2c6457]" />
+                            <Check className="mt-1 h-4 w-4 shrink-0 text-[#2c6457]" />
                             <span>{feature}</span>
                           </li>
                         ))}
                       </ul>
                     </div>
 
-                    <div className="mt-8 pt-4">
+                    <div className="mt-8">
                       <Link
                         to={`/signup?plan=${plan.name.toLowerCase()}&billing=${annual ? "annual" : "monthly"}`}
-                        className={`inline-flex h-12 w-full items-center justify-center gap-2 text-sm font-semibold transition ${
+                        className={`inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-[4px] px-4 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2 ${
                           plan.featured
                             ? "bg-[#202522] text-white hover:bg-[#2c6457]"
-                            : "border border-[#c8c1b4] text-[#202522] hover:border-[#2c6457] hover:bg-[#2c6457] hover:text-white"
+                            : "border border-[#d2cdbf] bg-transparent text-[#202522] hover:border-[#2c6457] hover:bg-[#2c6457] hover:text-white"
                         }`}
                       >
-                        Começar com {plan.name}
-                        <ArrowRight className="h-4 w-4" />
+                        Start with {plan.name}
+                        <ArrowRight aria-hidden="true" className="h-4 w-4" />
                       </Link>
                     </div>
                   </article>
@@ -232,39 +235,37 @@ export default function Pricing() {
               })}
             </div>
 
-            <div className="mt-10 flex flex-wrap items-center justify-center gap-6 font-mono text-[10px] uppercase tracking-[0.14em] text-[#8f8a80]">
+            <div className="mt-9 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-xs font-medium text-[#737a72]">
               <span className="flex items-center gap-1.5">
-                <ShieldCheck className="h-4 w-4 text-[#2c6457]" /> Sem cartão de
-                crédito
+                <ShieldCheck className="h-4 w-4 text-[#2c6457]" /> No credit
+                card
               </span>
               <span className="flex items-center gap-1.5">
-                <Zap className="h-4 w-4 text-[#2c6457]" /> Configuração imediata
+                <Zap className="h-4 w-4 text-[#2c6457]" /> Ready in minutes
               </span>
               <span className="flex items-center gap-1.5">
-                <Check className="h-4 w-4 text-[#2c6457]" /> Cancele quando
-                quiser
+                <Check className="h-4 w-4 text-[#2c6457]" /> Cancel anytime
               </span>
             </div>
           </div>
         </section>
 
-        {/* Pricing FAQ Section */}
-        <section className="border-b border-[#d8d3c8] bg-[#f1eee7]">
-          <div className="mx-auto max-w-[1240px] px-5 py-20 lg:px-8">
+        <section className="bg-[#f1eee7]">
+          <div className="mx-auto max-w-[1240px] px-5 py-16 sm:px-6 sm:py-20 lg:px-8">
             <div className="max-w-2xl">
               <div className="mb-4 inline-flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-[#2c6457]">
-                <HelpCircle className="h-3.5 w-3.5" /> Dúvidas Frequentes
+                <HelpCircle className="h-3.5 w-3.5" /> Common questions
               </div>
               <h2 className="text-4xl font-semibold leading-[0.95] tracking-[-0.06em] sm:text-5xl">
-                Perguntas sobre os planos
+                Questions about plans
               </h2>
             </div>
 
-            <div className="mt-10 grid gap-6 md:grid-cols-2">
+            <div className="mt-10 grid gap-4 md:grid-cols-2">
               {FAQ_PRICING.map((item) => (
-                <div
+                <article
                   key={item.q}
-                  className="border border-[#d8d3c8] bg-[#fffdf9] p-6"
+                  className="rounded-[4px] border border-[#e2ded5] bg-[#fffdf9] p-5 sm:p-6"
                 >
                   <h3 className="text-base font-semibold text-[#202522]">
                     {item.q}
@@ -272,7 +273,7 @@ export default function Pricing() {
                   <p className="mt-3 text-sm leading-6 text-[#6e716b]">
                     {item.a}
                   </p>
-                </div>
+                </article>
               ))}
             </div>
           </div>
