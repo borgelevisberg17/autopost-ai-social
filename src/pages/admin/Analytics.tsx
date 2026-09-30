@@ -159,9 +159,9 @@ export default function Analytics() {
     <AdminLayout title="Analytics">
       <div className="space-y-10">
         {/* INTRO */}
-        <section className="flex flex-col justify-between gap-5 border-b border-neutral-200 pb-7 sm:flex-row sm:items-end">
+        <section className="flex flex-col justify-between gap-5 border-b border-[#ded9d0] pb-7 sm:flex-row sm:items-end">
           <div>
-            <p className="mb-2 text-xs font-medium uppercase tracking-[0.16em] text-neutral-400">
+            <p className="mb-2 text-xs font-medium uppercase tracking-[0.16em] text-[#a7aaa2]">
               Desempenho Comercial
             </p>
 
@@ -169,12 +169,12 @@ export default function Analytics() {
               Analytics & Vendas
             </h2>
 
-            <p className="mt-2 max-w-xl text-sm leading-6 text-neutral-500">
+            <p className="mt-2 max-w-xl text-sm leading-6 text-[#747b73]">
               Análise detalhada de vendas, receita, canais de aquisição e perfil dos compradores.
             </p>
           </div>
 
-          <div className="flex w-fit border border-neutral-200 bg-white">
+          <div className="flex w-fit border border-[#ded9d0] bg-[#fffdf9]">
             {(
               [
                 ["7d", "7 dias"],
@@ -188,7 +188,7 @@ export default function Analytics() {
                 onClick={() => setPeriod(val)}
                 className={cn(
                   "min-h-9 px-3.5 text-xs font-medium transition",
-                  period === val ? "bg-black text-white" : "text-neutral-500 hover:bg-neutral-50 hover:text-black"
+                  period === val ? "bg-black text-white" : "text-[#747b73] hover:bg-[#f1eee7] hover:text-[#202522]"
                 )}
               >
                 {label}
@@ -198,31 +198,31 @@ export default function Analytics() {
         </section>
 
         {/* METRICS */}
-        <section className="grid border-y border-neutral-200 sm:grid-cols-3">
-          <div className="border-b border-neutral-200 p-5 sm:border-b-0 sm:border-r">
-            <div className="flex items-center justify-between text-neutral-400">
+        <section className="grid border-y border-[#ded9d0] sm:grid-cols-3">
+          <div className="border-b border-[#ded9d0] p-5 sm:border-b-0 sm:border-r">
+            <div className="flex items-center justify-between text-[#a7aaa2]">
               <span className="text-xs font-semibold uppercase tracking-wider">Receita Total</span>
               <Wallet className="h-4 w-4" />
             </div>
-            <p className="mt-2 text-2xl font-semibold text-neutral-950">
+            <p className="mt-2 text-2xl font-semibold text-[#202522]">
               {formatMoney(stats.totalRevenue, currency)}
             </p>
           </div>
 
-          <div className="border-b border-neutral-200 p-5 sm:border-b-0 sm:border-r">
-            <div className="flex items-center justify-between text-neutral-400">
+          <div className="border-b border-[#ded9d0] p-5 sm:border-b-0 sm:border-r">
+            <div className="flex items-center justify-between text-[#a7aaa2]">
               <span className="text-xs font-semibold uppercase tracking-wider">Total de Pedidos</span>
               <ShoppingBag className="h-4 w-4" />
             </div>
-            <p className="mt-2 text-2xl font-semibold text-neutral-950">{stats.totalOrders}</p>
+            <p className="mt-2 text-2xl font-semibold text-[#202522]">{stats.totalOrders}</p>
           </div>
 
           <div className="p-5">
-            <div className="flex items-center justify-between text-neutral-400">
+            <div className="flex items-center justify-between text-[#a7aaa2]">
               <span className="text-xs font-semibold uppercase tracking-wider">Ticket Médio</span>
               <TrendingUp className="h-4 w-4" />
             </div>
-            <p className="mt-2 text-2xl font-semibold text-neutral-950">
+            <p className="mt-2 text-2xl font-semibold text-[#202522]">
               {formatMoney(stats.avgOrder, currency)}
             </p>
           </div>
@@ -231,15 +231,15 @@ export default function Analytics() {
         {/* CHARTS SECTION */}
         <section className="grid gap-8 lg:grid-cols-3">
           {/* REVENUE OVER TIME */}
-          <div className="lg:col-span-2 border border-neutral-200 bg-white p-6">
+          <div className="lg:col-span-2 border border-[#ded9d0] bg-[#fffdf9] p-6">
             <div className="mb-6">
-              <h3 className="text-base font-semibold text-neutral-950">Evolução de Receita</h3>
-              <p className="text-xs text-neutral-400">Vendas acumuladas por dia no período selecionado.</p>
+              <h3 className="text-base font-semibold text-[#202522]">Evolução de Receita</h3>
+              <p className="text-xs text-[#a7aaa2]">Vendas acumuladas por dia no período selecionado.</p>
             </div>
 
             <div className="h-[280px] w-full">
               {loading ? (
-                <div className="grid h-full place-items-center text-xs text-neutral-400">A carregar gráfico...</div>
+                <div className="grid h-full place-items-center text-xs text-[#a7aaa2]">A carregar gráfico...</div>
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={stats.salesTrend}>
@@ -257,15 +257,15 @@ export default function Analytics() {
           </div>
 
           {/* CHANNELS PIE / BAR */}
-          <div className="border border-neutral-200 bg-white p-6">
+          <div className="border border-[#ded9d0] bg-[#fffdf9] p-6">
             <div className="mb-6">
-              <h3 className="text-base font-semibold text-neutral-950">Origem por Canal</h3>
-              <p className="text-xs text-neutral-400">Receita por canal de venda.</p>
+              <h3 className="text-base font-semibold text-[#202522]">Origem por Canal</h3>
+              <p className="text-xs text-[#a7aaa2]">Receita por canal de venda.</p>
             </div>
 
             <div className="h-[220px] w-full">
               {stats.channelBreakdown.length === 0 ? (
-                <div className="grid h-full place-items-center text-xs text-neutral-400">Sem vendas no período.</div>
+                <div className="grid h-full place-items-center text-xs text-[#a7aaa2]">Sem vendas no período.</div>
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -284,10 +284,10 @@ export default function Analytics() {
               {stats.channelBreakdown.map((ch) => (
                 <div key={ch.channel} className="flex items-center justify-between text-xs">
                   <span className="flex items-center gap-2">
-                    <span className="h-2.5 w-2.5 rounded-full" style={{ background: CHANNEL_COLORS[ch.channel] || "#737373" }} />
-                    <span className="font-medium text-neutral-800">{ch.channel}</span>
+                    <span className="h-2.5 w-2.5 rounded-[7px]" style={{ background: CHANNEL_COLORS[ch.channel] || "#737373" }} />
+                    <span className="font-medium text-[#303732]">{ch.channel}</span>
                   </span>
-                  <span className="font-semibold text-neutral-950">{formatMoney(ch.revenue, currency)}</span>
+                  <span className="font-semibold text-[#202522]">{formatMoney(ch.revenue, currency)}</span>
                 </div>
               ))}
             </div>
@@ -295,29 +295,29 @@ export default function Analytics() {
         </section>
 
         {/* TOP BUYERS */}
-        <section className="border border-neutral-200 bg-white p-6">
+        <section className="border border-[#ded9d0] bg-[#fffdf9] p-6">
           <div className="mb-5 flex items-center justify-between">
             <div>
-              <h3 className="text-base font-semibold text-neutral-950">Maiores Compradores</h3>
-              <p className="text-xs text-neutral-400">Clientes com maior volume de compras no período.</p>
+              <h3 className="text-base font-semibold text-[#202522]">Maiores Compradores</h3>
+              <p className="text-xs text-[#a7aaa2]">Clientes com maior volume de compras no período.</p>
             </div>
-            <Users className="h-4 w-4 text-neutral-400" />
+            <Users className="h-4 w-4 text-[#a7aaa2]" />
           </div>
 
           <div className="divide-y divide-neutral-100">
             {stats.topBuyers.length === 0 ? (
-              <p className="py-6 text-center text-xs text-neutral-400">Sem dados de compradores.</p>
+              <p className="py-6 text-center text-xs text-[#a7aaa2]">Sem dados de compradores.</p>
             ) : (
               stats.topBuyers.map((buyer, index) => (
                 <div key={buyer.name} className="flex items-center justify-between py-3 text-sm">
                   <div className="flex items-center gap-3">
-                    <span className="font-mono text-xs font-semibold text-neutral-400">#{index + 1}</span>
-                    <span className="font-medium text-neutral-950">{buyer.name}</span>
+                    <span className="font-mono text-xs font-semibold text-[#a7aaa2]">#{index + 1}</span>
+                    <span className="font-medium text-[#202522]">{buyer.name}</span>
                   </div>
 
                   <div className="text-right">
-                    <p className="font-semibold text-neutral-950">{formatMoney(buyer.spent, currency)}</p>
-                    <p className="text-[10px] text-neutral-400">{buyer.orders} {buyer.orders === 1 ? "pedido" : "pedidos"}</p>
+                    <p className="font-semibold text-[#202522]">{formatMoney(buyer.spent, currency)}</p>
+                    <p className="text-[10px] text-[#a7aaa2]">{buyer.orders} {buyer.orders === 1 ? "pedido" : "pedidos"}</p>
                   </div>
                 </div>
               ))

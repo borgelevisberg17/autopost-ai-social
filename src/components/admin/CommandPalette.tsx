@@ -157,7 +157,7 @@ export function CommandPalette({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] grid place-items-start pt-[12vh] justify-center bg-black/40 backdrop-blur-sm px-4">
+    <div className="fixed inset-0 z-[100] grid place-items-start pt-[12vh] justify-center bg-black/40-sm px-4">
       <div className="w-full max-w-xl overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-2xl">
         <div className="flex items-center border-b border-neutral-200 px-4">
           <Search className="h-4 w-4 shrink-0 text-neutral-400" />

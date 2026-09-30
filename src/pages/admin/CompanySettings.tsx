@@ -270,14 +270,14 @@ function SectionHeading({
   return (
     <div className="mb-8">
       {eyebrow && (
-        <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-500">
+        <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#747b73]">
           {eyebrow}
         </p>
       )}
-      <h2 className="text-[25px] font-semibold tracking-[-0.025em] text-neutral-950">
+      <h2 className="text-[25px] font-semibold tracking-[-0.025em] text-[#202522]">
         {title}
       </h2>
-      <p className="mt-1.5 max-w-2xl text-sm leading-6 text-neutral-500">
+      <p className="mt-1.5 max-w-2xl text-sm leading-6 text-[#747b73]">
         {description}
       </p>
     </div>
@@ -296,8 +296,8 @@ function Field({
   return (
     <div className="space-y-2">
       <div>
-        <label className="text-sm font-medium text-neutral-900">{label}</label>
-        {hint && <p className="mt-0.5 text-xs text-neutral-500">{hint}</p>}
+        <label className="text-sm font-medium text-[#202522]">{label}</label>
+        {hint && <p className="mt-0.5 text-xs text-[#747b73]">{hint}</p>}
       </div>
       {children}
     </div>
@@ -324,7 +324,7 @@ function Input({
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
       maxLength={maxLength}
-      className="h-11 w-full rounded-lg border border-neutral-200 bg-white px-3.5 text-sm text-neutral-950 outline-none transition placeholder:text-neutral-400 focus:border-neutral-950 focus:ring-1 focus:ring-neutral-950"
+      className="h-11 w-full rounded-lg border border-[#ded9d0] bg-[#fffdf9] px-3.5 text-sm text-[#202522] outline-none transition placeholder:text-[#a7aaa2] focus:border-neutral-950 focus:ring-1 focus:ring-neutral-950"
     />
   );
 }
@@ -349,7 +349,7 @@ function Textarea({
       placeholder={placeholder}
       maxLength={maxLength}
       rows={rows}
-      className="w-full resize-y rounded-lg border border-neutral-200 bg-white px-3.5 py-3 text-sm leading-6 text-neutral-950 outline-none transition placeholder:text-neutral-400 focus:border-neutral-950 focus:ring-1 focus:ring-neutral-950"
+      className="w-full resize-y rounded-lg border border-[#ded9d0] bg-[#fffdf9] px-3.5 py-3 text-sm leading-6 text-[#202522] outline-none transition placeholder:text-[#a7aaa2] focus:border-neutral-950 focus:ring-1 focus:ring-neutral-950"
     />
   );
 }
@@ -367,7 +367,7 @@ function Select({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="h-11 w-full rounded-lg border border-neutral-200 bg-white px-3.5 text-sm text-neutral-950 outline-none focus:border-neutral-950 focus:ring-1 focus:ring-neutral-950"
+      className="h-11 w-full rounded-lg border border-[#ded9d0] bg-[#fffdf9] px-3.5 text-sm text-[#202522] outline-none focus:border-neutral-950 focus:ring-1 focus:ring-neutral-950"
     >
       {children}
     </select>
@@ -393,11 +393,11 @@ function Toggle({
       aria-pressed={checked}
     >
       <span className="min-w-0">
-        <span className="block text-sm font-medium text-neutral-900">
+        <span className="block text-sm font-medium text-[#202522]">
           {label}
         </span>
         {description && (
-          <span className="mt-0.5 block text-xs leading-5 text-neutral-500">
+          <span className="mt-0.5 block text-xs leading-5 text-[#747b73]">
             {description}
           </span>
         )}
@@ -405,15 +405,15 @@ function Toggle({
 
       <span
         className={cn(
-          "relative h-6 w-11 shrink-0 rounded-full border transition",
+          "relative h-6 w-11 shrink-0 rounded-[7px] border transition",
           checked
-            ? "border-neutral-950 bg-neutral-950"
-            : "border-neutral-300 bg-neutral-100"
+            ? "border-neutral-950 bg-[#202522]"
+            : "border-[#c9c3b8] bg-[#ebe7df]"
         )}
       >
         <span
           className={cn(
-            "absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition",
+            "absolute top-0.5 h-5 w-5 rounded-[7px] bg-[#fffdf9] shadow-sm transition",
             checked ? "left-[21px]" : "left-0.5"
           )}
         />
@@ -434,8 +434,8 @@ function SaveBar({
   if (!dirty) return null;
 
   return (
-    <div className="sticky bottom-4 z-20 mt-8 flex items-center justify-between gap-4 rounded-xl border border-neutral-200 bg-white/95 px-4 py-3 shadow-lg shadow-black/[0.06] backdrop-blur">
-      <p className="text-sm text-neutral-600">
+    <div className="sticky bottom-4 z-20 mt-8 flex items-center justify-between gap-4 rounded-[7px] border border-[#ded9d0] bg-[#fffdf9]/95 px-4 py-3 shadow-lg shadow-black/[0.06]">
+      <p className="text-sm text-[#747b73]">
         Existem alterações por guardar.
       </p>
 
@@ -443,7 +443,7 @@ function SaveBar({
         type="button"
         onClick={onSave}
         disabled={saving}
-        className="inline-flex h-10 items-center gap-2 rounded-lg bg-neutral-950 px-4 text-sm font-medium text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
+        className="inline-flex h-10 items-center gap-2 rounded-lg bg-[#202522] px-4 text-sm font-medium text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
       >
         <Save className="h-4 w-4" />
         {saving ? "A guardar..." : "Guardar alterações"}
@@ -750,7 +750,7 @@ export default function CompanySettings() {
 
       <div className="space-y-8">
         <section>
-          <h3 className="text-sm font-semibold text-neutral-950">
+          <h3 className="text-sm font-semibold text-[#202522]">
             Informações da empresa
           </h3>
 
@@ -805,8 +805,8 @@ export default function CompanySettings() {
             </Field>
 
             <Field label="Endereço público da loja">
-              <div className="flex h-11 items-center justify-between gap-3 rounded-lg border border-neutral-200 bg-neutral-50 px-3.5">
-                <span className="truncate text-sm text-neutral-600">
+              <div className="flex h-11 items-center justify-between gap-3 rounded-lg border border-[#ded9d0] bg-[#f1eee7] px-3.5">
+                <span className="truncate text-sm text-[#747b73]">
                   /loja/{company?.slug}
                 </span>
 
@@ -814,7 +814,7 @@ export default function CompanySettings() {
                   href={`/loja/${company?.slug}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="shrink-0 text-neutral-950 transition hover:underline"
+                  className="shrink-0 text-[#202522] transition hover:underline"
                 >
                   <ArrowUpRight className="h-4 w-4" />
                 </a>
@@ -823,10 +823,10 @@ export default function CompanySettings() {
           </div>
         </section>
 
-        <div className="border-t border-neutral-200" />
+        <div className="border-t border-[#ded9d0]" />
 
         <section>
-          <h3 className="text-sm font-semibold text-neutral-950">
+          <h3 className="text-sm font-semibold text-[#202522]">
             Sobre o negócio
           </h3>
 
@@ -849,21 +849,21 @@ export default function CompanySettings() {
                 placeholder="Descreva brevemente a empresa, os seus produtos e a forma como trabalha."
               />
 
-              <p className="mt-1 text-right text-xs text-neutral-400">
+              <p className="mt-1 text-right text-xs text-[#a7aaa2]">
                 {companyForm.description.length}/500
               </p>
             </Field>
           </div>
         </section>
 
-        <section className="rounded-xl border border-neutral-200 bg-neutral-50 p-4">
+        <section className="rounded-[7px] border border-[#ded9d0] bg-[#f1eee7] p-4">
           <div className="flex gap-3">
-            <CircleHelp className="mt-0.5 h-4 w-4 shrink-0 text-neutral-500" />
+            <CircleHelp className="mt-0.5 h-4 w-4 shrink-0 text-[#747b73]" />
             <div>
-              <p className="text-sm font-medium text-neutral-900">
+              <p className="text-sm font-medium text-[#202522]">
                 Sobre a estrutura da empresa
               </p>
-              <p className="mt-1 text-xs leading-5 text-neutral-500">
+              <p className="mt-1 text-xs leading-5 text-[#747b73]">
                 Esta empresa é gerida através da sua conta e dos membros
                 associados. A loja pública usa o slug acima como endereço.
               </p>
@@ -884,7 +884,7 @@ export default function CompanySettings() {
 
       <div className="space-y-8">
         <section>
-          <h3 className="text-sm font-semibold text-neutral-950">
+          <h3 className="text-sm font-semibold text-[#202522]">
             Identidade visual
           </h3>
 
@@ -894,16 +894,16 @@ export default function CompanySettings() {
                 label="Logo"
                 hint="O armazenamento de imagens ainda não está ligado a esta configuração."
               >
-                <div className="flex items-center gap-4 rounded-xl border border-dashed border-neutral-300 bg-neutral-50 p-5">
-                  <div className="grid h-16 w-16 shrink-0 place-items-center rounded-xl border border-neutral-200 bg-white">
-                    <Building2 className="h-7 w-7 text-neutral-400" />
+                <div className="flex items-center gap-4 rounded-[7px] border border-dashed border-[#c9c3b8] bg-[#f1eee7] p-5">
+                  <div className="grid h-16 w-16 shrink-0 place-items-center rounded-[7px] border border-[#ded9d0] bg-[#fffdf9]">
+                    <Building2 className="h-7 w-7 text-[#a7aaa2]" />
                   </div>
 
                   <div>
-                    <p className="text-sm font-medium text-neutral-900">
+                    <p className="text-sm font-medium text-[#202522]">
                       Logo da empresa
                     </p>
-                    <p className="mt-1 text-xs leading-5 text-neutral-500">
+                    <p className="mt-1 text-xs leading-5 text-[#747b73]">
                       A infraestrutura de Storage pode ser conectada aqui numa
                       próxima etapa.
                     </p>
@@ -944,19 +944,19 @@ export default function CompanySettings() {
           </div>
         </section>
 
-        <section className="rounded-xl border border-neutral-200 bg-white p-5">
+        <section className="rounded-[7px] border border-[#ded9d0] bg-[#fffdf9] p-5">
           <div className="flex items-start gap-4">
-            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-neutral-100">
-              <Store className="h-5 w-5 text-neutral-700" />
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-[#ebe7df]">
+              <Store className="h-5 w-5 text-[#5f625d]" />
             </div>
 
             <div className="min-w-0">
-              <p className="text-sm font-semibold text-neutral-950">
+              <p className="text-sm font-semibold text-[#202522]">
                 Pré-visualização
               </p>
-              <div className="mt-4 rounded-xl border border-neutral-200 bg-neutral-50 p-5">
+              <div className="mt-4 rounded-[7px] border border-[#ded9d0] bg-[#f1eee7] p-5">
                 <div className="flex items-center gap-3">
-                  <div className="grid h-10 w-10 place-items-center rounded-lg bg-neutral-950 text-sm font-semibold text-white">
+                  <div className="grid h-10 w-10 place-items-center rounded-lg bg-[#202522] text-sm font-semibold text-white">
                     {getInitials(
                       business.business_name || company?.name,
                       null
@@ -964,12 +964,12 @@ export default function CompanySettings() {
                   </div>
 
                   <div>
-                    <p className="text-sm font-semibold text-neutral-950">
+                    <p className="text-sm font-semibold text-[#202522]">
                       {business.business_name ||
                         company?.name ||
                         "Nome da empresa"}
                     </p>
-                    <p className="text-xs text-neutral-500">
+                    <p className="text-xs text-[#747b73]">
                       {business.business_type || "Tipo de negócio"}
                     </p>
                   </div>
@@ -994,14 +994,14 @@ export default function CompanySettings() {
 
       {loadingBusiness ? (
         <div className="animate-pulse space-y-4">
-          <div className="h-11 rounded-lg bg-neutral-100" />
-          <div className="h-28 rounded-lg bg-neutral-100" />
-          <div className="h-28 rounded-lg bg-neutral-100" />
+          <div className="h-11 rounded-lg bg-[#ebe7df]" />
+          <div className="h-28 rounded-lg bg-[#ebe7df]" />
+          <div className="h-28 rounded-lg bg-[#ebe7df]" />
         </div>
       ) : (
         <div className="space-y-8">
           <section>
-            <h3 className="text-sm font-semibold text-neutral-950">
+            <h3 className="text-sm font-semibold text-[#202522]">
               Perfil do negócio
             </h3>
 
@@ -1057,10 +1057,10 @@ export default function CompanySettings() {
             </div>
           </section>
 
-          <div className="border-t border-neutral-200" />
+          <div className="border-t border-[#ded9d0]" />
 
           <section>
-            <h3 className="text-sm font-semibold text-neutral-950">
+            <h3 className="text-sm font-semibold text-[#202522]">
               Voz da marca
             </h3>
 
@@ -1143,7 +1143,7 @@ export default function CompanySettings() {
 
       <div className="space-y-8">
         <section>
-          <h3 className="text-sm font-semibold text-neutral-950">
+          <h3 className="text-sm font-semibold text-[#202522]">
             Moeda e inventário
           </h3>
 
@@ -1190,14 +1190,14 @@ export default function CompanySettings() {
           </div>
         </section>
 
-        <div className="border-t border-neutral-200" />
+        <div className="border-t border-[#ded9d0]" />
 
         <section>
-          <h3 className="text-sm font-semibold text-neutral-950">
+          <h3 className="text-sm font-semibold text-[#202522]">
             Regras comerciais
           </h3>
 
-          <div className="mt-4 divide-y divide-neutral-200 rounded-xl border border-neutral-200 px-4">
+          <div className="mt-4 divide-y divide-neutral-200 rounded-[7px] border border-[#ded9d0] px-4">
             <Toggle
               checked={commerceForm.blockOutOfStock}
               onChange={(checked) => {
@@ -1213,15 +1213,15 @@ export default function CompanySettings() {
           </div>
         </section>
 
-        <section className="rounded-xl border border-neutral-200 bg-neutral-50 p-5">
+        <section className="rounded-[7px] border border-[#ded9d0] bg-[#f1eee7] p-5">
           <div className="flex gap-3">
-            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-neutral-500" />
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#747b73]" />
 
             <div>
-              <p className="text-sm font-medium text-neutral-900">
+              <p className="text-sm font-medium text-[#202522]">
                 Configurações comerciais avançadas
               </p>
-              <p className="mt-1 text-xs leading-5 text-neutral-500">
+              <p className="mt-1 text-xs leading-5 text-[#747b73]">
                 Frete, IVA, valor mínimo de pedido e regras de cancelamento
                 ainda não possuem campos persistentes no schema atual. Por
                 isso, não são apresentados como configurações funcionais.
@@ -1349,17 +1349,17 @@ export default function CompanySettings() {
 
       {loadingBusiness ? (
         <div className="animate-pulse space-y-4">
-          <div className="h-28 rounded-xl bg-neutral-100" />
-          <div className="h-40 rounded-xl bg-neutral-100" />
+          <div className="h-28 rounded-[7px] bg-[#ebe7df]" />
+          <div className="h-40 rounded-[7px] bg-[#ebe7df]" />
         </div>
       ) : (
         <div className="space-y-8">
           <section>
-            <h3 className="text-sm font-semibold text-neutral-950">
+            <h3 className="text-sm font-semibold text-[#202522]">
               Política global
             </h3>
 
-            <div className="mt-4 rounded-xl border border-neutral-200 px-4">
+            <div className="mt-4 rounded-[7px] border border-[#ded9d0] px-4">
               <Toggle
                 checked={Boolean(business.include_cta)}
                 onChange={(checked) => {
@@ -1415,7 +1415,7 @@ export default function CompanySettings() {
           </section>
 
           <section>
-            <h3 className="text-sm font-semibold text-neutral-950">
+            <h3 className="text-sm font-semibold text-[#202522]">
               Dados disponíveis para a IA
             </h3>
 
@@ -1429,25 +1429,25 @@ export default function CompanySettings() {
               ].map((item) => (
                 <div
                   key={item}
-                  className="flex items-center gap-3 rounded-xl border border-neutral-200 bg-white px-4 py-3"
+                  className="flex items-center gap-3 rounded-[7px] border border-[#ded9d0] bg-[#fffdf9] px-4 py-3"
                 >
-                  <div className="grid h-7 w-7 place-items-center rounded-full bg-neutral-100">
-                    <Check className="h-4 w-4 text-neutral-700" />
+                  <div className="grid h-7 w-7 place-items-center rounded-[7px] bg-[#ebe7df]">
+                    <Check className="h-4 w-4 text-[#5f625d]" />
                   </div>
-                  <span className="text-sm text-neutral-800">{item}</span>
+                  <span className="text-sm text-[#303732]">{item}</span>
                 </div>
               ))}
             </div>
           </section>
 
-          <section className="rounded-xl border border-neutral-200 bg-neutral-50 p-5">
+          <section className="rounded-[7px] border border-[#ded9d0] bg-[#f1eee7] p-5">
             <div className="flex gap-3">
-              <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-neutral-700" />
+              <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[#5f625d]" />
               <div>
-                <p className="text-sm font-semibold text-neutral-950">
+                <p className="text-sm font-semibold text-[#202522]">
                   Limites de segurança
                 </p>
-                <p className="mt-1 text-sm leading-6 text-neutral-600">
+                <p className="mt-1 text-sm leading-6 text-[#747b73]">
                   As regras críticas não devem depender apenas desta interface.
                   Alterações de preço, stock, reembolsos e outras ações
                   sensíveis devem continuar protegidas no backend.
@@ -1462,7 +1462,7 @@ export default function CompanySettings() {
                   ].map((rule) => (
                     <div
                       key={rule}
-                      className="flex items-center gap-2 text-xs text-neutral-700"
+                      className="flex items-center gap-2 text-xs text-[#5f625d]"
                     >
                       <Check className="h-3.5 w-3.5" />
                       {rule}
@@ -1487,8 +1487,8 @@ export default function CompanySettings() {
         description="Membros associados à empresa e a função que possuem dentro da organização."
       />
 
-      <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white">
-        <div className="hidden grid-cols-[minmax(0,1fr)_140px_80px] gap-4 border-b border-neutral-200 bg-neutral-50 px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-500 md:grid">
+      <div className="overflow-hidden rounded-[7px] border border-[#ded9d0] bg-[#fffdf9]">
+        <div className="hidden grid-cols-[minmax(0,1fr)_140px_80px] gap-4 border-b border-[#ded9d0] bg-[#f1eee7] px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#747b73] md:grid">
           <span>Membro</span>
           <span>Função</span>
           <span />
@@ -1496,13 +1496,13 @@ export default function CompanySettings() {
 
         {loadingMembers ? (
           <div className="space-y-3 p-5">
-            <div className="h-12 animate-pulse rounded-lg bg-neutral-100" />
-            <div className="h-12 animate-pulse rounded-lg bg-neutral-100" />
+            <div className="h-12 animate-pulse rounded-lg bg-[#ebe7df]" />
+            <div className="h-12 animate-pulse rounded-lg bg-[#ebe7df]" />
           </div>
         ) : members.length === 0 ? (
           <div className="p-10 text-center">
-            <Users className="mx-auto h-7 w-7 text-neutral-300" />
-            <p className="mt-3 text-sm font-medium text-neutral-900">
+            <Users className="mx-auto h-7 w-7 text-[#c9c3b8]" />
+            <p className="mt-3 text-sm font-medium text-[#202522]">
               Nenhum membro encontrado
             </p>
           </div>
@@ -1516,40 +1516,40 @@ export default function CompanySettings() {
             return (
               <div
                 key={member.id}
-                className="grid gap-3 border-b border-neutral-100 px-5 py-4 last:border-0 md:grid-cols-[minmax(0,1fr)_140px_80px] md:items-center"
+                className="grid gap-3 border-b border-[#ebe7df] px-5 py-4 last:border-0 md:grid-cols-[minmax(0,1fr)_140px_80px] md:items-center"
               >
                 <div className="flex min-w-0 items-center gap-3">
                   {member.profile?.avatar_url ? (
                     <img
                       src={member.profile.avatar_url}
                       alt=""
-                      className="h-9 w-9 rounded-full object-cover"
+                      className="h-9 w-9 rounded-[7px] object-cover"
                     />
                   ) : (
-                    <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-neutral-100 text-xs font-semibold text-neutral-700">
+                    <div className="grid h-9 w-9 shrink-0 place-items-center rounded-[7px] bg-[#ebe7df] text-xs font-semibold text-[#5f625d]">
                       {getInitials(name, member.profile?.email)}
                     </div>
                   )}
 
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-neutral-900">
+                    <p className="truncate text-sm font-medium text-[#202522]">
                       {name}
                     </p>
-                    <p className="truncate text-xs text-neutral-500">
+                    <p className="truncate text-xs text-[#747b73]">
                       {member.profile?.email || member.user_id}
                     </p>
                   </div>
                 </div>
 
                 <div>
-                  <span className="inline-flex rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-medium capitalize text-neutral-700">
+                  <span className="inline-flex rounded-[7px] bg-[#ebe7df] px-2.5 py-1 text-xs font-medium capitalize text-[#5f625d]">
                     {member.role}
                   </span>
                 </div>
 
                 <div className="hidden md:block">
                   {member.role === "owner" && (
-                    <span className="text-xs text-neutral-400">
+                    <span className="text-xs text-[#a7aaa2]">
                       Proprietário
                     </span>
                   )}
@@ -1560,14 +1560,14 @@ export default function CompanySettings() {
         )}
       </div>
 
-      <div className="mt-5 rounded-xl border border-neutral-200 bg-neutral-50 p-5">
+      <div className="mt-5 rounded-[7px] border border-[#ded9d0] bg-[#f1eee7] p-5">
         <div className="flex gap-3">
-          <Users className="mt-0.5 h-4 w-4 shrink-0 text-neutral-500" />
+          <Users className="mt-0.5 h-4 w-4 shrink-0 text-[#747b73]" />
           <div>
-            <p className="text-sm font-medium text-neutral-900">
+            <p className="text-sm font-medium text-[#202522]">
               Funções disponíveis
             </p>
-            <p className="mt-1 text-xs leading-5 text-neutral-500">
+            <p className="mt-1 text-xs leading-5 text-[#747b73]">
               O sistema atualmente suporta Owner, Admin e Staff. A gestão
               detalhada de permissões será adicionada sobre este RBAC.
             </p>
@@ -1586,8 +1586,8 @@ export default function CompanySettings() {
       />
 
       <div className="space-y-6">
-        <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white">
-          <div className="hidden grid-cols-[140px_minmax(0,1fr)_140px] gap-4 border-b border-neutral-200 bg-neutral-50 px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-500 md:grid">
+        <div className="overflow-hidden rounded-[7px] border border-[#ded9d0] bg-[#fffdf9]">
+          <div className="hidden grid-cols-[140px_minmax(0,1fr)_140px] gap-4 border-b border-[#ded9d0] bg-[#f1eee7] px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#747b73] md:grid">
             <span>Ator</span>
             <span>Ação / Alteração</span>
             <span>Data</span>
@@ -1595,16 +1595,16 @@ export default function CompanySettings() {
 
           {loadingAudit ? (
             <div className="space-y-3 p-5">
-              <div className="h-12 animate-pulse rounded-lg bg-neutral-100" />
-              <div className="h-12 animate-pulse rounded-lg bg-neutral-100" />
+              <div className="h-12 animate-pulse rounded-lg bg-[#ebe7df]" />
+              <div className="h-12 animate-pulse rounded-lg bg-[#ebe7df]" />
             </div>
           ) : auditLogs.length === 0 ? (
             <div className="p-10 text-center">
-              <ShieldCheck className="mx-auto h-7 w-7 text-neutral-300" />
-              <p className="mt-3 text-sm font-semibold text-neutral-900">
+              <ShieldCheck className="mx-auto h-7 w-7 text-[#c9c3b8]" />
+              <p className="mt-3 text-sm font-semibold text-[#202522]">
                 Nenhum evento de auditoria registado
               </p>
-              <p className="mt-1 text-xs text-neutral-400">
+              <p className="mt-1 text-xs text-[#a7aaa2]">
                 As ações sensíveis executadas por utilizadores e agentes aparecerão aqui.
               </p>
             </div>
@@ -1612,25 +1612,25 @@ export default function CompanySettings() {
             auditLogs.map((log) => (
               <div
                 key={log.id}
-                className="grid gap-3 border-b border-neutral-100 px-5 py-4 last:border-0 md:grid-cols-[140px_minmax(0,1fr)_140px] md:items-center"
+                className="grid gap-3 border-b border-[#ebe7df] px-5 py-4 last:border-0 md:grid-cols-[140px_minmax(0,1fr)_140px] md:items-center"
               >
                 <div>
-                  <p className="text-sm font-semibold text-neutral-950">{log.actor_name}</p>
-                  <span className="inline-flex rounded bg-neutral-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-neutral-600">
+                  <p className="text-sm font-semibold text-[#202522]">{log.actor_name}</p>
+                  <span className="inline-flex rounded bg-[#ebe7df] px-1.5 py-0.5 text-[10px] font-semibold uppercase text-[#747b73]">
                     {log.actor_type}
                   </span>
                 </div>
 
                 <div>
-                  <p className="text-sm font-medium text-neutral-900">{log.action}</p>
+                  <p className="text-sm font-medium text-[#202522]">{log.action}</p>
                   {log.target_type && (
-                    <p className="text-xs text-neutral-400">
+                    <p className="text-xs text-[#a7aaa2]">
                       Alvo: {log.target_type} {log.target_id ? `(#${log.target_id.slice(0, 8)})` : ""}
                     </p>
                   )}
                 </div>
 
-                <div className="text-xs text-neutral-500">
+                <div className="text-xs text-[#747b73]">
                   {new Intl.DateTimeFormat("pt-PT", {
                     day: "2-digit",
                     month: "short",
@@ -1661,17 +1661,17 @@ export default function CompanySettings() {
           }
         />
 
-        <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-6">
+        <div className="rounded-[7px] border border-[#ded9d0] bg-[#f1eee7] p-6">
           <div className="flex gap-4">
-            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-white ring-1 ring-neutral-200">
-              <Settings2 className="h-5 w-5 text-neutral-600" />
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-[#fffdf9] ring-1 ring-neutral-200">
+              <Settings2 className="h-5 w-5 text-[#747b73]" />
             </div>
 
             <div>
-              <p className="text-sm font-semibold text-neutral-950">
+              <p className="text-sm font-semibold text-[#202522]">
                 Área preparada para expansão
               </p>
-              <p className="mt-1 max-w-xl text-sm leading-6 text-neutral-500">
+              <p className="mt-1 max-w-xl text-sm leading-6 text-[#747b73]">
                 Esta seção já faz parte da arquitetura de Settings, mas ainda
                 não existe persistência suficiente no banco para oferecer
                 controles reais aqui.
@@ -1721,7 +1721,7 @@ export default function CompanySettings() {
           <select
             value={section}
             onChange={(e) => selectSection(e.target.value as Section)}
-            className="h-11 w-full rounded-lg border border-neutral-200 bg-white px-3 text-sm font-medium text-neutral-900"
+            className="h-11 w-full rounded-lg border border-[#ded9d0] bg-[#fffdf9] px-3 text-sm font-medium text-[#202522]"
           >
             {NAVIGATION.flatMap((group) =>
               group.items
@@ -1739,10 +1739,10 @@ export default function CompanySettings() {
           <aside className="hidden lg:block">
             <div className="sticky top-24">
               <div className="mb-5">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-500">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#747b73]">
                   Settings
                 </p>
-                <p className="mt-1 text-sm text-neutral-500">
+                <p className="mt-1 text-sm text-[#747b73]">
                   Configuração da empresa
                 </p>
               </div>
@@ -1750,7 +1750,7 @@ export default function CompanySettings() {
               <nav className="space-y-6">
                 {NAVIGATION.map((group) => (
                   <div key={group.group}>
-                    <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-neutral-400">
+                    <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#a7aaa2]">
                       {group.group}
                     </p>
 
@@ -1782,8 +1782,8 @@ export default function CompanySettings() {
                             className={cn(
                               "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition",
                               active
-                                ? "bg-neutral-950 text-white"
-                                : "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-950"
+                                ? "bg-[#202522] text-white"
+                                : "text-[#747b73] hover:bg-[#ebe7df] hover:text-[#202522]"
                             )}
                           >
                             <Icon className="h-4 w-4 shrink-0" />
@@ -1803,11 +1803,11 @@ export default function CompanySettings() {
                 ))}
               </nav>
 
-              <div className="mt-8 border-t border-neutral-200 pt-5">
+              <div className="mt-8 border-t border-[#ded9d0] pt-5">
                 <Link
                   to={`/loja/${company?.slug}`}
                   target="_blank"
-                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-neutral-600 transition hover:bg-neutral-100 hover:text-neutral-950"
+                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-[#747b73] transition hover:bg-[#ebe7df] hover:text-[#202522]"
                 >
                   <Store className="h-4 w-4" />
                   Ver loja
@@ -1840,27 +1840,27 @@ function ChannelRow({
   href?: string;
 }) {
   return (
-    <div className="flex flex-col gap-4 rounded-xl border border-neutral-200 bg-white p-5 sm:flex-row sm:items-center">
-      <div className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-neutral-100 text-neutral-700">
+    <div className="flex flex-col gap-4 rounded-[7px] border border-[#ded9d0] bg-[#fffdf9] p-5 sm:flex-row sm:items-center">
+      <div className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-[#ebe7df] text-[#5f625d]">
         {icon}
       </div>
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <p className="text-sm font-semibold text-neutral-950">{name}</p>
+          <p className="text-sm font-semibold text-[#202522]">{name}</p>
 
-          <span className="flex items-center gap-1.5 text-xs text-neutral-500">
+          <span className="flex items-center gap-1.5 text-xs text-[#747b73]">
             <span
               className={cn(
-                "h-1.5 w-1.5 rounded-full",
-                connected ? "bg-neutral-950" : "bg-neutral-300"
+                "h-1.5 w-1.5 rounded-[7px]",
+                connected ? "bg-[#202522]" : "bg-neutral-300"
               )}
             />
             {connected ? "Connected" : "Not connected"}
           </span>
         </div>
 
-        <p className="mt-1 truncate text-xs text-neutral-500">{detail}</p>
+        <p className="mt-1 truncate text-xs text-[#747b73]">{detail}</p>
       </div>
 
       {onToggle && (
@@ -1870,8 +1870,8 @@ function ChannelRow({
           className={cn(
             "h-9 rounded-lg border px-3 text-xs font-medium transition",
             connected
-              ? "border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-50"
-              : "border-neutral-950 bg-neutral-950 text-white hover:bg-neutral-800"
+              ? "border-[#ded9d0] bg-[#fffdf9] text-[#5f625d] hover:bg-[#f1eee7]"
+              : "border-neutral-950 bg-[#202522] text-white hover:bg-neutral-800"
           )}
         >
           {connected ? "Desconectar" : "Marcar conectado"}
@@ -1883,7 +1883,7 @@ function ChannelRow({
           href={href}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-neutral-200 px-3 text-xs font-medium text-neutral-700 transition hover:bg-neutral-50"
+          className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-[#ded9d0] px-3 text-xs font-medium text-[#5f625d] transition hover:bg-[#f1eee7]"
         >
           Abrir
           <ArrowUpRight className="h-3.5 w-3.5" />

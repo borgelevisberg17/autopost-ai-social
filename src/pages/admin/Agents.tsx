@@ -129,10 +129,10 @@ const formatRelativeDate = (date: string) => {
 const actionStatusClass = (status: string) => {
   switch (status) {
     case "DRAFT":
-      return "border-neutral-200 bg-neutral-50 text-neutral-700";
+      return "border-[#ded9d0] bg-[#f1eee7] text-[#5f625d]";
 
     case "PUBLISHED":
-      return "border-neutral-200 bg-neutral-950 text-white";
+      return "border-[#ded9d0] bg-[#202522] text-white";
 
     case "BLOCKED":
       return "border-amber-200 bg-amber-50 text-amber-800";
@@ -141,7 +141,7 @@ const actionStatusClass = (status: string) => {
       return "border-red-200 bg-red-50 text-red-700";
 
     default:
-      return "border-neutral-200 bg-white text-neutral-600";
+      return "border-[#ded9d0] bg-[#fffdf9] text-[#747b73]";
   }
 };
 
@@ -338,7 +338,7 @@ export default function Agents() {
     return (
       <AdminLayout title="Agentes">
         <div className="grid min-h-[420px] place-items-center">
-          <div className="flex items-center gap-3 text-sm text-neutral-500">
+          <div className="flex items-center gap-3 text-sm text-[#747b73]">
             <Loader2 className="h-4 w-4 animate-spin" />
             A carregar agentes...
           </div>
@@ -354,7 +354,7 @@ export default function Agents() {
         <button
           type="button"
           onClick={() => setShowRunPanel(true)}
-          className="inline-flex h-9 items-center gap-2 rounded-sm bg-neutral-950 px-3.5 text-sm font-medium text-white transition-colors hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+          className="inline-flex h-9 items-center gap-2 rounded-sm bg-[#202522] px-3.5 text-sm font-medium text-white transition-colors hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
         >
           <Play className="h-3.5 w-3.5" />
           Executar agente
@@ -366,15 +366,15 @@ export default function Agents() {
         <section>
           <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
             <div>
-              <p className="mb-2 text-[10px] font-medium uppercase tracking-[0.18em] text-neutral-400">
+              <p className="mb-2 text-[10px] font-medium uppercase tracking-[0.18em] text-[#a7aaa2]">
                 Automação
               </p>
 
-              <h2 className="text-3xl font-semibold tracking-[-0.045em] text-neutral-950">
+              <h2 className="text-3xl font-semibold tracking-[-0.045em] text-[#202522]">
                 AI workforce
               </h2>
 
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-neutral-500">
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-[#747b73]">
                 Gerencie os agentes que trabalham sobre o catálogo,
                 conteúdo e canais da sua loja.
               </p>
@@ -383,7 +383,7 @@ export default function Agents() {
             <button
               type="button"
               onClick={loadData}
-              className="inline-flex h-9 w-fit items-center gap-2 rounded-sm border border-neutral-200 bg-white px-3 text-sm font-medium text-neutral-700 transition-colors hover:border-neutral-300 hover:bg-neutral-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+              className="inline-flex h-9 w-fit items-center gap-2 rounded-sm border border-[#ded9d0] bg-[#fffdf9] px-3 text-sm font-medium text-[#5f625d] transition-colors hover:border-[#c9c3b8] hover:bg-[#f1eee7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
             >
               <RefreshCw className="h-3.5 w-3.5" />
               Atualizar
@@ -394,7 +394,7 @@ export default function Agents() {
         {/* WORKFORCE */}
         <section>
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-400">
+            <h3 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#a7aaa2]">
               Workforce
             </h3>
 
@@ -409,18 +409,18 @@ export default function Agents() {
             )}
           </div>
 
-          <div className="grid border-y border-neutral-200 sm:grid-cols-3">
-            <div className="border-b border-neutral-200 px-0 py-5 sm:border-b-0 sm:border-r sm:px-5">
-              <p className="text-xs text-neutral-400">Agentes</p>
+          <div className="grid border-y border-[#ded9d0] sm:grid-cols-3">
+            <div className="border-b border-[#ded9d0] px-0 py-5 sm:border-b-0 sm:border-r sm:px-5">
+              <p className="text-xs text-[#a7aaa2]">Agentes</p>
               <p className="mt-1 text-2xl font-semibold tracking-[-0.04em]">
                 1
               </p>
             </div>
 
-            <div className="border-b border-neutral-200 px-0 py-5 sm:border-b-0 sm:border-r sm:px-5">
+            <div className="border-b border-[#ded9d0] px-0 py-5 sm:border-b-0 sm:border-r sm:px-5">
               <div className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-neutral-900" />
-                <p className="text-xs text-neutral-400">Ativo</p>
+                <span className="h-1.5 w-1.5 rounded-[7px] bg-[#202522]" />
+                <p className="text-xs text-[#a7aaa2]">Ativo</p>
               </div>
 
               <p className="mt-1 text-2xl font-semibold tracking-[-0.04em]">
@@ -429,7 +429,7 @@ export default function Agents() {
             </div>
 
             <div className="px-0 py-5 sm:px-5">
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-[#a7aaa2]">
                 Atenção
               </p>
 
@@ -448,7 +448,7 @@ export default function Agents() {
                 Seus agentes
               </h3>
 
-              <p className="mt-1 text-sm text-neutral-500">
+              <p className="mt-1 text-sm text-[#747b73]">
                 Agentes atualmente disponíveis na sua operação.
               </p>
             </div>
@@ -456,22 +456,22 @@ export default function Agents() {
 
           <div className="grid gap-4 xl:grid-cols-2">
             {/* MARKETING AGENT */}
-            <article className="group border border-neutral-200 bg-white transition-colors hover:border-neutral-300">
+            <article className="group border border-[#ded9d0] bg-[#fffdf9] transition-colors hover:border-[#c9c3b8]">
               <div className="p-5 sm:p-6">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-3.5">
-                    <div className="grid h-11 w-11 shrink-0 place-items-center border border-neutral-200 bg-neutral-50">
+                    <div className="grid h-11 w-11 shrink-0 place-items-center border border-[#ded9d0] bg-[#f1eee7]">
                       <Megaphone
-                        className="h-[19px] w-[19px] text-neutral-800"
+                        className="h-[19px] w-[19px] text-[#303732]"
                         strokeWidth={1.7}
                       />
                     </div>
 
                     <div>
                       <div className="mb-1 flex items-center gap-2">
-                        <span className="h-1.5 w-1.5 rounded-full bg-neutral-900" />
+                        <span className="h-1.5 w-1.5 rounded-[7px] bg-[#202522]" />
 
-                        <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-neutral-500">
+                        <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#747b73]">
                           Ativo
                         </span>
                       </div>
@@ -480,7 +480,7 @@ export default function Agents() {
                         Marketing Agent
                       </h4>
 
-                      <p className="mt-0.5 text-sm text-neutral-500">
+                      <p className="mt-0.5 text-sm text-[#747b73]">
                         Content & Publishing
                       </p>
                     </div>
@@ -491,13 +491,13 @@ export default function Agents() {
                       type="button"
                       onClick={() => setShowMenu((value) => !value)}
                       aria-label="Mais opções"
-                      className="grid h-8 w-8 place-items-center rounded-sm text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+                      className="grid h-8 w-8 place-items-center rounded-sm text-[#a7aaa2] transition-colors hover:bg-[#ebe7df] hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
                     >
                       <MoreHorizontal className="h-4 w-4" />
                     </button>
 
                     {showMenu && (
-                      <div className="absolute right-0 top-9 z-20 w-44 border border-neutral-200 bg-white p-1 shadow-sm">
+                      <div className="absolute right-0 top-9 z-20 w-44 border border-[#ded9d0] bg-[#fffdf9] p-1 shadow-sm">
                         <button
                           type="button"
                           onClick={() => {
@@ -506,7 +506,7 @@ export default function Agents() {
                               "Configurações avançadas estarão disponíveis quando os agentes configuráveis forem ativados.",
                             );
                           }}
-                          className="flex w-full items-center gap-2 rounded-sm px-3 py-2 text-left text-xs font-medium text-neutral-700 hover:bg-neutral-50"
+                          className="flex w-full items-center gap-2 rounded-sm px-3 py-2 text-left text-xs font-medium text-[#5f625d] hover:bg-[#f1eee7]"
                         >
                           Configurações
                         </button>
@@ -519,7 +519,7 @@ export default function Agents() {
                               "O agente atualmente é controlado pelo sistema.",
                             );
                           }}
-                          className="flex w-full items-center gap-2 rounded-sm px-3 py-2 text-left text-xs font-medium text-neutral-700 hover:bg-neutral-50"
+                          className="flex w-full items-center gap-2 rounded-sm px-3 py-2 text-left text-xs font-medium text-[#5f625d] hover:bg-[#f1eee7]"
                         >
                           Ver regras
                         </button>
@@ -532,7 +532,7 @@ export default function Agents() {
                   {PLATFORMS.map((platform) => (
                     <span
                       key={platform.id}
-                      className="inline-flex items-center gap-1.5 border border-neutral-200 px-2.5 py-1 text-[11px] font-medium text-neutral-600"
+                      className="inline-flex items-center gap-1.5 border border-[#ded9d0] px-2.5 py-1 text-[11px] font-medium text-[#747b73]"
                     >
                       {platform.id === "instagram" ? (
                         <Instagram className="h-3 w-3" />
@@ -547,11 +547,11 @@ export default function Agents() {
                   ))}
                 </div>
 
-                <div className="my-5 border-t border-neutral-200" />
+                <div className="my-5 border-t border-[#ded9d0]" />
 
                 <div className="grid grid-cols-2 gap-y-5 sm:grid-cols-4">
                   <div>
-                    <p className="text-[11px] text-neutral-400">
+                    <p className="text-[11px] text-[#a7aaa2]">
                       Hoje
                     </p>
 
@@ -561,7 +561,7 @@ export default function Agents() {
                   </div>
 
                   <div>
-                    <p className="text-[11px] text-neutral-400">
+                    <p className="text-[11px] text-[#a7aaa2]">
                       Rascunhos
                     </p>
 
@@ -571,7 +571,7 @@ export default function Agents() {
                   </div>
 
                   <div>
-                    <p className="text-[11px] text-neutral-400">
+                    <p className="text-[11px] text-[#a7aaa2]">
                       Bloqueados
                     </p>
 
@@ -581,7 +581,7 @@ export default function Agents() {
                   </div>
 
                   <div>
-                    <p className="text-[11px] text-neutral-400">
+                    <p className="text-[11px] text-[#a7aaa2]">
                       Falhas
                     </p>
 
@@ -593,23 +593,23 @@ export default function Agents() {
 
                 {latestAction && (
                   <>
-                    <div className="my-5 border-t border-neutral-200" />
+                    <div className="my-5 border-t border-[#ded9d0]" />
 
                     <div>
-                      <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-neutral-400">
+                      <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#a7aaa2]">
                         Última atividade
                       </p>
 
                       <div className="mt-2 flex items-start gap-2.5">
-                        <div className="mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-neutral-900" />
+                        <div className="mt-0.5 h-1.5 w-1.5 shrink-0 rounded-[7px] bg-[#202522]" />
 
                         <div className="min-w-0">
-                          <p className="truncate text-sm font-medium text-neutral-800">
+                          <p className="truncate text-sm font-medium text-[#303732]">
                             {ACTION_LABEL[latestAction.action] ??
                               latestAction.action}
                           </p>
 
-                          <p className="mt-0.5 truncate text-xs text-neutral-500">
+                          <p className="mt-0.5 truncate text-xs text-[#747b73]">
                             {platformLabel(latestAction.platform)}
                             {" · "}
                             {productName(latestAction.product_id)}
@@ -628,7 +628,7 @@ export default function Agents() {
                   <button
                     type="button"
                     onClick={() => setShowRunPanel(true)}
-                    className="inline-flex h-10 items-center justify-center gap-2 bg-neutral-950 px-4 text-sm font-medium text-white transition-colors hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+                    className="inline-flex h-10 items-center justify-center gap-2 bg-[#202522] px-4 text-sm font-medium text-white transition-colors hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
                   >
                     <Play className="h-3.5 w-3.5" />
                     Executar agente
@@ -647,7 +647,7 @@ export default function Agents() {
                         block: "start",
                       });
                     }}
-                    className="inline-flex h-10 items-center justify-center gap-2 border border-neutral-200 px-4 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+                    className="inline-flex h-10 items-center justify-center gap-2 border border-[#ded9d0] px-4 text-sm font-medium text-[#5f625d] transition-colors hover:bg-[#f1eee7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
                   >
                     Ver atividade
                     <ChevronRight className="h-3.5 w-3.5" />
@@ -657,18 +657,18 @@ export default function Agents() {
             </article>
 
             {/* CURRENT CAPABILITIES */}
-            <article className="border border-neutral-200 bg-neutral-50">
+            <article className="border border-[#ded9d0] bg-[#f1eee7]">
               <div className="p-5 sm:p-6">
                 <div className="flex items-start gap-3.5">
-                  <div className="grid h-11 w-11 shrink-0 place-items-center border border-neutral-200 bg-white">
+                  <div className="grid h-11 w-11 shrink-0 place-items-center border border-[#ded9d0] bg-[#fffdf9]">
                     <ShieldCheck
-                      className="h-[19px] w-[19px] text-neutral-800"
+                      className="h-[19px] w-[19px] text-[#303732]"
                       strokeWidth={1.7}
                     />
                   </div>
 
                   <div>
-                    <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-neutral-400">
+                    <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#a7aaa2]">
                       Guardrails
                     </p>
 
@@ -676,7 +676,7 @@ export default function Agents() {
                       Operação controlada
                     </h4>
 
-                    <p className="mt-1 text-sm leading-5 text-neutral-500">
+                    <p className="mt-1 text-sm leading-5 text-[#747b73]">
                       O agente trabalha apenas com dados disponíveis
                       no sistema e passa pelas regras antes de gerar
                       qualquer publicação.
@@ -684,61 +684,61 @@ export default function Agents() {
                   </div>
                 </div>
 
-                <div className="mt-6 space-y-0 border-y border-neutral-200 bg-white">
-                  <div className="flex items-center gap-3 border-b border-neutral-200 px-4 py-3.5">
-                    <Check className="h-4 w-4 shrink-0 text-neutral-800" />
+                <div className="mt-6 space-y-0 border-y border-[#ded9d0] bg-[#fffdf9]">
+                  <div className="flex items-center gap-3 border-b border-[#ded9d0] px-4 py-3.5">
+                    <Check className="h-4 w-4 shrink-0 text-[#303732]" />
 
                     <div>
                       <p className="text-sm font-medium">
                         Produtos
                       </p>
-                      <p className="text-xs text-neutral-500">
+                      <p className="text-xs text-[#747b73]">
                         Consulta dados reais do catálogo.
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 border-b border-neutral-200 px-4 py-3.5">
-                    <Check className="h-4 w-4 shrink-0 text-neutral-800" />
+                  <div className="flex items-center gap-3 border-b border-[#ded9d0] px-4 py-3.5">
+                    <Check className="h-4 w-4 shrink-0 text-[#303732]" />
 
                     <div>
                       <p className="text-sm font-medium">
                         Stock e preços
                       </p>
-                      <p className="text-xs text-neutral-500">
+                      <p className="text-xs text-[#747b73]">
                         Não inventa disponibilidade ou valores.
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 border-b border-neutral-200 px-4 py-3.5">
-                    <Check className="h-4 w-4 shrink-0 text-neutral-800" />
+                  <div className="flex items-center gap-3 border-b border-[#ded9d0] px-4 py-3.5">
+                    <Check className="h-4 w-4 shrink-0 text-[#303732]" />
 
                     <div>
                       <p className="text-sm font-medium">
                         Promoções
                       </p>
-                      <p className="text-xs text-neutral-500">
+                      <p className="text-xs text-[#747b73]">
                         Valida a promoção antes da geração.
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-3 px-4 py-3.5">
-                    <Check className="h-4 w-4 shrink-0 text-neutral-800" />
+                    <Check className="h-4 w-4 shrink-0 text-[#303732]" />
 
                     <div>
                       <p className="text-sm font-medium">
                         Conteúdo por canal
                       </p>
-                      <p className="text-xs text-neutral-500">
+                      <p className="text-xs text-[#747b73]">
                         Adapta o texto para cada plataforma.
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-5 flex items-start gap-2 text-xs leading-5 text-neutral-500">
+                <div className="mt-5 flex items-start gap-2 text-xs leading-5 text-[#747b73]">
                   <TriangleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0" />
 
                   <p>
@@ -759,53 +759,53 @@ export default function Agents() {
               Marketing Agent
             </h3>
 
-            <p className="mt-1 text-sm text-neutral-500">
+            <p className="mt-1 text-sm text-[#747b73]">
               O que este agente pode consultar e executar atualmente.
             </p>
           </div>
 
           <div className="grid gap-4 lg:grid-cols-3">
-            <div className="border border-neutral-200 bg-white p-5">
+            <div className="border border-[#ded9d0] bg-[#fffdf9] p-5">
               <div className="flex items-center gap-2">
-                <Package className="h-4 w-4 text-neutral-500" />
+                <Package className="h-4 w-4 text-[#747b73]" />
                 <h4 className="text-sm font-semibold">
                   Conhecimento
                 </h4>
               </div>
 
               <div className="mt-4 space-y-3">
-                <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
-                  <span className="text-sm text-neutral-600">
+                <div className="flex items-center justify-between border-b border-[#ebe7df] pb-3">
+                  <span className="text-sm text-[#747b73]">
                     Produtos
                   </span>
-                  <span className="text-xs font-medium text-neutral-900">
+                  <span className="text-xs font-medium text-[#202522]">
                     {products.length}
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
-                  <span className="text-sm text-neutral-600">
+                <div className="flex items-center justify-between border-b border-[#ebe7df] pb-3">
+                  <span className="text-sm text-[#747b73]">
                     Informações da loja
                   </span>
-                  <span className="text-xs font-medium text-neutral-900">
+                  <span className="text-xs font-medium text-[#202522]">
                     Ligado
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-neutral-600">
+                  <span className="text-sm text-[#747b73]">
                     Preços e stock
                   </span>
-                  <span className="text-xs font-medium text-neutral-900">
+                  <span className="text-xs font-medium text-[#202522]">
                     Ligado
                   </span>
                 </div>
               </div>
             </div>
 
-            <div className="border border-neutral-200 bg-white p-5">
+            <div className="border border-[#ded9d0] bg-[#fffdf9] p-5">
               <div className="flex items-center gap-2">
-                <ShieldCheck className="h-4 w-4 text-neutral-500" />
+                <ShieldCheck className="h-4 w-4 text-[#747b73]" />
                 <h4 className="text-sm font-semibold">
                   Permissões
                 </h4>
@@ -824,14 +824,14 @@ export default function Agents() {
                     key={String(label)}
                     className="flex items-center justify-between"
                   >
-                    <span className="text-sm text-neutral-600">
+                    <span className="text-sm text-[#747b73]">
                       {label}
                     </span>
 
                     {enabled ? (
-                      <CheckCircle2 className="h-4 w-4 text-neutral-800" />
+                      <CheckCircle2 className="h-4 w-4 text-[#303732]" />
                     ) : (
-                      <span className="text-xs text-neutral-400">
+                      <span className="text-xs text-[#a7aaa2]">
                         Não
                       </span>
                     )}
@@ -840,16 +840,16 @@ export default function Agents() {
               </div>
             </div>
 
-            <div className="border border-neutral-200 bg-white p-5">
+            <div className="border border-[#ded9d0] bg-[#fffdf9] p-5">
               <div className="flex items-center gap-2">
-                <Clock3 className="h-4 w-4 text-neutral-500" />
+                <Clock3 className="h-4 w-4 text-[#747b73]" />
                 <h4 className="text-sm font-semibold">
                   Execução
                 </h4>
               </div>
 
               <div className="mt-4">
-                <p className="text-sm leading-6 text-neutral-500">
+                <p className="text-sm leading-6 text-[#747b73]">
                   O agente é executado manualmente nesta fase.
                   Agendamento automático será adicionado quando o
                   scheduler fizer parte da infraestrutura dos agentes.
@@ -862,7 +862,7 @@ export default function Agents() {
                       "Agendamento automático será disponibilizado numa próxima fase.",
                     )
                   }
-                  className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-neutral-900 underline underline-offset-4"
+                  className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-[#202522] underline underline-offset-4"
                 >
                   Configurar quando disponível
                   <ChevronRight className="h-3 w-3" />
@@ -881,14 +881,14 @@ export default function Agents() {
                   Atenção
                 </h3>
 
-                <p className="mt-1 text-sm text-neutral-500">
+                <p className="mt-1 text-sm text-[#747b73]">
                   Eventos que exigiram intervenção ou foram
                   bloqueados pelas regras do sistema.
                 </p>
               </div>
             </div>
 
-            <div className="border border-neutral-200 bg-white">
+            <div className="border border-[#ded9d0] bg-[#fffdf9]">
               {log
                 .filter(
                   (item) =>
@@ -908,9 +908,9 @@ export default function Agents() {
                       key={item.id}
                       onClick={() => setSelectedAction(item)}
                       className={cn(
-                        "flex w-full items-start gap-3 px-4 py-4 text-left transition-colors hover:bg-neutral-50",
+                        "flex w-full items-start gap-3 px-4 py-4 text-left transition-colors hover:bg-[#f1eee7]",
                         index < array.length - 1 &&
-                          "border-b border-neutral-200",
+                          "border-b border-[#ded9d0]",
                       )}
                     >
                       <Icon
@@ -929,17 +929,17 @@ export default function Agents() {
                               item.action}
                           </p>
 
-                          <span className="text-xs text-neutral-400">
+                          <span className="text-xs text-[#a7aaa2]">
                             {platformLabel(item.platform)}
                           </span>
                         </div>
 
-                        <p className="mt-1 text-xs text-neutral-500">
+                        <p className="mt-1 text-xs text-[#747b73]">
                           {item.reason ?? "Sem motivo registado"}
                         </p>
                       </div>
 
-                      <span className="shrink-0 text-xs text-neutral-400">
+                      <span className="shrink-0 text-xs text-[#a7aaa2]">
                         {formatRelativeDate(item.created_at)}
                       </span>
                     </button>
@@ -957,33 +957,33 @@ export default function Agents() {
                 Activity
               </h3>
 
-              <p className="mt-1 text-sm text-neutral-500">
+              <p className="mt-1 text-sm text-[#747b73]">
                 Histórico recente das ações executadas pelo agente.
               </p>
             </div>
 
-            <span className="text-xs text-neutral-400">
+            <span className="text-xs text-[#a7aaa2]">
               Últimas {Math.min(log.length, 100)} ações
             </span>
           </div>
 
           {recentActivity.length === 0 ? (
-            <div className="border border-dashed border-neutral-300 px-6 py-14 text-center">
-              <div className="mx-auto grid h-10 w-10 place-items-center border border-neutral-200">
-                <Activity className="h-4 w-4 text-neutral-500" />
+            <div className="border border-dashed border-[#c9c3b8] px-6 py-14 text-center">
+              <div className="mx-auto grid h-10 w-10 place-items-center border border-[#ded9d0]">
+                <Activity className="h-4 w-4 text-[#747b73]" />
               </div>
 
               <p className="mt-4 text-sm font-medium">
                 Nenhuma atividade ainda
               </p>
 
-              <p className="mx-auto mt-1 max-w-sm text-xs leading-5 text-neutral-500">
+              <p className="mx-auto mt-1 max-w-sm text-xs leading-5 text-[#747b73]">
                 Execute o Marketing Agent para começar a registrar
                 as ações nesta área.
               </p>
             </div>
           ) : (
-            <div className="border-y border-neutral-200 bg-white">
+            <div className="border-y border-[#ded9d0] bg-[#fffdf9]">
               {recentActivity.map((item, index) => {
                 const StatusIcon = statusIcon(item.status);
                 const PlatformIcon = platformIcon(item.platform);
@@ -994,28 +994,28 @@ export default function Agents() {
                     key={item.id}
                     onClick={() => setSelectedAction(item)}
                     className={cn(
-                      "flex w-full items-start gap-3.5 px-4 py-4 text-left transition-colors hover:bg-neutral-50 sm:px-5",
+                      "flex w-full items-start gap-3.5 px-4 py-4 text-left transition-colors hover:bg-[#f1eee7] sm:px-5",
                       index < recentActivity.length - 1 &&
-                        "border-b border-neutral-200",
+                        "border-b border-[#ded9d0]",
                     )}
                   >
-                    <div className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center border border-neutral-200 bg-white">
+                    <div className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center border border-[#ded9d0] bg-[#fffdf9]">
                       <StatusIcon
-                        className="h-3.5 w-3.5 text-neutral-600"
+                        className="h-3.5 w-3.5 text-[#747b73]"
                         strokeWidth={1.8}
                       />
                     </div>
 
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <p className="text-sm font-medium text-neutral-900">
+                        <p className="text-sm font-medium text-[#202522]">
                           {ACTION_LABEL[item.action] ??
                             item.action}
                         </p>
 
                         <span
                           className={cn(
-                            "inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium",
+                            "inline-flex items-center rounded-[7px] border px-2 py-0.5 text-[10px] font-medium",
                             actionStatusClass(item.status),
                           )}
                         >
@@ -1024,7 +1024,7 @@ export default function Agents() {
                         </span>
                       </div>
 
-                      <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-neutral-500">
+                      <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[#747b73]">
                         <span className="inline-flex items-center gap-1">
                           <PlatformIcon className="h-3 w-3" />
                           {platformLabel(item.platform)}
@@ -1042,13 +1042,13 @@ export default function Agents() {
                       </div>
 
                       {item.reason && (
-                        <p className="mt-2 line-clamp-1 text-xs text-neutral-500">
+                        <p className="mt-2 line-clamp-1 text-xs text-[#747b73]">
                           {item.reason}
                         </p>
                       )}
                     </div>
 
-                    <ChevronRight className="mt-2 h-4 w-4 shrink-0 text-neutral-300" />
+                    <ChevronRight className="mt-2 h-4 w-4 shrink-0 text-[#c9c3b8]" />
                   </button>
                 );
               })}
@@ -1068,10 +1068,10 @@ export default function Agents() {
             }
           }}
         >
-          <aside className="absolute inset-y-0 right-0 flex w-full max-w-md flex-col border-l border-neutral-200 bg-white shadow-xl">
-            <div className="flex h-16 shrink-0 items-center justify-between border-b border-neutral-200 px-5">
+          <aside className="absolute inset-y-0 right-0 flex w-full max-w-md flex-col border-l border-[#ded9d0] bg-[#fffdf9] shadow-xl">
+            <div className="flex h-16 shrink-0 items-center justify-between border-b border-[#ded9d0] px-5">
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-neutral-400">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#a7aaa2]">
                   Marketing Agent
                 </p>
 
@@ -1084,7 +1084,7 @@ export default function Agents() {
                 type="button"
                 onClick={() => setShowRunPanel(false)}
                 aria-label="Fechar"
-                className="grid h-8 w-8 place-items-center rounded-sm text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+                className="grid h-8 w-8 place-items-center rounded-sm text-[#a7aaa2] hover:bg-[#ebe7df] hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
               >
                 <XCircle className="h-4 w-4" />
               </button>
@@ -1095,12 +1095,12 @@ export default function Agents() {
                 <div>
                   <label
                     htmlFor="agent-product"
-                    className="text-sm font-medium text-neutral-900"
+                    className="text-sm font-medium text-[#202522]"
                   >
                     Produto
                   </label>
 
-                  <p className="mt-1 text-xs leading-5 text-neutral-500">
+                  <p className="mt-1 text-xs leading-5 text-[#747b73]">
                     O agente vai usar somente os dados reais deste
                     produto.
                   </p>
@@ -1111,7 +1111,7 @@ export default function Agents() {
                     onChange={(event) =>
                       setSelectedProductId(event.target.value)
                     }
-                    className="mt-3 h-11 w-full rounded-sm border border-neutral-200 bg-white px-3 text-sm text-neutral-900 outline-none transition focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
+                    className="mt-3 h-11 w-full rounded-sm border border-[#ded9d0] bg-[#fffdf9] px-3 text-sm text-[#202522] outline-none transition focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
                   >
                     <option value="">
                       Escolher produto...
@@ -1129,11 +1129,11 @@ export default function Agents() {
                 </div>
 
                 <div>
-                  <p className="text-sm font-medium text-neutral-900">
+                  <p className="text-sm font-medium text-[#202522]">
                     Canais
                   </p>
 
-                  <p className="mt-1 text-xs leading-5 text-neutral-500">
+                  <p className="mt-1 text-xs leading-5 text-[#747b73]">
                     Será criado um conteúdo adaptado para cada rede
                     selecionada.
                   </p>
@@ -1157,8 +1157,8 @@ export default function Agents() {
                           className={cn(
                             "flex cursor-pointer items-center gap-3 border px-3.5 py-3 transition-colors",
                             checked
-                              ? "border-neutral-900 bg-neutral-50"
-                              : "border-neutral-200 hover:bg-neutral-50",
+                              ? "border-neutral-900 bg-[#f1eee7]"
+                              : "border-[#ded9d0] hover:bg-[#f1eee7]",
                           )}
                         >
                           <input
@@ -1170,7 +1170,7 @@ export default function Agents() {
                             className="h-4 w-4 accent-black"
                           />
 
-                          <Icon className="h-4 w-4 text-neutral-600" />
+                          <Icon className="h-4 w-4 text-[#747b73]" />
 
                           <span className="text-sm font-medium">
                             {platform.label}
@@ -1181,16 +1181,16 @@ export default function Agents() {
                   </div>
                 </div>
 
-                <div className="border border-neutral-200 bg-neutral-50 p-4">
+                <div className="border border-[#ded9d0] bg-[#f1eee7] p-4">
                   <div className="flex items-start gap-2.5">
-                    <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-neutral-700" />
+                    <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#5f625d]" />
 
                     <div>
-                      <p className="text-xs font-semibold text-neutral-900">
+                      <p className="text-xs font-semibold text-[#202522]">
                         Regras aplicadas automaticamente
                       </p>
 
-                      <ul className="mt-2 space-y-1.5 text-xs leading-5 text-neutral-500">
+                      <ul className="mt-2 space-y-1.5 text-xs leading-5 text-[#747b73]">
                         <li>
                           O produto precisa estar ativo.
                         </li>
@@ -1214,8 +1214,8 @@ export default function Agents() {
               </div>
             </div>
 
-            <div className="shrink-0 border-t border-neutral-200 bg-white p-5">
-              <div className="mb-3 flex items-center justify-between text-xs text-neutral-500">
+            <div className="shrink-0 border-t border-[#ded9d0] bg-[#fffdf9] p-5">
+              <div className="mb-3 flex items-center justify-between text-xs text-[#747b73]">
                 <span>
                   {selectedPlatforms.length}{" "}
                   {selectedPlatforms.length === 1
@@ -1238,7 +1238,7 @@ export default function Agents() {
                   !selectedProductId ||
                   selectedPlatforms.length === 0
                 }
-                className="flex h-11 w-full items-center justify-center gap-2 bg-neutral-950 text-sm font-medium text-white transition-colors hover:bg-neutral-800 disabled:cursor-not-allowed disabled:bg-neutral-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+                className="flex h-11 w-full items-center justify-center gap-2 bg-[#202522] text-sm font-medium text-white transition-colors hover:bg-neutral-800 disabled:cursor-not-allowed disabled:bg-neutral-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
               >
                 {running ? (
                   <>
@@ -1268,14 +1268,14 @@ export default function Agents() {
             }
           }}
         >
-          <aside className="absolute inset-y-0 right-0 flex w-full max-w-xl flex-col border-l border-neutral-200 bg-white shadow-xl">
-            <div className="flex h-16 shrink-0 items-center justify-between border-b border-neutral-200 px-5">
+          <aside className="absolute inset-y-0 right-0 flex w-full max-w-xl flex-col border-l border-[#ded9d0] bg-[#fffdf9] shadow-xl">
+            <div className="flex h-16 shrink-0 items-center justify-between border-b border-[#ded9d0] px-5">
               <div className="flex min-w-0 items-center gap-3">
                 <button
                   type="button"
                   onClick={() => setSelectedAction(null)}
                   aria-label="Voltar"
-                  className="grid h-8 w-8 shrink-0 place-items-center rounded-sm text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+                  className="grid h-8 w-8 shrink-0 place-items-center rounded-sm text-[#747b73] hover:bg-[#ebe7df] hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
                 >
                   <ArrowLeft className="h-4 w-4" />
                 </button>
@@ -1286,7 +1286,7 @@ export default function Agents() {
                       selectedAction.action}
                   </p>
 
-                  <p className="truncate text-xs text-neutral-500">
+                  <p className="truncate text-xs text-[#747b73]">
                     {formatDate(selectedAction.created_at)}
                   </p>
                 </div>
@@ -1294,7 +1294,7 @@ export default function Agents() {
 
               <span
                 className={cn(
-                  "inline-flex shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-semibold",
+                  "inline-flex shrink-0 rounded-[7px] border px-2.5 py-1 text-[10px] font-semibold",
                   actionStatusClass(selectedAction.status),
                 )}
               >
@@ -1305,9 +1305,9 @@ export default function Agents() {
 
             <div className="min-h-0 flex-1 overflow-y-auto px-5 py-6">
               <div className="space-y-7">
-                <div className="grid grid-cols-2 border-y border-neutral-200">
-                  <div className="border-r border-neutral-200 py-4">
-                    <p className="text-[11px] text-neutral-400">
+                <div className="grid grid-cols-2 border-y border-[#ded9d0]">
+                  <div className="border-r border-[#ded9d0] py-4">
+                    <p className="text-[11px] text-[#a7aaa2]">
                       Canal
                     </p>
 
@@ -1317,7 +1317,7 @@ export default function Agents() {
                   </div>
 
                   <div className="py-4 pl-4">
-                    <p className="text-[11px] text-neutral-400">
+                    <p className="text-[11px] text-[#a7aaa2]">
                       Produto
                     </p>
 
@@ -1328,16 +1328,16 @@ export default function Agents() {
                 </div>
 
                 {selectedAction.reason && (
-                  <div className="border border-neutral-200 bg-neutral-50 p-4">
+                  <div className="border border-[#ded9d0] bg-[#f1eee7] p-4">
                     <div className="flex items-start gap-2.5">
-                      <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-neutral-600" />
+                      <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#747b73]" />
 
                       <div>
                         <p className="text-xs font-semibold">
                           Motivo
                         </p>
 
-                        <p className="mt-1 text-sm leading-6 text-neutral-600">
+                        <p className="mt-1 text-sm leading-6 text-[#747b73]">
                           {selectedAction.reason}
                         </p>
                       </div>
@@ -1349,7 +1349,7 @@ export default function Agents() {
                   <div>
                     <div className="mb-3 flex items-center justify-between">
                       <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-neutral-400">
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#a7aaa2]">
                           Conteúdo gerado
                         </p>
 
@@ -1363,26 +1363,26 @@ export default function Agents() {
                         onClick={() =>
                           copyContent(selectedAction.content!)
                         }
-                        className="inline-flex h-8 items-center gap-1.5 border border-neutral-200 px-2.5 text-xs font-medium text-neutral-700 hover:bg-neutral-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+                        className="inline-flex h-8 items-center gap-1.5 border border-[#ded9d0] px-2.5 text-xs font-medium text-[#5f625d] hover:bg-[#f1eee7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
                       >
                         <Copy className="h-3 w-3" />
                         Copiar
                       </button>
                     </div>
 
-                    <div className="border border-neutral-200 bg-neutral-50 p-4">
-                      <p className="whitespace-pre-wrap text-sm leading-6 text-neutral-700">
+                    <div className="border border-[#ded9d0] bg-[#f1eee7] p-4">
+                      <p className="whitespace-pre-wrap text-sm leading-6 text-[#5f625d]">
                         {selectedAction.content}
                       </p>
                     </div>
                   </div>
                 ) : (
-                  <div className="border border-dashed border-neutral-300 px-5 py-10 text-center">
+                  <div className="border border-dashed border-[#c9c3b8] px-5 py-10 text-center">
                     <p className="text-sm font-medium">
                       Nenhum conteúdo disponível
                     </p>
 
-                    <p className="mt-1 text-xs text-neutral-500">
+                    <p className="mt-1 text-xs text-[#747b73]">
                       Esta ação não possui texto associado.
                     </p>
                   </div>
@@ -1390,11 +1390,11 @@ export default function Agents() {
               </div>
             </div>
 
-            <div className="shrink-0 border-t border-neutral-200 px-5 py-4">
+            <div className="shrink-0 border-t border-[#ded9d0] px-5 py-4">
               <button
                 type="button"
                 onClick={() => setSelectedAction(null)}
-                className="h-10 w-full border border-neutral-200 text-sm font-medium text-neutral-700 hover:bg-neutral-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+                className="h-10 w-full border border-[#ded9d0] text-sm font-medium text-[#5f625d] hover:bg-[#f1eee7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
               >
                 Fechar
               </button>

@@ -87,15 +87,15 @@ function statusLabel(status: string) {
 function statusClass(status: string) {
   switch (status) {
     case "confirmed":
-      return "bg-neutral-100 text-neutral-700";
+      return "bg-[#ebe7df] text-[#5f625d]";
     case "shipped":
-      return "bg-neutral-100 text-neutral-700";
+      return "bg-[#ebe7df] text-[#5f625d]";
     case "completed":
-      return "bg-neutral-900 text-white";
+      return "bg-[#202522] text-white";
     case "cancelled":
-      return "bg-neutral-100 text-neutral-400";
+      return "bg-[#ebe7df] text-[#a7aaa2]";
     default:
-      return "bg-[#f5f5f2] text-neutral-700";
+      return "bg-[#f5f5f2] text-[#5f625d]";
   }
 }
 
@@ -385,9 +385,9 @@ export default function Overview() {
     <AdminLayout title="Visão geral">
       <div className="space-y-10">
         {/* INTRO */}
-        <section className="flex flex-col justify-between gap-5 border-b border-neutral-200 pb-7 sm:flex-row sm:items-end">
+        <section className="flex flex-col justify-between gap-5 border-b border-[#ded9d0] pb-7 sm:flex-row sm:items-end">
           <div>
-            <p className="mb-2 text-xs font-medium uppercase tracking-[0.16em] text-neutral-400">
+            <p className="mb-2 text-xs font-medium uppercase tracking-[0.16em] text-[#a7aaa2]">
               Visão geral
             </p>
 
@@ -395,13 +395,13 @@ export default function Overview() {
               Olá, {company.name}.
             </h2>
 
-            <p className="mt-2 max-w-xl text-sm leading-6 text-neutral-500">
+            <p className="mt-2 max-w-xl text-sm leading-6 text-[#747b73]">
               Aqui está o estado atual da sua operação e o que merece
               atenção.
             </p>
           </div>
 
-          <div className="text-sm text-neutral-400">
+          <div className="text-sm text-[#a7aaa2]">
             {new Intl.DateTimeFormat("pt-PT", {
               weekday: "long",
               day: "numeric",
@@ -411,7 +411,7 @@ export default function Overview() {
         </section>
 
         {/* KEY METRICS */}
-        <section className="grid border-y border-neutral-200 sm:grid-cols-2 lg:grid-cols-4">
+        <section className="grid border-y border-[#ded9d0] sm:grid-cols-2 lg:grid-cols-4">
           <Metric
             label="Receita"
             value={formatMoney(stats.revenue, currency)}
@@ -450,7 +450,7 @@ export default function Overview() {
           <div className="min-w-0">
             <div className="mb-5 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
               <div>
-                <p className="text-xs font-medium uppercase tracking-[0.16em] text-neutral-400">
+                <p className="text-xs font-medium uppercase tracking-[0.16em] text-[#a7aaa2]">
                   Desempenho
                 </p>
 
@@ -459,7 +459,7 @@ export default function Overview() {
                 </h2>
               </div>
 
-              <div className="flex w-fit border border-neutral-200 bg-white">
+              <div className="flex w-fit border border-[#ded9d0] bg-[#fffdf9]">
                 {(
                   [
                     ["7d", "7 dias"],
@@ -473,10 +473,10 @@ export default function Overview() {
                     onClick={() => setPeriod(value)}
                     className={cn(
                       "min-h-9 px-3 text-xs font-medium transition-colors",
-                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-inset",
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-inset",
                       period === value
                         ? "bg-black text-white"
-                        : "text-neutral-500 hover:bg-neutral-50 hover:text-neutral-950",
+                        : "text-[#747b73] hover:bg-[#f1eee7] hover:text-[#202522]",
                     )}
                   >
                     {label}
@@ -485,19 +485,19 @@ export default function Overview() {
               </div>
             </div>
 
-            <div className="h-[300px] w-full border-y border-neutral-200 py-6">
+            <div className="h-[300px] w-full border-y border-[#ded9d0] py-6">
               {loading ? (
-                <div className="grid h-full place-items-center text-sm text-neutral-400">
+                <div className="grid h-full place-items-center text-sm text-[#a7aaa2]">
                   A carregar dados...
                 </div>
               ) : stats.chart.every((item) => item.receita === 0) ? (
                 <div className="grid h-full place-items-center px-6 text-center">
                   <div>
-                    <TrendingUp className="mx-auto mb-3 h-5 w-5 text-neutral-300" />
-                    <p className="text-sm font-medium text-neutral-700">
+                    <TrendingUp className="mx-auto mb-3 h-5 w-5 text-[#c9c3b8]" />
+                    <p className="text-sm font-medium text-[#5f625d]">
                       Ainda não existem vendas neste período.
                     </p>
-                    <p className="mt-1 text-xs text-neutral-400">
+                    <p className="mt-1 text-xs text-[#a7aaa2]">
                       Os dados de vendas aparecerão aqui quando os pedidos
                       forem recebidos.
                     </p>
@@ -601,7 +601,7 @@ export default function Overview() {
           {/* ATTENTION */}
           <div>
             <div className="mb-5">
-              <p className="text-xs font-medium uppercase tracking-[0.16em] text-neutral-400">
+              <p className="text-xs font-medium uppercase tracking-[0.16em] text-[#a7aaa2]">
                 Atenção
               </p>
 
@@ -610,7 +610,7 @@ export default function Overview() {
               </h2>
             </div>
 
-            <div className="border-y border-neutral-200">
+            <div className="border-y border-[#ded9d0]">
               {lowStock.length > 0 && (
                 <AttentionItem
                   icon={AlertTriangle}
@@ -658,14 +658,14 @@ export default function Overview() {
                 stats.pendingOrders.length === 0 &&
                 stats.cancelledOrders.length === 0 && (
                   <div className="flex items-start gap-3 py-5">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 text-neutral-700" />
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 text-[#5f625d]" />
 
                     <div>
                       <p className="text-sm font-medium">
                         Tudo em ordem
                       </p>
 
-                      <p className="mt-1 text-xs leading-5 text-neutral-400">
+                      <p className="mt-1 text-xs leading-5 text-[#a7aaa2]">
                         Não há tarefas urgentes neste momento.
                       </p>
                     </div>
@@ -679,7 +679,7 @@ export default function Overview() {
         {stats.channelSales.length > 0 && (
           <section>
             <div className="mb-5">
-              <p className="text-xs font-medium uppercase tracking-[0.16em] text-neutral-400">
+              <p className="text-xs font-medium uppercase tracking-[0.16em] text-[#a7aaa2]">
                 Origem dos pedidos
               </p>
 
@@ -688,7 +688,7 @@ export default function Overview() {
               </h2>
             </div>
 
-            <div className="border-y border-neutral-200">
+            <div className="border-y border-[#ded9d0]">
               {stats.channelSales.map((channel, index) => {
                 const totalRevenue = stats.channelSales.reduce(
                   (sum, item) => sum + item.revenue,
@@ -703,18 +703,18 @@ export default function Overview() {
                 return (
                   <div
                     key={channel.channel}
-                    className="grid grid-cols-[130px_1fr_100px] items-center gap-4 border-b border-neutral-100 py-4 last:border-b-0 sm:grid-cols-[160px_1fr_120px]"
+                    className="grid grid-cols-[130px_1fr_100px] items-center gap-4 border-b border-[#ebe7df] py-4 last:border-b-0 sm:grid-cols-[160px_1fr_120px]"
                   >
                     <div className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-neutral-900" />
+                      <span className="h-1.5 w-1.5 rounded-[7px] bg-[#202522]" />
                       <span className="text-sm font-medium">
                         {channel.channel}
                       </span>
                     </div>
 
-                    <div className="h-1.5 overflow-hidden bg-neutral-100">
+                    <div className="h-1.5 overflow-hidden bg-[#ebe7df]">
                       <div
-                        className="h-full bg-neutral-900 transition-all"
+                        className="h-full bg-[#202522] transition-all"
                         style={{
                           width: `${Math.max(percentage, 2)}%`,
                         }}
@@ -725,7 +725,7 @@ export default function Overview() {
                       <p className="text-sm font-semibold">
                         {formatMoney(channel.revenue, currency)}
                       </p>
-                      <p className="text-[11px] text-neutral-400">
+                      <p className="text-[11px] text-[#a7aaa2]">
                         {channel.orders} pedido
                         {channel.orders !== 1 ? "s" : ""}
                       </p>
@@ -745,7 +745,7 @@ export default function Overview() {
           <div>
             <div className="mb-5 flex items-end justify-between gap-4">
               <div>
-                <p className="text-xs font-medium uppercase tracking-[0.16em] text-neutral-400">
+                <p className="text-xs font-medium uppercase tracking-[0.16em] text-[#a7aaa2]">
                   Produtos
                 </p>
 
@@ -756,14 +756,14 @@ export default function Overview() {
 
               <Link
                 to="/admin/produtos"
-                className="group flex shrink-0 items-center gap-1 text-xs font-medium text-neutral-500 hover:text-neutral-950"
+                className="group flex shrink-0 items-center gap-1 text-xs font-medium text-[#747b73] hover:text-[#202522]"
               >
                 Ver produtos
                 <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
               </Link>
             </div>
 
-            <div className="border-y border-neutral-200">
+            <div className="border-y border-[#ded9d0]">
               {stats.productSales.length === 0 ? (
                 <EmptyState
                   icon={Package}
@@ -774,9 +774,9 @@ export default function Overview() {
                 stats.productSales.map((product, index) => (
                   <div
                     key={product.name}
-                    className="flex items-center gap-4 border-b border-neutral-100 py-4 last:border-b-0"
+                    className="flex items-center gap-4 border-b border-[#ebe7df] py-4 last:border-b-0"
                   >
-                    <span className="w-5 text-xs text-neutral-400">
+                    <span className="w-5 text-xs text-[#a7aaa2]">
                       {String(index + 1).padStart(2, "0")}
                     </span>
 
@@ -785,7 +785,7 @@ export default function Overview() {
                         {product.name}
                       </p>
 
-                      <p className="mt-0.5 text-xs text-neutral-400">
+                      <p className="mt-0.5 text-xs text-[#a7aaa2]">
                         {product.quantity} unidade
                         {product.quantity !== 1 ? "s" : ""} vendida
                         {product.quantity !== 1 ? "s" : ""}
@@ -805,7 +805,7 @@ export default function Overview() {
           <div>
             <div className="mb-5 flex items-end justify-between gap-4">
               <div>
-                <p className="text-xs font-medium uppercase tracking-[0.16em] text-neutral-400">
+                <p className="text-xs font-medium uppercase tracking-[0.16em] text-[#a7aaa2]">
                   Operação
                 </p>
 
@@ -816,14 +816,14 @@ export default function Overview() {
 
               <Link
                 to="/admin/pedidos"
-                className="group flex shrink-0 items-center gap-1 text-xs font-medium text-neutral-500 hover:text-neutral-950"
+                className="group flex shrink-0 items-center gap-1 text-xs font-medium text-[#747b73] hover:text-[#202522]"
               >
                 Ver todos
                 <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
               </Link>
             </div>
 
-            <div className="border-y border-neutral-200">
+            <div className="border-y border-[#ded9d0]">
               {orders.length === 0 ? (
                 <EmptyState
                   icon={ShoppingBag}
@@ -834,10 +834,10 @@ export default function Overview() {
                 orders.slice(0, 5).map((order) => (
                   <div
                     key={order.id}
-                    className="flex items-center gap-4 border-b border-neutral-100 py-4 last:border-b-0"
+                    className="flex items-center gap-4 border-b border-[#ebe7df] py-4 last:border-b-0"
                   >
-                    <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-neutral-100">
-                      <ShoppingBag className="h-3.5 w-3.5 text-neutral-600" />
+                    <div className="grid h-8 w-8 shrink-0 place-items-center rounded-[7px] bg-[#ebe7df]">
+                      <ShoppingBag className="h-3.5 w-3.5 text-[#747b73]" />
                     </div>
 
                     <div className="min-w-0 flex-1">
@@ -845,7 +845,7 @@ export default function Overview() {
                         {order.customer_name}
                       </p>
 
-                      <p className="mt-0.5 text-xs text-neutral-400">
+                      <p className="mt-0.5 text-xs text-[#a7aaa2]">
                         {formatDate(order.created_at)} ·{" "}
                         {channelLabel(order.channel)}
                       </p>
@@ -875,7 +875,7 @@ export default function Overview() {
         {/* STORE STATUS */}
         <section>
           <div className="mb-5">
-            <p className="text-xs font-medium uppercase tracking-[0.16em] text-neutral-400">
+            <p className="text-xs font-medium uppercase tracking-[0.16em] text-[#a7aaa2]">
               Estado da loja
             </p>
 
@@ -884,7 +884,7 @@ export default function Overview() {
             </h2>
           </div>
 
-          <div className="grid border-y border-neutral-200 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid border-y border-[#ded9d0] sm:grid-cols-2 lg:grid-cols-4">
             <StoreStat
               label="Pedidos hoje"
               value={String(stats.todayOrders)}
@@ -934,23 +934,23 @@ function Metric({
   const positive = change !== undefined && change >= 0;
 
   return (
-    <div className="border-b border-neutral-200 px-1 py-5 sm:border-r sm:px-5 lg:border-b-0 lg:px-6 first:pl-0 last:border-r-0">
+    <div className="border-b border-[#ded9d0] px-1 py-5 sm:border-r sm:px-5 lg:border-b-0 lg:px-6 first:pl-0 last:border-r-0">
       <div className="flex items-center justify-between">
-        <p className="text-xs font-medium uppercase tracking-[0.12em] text-neutral-400">
+        <p className="text-xs font-medium uppercase tracking-[0.12em] text-[#a7aaa2]">
           {label}
         </p>
 
         <Icon
           className={cn(
             "h-4 w-4",
-            warning ? "text-neutral-900" : "text-neutral-300",
+            warning ? "text-[#202522]" : "text-[#c9c3b8]",
           )}
           strokeWidth={1.7}
         />
       </div>
 
       {loading ? (
-        <div className="mt-3 h-7 w-28 animate-pulse bg-neutral-100" />
+        <div className="mt-3 h-7 w-28 animate-pulse bg-[#ebe7df]" />
       ) : (
         <p className="mt-2 truncate text-xl font-semibold tracking-[-0.035em] sm:text-2xl">
           {value}
@@ -969,14 +969,14 @@ function Metric({
             {Math.abs(change).toFixed(1)}%
           </span>
 
-          <span className="text-neutral-400">
+          <span className="text-[#a7aaa2]">
             vs. período anterior
           </span>
         </div>
       )}
 
       {warning && !loading && (
-        <p className="mt-2 text-[11px] font-medium text-neutral-600">
+        <p className="mt-2 text-[11px] font-medium text-[#747b73]">
           Requer atenção
         </p>
       )}
@@ -1000,12 +1000,12 @@ function AttentionItem({
   return (
     <Link
       to={href}
-      className="group flex items-start gap-3 border-b border-neutral-100 py-4 last:border-b-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-inset"
+      className="group flex items-start gap-3 border-b border-[#ebe7df] py-4 last:border-b-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-inset"
     >
       <Icon
         className={cn(
           "mt-0.5 h-4 w-4 shrink-0",
-          danger ? "text-neutral-900" : "text-neutral-400",
+          danger ? "text-[#202522]" : "text-[#a7aaa2]",
         )}
         strokeWidth={1.8}
       />
@@ -1015,12 +1015,12 @@ function AttentionItem({
           {title}
         </p>
 
-        <p className="mt-1 text-xs text-neutral-400">
+        <p className="mt-1 text-xs text-[#a7aaa2]">
           {description}
         </p>
       </div>
 
-      <ArrowRight className="mt-1 h-3.5 w-3.5 shrink-0 text-neutral-300 transition-transform group-hover:translate-x-0.5 group-hover:text-neutral-700" />
+      <ArrowRight className="mt-1 h-3.5 w-3.5 shrink-0 text-[#c9c3b8] transition-transform group-hover:translate-x-0.5 group-hover:text-[#5f625d]" />
     </Link>
   );
 }
@@ -1036,13 +1036,13 @@ function EmptyState({
 }) {
   return (
     <div className="flex min-h-[150px] items-center gap-4">
-      <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-neutral-100">
-        <Icon className="h-4 w-4 text-neutral-400" />
+      <div className="grid h-9 w-9 shrink-0 place-items-center rounded-[7px] bg-[#ebe7df]">
+        <Icon className="h-4 w-4 text-[#a7aaa2]" />
       </div>
 
       <div>
         <p className="text-sm font-medium">{title}</p>
-        <p className="mt-1 text-xs text-neutral-400">
+        <p className="mt-1 text-xs text-[#a7aaa2]">
           {description}
         </p>
       </div>
@@ -1062,19 +1062,19 @@ function StoreStat({
   warning?: boolean;
 }) {
   return (
-    <div className="flex items-center gap-3 border-b border-neutral-200 px-1 py-5 last:border-b-0 sm:border-r sm:px-5 sm:last:border-r-0 lg:border-b-0 lg:px-6">
-      <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-neutral-100">
+    <div className="flex items-center gap-3 border-b border-[#ded9d0] px-1 py-5 last:border-b-0 sm:border-r sm:px-5 sm:last:border-r-0 lg:border-b-0 lg:px-6">
+      <div className="grid h-8 w-8 shrink-0 place-items-center rounded-[7px] bg-[#ebe7df]">
         <Icon
           className={cn(
             "h-4 w-4",
-            warning ? "text-neutral-900" : "text-neutral-500",
+            warning ? "text-[#202522]" : "text-[#747b73]",
           )}
           strokeWidth={1.7}
         />
       </div>
 
       <div className="min-w-0">
-        <p className="text-xs text-neutral-400">{label}</p>
+        <p className="text-xs text-[#a7aaa2]">{label}</p>
         <p className="mt-0.5 truncate text-sm font-semibold">
           {value}
         </p>

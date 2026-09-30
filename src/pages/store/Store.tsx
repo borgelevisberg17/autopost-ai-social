@@ -396,7 +396,7 @@ export default function Store() {
 
   if (company === undefined) {
     return (
-      <div className="grid min-h-screen place-items-center bg-white">
+      <div className="grid min-h-screen place-items-center bg-[#fffdf9]">
         <Loader2 className="h-5 w-5 animate-spin text-black" />
       </div>
     );
@@ -404,17 +404,17 @@ export default function Store() {
 
   if (company === null) {
     return (
-      <div className="grid min-h-screen place-items-center bg-white px-6">
+      <div className="grid min-h-screen place-items-center bg-[#fffdf9] px-6">
         <div className="max-w-sm text-center">
-          <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-neutral-100">
-            <ShoppingBag className="h-6 w-6 text-neutral-700" />
+          <div className="mx-auto grid h-14 w-14 place-items-center rounded-[7px] bg-[#ebe7df]">
+            <ShoppingBag className="h-6 w-6 text-[#5f625d]" />
           </div>
 
-          <h1 className="mt-6 text-xl font-semibold tracking-tight text-neutral-950">
+          <h1 className="mt-6 text-xl font-semibold tracking-tight text-[#202522]">
             Loja não encontrada
           </h1>
 
-          <p className="mt-2 text-sm leading-6 text-neutral-600">
+          <p className="mt-2 text-sm leading-6 text-[#747b73]">
             Esta loja não está disponível neste momento.
           </p>
         </div>
@@ -426,10 +426,10 @@ export default function Store() {
     company.currency;
 
   return (
-    <div className="min-h-screen bg-white text-neutral-950">
+    <div className="min-h-screen bg-[#fffdf9] text-[#202522]">
       {/* HEADER */}
 
-      <header className="sticky top-0 z-50 border-b border-neutral-200 bg-white/95 backdrop-blur-xl">
+      <header className="sticky top-0 z-50 border-b border-[#ded9d0] bg-[#fffdf9]">
         <div className="mx-auto flex h-16 max-w-[1400px] items-center justify-between px-4 sm:px-5 lg:px-8">
           <button
             type="button"
@@ -440,9 +440,9 @@ export default function Store() {
               });
             }}
             aria-label={`Ir para o início da loja ${company.name}`}
-            className="group flex min-w-0 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+            className="group flex min-w-0 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
           >
-            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-black text-white">
+            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-[7px] bg-black text-white">
               <span className="text-sm font-bold">
                 {company.name
                   .charAt(0)
@@ -450,7 +450,7 @@ export default function Store() {
               </span>
             </div>
 
-            <span className="max-w-[160px] truncate text-sm font-semibold tracking-tight text-neutral-950 sm:max-w-[220px]">
+            <span className="max-w-[160px] truncate text-sm font-semibold tracking-tight text-[#202522] sm:max-w-[220px]">
               {company.name}
             </span>
           </button>
@@ -470,7 +470,7 @@ export default function Store() {
                     behavior: "smooth",
                   })
               }
-              className="rounded-md px-1 py-2 text-sm font-medium text-neutral-700 transition hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+              className="rounded-md px-1 py-2 text-sm font-medium text-[#5f625d] transition hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
             >
               Produtos
             </button>
@@ -489,7 +489,7 @@ export default function Store() {
                         "smooth",
                     })
                 }
-                className="rounded-md px-1 py-2 text-sm font-medium text-neutral-700 transition hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+                className="rounded-md px-1 py-2 text-sm font-medium text-[#5f625d] transition hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
               >
                 Categorias
               </button>
@@ -504,7 +504,7 @@ export default function Store() {
                 ? `Abrir carrinho com ${cartCount} produtos`
                 : "Abrir carrinho"
             }
-            className="flex min-h-10 items-center gap-2 rounded-full border border-neutral-300 px-3.5 py-2 text-sm font-semibold text-neutral-950 transition hover:border-neutral-500 hover:bg-neutral-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 sm:px-4"
+            className="flex min-h-10 items-center gap-2 rounded-[7px] border border-[#c9c3b8] px-3.5 py-2 text-sm font-semibold text-[#202522] transition hover:border-neutral-500 hover:bg-[#f1eee7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2 sm:px-4"
           >
             <ShoppingBag className="h-4 w-4 shrink-0" />
 
@@ -513,7 +513,7 @@ export default function Store() {
             </span>
 
             {cartCount > 0 && (
-              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-black px-1.5 text-[11px] font-bold text-white">
+              <span className="flex h-5 min-w-5 items-center justify-center rounded-[7px] bg-black px-1.5 text-[11px] font-bold text-white">
                 {cartCount}
               </span>
             )}
@@ -523,22 +523,22 @@ export default function Store() {
 
       {/* HERO */}
 
-      <section className="border-b border-neutral-200 bg-[#f5f5f2]">
+      <section className="border-b border-[#ded9d0] bg-[#f5f5f2]">
         <div className="mx-auto grid min-h-[520px] max-w-[1400px] lg:grid-cols-2">
           <div className="flex items-center px-5 py-16 sm:px-8 lg:px-12 lg:py-24">
             <div className="max-w-xl">
-              <p className="mb-5 text-xs font-bold uppercase tracking-[0.2em] text-neutral-700">
+              <p className="mb-5 text-xs font-bold uppercase tracking-[0.2em] text-[#5f625d]">
                 {company.name}
               </p>
 
-              <h1 className="text-[2.75rem] font-bold leading-[0.98] tracking-[-0.055em] text-neutral-950 sm:text-6xl lg:text-7xl">
+              <h1 className="text-[2.75rem] font-bold leading-[0.98] tracking-[-0.055em] text-[#202522] sm:text-6xl lg:text-7xl">
                 Produtos que
                 <br />
                 fazem sentido.
               </h1>
 
               {company.description && (
-                <p className="mt-7 max-w-lg text-base font-normal leading-7 text-neutral-700 sm:text-[17px]">
+                <p className="mt-7 max-w-lg text-base font-normal leading-7 text-[#5f625d] sm:text-[17px]">
                   {
                     company.description
                   }
@@ -557,7 +557,7 @@ export default function Store() {
                           "smooth",
                       })
                   }
-                  className="h-12 rounded-full bg-black px-7 text-sm font-semibold text-white hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+                  className="h-12 rounded-[7px] bg-black px-7 text-sm font-semibold text-white hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
                 >
                   Explorar produtos
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -568,20 +568,20 @@ export default function Store() {
                   <button
                     type="button"
                     onClick={openCart}
-                    className="h-12 rounded-full px-5 text-sm font-semibold text-neutral-800 transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+                    className="h-12 rounded-[7px] px-5 text-sm font-semibold text-[#303732] transition hover:bg-[#fffdf9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
                   >
                     Ver carrinho
                   </button>
                 )}
               </div>
 
-              <div className="mt-12 flex items-center gap-8 border-t border-neutral-300 pt-6">
+              <div className="mt-12 flex items-center gap-8 border-t border-[#c9c3b8] pt-6">
                 <div>
-                  <p className="text-2xl font-bold tracking-tight text-neutral-950">
+                  <p className="text-2xl font-bold tracking-tight text-[#202522]">
                     {products.length}
                   </p>
 
-                  <p className="mt-1 text-xs font-medium text-neutral-600">
+                  <p className="mt-1 text-xs font-medium text-[#747b73]">
                     produtos
                   </p>
                 </div>
@@ -589,7 +589,7 @@ export default function Store() {
                 <div className="h-8 w-px bg-neutral-300" />
 
                 <div>
-                  <p className="text-2xl font-bold tracking-tight text-neutral-950">
+                  <p className="text-2xl font-bold tracking-tight text-[#202522]">
                     {
                       products.filter(
                         (product) =>
@@ -599,7 +599,7 @@ export default function Store() {
                     }
                   </p>
 
-                  <p className="mt-1 text-xs font-medium text-neutral-600">
+                  <p className="mt-1 text-xs font-medium text-[#747b73]">
                     disponíveis
                   </p>
                 </div>
@@ -607,7 +607,7 @@ export default function Store() {
             </div>
           </div>
 
-          <div className="relative min-h-[420px] bg-neutral-200 lg:min-h-full">
+          <div className="relative min-h-[420px] bg-[#e7e2d9] lg:min-h-full">
             {featuredProducts[0]
               ?.images?.[0] ? (
               <button
@@ -618,7 +618,7 @@ export default function Store() {
                   )
                 }
                 aria-label={`Ver ${featuredProducts[0].name}`}
-                className="group relative h-full w-full overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-black"
+                className="group relative h-full w-full overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#e36c3f]"
               >
                 <img
                   src={
@@ -632,7 +632,7 @@ export default function Store() {
                   className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.025]"
                 />
 
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent p-6 pt-28 text-left text-white">
+                <div className="absolute inset-x-0 bottom-0 bg-black/65 p-6 pt-28 text-left text-white">
                   <p className="text-xs font-bold uppercase tracking-[0.18em] text-white">
                     Destaque
                   </p>
@@ -651,7 +651,7 @@ export default function Store() {
               </button>
             ) : (
               <div className="grid h-full place-items-center">
-                <ImageOff className="h-10 w-10 text-neutral-500" />
+                <ImageOff className="h-10 w-10 text-[#747b73]" />
               </div>
             )}
           </div>
@@ -664,7 +664,7 @@ export default function Store() {
         1 && (
         <section
           id="categorias"
-          className="border-b border-neutral-200 bg-white"
+          className="border-b border-[#ded9d0] bg-[#fffdf9]"
         >
           <div className="mx-auto max-w-[1400px] px-5 py-4 lg:px-8">
             <div
@@ -702,10 +702,10 @@ export default function Store() {
                       aria-selected={
                         active
                       }
-                      className={`min-h-10 whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black ${
+                      className={`min-h-10 whitespace-nowrap rounded-[7px] px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] ${
                         active
                           ? "bg-black text-white"
-                          : "text-neutral-700 hover:bg-neutral-100 hover:text-black"
+                          : "text-[#5f625d] hover:bg-[#ebe7df] hover:text-[#202522]"
                       }`}
                     >
                       {item}
@@ -726,18 +726,18 @@ export default function Store() {
       >
         <div className="mb-10 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-neutral-600">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#747b73]">
               Catálogo
             </p>
 
-            <h2 className="mt-2 text-3xl font-bold tracking-[-0.035em] text-neutral-950 sm:text-4xl">
+            <h2 className="mt-2 text-3xl font-bold tracking-[-0.035em] text-[#202522] sm:text-4xl">
               {category ===
               "Todos"
                 ? "Todos os produtos"
                 : category}
             </h2>
 
-            <p className="mt-2 text-sm text-neutral-600">
+            <p className="mt-2 text-sm text-[#747b73]">
               {
                 filteredProducts.length
               }{" "}
@@ -751,7 +751,7 @@ export default function Store() {
           <div className="relative w-full md:w-[320px]">
             <Search
               aria-hidden="true"
-              className="absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-700"
+              className="absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5f625d]"
             />
 
             <Input
@@ -764,7 +764,7 @@ export default function Store() {
               }
               placeholder="Pesquisar produtos..."
               aria-label="Pesquisar produtos"
-              className="h-11 rounded-none border-0 border-b border-neutral-400 bg-transparent pl-7 pr-8 text-sm font-medium text-neutral-950 placeholder:text-neutral-600 shadow-none focus-visible:border-black focus-visible:ring-0"
+              className="h-11 rounded-none border-0 border-b border-neutral-400 bg-transparent pl-7 pr-8 text-sm font-medium text-[#202522] placeholder:text-[#747b73] shadow-none focus-visible:border-black focus-visible:ring-0"
             />
 
             {search && (
@@ -774,7 +774,7 @@ export default function Store() {
                   setSearch("")
                 }
                 aria-label="Limpar pesquisa"
-                className="absolute right-0 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full text-neutral-700 transition hover:bg-neutral-100 hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+                className="absolute right-0 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-[7px] text-[#5f625d] transition hover:bg-[#ebe7df] hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -784,14 +784,14 @@ export default function Store() {
 
         {filteredProducts.length ===
         0 ? (
-          <div className="rounded-2xl border border-neutral-200 bg-neutral-50 py-24 text-center">
-            <ShoppingBag className="mx-auto h-8 w-8 text-neutral-600" />
+          <div className="rounded-[7px] border border-[#ded9d0] bg-[#f1eee7] py-24 text-center">
+            <ShoppingBag className="mx-auto h-8 w-8 text-[#747b73]" />
 
-            <p className="mt-5 text-base font-semibold text-neutral-950">
+            <p className="mt-5 text-base font-semibold text-[#202522]">
               Nenhum produto encontrado
             </p>
 
-            <p className="mt-2 text-sm text-neutral-600">
+            <p className="mt-2 text-sm text-[#747b73]">
               Tente alterar a pesquisa ou selecionar outra categoria.
             </p>
 
@@ -803,7 +803,7 @@ export default function Store() {
                   "Todos",
                 );
               }}
-              className="mt-5 text-sm font-semibold text-neutral-950 underline underline-offset-4 hover:text-neutral-600"
+              className="mt-5 text-sm font-semibold text-[#202522] underline underline-offset-4 hover:text-[#747b73]"
             >
               Limpar filtros
             </button>
@@ -851,7 +851,7 @@ export default function Store() {
                         )
                       }
                       aria-label={`Ver detalhes de ${product.name}`}
-                      className="relative block aspect-[4/5] w-full overflow-hidden bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+                      className="relative block aspect-[4/5] w-full overflow-hidden bg-[#ebe7df] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
                     >
                       {product
                         .images?.[0] ? (
@@ -868,13 +868,13 @@ export default function Store() {
                         />
                       ) : (
                         <div className="grid h-full place-items-center">
-                          <ImageOff className="h-7 w-7 text-neutral-500" />
+                          <ImageOff className="h-7 w-7 text-[#747b73]" />
                         </div>
                       )}
 
                       {discount >
                         0 && (
-                        <span className="absolute left-3 top-3 rounded-sm bg-white px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-neutral-950 shadow-sm">
+                        <span className="absolute left-3 top-3 rounded-sm bg-[#fffdf9] px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#202522] shadow-sm">
                           -{discount}%
                         </span>
                       )}
@@ -887,14 +887,14 @@ export default function Store() {
                       )}
 
                       {lowStock && (
-                        <span className="absolute right-3 top-3 rounded-sm bg-white px-2.5 py-1.5 text-[10px] font-bold text-neutral-950 shadow-sm">
+                        <span className="absolute right-3 top-3 rounded-sm bg-[#fffdf9] px-2.5 py-1.5 text-[10px] font-bold text-[#202522] shadow-sm">
                           Últimas unidades
                         </span>
                       )}
 
                       {product.stock >
                         0 && (
-                        <span className="absolute bottom-3 left-3 right-3 hidden translate-y-2 bg-white px-4 py-3 text-center text-xs font-bold text-neutral-950 opacity-0 shadow-sm transition duration-300 group-hover:translate-y-0 group-hover:opacity-100 sm:block">
+                        <span className="absolute bottom-3 left-3 right-3 hidden translate-y-2 bg-[#fffdf9] px-4 py-3 text-center text-xs font-bold text-[#202522] opacity-0 shadow-sm transition duration-300 group-hover:translate-y-0 group-hover:opacity-100 sm:block">
                           Ver produto
                         </span>
                       )}
@@ -904,7 +904,7 @@ export default function Store() {
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
                           {product.category && (
-                            <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-600">
+                            <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[#747b73]">
                               {
                                 product.category
                               }
@@ -918,7 +918,7 @@ export default function Store() {
                                 product,
                               )
                             }
-                            className="line-clamp-2 text-left text-sm font-semibold leading-5 text-neutral-950 transition hover:text-neutral-600 focus-visible:outline-none focus-visible:underline focus-visible:underline-offset-4"
+                            className="line-clamp-2 text-left text-sm font-semibold leading-5 text-[#202522] transition hover:text-[#747b73] focus-visible:outline-none focus-visible:underline focus-visible:underline-offset-4"
                           >
                             {
                               product.name
@@ -926,7 +926,7 @@ export default function Store() {
                           </button>
                         </div>
 
-                        <p className="shrink-0 text-sm font-bold text-neutral-950">
+                        <p className="shrink-0 text-sm font-bold text-[#202522]">
                           {formatMoney(
                             price,
                             currency,
@@ -937,7 +937,7 @@ export default function Store() {
                       {product.promo_price !=
                         null && (
                         <div className="mt-1">
-                          <span className="text-xs font-medium text-neutral-600 line-through">
+                          <span className="text-xs font-medium text-[#747b73] line-through">
                             {formatMoney(
                               product.price,
                               currency,
@@ -951,10 +951,10 @@ export default function Store() {
                           className={`text-xs font-medium ${
                             product.stock ===
                             0
-                              ? "text-neutral-700"
+                              ? "text-[#5f625d]"
                               : lowStock
-                                ? "text-neutral-950"
-                                : "text-neutral-600"
+                                ? "text-[#202522]"
+                                : "text-[#747b73]"
                           }`}
                         >
                           {product.stock >
@@ -975,7 +975,7 @@ export default function Store() {
                               1,
                             )
                           }
-                          className="min-h-9 rounded-md px-1 text-xs font-bold text-neutral-950 underline underline-offset-4 transition hover:text-neutral-600 disabled:cursor-not-allowed disabled:text-neutral-400 disabled:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+                          className="min-h-9 rounded-md px-1 text-xs font-bold text-[#202522] underline underline-offset-4 transition hover:text-[#747b73] disabled:cursor-not-allowed disabled:text-[#a7aaa2] disabled:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
                         >
                           Adicionar
                         </button>
@@ -1001,11 +1001,11 @@ export default function Store() {
       >
         <SheetContent
           side="right"
-          className="h-[100dvh] w-full overflow-y-auto border-l border-neutral-200 bg-white p-0 sm:max-w-xl"
+          className="h-[100dvh] w-full overflow-y-auto border-l border-[#ded9d0] bg-[#fffdf9] p-0 sm:max-w-xl"
         >
           {productOpen && (
             <div>
-              <div className="relative aspect-[4/5] bg-neutral-100">
+              <div className="relative aspect-[4/5] bg-[#ebe7df]">
                 {productOpen
                   .images?.[0] ? (
                   <img
@@ -1020,7 +1020,7 @@ export default function Store() {
                   />
                 ) : (
                   <div className="grid h-full place-items-center">
-                    <ImageOff className="h-10 w-10 text-neutral-500" />
+                    <ImageOff className="h-10 w-10 text-[#747b73]" />
                   </div>
                 )}
 
@@ -1032,7 +1032,7 @@ export default function Store() {
                     )
                   }
                   aria-label="Fechar detalhes do produto"
-                  className="absolute right-4 top-4 grid h-11 w-11 place-items-center rounded-full bg-white text-neutral-950 shadow-md transition hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+                  className="absolute right-4 top-4 grid h-11 w-11 place-items-center rounded-[7px] bg-[#fffdf9] text-[#202522] shadow-md transition hover:bg-[#ebe7df] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -1041,14 +1041,14 @@ export default function Store() {
               <div className="p-6 sm:p-8">
                 <SheetHeader className="space-y-3 text-left">
                   {productOpen.category && (
-                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-neutral-700">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#5f625d]">
                       {
                         productOpen.category
                       }
                     </p>
                   )}
 
-                  <SheetTitle className="text-2xl font-bold tracking-tight text-neutral-950 sm:text-3xl">
+                  <SheetTitle className="text-2xl font-bold tracking-tight text-[#202522] sm:text-3xl">
                     {
                       productOpen.name
                     }
@@ -1056,7 +1056,7 @@ export default function Store() {
                 </SheetHeader>
 
                 <div className="mt-5 flex flex-wrap items-baseline gap-3">
-                  <span className="text-2xl font-bold text-neutral-950">
+                  <span className="text-2xl font-bold text-[#202522]">
                     {formatMoney(
                       priceOf(
                         productOpen,
@@ -1067,7 +1067,7 @@ export default function Store() {
 
                   {productOpen.promo_price !=
                     null && (
-                    <span className="text-sm font-medium text-neutral-600 line-through">
+                    <span className="text-sm font-medium text-[#747b73] line-through">
                       {formatMoney(
                         productOpen.price,
                         currency,
@@ -1077,16 +1077,16 @@ export default function Store() {
                 </div>
 
                 {productOpen.description && (
-                  <p className="mt-6 whitespace-pre-wrap text-[15px] leading-7 text-neutral-700">
+                  <p className="mt-6 whitespace-pre-wrap text-[15px] leading-7 text-[#5f625d]">
                     {
                       productOpen.description
                     }
                   </p>
                 )}
 
-                <div className="mt-7 border-y border-neutral-200 py-5">
+                <div className="mt-7 border-y border-[#ded9d0] py-5">
                   <div className="flex items-center justify-between gap-4">
-                    <span className="text-sm font-medium text-neutral-700">
+                    <span className="text-sm font-medium text-[#5f625d]">
                       Disponibilidade
                     </span>
 
@@ -1094,8 +1094,8 @@ export default function Store() {
                       className={`text-sm font-bold ${
                         productOpen.stock >
                         0
-                          ? "text-neutral-950"
-                          : "text-neutral-700"
+                          ? "text-[#202522]"
+                          : "text-[#5f625d]"
                       }`}
                     >
                       {productOpen.stock >
@@ -1121,7 +1121,7 @@ export default function Store() {
                       null,
                     );
                   }}
-                  className="mt-6 h-12 w-full rounded-xl bg-black text-sm font-bold text-white hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+                  className="mt-6 h-12 w-full rounded-[7px] bg-black text-sm font-bold text-white hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
                 >
                   {productOpen.stock >
                   0
@@ -1137,7 +1137,7 @@ export default function Store() {
                     );
                     openCart();
                   }}
-                  className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 text-sm font-semibold text-neutral-700 transition hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+                  className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 text-sm font-semibold text-[#5f625d] transition hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
                 >
                   Ver carrinho
                   <ArrowRight className="h-4 w-4" />
@@ -1162,11 +1162,11 @@ export default function Store() {
       >
         <SheetContent
           side="right"
-          className="flex h-[100dvh] max-h-[100dvh] w-full flex-col overflow-hidden border-l border-neutral-200 bg-white p-0 sm:max-w-lg"
+          className="flex h-[100dvh] max-h-[100dvh] w-full flex-col overflow-hidden border-l border-[#ded9d0] bg-[#fffdf9] p-0 sm:max-w-lg"
         >
           {/* HEADER */}
 
-          <div className="shrink-0 border-b border-neutral-200 bg-white px-5 py-5 sm:px-6">
+          <div className="shrink-0 border-b border-[#ded9d0] bg-[#fffdf9] px-5 py-5 sm:px-6">
             <SheetHeader>
               <div className="flex items-center gap-3">
                 {cartStep ===
@@ -1177,14 +1177,14 @@ export default function Store() {
                       goBackToCart
                     }
                     aria-label="Voltar ao carrinho"
-                    className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-neutral-200 text-neutral-800 transition hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+                    className="grid h-9 w-9 shrink-0 place-items-center rounded-[7px] border border-[#ded9d0] text-[#303732] transition hover:bg-[#ebe7df] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
                   >
                     <ArrowLeft className="h-4 w-4" />
                   </button>
                 )}
 
                 <div className="min-w-0">
-                  <SheetTitle className="text-xl font-bold tracking-tight text-neutral-950">
+                  <SheetTitle className="text-xl font-bold tracking-tight text-[#202522]">
                     {cartStep ===
                     "cart"
                       ? "Carrinho"
@@ -1198,7 +1198,7 @@ export default function Store() {
                     "cart" &&
                     cartCount >
                       0 && (
-                      <p className="mt-1 text-sm font-medium text-neutral-600">
+                      <p className="mt-1 text-sm font-medium text-[#747b73]">
                         {cartCount}{" "}
                         {cartCount ===
                         1
@@ -1209,7 +1209,7 @@ export default function Store() {
 
                   {cartStep ===
                     "checkout" && (
-                    <p className="mt-1 text-sm font-medium text-neutral-600">
+                    <p className="mt-1 text-sm font-medium text-[#747b73]">
                       Dados para contacto
                     </p>
                   )}
@@ -1225,15 +1225,15 @@ export default function Store() {
           cartStep ===
             "cart" ? (
             <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-8 text-center">
-              <div className="grid h-16 w-16 place-items-center rounded-full bg-neutral-100">
-                <ShoppingCart className="h-6 w-6 text-neutral-700" />
+              <div className="grid h-16 w-16 place-items-center rounded-[7px] bg-[#ebe7df]">
+                <ShoppingCart className="h-6 w-6 text-[#5f625d]" />
               </div>
 
-              <h3 className="mt-6 text-base font-bold text-neutral-950">
+              <h3 className="mt-6 text-base font-bold text-[#202522]">
                 O seu carrinho está vazio
               </h3>
 
-              <p className="mt-2 max-w-xs text-sm leading-6 text-neutral-600">
+              <p className="mt-2 max-w-xs text-sm leading-6 text-[#747b73]">
                 Adicione produtos para continuar.
               </p>
 
@@ -1242,7 +1242,7 @@ export default function Store() {
                 onClick={
                   continueShopping
                 }
-                className="mt-7 h-11 rounded-full bg-black px-6 text-sm font-bold text-white hover:bg-neutral-800"
+                className="mt-7 h-11 rounded-[7px] bg-black px-6 text-sm font-bold text-white hover:bg-neutral-800"
               >
                 Ver produtos
               </Button>
@@ -1280,7 +1280,7 @@ export default function Store() {
                                 className="py-5"
                               >
                                 <div className="flex gap-4">
-                                  <div className="h-24 w-20 shrink-0 overflow-hidden rounded-lg bg-neutral-100 sm:h-28 sm:w-24">
+                                  <div className="h-24 w-20 shrink-0 overflow-hidden rounded-lg bg-[#ebe7df] sm:h-28 sm:w-24">
                                     {product
                                       .images?.[0] ? (
                                       <img
@@ -1295,7 +1295,7 @@ export default function Store() {
                                       />
                                     ) : (
                                       <div className="grid h-full place-items-center">
-                                        <ImageOff className="h-5 w-5 text-neutral-500" />
+                                        <ImageOff className="h-5 w-5 text-[#747b73]" />
                                       </div>
                                     )}
                                   </div>
@@ -1304,14 +1304,14 @@ export default function Store() {
                                     <div className="flex items-start justify-between gap-3">
                                       <div className="min-w-0">
                                         {product.category && (
-                                          <p className="mb-1 text-[9px] font-bold uppercase tracking-[0.16em] text-neutral-500">
+                                          <p className="mb-1 text-[9px] font-bold uppercase tracking-[0.16em] text-[#747b73]">
                                             {
                                               product.category
                                             }
                                           </p>
                                         )}
 
-                                        <p className="line-clamp-2 text-sm font-semibold leading-5 text-neutral-950">
+                                        <p className="line-clamp-2 text-sm font-semibold leading-5 text-[#202522]">
                                           {
                                             product.name
                                           }
@@ -1335,13 +1335,13 @@ export default function Store() {
                                           );
                                         }}
                                         aria-label={`Remover ${product.name}`}
-                                        className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-neutral-600 transition hover:bg-neutral-100 hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+                                        className="grid h-8 w-8 shrink-0 place-items-center rounded-[7px] text-[#747b73] transition hover:bg-[#ebe7df] hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
                                       >
                                         <X className="h-4 w-4" />
                                       </button>
                                     </div>
 
-                                    <p className="mt-2 text-sm font-bold text-neutral-950">
+                                    <p className="mt-2 text-sm font-bold text-[#202522]">
                                       {formatMoney(
                                         itemTotal,
                                         currency,
@@ -1349,7 +1349,7 @@ export default function Store() {
                                     </p>
 
                                     <div className="mt-4">
-                                      <div className="inline-flex h-9 items-center rounded-full border border-neutral-300">
+                                      <div className="inline-flex h-9 items-center rounded-[7px] border border-[#c9c3b8]">
                                         <button
                                           type="button"
                                           onClick={() =>
@@ -1359,12 +1359,12 @@ export default function Store() {
                                             )
                                           }
                                           aria-label={`Diminuir quantidade de ${product.name}`}
-                                          className="grid h-9 w-9 place-items-center rounded-full text-neutral-800 transition hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+                                          className="grid h-9 w-9 place-items-center rounded-[7px] text-[#303732] transition hover:bg-[#ebe7df] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
                                         >
                                           <Minus className="h-3.5 w-3.5" />
                                         </button>
 
-                                        <span className="w-7 text-center text-sm font-bold text-neutral-950">
+                                        <span className="w-7 text-center text-sm font-bold text-[#202522]">
                                           {
                                             quantity
                                           }
@@ -1379,7 +1379,7 @@ export default function Store() {
                                             )
                                           }
                                           aria-label={`Aumentar quantidade de ${product.name}`}
-                                          className="grid h-9 w-9 place-items-center rounded-full text-neutral-800 transition hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+                                          className="grid h-9 w-9 place-items-center rounded-[7px] text-[#303732] transition hover:bg-[#ebe7df] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
                                         >
                                           <Plus className="h-3.5 w-3.5" />
                                         </button>
@@ -1399,11 +1399,11 @@ export default function Store() {
                     "checkout" && (
                     <div className="px-5 py-6 sm:px-6">
                       <div className="mb-7">
-                        <p className="text-2xl font-bold tracking-tight text-neutral-950">
+                        <p className="text-2xl font-bold tracking-tight text-[#202522]">
                           Quase concluído.
                         </p>
 
-                        <p className="mt-2 text-sm leading-6 text-neutral-600">
+                        <p className="mt-2 text-sm leading-6 text-[#747b73]">
                           Preencha os seus dados para receber o contacto da loja.
                         </p>
                       </div>
@@ -1412,7 +1412,7 @@ export default function Store() {
                         <div>
                           <label
                             htmlFor="customer-name"
-                            className="mb-2 block text-sm font-semibold text-neutral-950"
+                            className="mb-2 block text-sm font-semibold text-[#202522]"
                           >
                             Nome completo
                           </label>
@@ -1435,7 +1435,7 @@ export default function Store() {
                               )
                             }
                             placeholder="O seu nome"
-                            className="h-12 rounded-xl border-neutral-300 bg-white text-sm font-medium text-neutral-950 placeholder:text-neutral-500 focus-visible:border-black focus-visible:ring-2 focus-visible:ring-black"
+                            className="h-12 rounded-[7px] border-[#c9c3b8] bg-[#fffdf9] text-sm font-medium text-[#202522] placeholder:text-[#747b73] focus-visible:border-black focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
                             maxLength={
                               120
                             }
@@ -1446,7 +1446,7 @@ export default function Store() {
                         <div>
                           <label
                             htmlFor="customer-phone"
-                            className="mb-2 block text-sm font-semibold text-neutral-950"
+                            className="mb-2 block text-sm font-semibold text-[#202522]"
                           >
                             Telefone / WhatsApp
                           </label>
@@ -1469,7 +1469,7 @@ export default function Store() {
                               )
                             }
                             placeholder="+244 9xx xxx xxx"
-                            className="h-12 rounded-xl border-neutral-300 bg-white text-sm font-medium text-neutral-950 placeholder:text-neutral-500 focus-visible:border-black focus-visible:ring-2 focus-visible:ring-black"
+                            className="h-12 rounded-[7px] border-[#c9c3b8] bg-[#fffdf9] text-sm font-medium text-[#202522] placeholder:text-[#747b73] focus-visible:border-black focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
                             maxLength={
                               40
                             }
@@ -1481,10 +1481,10 @@ export default function Store() {
                         <div>
                           <label
                             htmlFor="customer-email"
-                            className="mb-2 block text-sm font-semibold text-neutral-950"
+                            className="mb-2 block text-sm font-semibold text-[#202522]"
                           >
                             Email
-                            <span className="ml-1 font-normal text-neutral-500">
+                            <span className="ml-1 font-normal text-[#747b73]">
                               opcional
                             </span>
                           </label>
@@ -1508,7 +1508,7 @@ export default function Store() {
                             }
                             placeholder="seu@email.com"
                             type="email"
-                            className="h-12 rounded-xl border-neutral-300 bg-white text-sm font-medium text-neutral-950 placeholder:text-neutral-500 focus-visible:border-black focus-visible:ring-2 focus-visible:ring-black"
+                            className="h-12 rounded-[7px] border-[#c9c3b8] bg-[#fffdf9] text-sm font-medium text-[#202522] placeholder:text-[#747b73] focus-visible:border-black focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
                             maxLength={
                               160
                             }
@@ -1519,10 +1519,10 @@ export default function Store() {
                         <div>
                           <label
                             htmlFor="customer-notes"
-                            className="mb-2 block text-sm font-semibold text-neutral-950"
+                            className="mb-2 block text-sm font-semibold text-[#202522]"
                           >
                             Morada / observações
-                            <span className="ml-1 font-normal text-neutral-500">
+                            <span className="ml-1 font-normal text-[#747b73]">
                               opcional
                             </span>
                           </label>
@@ -1545,7 +1545,7 @@ export default function Store() {
                               )
                             }
                             placeholder="Morada, referência ou alguma observação"
-                            className="min-h-[110px] resize-none rounded-xl border-neutral-300 bg-white text-sm font-medium text-neutral-950 placeholder:text-neutral-500 focus-visible:border-black focus-visible:ring-2 focus-visible:ring-black"
+                            className="min-h-[110px] resize-none rounded-[7px] border-[#c9c3b8] bg-[#fffdf9] text-sm font-medium text-[#202522] placeholder:text-[#747b73] focus-visible:border-black focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
                             maxLength={
                               1000
                             }
@@ -1563,29 +1563,29 @@ export default function Store() {
                 "success" && (
                 <div className="min-h-0 flex-1 overflow-y-auto">
                   <div className="flex min-h-full flex-col items-center justify-center px-7 py-12 text-center sm:px-10">
-                    <div className="grid h-20 w-20 place-items-center rounded-full bg-black text-white">
+                    <div className="grid h-20 w-20 place-items-center rounded-[7px] bg-black text-white">
                       <Check className="h-9 w-9 stroke-[2.5]" />
                     </div>
 
-                    <p className="mt-8 text-xs font-bold uppercase tracking-[0.2em] text-neutral-500">
+                    <p className="mt-8 text-xs font-bold uppercase tracking-[0.2em] text-[#747b73]">
                       Pedido recebido
                     </p>
 
-                    <h2 className="mt-3 text-3xl font-bold tracking-[-0.04em] text-neutral-950">
+                    <h2 className="mt-3 text-3xl font-bold tracking-[-0.04em] text-[#202522]">
                       Tudo certo.
                     </h2>
 
-                    <p className="mt-4 max-w-sm text-sm leading-6 text-neutral-600">
+                    <p className="mt-4 max-w-sm text-sm leading-6 text-[#747b73]">
                       O seu pedido foi registado com sucesso. A loja poderá entrar em contacto consigo para combinar os próximos passos.
                     </p>
 
                     {orderId && (
-                      <div className="mt-7 rounded-xl border border-neutral-200 bg-neutral-50 px-5 py-4">
-                        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-neutral-500">
+                      <div className="mt-7 rounded-[7px] border border-[#ded9d0] bg-[#f1eee7] px-5 py-4">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#747b73]">
                           Pedido
                         </p>
 
-                        <p className="mt-1 font-mono text-sm font-bold text-neutral-950">
+                        <p className="mt-1 font-mono text-sm font-bold text-[#202522]">
                           #{orderId}
                         </p>
                       </div>
@@ -1598,14 +1598,14 @@ export default function Store() {
 
               {cartStep ===
                 "cart" && (
-                <div className="shrink-0 border-t border-neutral-200 bg-white px-5 py-5 sm:px-6">
+                <div className="shrink-0 border-t border-[#ded9d0] bg-[#fffdf9] px-5 py-5 sm:px-6">
                   <div className="flex items-end justify-between gap-5">
                     <div>
-                      <p className="text-xs font-medium text-neutral-600">
+                      <p className="text-xs font-medium text-[#747b73]">
                         Total
                       </p>
 
-                      <p className="mt-1 text-xl font-bold tracking-tight text-neutral-950">
+                      <p className="mt-1 text-xl font-bold tracking-tight text-[#202522]">
                         {formatMoney(
                           cartTotal,
                           currency,
@@ -1618,7 +1618,7 @@ export default function Store() {
                       onClick={
                         goToCheckout
                       }
-                      className="h-12 rounded-xl bg-black px-5 text-sm font-bold text-white hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+                      className="h-12 rounded-[7px] bg-black px-5 text-sm font-bold text-white hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
                     >
                       Finalizar pedido
                       <ArrowRight className="ml-2 h-4 w-4" />
@@ -1629,13 +1629,13 @@ export default function Store() {
 
               {cartStep ===
                 "checkout" && (
-                <div className="shrink-0 border-t border-neutral-200 bg-white px-5 py-5 sm:px-6">
+                <div className="shrink-0 border-t border-[#ded9d0] bg-[#fffdf9] px-5 py-5 sm:px-6">
                   <div className="mb-4 flex items-center justify-between gap-4">
-                    <span className="text-sm font-medium text-neutral-600">
+                    <span className="text-sm font-medium text-[#747b73]">
                       Total
                     </span>
 
-                    <span className="text-lg font-bold text-neutral-950">
+                    <span className="text-lg font-bold text-[#202522]">
                       {formatMoney(
                         cartTotal,
                         currency,
@@ -1651,7 +1651,7 @@ export default function Store() {
                     disabled={
                       placing
                     }
-                    className="h-12 w-full rounded-xl bg-black text-sm font-bold text-white hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+                    className="h-12 w-full rounded-[7px] bg-black text-sm font-bold text-white hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
                   >
                     {placing ? (
                       <>
@@ -1670,7 +1670,7 @@ export default function Store() {
 
               {cartStep ===
                 "success" && (
-                <div className="shrink-0 border-t border-neutral-200 bg-white px-5 py-5 sm:px-6">
+                <div className="shrink-0 border-t border-[#ded9d0] bg-[#fffdf9] px-5 py-5 sm:px-6">
                   <Button
                     type="button"
                     onClick={() => {
@@ -1689,7 +1689,7 @@ export default function Store() {
                         );
                       }
                     }}
-                    className="h-12 w-full rounded-xl bg-black text-sm font-bold text-white hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+                    className="h-12 w-full rounded-[7px] bg-black text-sm font-bold text-white hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
                   >
                     Ver pedido
                     <ArrowRight className="ml-2 h-4 w-4" />
@@ -1700,7 +1700,7 @@ export default function Store() {
                     onClick={
                       continueShopping
                     }
-                    className="mt-3 flex min-h-10 w-full items-center justify-center text-sm font-semibold text-neutral-700 transition hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+                    className="mt-3 flex min-h-10 w-full items-center justify-center text-sm font-semibold text-[#5f625d] transition hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
                   >
                     Continuar a comprar
                   </button>
@@ -1724,7 +1724,7 @@ export default function Store() {
               cartTotal,
               currency,
             )}`}
-            className="fixed bottom-4 left-1/2 z-40 flex min-h-12 -translate-x-1/2 items-center gap-3 rounded-full bg-black px-5 py-3 text-sm font-bold text-white shadow-2xl transition hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black sm:bottom-5 md:hidden"
+            className="fixed bottom-4 left-1/2 z-40 flex min-h-12 -translate-x-1/2 items-center gap-3 rounded-[7px] bg-black px-5 py-3 text-sm font-bold text-white shadow-2xl transition hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black sm:bottom-5 md:hidden"
           >
             <ShoppingBag className="h-4 w-4" />
 
@@ -1732,7 +1732,7 @@ export default function Store() {
               Ver carrinho
             </span>
 
-            <span className="h-4 w-px bg-white/40" />
+            <span className="h-4 w-px bg-[#fffdf9]/40" />
 
             <span>
               {formatMoney(
@@ -1745,16 +1745,16 @@ export default function Store() {
 
       {/* FOOTER */}
 
-      <footer className="border-t border-neutral-200 bg-[#f5f5f2]">
+      <footer className="border-t border-[#ded9d0] bg-[#f5f5f2]">
         <div className="mx-auto max-w-[1400px] px-5 py-12 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-8 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-lg font-bold tracking-tight text-neutral-950">
+              <p className="text-lg font-bold tracking-tight text-[#202522]">
                 {company.name}
               </p>
 
               {company.description && (
-                <p className="mt-2 max-w-md text-sm leading-6 text-neutral-700">
+                <p className="mt-2 max-w-md text-sm leading-6 text-[#5f625d]">
                   {
                     company.description
                   }
@@ -1763,11 +1763,11 @@ export default function Store() {
             </div>
 
             <div className="text-left sm:text-right">
-              <p className="text-xs font-bold uppercase tracking-[0.15em] text-neutral-700">
+              <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#5f625d]">
                 Loja online
               </p>
 
-              <p className="mt-2 text-sm font-medium text-neutral-600">
+              <p className="mt-2 text-sm font-medium text-[#747b73]">
                 ©{" "}
                 {new Date().getFullYear()}{" "}
                 {company.name}

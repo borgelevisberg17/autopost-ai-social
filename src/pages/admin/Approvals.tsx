@@ -133,9 +133,9 @@ export default function Approvals() {
     <AdminLayout title="Approval Center">
       <div className="space-y-8">
         {/* HEADER */}
-        <section className="flex flex-col gap-5 border-b border-neutral-200 pb-7 lg:flex-row lg:items-end lg:justify-between">
+        <section className="flex flex-col gap-5 border-b border-[#ded9d0] pb-7 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-neutral-400">
+            <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#a7aaa2]">
               Controlo de Qualidade
             </p>
 
@@ -143,14 +143,14 @@ export default function Approvals() {
               Central de Aprovações
             </h2>
 
-            <p className="mt-2 text-sm leading-6 text-neutral-500">
+            <p className="mt-2 text-sm leading-6 text-[#747b73]">
               Reveja, edite ou aprove as publicações geradas pelos agentes de IA antes da publicação.
             </p>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-2 border border-neutral-200 bg-neutral-50 px-3 py-1.5 text-xs font-semibold text-neutral-700">
-              <Megaphone className="h-3.5 w-3.5 text-neutral-500" />
+            <span className="inline-flex items-center gap-2 border border-[#ded9d0] bg-[#f1eee7] px-3 py-1.5 text-xs font-semibold text-[#5f625d]">
+              <Megaphone className="h-3.5 w-3.5 text-[#747b73]" />
               {drafts.length} {drafts.length === 1 ? "rascunho pendente" : "rascunhos pendentes"}
             </span>
           </div>
@@ -161,14 +161,14 @@ export default function Approvals() {
           {loading ? (
             <div className="space-y-4">
               {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="h-40 w-full animate-pulse bg-neutral-100 rounded-sm" />
+                <div key={i} className="h-40 w-full animate-pulse bg-[#ebe7df] rounded-sm" />
               ))}
             </div>
           ) : drafts.length === 0 ? (
-            <div className="py-20 text-center border-y border-neutral-200 bg-white">
-              <CheckCircle2 className="mx-auto h-8 w-8 text-neutral-300" />
-              <p className="mt-3 text-sm font-semibold text-neutral-900">Nenhum rascunho a aguardar revisão</p>
-              <p className="mt-1 text-xs text-neutral-400">
+            <div className="py-20 text-center border-y border-[#ded9d0] bg-[#fffdf9]">
+              <CheckCircle2 className="mx-auto h-8 w-8 text-[#c9c3b8]" />
+              <p className="mt-3 text-sm font-semibold text-[#202522]">Nenhum rascunho a aguardar revisão</p>
+              <p className="mt-1 text-xs text-[#a7aaa2]">
                 Quando os agentes gerarem novos conteúdos, eles aparecerão aqui para aprovação.
               </p>
             </div>
@@ -177,13 +177,13 @@ export default function Approvals() {
               {drafts.map((draft) => (
                 <article
                   key={draft.id}
-                  className="flex flex-col justify-between border border-neutral-200 bg-white p-6 shadow-sm"
+                  className="flex flex-col justify-between border border-[#ded9d0] bg-[#fffdf9] p-6 shadow-sm"
                 >
                   <div className="space-y-4">
                     {/* TOP META */}
-                    <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
+                    <div className="flex items-center justify-between border-b border-[#ebe7df] pb-3">
                       <div className="flex items-center gap-2">
-                        <span className="grid h-6 w-6 place-items-center rounded-full bg-neutral-100 text-neutral-700">
+                        <span className="grid h-6 w-6 place-items-center rounded-[7px] bg-[#ebe7df] text-[#5f625d]">
                           {draft.platform === "instagram" ? (
                             <Instagram className="h-3.5 w-3.5" />
                           ) : draft.platform === "facebook" ? (
@@ -192,24 +192,24 @@ export default function Approvals() {
                             <MessageCircle className="h-3.5 w-3.5" />
                           )}
                         </span>
-                        <span className="text-xs font-semibold capitalize text-neutral-900">
+                        <span className="text-xs font-semibold capitalize text-[#202522]">
                           {draft.platform || "Rede Social"}
                         </span>
                       </div>
 
-                      <span className="text-[11px] font-mono text-neutral-400">
+                      <span className="text-[11px] font-mono text-[#a7aaa2]">
                         {draft.product_name}
                       </span>
                     </div>
 
                     {/* CONTENT BODY */}
-                    <div className="relative border border-neutral-100 bg-neutral-50/50 p-4 text-xs leading-6 text-neutral-800 font-sans whitespace-pre-wrap">
+                    <div className="relative border border-[#ebe7df] bg-[#f1eee7]/50 p-4 text-xs leading-6 text-[#303732] font-sans whitespace-pre-wrap">
                       {draft.content}
 
                       <button
                         type="button"
                         onClick={() => copyContent(draft.content || "")}
-                        className="absolute right-2 top-2 p-1 text-neutral-400 hover:text-black"
+                        className="absolute right-2 top-2 p-1 text-[#a7aaa2] hover:text-[#202522]"
                         title="Copiar texto"
                       >
                         <Copy className="h-3.5 w-3.5" />
@@ -218,12 +218,12 @@ export default function Approvals() {
                   </div>
 
                   {/* ACTION BUTTONS */}
-                  <div className="mt-6 flex items-center justify-end gap-2 border-t border-neutral-100 pt-4">
+                  <div className="mt-6 flex items-center justify-end gap-2 border-t border-[#ebe7df] pt-4">
                     <button
                       type="button"
                       disabled={processingId === draft.id}
                       onClick={() => handleReject(draft)}
-                      className="inline-flex h-9 items-center gap-1.5 border border-neutral-200 px-3 text-xs font-medium text-red-600 hover:bg-red-50 disabled:opacity-50"
+                      className="inline-flex h-9 items-center gap-1.5 border border-[#ded9d0] px-3 text-xs font-medium text-red-600 hover:bg-red-50 disabled:opacity-50"
                     >
                       <X className="h-3.5 w-3.5" />
                       Rejeitar

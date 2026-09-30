@@ -54,7 +54,7 @@ export default function Signup() {
           <span>Já tem uma conta?</span>
           <Link
             to="/login"
-            className="font-semibold text-[#111111] underline decoration-[#cccccc] underline-offset-4 transition-colors hover:decoration-[#111111]"
+            className="font-semibold text-[#202522] underline decoration-[#cccccc] underline-offset-4 transition-colors hover:decoration-[#202522]"
           >
             Entrar
           </Link>
@@ -67,7 +67,7 @@ export default function Signup() {
             Nova conta
           </p>
 
-          <h1 className="text-[34px] font-semibold leading-[1.05] tracking-[-0.045em] text-[#111111] sm:text-[40px]">
+          <h1 className="text-[34px] font-semibold leading-[1.05] tracking-[-0.045em] text-[#202522] sm:text-[40px]">
             Comece por aqui.
           </h1>
 
@@ -79,7 +79,7 @@ export default function Signup() {
 
         <div className="mb-8 flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <span className="grid h-6 w-6 place-items-center rounded-full bg-[#111111] text-[11px] font-semibold text-white">
+            <span className="grid h-6 w-6 place-items-center rounded-full bg-[#202522] text-[11px] font-semibold text-white">
               1
             </span>
 
@@ -125,7 +125,7 @@ export default function Signup() {
                 onChange={(event) => setName(event.target.value)}
                 disabled={isLoading}
                 required
-                className="h-[52px] w-full rounded-[10px] border border-[#ddddda] bg-white pl-11 pr-4 text-[14px] text-[#111111] outline-none transition-all placeholder:text-[#aaaaaa] hover:border-[#c8c8c4] focus:border-[#111111] focus:ring-2 focus:ring-[#111111]/8 disabled:cursor-not-allowed disabled:bg-[#f7f7f5]"
+                className="h-[52px] w-full rounded-[7px] border border-[#ddddda] bg-[#fffdf9] pl-11 pr-4 text-[14px] text-[#202522] outline-none transition-all placeholder:text-[#aaaaaa] hover:border-[#c8c8c4] focus:border-[#2c6457] focus:ring-2 focus:ring-[#2c6457]/10 disabled:cursor-not-allowed disabled:bg-[#f7f7f5]"
               />
             </div>
           </div>
@@ -156,7 +156,7 @@ export default function Signup() {
                 onChange={(event) => setEmail(event.target.value)}
                 disabled={isLoading}
                 required
-                className="h-[52px] w-full rounded-[10px] border border-[#ddddda] bg-white pl-11 pr-4 text-[14px] text-[#111111] outline-none transition-all placeholder:text-[#aaaaaa] hover:border-[#c8c8c4] focus:border-[#111111] focus:ring-2 focus:ring-[#111111]/8 disabled:cursor-not-allowed disabled:bg-[#f7f7f5]"
+                className="h-[52px] w-full rounded-[7px] border border-[#ddddda] bg-[#fffdf9] pl-11 pr-4 text-[14px] text-[#202522] outline-none transition-all placeholder:text-[#aaaaaa] hover:border-[#c8c8c4] focus:border-[#2c6457] focus:ring-2 focus:ring-[#2c6457]/10 disabled:cursor-not-allowed disabled:bg-[#f7f7f5]"
               />
             </div>
           </div>
@@ -187,7 +187,7 @@ export default function Signup() {
                 disabled={isLoading}
                 required
                 minLength={8}
-                className="h-[52px] w-full rounded-[10px] border border-[#ddddda] bg-white pl-11 pr-12 text-[14px] text-[#111111] outline-none transition-all placeholder:text-[#aaaaaa] hover:border-[#c8c8c4] focus:border-[#111111] focus:ring-2 focus:ring-[#111111]/8 disabled:cursor-not-allowed disabled:bg-[#f7f7f5]"
+                className="h-[52px] w-full rounded-[7px] border border-[#ddddda] bg-[#fffdf9] pl-11 pr-12 text-[14px] text-[#202522] outline-none transition-all placeholder:text-[#aaaaaa] hover:border-[#c8c8c4] focus:border-[#2c6457] focus:ring-2 focus:ring-[#2c6457]/10 disabled:cursor-not-allowed disabled:bg-[#f7f7f5]"
               />
 
               <button
@@ -199,7 +199,7 @@ export default function Signup() {
                 }
                 onClick={() => setShowPassword((value) => !value)}
                 disabled={isLoading}
-                className="absolute right-3 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-md text-[#888888] transition-colors hover:bg-[#f5f5f3] hover:text-[#111111] disabled:opacity-50"
+                className="absolute right-3 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-[7px] text-[#888888] transition-colors hover:bg-[#f5f5f3] hover:text-[#202522] disabled:opacity-50"
               >
                 {showPassword ? (
                   <EyeOff className="h-[17px] w-[17px]" strokeWidth={1.8} />
@@ -237,7 +237,7 @@ export default function Signup() {
           <button
             type="submit"
             disabled={isLoading}
-            className="group mt-2 flex h-[52px] w-full items-center justify-center gap-2 rounded-[10px] bg-[#111111] text-[14px] font-semibold text-white transition-all hover:bg-[#252525] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+            className="group mt-2 flex h-[52px] w-full items-center justify-center gap-2 rounded-[7px] bg-[#202522] text-[14px] font-semibold text-white transition-all hover:bg-[#2c6457] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isLoading ? "A criar conta..." : "Criar conta"}
 
@@ -260,7 +260,7 @@ export default function Signup() {
             Já tem uma conta?{" "}
             <Link
               to="/login"
-              className="font-semibold text-[#111111] underline decoration-[#cccccc] underline-offset-4"
+              className="font-semibold text-[#202522] underline decoration-[#cccccc] underline-offset-4"
             >
               Entrar
             </Link>

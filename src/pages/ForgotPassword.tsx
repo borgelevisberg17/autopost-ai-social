@@ -42,7 +42,7 @@ export default function ForgotPassword() {
       footer={
         <Link
           to="/login"
-          className="flex items-center gap-2 text-sm font-medium text-[#666666] transition-colors hover:text-[#111111]"
+          className="flex items-center gap-2 text-sm font-medium text-[#666666] transition-colors hover:text-[#202522]"
         >
           <ArrowLeft className="h-4 w-4" />
           Voltar ao login
@@ -57,7 +57,7 @@ export default function ForgotPassword() {
               Recuperação
             </p>
 
-            <h1 className="text-[34px] font-semibold leading-[1.05] tracking-[-0.045em] text-[#111111] sm:text-[40px]">
+            <h1 className="text-[34px] font-semibold leading-[1.05] tracking-[-0.045em] text-[#202522] sm:text-[40px]">
               Esqueceu a palavra-passe?
             </h1>
 
@@ -94,7 +94,7 @@ export default function ForgotPassword() {
                   onChange={(event) => setEmail(event.target.value)}
                   disabled={isLoading}
                   required
-                  className="h-[52px] w-full rounded-[10px] border border-[#ddddda] bg-white pl-11 pr-4 text-[14px] text-[#111111] outline-none transition-all placeholder:text-[#aaaaaa] hover:border-[#c8c8c4] focus:border-[#111111] focus:ring-2 focus:ring-[#111111]/8 disabled:cursor-not-allowed disabled:bg-[#f7f7f5]"
+                  className="h-[52px] w-full rounded-[7px] border border-[#ddddda] bg-[#fffdf9] pl-11 pr-4 text-[14px] text-[#202522] outline-none transition-all placeholder:text-[#aaaaaa] hover:border-[#c8c8c4] focus:border-[#2c6457] focus:ring-2 focus:ring-[#2c6457]/10 disabled:cursor-not-allowed disabled:bg-[#f7f7f5]"
                 />
               </div>
             </div>
@@ -102,7 +102,7 @@ export default function ForgotPassword() {
             <button
               type="submit"
               disabled={isLoading}
-              className="group flex h-[52px] w-full items-center justify-center gap-2 rounded-[10px] bg-[#111111] text-[14px] font-semibold text-white transition-all hover:bg-[#252525] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+              className="group flex h-[52px] w-full items-center justify-center gap-2 rounded-[7px] bg-[#202522] text-[14px] font-semibold text-white transition-all hover:bg-[#2c6457] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isLoading ? "A enviar..." : "Enviar instruções"}
 
@@ -118,7 +118,7 @@ export default function ForgotPassword() {
           <div className="mt-7 text-center">
             <Link
               to="/login"
-              className="inline-flex items-center gap-2 text-[13px] font-medium text-[#666666] transition-colors hover:text-[#111111]"
+              className="inline-flex items-center gap-2 text-[13px] font-medium text-[#666666] transition-colors hover:text-[#202522]"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
               Voltar para entrar
@@ -129,7 +129,7 @@ export default function ForgotPassword() {
         <div>
           <div className="mb-8 grid h-12 w-12 place-items-center rounded-full bg-[#f2f2ef]">
             <CheckCircle2
-              className="h-6 w-6 text-[#111111]"
+              className="h-6 w-6 text-[#202522]"
               strokeWidth={1.7}
             />
           </div>
@@ -138,7 +138,7 @@ export default function ForgotPassword() {
             Pedido enviado
           </p>
 
-          <h1 className="text-[34px] font-semibold leading-[1.05] tracking-[-0.045em] text-[#111111] sm:text-[40px]">
+          <h1 className="text-[34px] font-semibold leading-[1.05] tracking-[-0.045em] text-[#202522] sm:text-[40px]">
             Verifique o seu email.
           </h1>
 
@@ -147,13 +147,13 @@ export default function ForgotPassword() {
             instruções para redefinir a sua palavra-passe.
           </p>
 
-          <div className="mt-7 rounded-[10px] border border-[#e8e8e5] bg-[#fafaf8] px-4 py-3 text-[13px] text-[#555555]">
+          <div className="mt-7 rounded-[7px] border border-[#e8e8e5] bg-[#fafaf8] px-4 py-3 text-[13px] text-[#555555]">
             <span className="font-medium text-[#222222]">{email}</span>
           </div>
 
           <Link
             to="/login"
-            className="mt-7 flex h-[52px] w-full items-center justify-center gap-2 rounded-[10px] border border-[#ddddda] text-[14px] font-semibold text-[#111111] transition-colors hover:bg-[#f7f7f5]"
+            className="mt-7 flex h-[52px] w-full items-center justify-center gap-2 rounded-[7px] border border-[#ddddda] text-[14px] font-semibold text-[#202522] transition-colors hover:bg-[#f7f7f5]"
           >
             <ArrowLeft className="h-4 w-4" />
             Voltar para entrar

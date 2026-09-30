@@ -115,7 +115,7 @@ export default function ResetPassword() {
 
           <Link
             to="/forgot-password"
-            className="mt-6 text-[13px] font-medium text-[#111111] underline decoration-[#cccccc] underline-offset-4"
+            className="mt-6 text-[13px] font-medium text-[#202522] underline decoration-[#cccccc] underline-offset-4"
           >
             Solicitar novo link
           </Link>
@@ -135,12 +135,12 @@ export default function ResetPassword() {
         <div>
           <div className="mb-8 grid h-12 w-12 place-items-center rounded-full bg-[#f2f2ef]">
             <CheckCircle2
-              className="h-6 w-6 text-[#111111]"
+              className="h-6 w-6 text-[#202522]"
               strokeWidth={1.7}
             />
           </div>
 
-          <h1 className="text-[34px] font-semibold leading-[1.05] tracking-[-0.045em] text-[#111111] sm:text-[40px]">
+          <h1 className="text-[34px] font-semibold leading-[1.05] tracking-[-0.045em] text-[#202522] sm:text-[40px]">
             Palavra-passe atualizada.
           </h1>
 
@@ -151,7 +151,7 @@ export default function ResetPassword() {
           <button
             type="button"
             onClick={() => navigate("/login", { replace: true })}
-            className="mt-8 flex h-[52px] w-full items-center justify-center gap-2 rounded-[10px] bg-[#111111] text-[14px] font-semibold text-white transition-colors hover:bg-[#252525]"
+            className="mt-8 flex h-[52px] w-full items-center justify-center gap-2 rounded-[7px] bg-[#202522] text-[14px] font-semibold text-white transition-colors hover:bg-[#2c6457]"
           >
             Entrar na conta
             <ArrowRight className="h-4 w-4" />
@@ -169,7 +169,7 @@ export default function ResetPassword() {
       footer={
         <Link
           to="/login"
-          className="text-sm font-medium text-[#666666] transition-colors hover:text-[#111111]"
+          className="text-sm font-medium text-[#666666] transition-colors hover:text-[#202522]"
         >
           Cancelar
         </Link>
@@ -182,7 +182,7 @@ export default function ResetPassword() {
             Nova palavra-passe
           </p>
 
-          <h1 className="text-[34px] font-semibold leading-[1.05] tracking-[-0.045em] text-[#111111] sm:text-[40px]">
+          <h1 className="text-[34px] font-semibold leading-[1.05] tracking-[-0.045em] text-[#202522] sm:text-[40px]">
             Proteja novamente a sua conta.
           </h1>
 
@@ -218,7 +218,7 @@ export default function ResetPassword() {
                 disabled={isLoading}
                 required
                 minLength={8}
-                className="h-[52px] w-full rounded-[10px] border border-[#ddddda] bg-white pl-11 pr-12 text-[14px] text-[#111111] outline-none transition-all placeholder:text-[#aaaaaa] hover:border-[#c8c8c4] focus:border-[#111111] focus:ring-2 focus:ring-[#111111]/8"
+                className="h-[52px] w-full rounded-[7px] border border-[#ddddda] bg-[#fffdf9] pl-11 pr-12 text-[14px] text-[#202522] outline-none transition-all placeholder:text-[#aaaaaa] hover:border-[#c8c8c4] focus:border-[#2c6457] focus:ring-2 focus:ring-[#2c6457]/10"
               />
 
               <button
@@ -229,7 +229,7 @@ export default function ResetPassword() {
                     : "Mostrar palavra-passe"
                 }
                 onClick={() => setShowPassword((value) => !value)}
-                className="absolute right-3 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-md text-[#888888] hover:bg-[#f5f5f3] hover:text-[#111111]"
+                className="absolute right-3 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-[7px] text-[#888888] hover:bg-[#f5f5f3] hover:text-[#202522]"
               >
                 {showPassword ? (
                   <EyeOff className="h-[17px] w-[17px]" strokeWidth={1.8} />
@@ -265,7 +265,7 @@ export default function ResetPassword() {
                 onChange={(event) => setConfirmation(event.target.value)}
                 disabled={isLoading}
                 required
-                className="h-[52px] w-full rounded-[10px] border border-[#ddddda] bg-white pl-11 pr-12 text-[14px] text-[#111111] outline-none transition-all placeholder:text-[#aaaaaa] hover:border-[#c8c8c4] focus:border-[#111111] focus:ring-2 focus:ring-[#111111]/8"
+                className="h-[52px] w-full rounded-[7px] border border-[#ddddda] bg-[#fffdf9] pl-11 pr-12 text-[14px] text-[#202522] outline-none transition-all placeholder:text-[#aaaaaa] hover:border-[#c8c8c4] focus:border-[#2c6457] focus:ring-2 focus:ring-[#2c6457]/10"
               />
 
               <button
@@ -276,7 +276,7 @@ export default function ResetPassword() {
                     : "Mostrar confirmação"
                 }
                 onClick={() => setShowConfirmation((value) => !value)}
-                className="absolute right-3 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-md text-[#888888] hover:bg-[#f5f5f3] hover:text-[#111111]"
+                className="absolute right-3 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-[7px] text-[#888888] hover:bg-[#f5f5f3] hover:text-[#202522]"
               >
                 {showConfirmation ? (
                   <EyeOff className="h-[17px] w-[17px]" strokeWidth={1.8} />
@@ -287,7 +287,7 @@ export default function ResetPassword() {
             </div>
           </div>
 
-          <div className="space-y-2 rounded-[10px] border border-[#eeeeeb] bg-[#fafaf8] px-4 py-3">
+          <div className="space-y-2 rounded-[7px] border border-[#eeeeeb] bg-[#fafaf8] px-4 py-3">
             <div
               className={`flex items-center gap-2 text-[12px] ${
                 passwordHasLength ? "text-[#333333]" : "text-[#999999]"
@@ -310,7 +310,7 @@ export default function ResetPassword() {
           <button
             type="submit"
             disabled={isLoading || !passwordHasLength || !passwordsMatch}
-            className="group flex h-[52px] w-full items-center justify-center gap-2 rounded-[10px] bg-[#111111] text-[14px] font-semibold text-white transition-all hover:bg-[#252525] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40"
+            className="group flex h-[52px] w-full items-center justify-center gap-2 rounded-[7px] bg-[#202522] text-[14px] font-semibold text-white transition-all hover:bg-[#2c6457] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40"
           >
             {isLoading ? "A atualizar..." : "Atualizar palavra-passe"}
 

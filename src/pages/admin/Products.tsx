@@ -101,20 +101,20 @@ function stockState(product: Product) {
   if (product.stock <= 0) {
     return {
       label: "Sem stock",
-      className: "text-neutral-950",
+      className: "text-[#202522]",
     };
   }
 
   if (product.stock <= LOW_STOCK_LIMIT) {
     return {
       label: "Stock baixo",
-      className: "text-neutral-600",
+      className: "text-[#747b73]",
     };
   }
 
   return {
     label: "Disponível",
-    className: "text-neutral-500",
+    className: "text-[#747b73]",
   };
 }
 
@@ -674,7 +674,7 @@ export default function Products() {
         <button
           type="button"
           onClick={openNew}
-          className="inline-flex min-h-10 items-center gap-2 bg-black px-4 text-sm font-semibold text-white transition hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+          className="inline-flex min-h-10 items-center gap-2 bg-black px-4 text-sm font-semibold text-white transition hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
         >
           <Plus className="h-4 w-4" />
           <span>Novo produto</span>
@@ -684,17 +684,17 @@ export default function Products() {
       <div className="mx-auto max-w-[1500px]">
         {/* PAGE HEADER */}
 
-        <section className="mb-8 flex flex-col gap-5 border-b border-neutral-200 pb-7 lg:flex-row lg:items-end lg:justify-between">
+        <section className="mb-8 flex flex-col gap-5 border-b border-[#ded9d0] pb-7 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#a7aaa2]">
               Catálogo
             </p>
 
-            <h1 className="mt-2 text-3xl font-semibold tracking-[-0.045em] text-neutral-950 sm:text-4xl">
+            <h1 className="mt-2 text-3xl font-semibold tracking-[-0.045em] text-[#202522] sm:text-4xl">
               Produtos
             </h1>
 
-            <p className="mt-2 max-w-xl text-sm leading-6 text-neutral-500">
+            <p className="mt-2 max-w-xl text-sm leading-6 text-[#747b73]">
               Gerencie o catálogo, preços, stock e publicação
               dos produtos da sua loja.
             </p>
@@ -704,7 +704,7 @@ export default function Products() {
             <button
               type="button"
               onClick={exportProducts}
-              className="inline-flex min-h-10 items-center gap-2 border border-neutral-300 px-4 text-sm font-medium text-neutral-800 transition hover:border-neutral-500 hover:bg-neutral-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+              className="inline-flex min-h-10 items-center gap-2 border border-[#c9c3b8] px-4 text-sm font-medium text-[#303732] transition hover:border-neutral-500 hover:bg-[#f1eee7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
             >
               <Archive className="h-4 w-4" />
               Exportar
@@ -713,7 +713,7 @@ export default function Products() {
             <button
               type="button"
               onClick={openNew}
-              className="inline-flex min-h-10 items-center gap-2 bg-black px-4 text-sm font-semibold text-white transition hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+              className="inline-flex min-h-10 items-center gap-2 bg-black px-4 text-sm font-semibold text-white transition hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
             >
               <Plus className="h-4 w-4" />
               Adicionar produto
@@ -723,7 +723,7 @@ export default function Products() {
 
         {/* SUMMARY FILTERS */}
 
-        <section className="mb-7 border-y border-neutral-200">
+        <section className="mb-7 border-y border-[#ded9d0]">
           <div className="grid grid-cols-2 sm:grid-cols-5">
             <SummaryFilter
               label="Todos"
@@ -768,7 +768,7 @@ export default function Products() {
 
         <section className="mb-5 flex flex-col gap-3 lg:flex-row">
           <div className="relative min-w-0 flex-1">
-            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#a7aaa2]" />
 
             <input
               value={query}
@@ -776,7 +776,7 @@ export default function Products() {
                 setQuery(event.target.value)
               }
               placeholder="Pesquisar produto, SKU ou categoria..."
-              className="min-h-11 w-full border border-neutral-300 bg-white pl-10 pr-10 text-sm text-neutral-950 outline-none transition placeholder:text-neutral-400 focus:border-neutral-700 focus:ring-1 focus:ring-neutral-700"
+              className="min-h-11 w-full border border-[#c9c3b8] bg-[#fffdf9] pl-10 pr-10 text-sm text-[#202522] outline-none transition placeholder:text-[#a7aaa2] focus:border-neutral-700 focus:ring-1 focus:ring-neutral-700"
             />
 
             {query && (
@@ -784,7 +784,7 @@ export default function Products() {
                 type="button"
                 onClick={() => setQuery("")}
                 aria-label="Limpar pesquisa"
-                className="absolute right-3 top-1/2 grid h-6 w-6 -translate-y-1/2 place-items-center text-neutral-400 hover:text-neutral-950"
+                className="absolute right-3 top-1/2 grid h-6 w-6 -translate-y-1/2 place-items-center text-[#a7aaa2] hover:text-[#202522]"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -809,7 +809,7 @@ export default function Products() {
             <button
               type="button"
               onClick={clearFilters}
-              className="min-h-11 px-3 text-sm font-medium text-neutral-500 hover:text-neutral-950"
+              className="min-h-11 px-3 text-sm font-medium text-[#747b73] hover:text-[#202522]"
             >
               Limpar filtros
             </button>
@@ -819,8 +819,8 @@ export default function Products() {
         {/* BULK ACTION BAR */}
 
         {selectedIds.length > 0 && (
-          <section className="mb-4 flex flex-col gap-3 border border-neutral-300 bg-[#f5f5f2] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm font-medium text-neutral-900">
+          <section className="mb-4 flex flex-col gap-3 border border-[#c9c3b8] bg-[#f5f5f2] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm font-medium text-[#202522]">
               {selectedIds.length}{" "}
               {selectedIds.length === 1
                 ? "produto selecionado"
@@ -831,7 +831,7 @@ export default function Products() {
               <button
                 type="button"
                 onClick={() => bulkSetActive(true)}
-                className="inline-flex min-h-9 items-center gap-2 border border-neutral-300 bg-white px-3 text-xs font-semibold text-neutral-800 hover:border-neutral-500"
+                className="inline-flex min-h-9 items-center gap-2 border border-[#c9c3b8] bg-[#fffdf9] px-3 text-xs font-semibold text-[#303732] hover:border-neutral-500"
               >
                 <Check className="h-3.5 w-3.5" />
                 Ativar
@@ -840,7 +840,7 @@ export default function Products() {
               <button
                 type="button"
                 onClick={() => bulkSetActive(false)}
-                className="inline-flex min-h-9 items-center gap-2 border border-neutral-300 bg-white px-3 text-xs font-semibold text-neutral-800 hover:border-neutral-500"
+                className="inline-flex min-h-9 items-center gap-2 border border-[#c9c3b8] bg-[#fffdf9] px-3 text-xs font-semibold text-[#303732] hover:border-neutral-500"
               >
                 Ocultar
               </button>
@@ -848,7 +848,7 @@ export default function Products() {
               <button
                 type="button"
                 onClick={() => setSelectedIds([])}
-                className="inline-flex min-h-9 items-center gap-2 px-3 text-xs font-medium text-neutral-500 hover:text-neutral-950"
+                className="inline-flex min-h-9 items-center gap-2 px-3 text-xs font-medium text-[#747b73] hover:text-[#202522]"
               >
                 Cancelar
               </button>
@@ -858,13 +858,13 @@ export default function Products() {
 
         {/* RESULTS */}
 
-        <section className="border-y border-neutral-200">
+        <section className="border-y border-[#ded9d0]">
           {/* DESKTOP TABLE */}
 
           <div className="hidden overflow-x-auto lg:block">
             <table className="w-full min-w-[980px] border-collapse">
               <thead>
-                <tr className="border-b border-neutral-200 bg-[#fafafa]">
+                <tr className="border-b border-[#ded9d0] bg-[#fafafa]">
                   <th className="w-12 px-4 py-3 text-left">
                     <input
                       type="checkbox"
@@ -875,27 +875,27 @@ export default function Products() {
                     />
                   </th>
 
-                  <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-400">
+                  <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.12em] text-[#a7aaa2]">
                     Produto
                   </th>
 
-                  <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-400">
+                  <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.12em] text-[#a7aaa2]">
                     SKU
                   </th>
 
-                  <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-400">
+                  <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.12em] text-[#a7aaa2]">
                     Categoria
                   </th>
 
-                  <th className="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-400">
+                  <th className="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-[0.12em] text-[#a7aaa2]">
                     Preço
                   </th>
 
-                  <th className="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-400">
+                  <th className="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-[0.12em] text-[#a7aaa2]">
                     Stock
                   </th>
 
-                  <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-400">
+                  <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.12em] text-[#a7aaa2]">
                     Estado
                   </th>
 
@@ -972,13 +972,13 @@ export default function Products() {
                   (_, index) => (
                     <div
                       key={index}
-                      className="flex animate-pulse gap-3 border-b border-neutral-100 p-4"
+                      className="flex animate-pulse gap-3 border-b border-[#ebe7df] p-4"
                     >
-                      <div className="h-16 w-16 shrink-0 bg-neutral-100" />
+                      <div className="h-16 w-16 shrink-0 bg-[#ebe7df]" />
                       <div className="flex-1 space-y-2">
-                        <div className="h-4 w-2/3 bg-neutral-100" />
-                        <div className="h-3 w-1/2 bg-neutral-100" />
-                        <div className="h-3 w-1/3 bg-neutral-100" />
+                        <div className="h-4 w-2/3 bg-[#ebe7df]" />
+                        <div className="h-3 w-1/2 bg-[#ebe7df]" />
+                        <div className="h-3 w-1/3 bg-[#ebe7df]" />
                       </div>
                     </div>
                   ),
@@ -1045,14 +1045,14 @@ export default function Products() {
         {/* RESULT FOOTER */}
 
         {!loading && filtered.length > 0 && (
-          <div className="flex flex-col gap-2 py-4 text-xs text-neutral-400 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-2 py-4 text-xs text-[#a7aaa2] sm:flex-row sm:items-center sm:justify-between">
             <span>
               A mostrar {filtered.length} de {items.length}{" "}
               produtos
             </span>
 
             {selectedIds.length > 0 && (
-              <span className="text-neutral-600">
+              <span className="text-[#747b73]">
                 {selectedIds.length} selecionados
               </span>
             )}
@@ -1087,16 +1087,16 @@ export default function Products() {
           aria-modal="true"
           aria-labelledby="delete-product-title"
         >
-          <div className="w-full max-w-md bg-white p-6 shadow-2xl">
+          <div className="w-full max-w-md bg-[#fffdf9] p-6 shadow-2xl">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-neutral-400">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#a7aaa2]">
                   Remover produto
                 </p>
 
                 <h2
                   id="delete-product-title"
-                  className="mt-2 text-xl font-semibold tracking-tight text-neutral-950"
+                  className="mt-2 text-xl font-semibold tracking-tight text-[#202522]"
                 >
                   Apagar este produto?
                 </h2>
@@ -1106,15 +1106,15 @@ export default function Products() {
                 type="button"
                 onClick={() => setDeleteProduct(null)}
                 aria-label="Fechar"
-                className="grid h-9 w-9 shrink-0 place-items-center text-neutral-400 hover:bg-neutral-100 hover:text-neutral-950"
+                className="grid h-9 w-9 shrink-0 place-items-center text-[#a7aaa2] hover:bg-[#ebe7df] hover:text-[#202522]"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
-            <p className="mt-4 text-sm leading-6 text-neutral-600">
+            <p className="mt-4 text-sm leading-6 text-[#747b73]">
               O produto{" "}
-              <strong className="font-semibold text-neutral-950">
+              <strong className="font-semibold text-[#202522]">
                 “{deleteProduct.name}”
               </strong>{" "}
               será removido do catálogo. Para produtos que
@@ -1126,7 +1126,7 @@ export default function Products() {
               <button
                 type="button"
                 onClick={() => setDeleteProduct(null)}
-                className="min-h-10 px-4 text-sm font-medium text-neutral-600 hover:bg-neutral-100"
+                className="min-h-10 px-4 text-sm font-medium text-[#747b73] hover:bg-[#ebe7df]"
               >
                 Cancelar
               </button>
@@ -1165,10 +1165,10 @@ function SummaryFilter({
       type="button"
       onClick={onClick}
       className={cn(
-        "border-b border-r border-neutral-200 px-4 py-4 text-left transition last:border-r-0 sm:px-5",
+        "border-b border-r border-[#ded9d0] px-4 py-4 text-left transition last:border-r-0 sm:px-5",
         active
           ? "bg-[#f5f5f2]"
-          : "bg-white hover:bg-neutral-50",
+          : "bg-[#fffdf9] hover:bg-[#f1eee7]",
       )}
     >
       <div className="flex items-center justify-between gap-3">
@@ -1176,15 +1176,15 @@ function SummaryFilter({
           className={cn(
             "text-xs font-medium",
             active
-              ? "text-neutral-950"
-              : "text-neutral-500",
+              ? "text-[#202522]"
+              : "text-[#747b73]",
           )}
         >
           {label}
         </span>
 
         {warning && value > 0 && (
-          <span className="h-1.5 w-1.5 rounded-full bg-black" />
+          <span className="h-1.5 w-1.5 rounded-[7px] bg-black" />
         )}
       </div>
 
@@ -1192,8 +1192,8 @@ function SummaryFilter({
         className={cn(
           "mt-2 text-xl font-semibold tracking-tight",
           active
-            ? "text-neutral-950"
-            : "text-neutral-700",
+            ? "text-[#202522]"
+            : "text-[#5f625d]",
         )}
       >
         {value}
@@ -1221,7 +1221,7 @@ function FilterSelect({
         onChange={(event) =>
           onChange(event.target.value)
         }
-        className="min-h-11 min-w-[190px] appearance-none border border-neutral-300 bg-white pl-3.5 pr-10 text-sm text-neutral-800 outline-none focus:border-neutral-700 focus:ring-1 focus:ring-neutral-700"
+        className="min-h-11 min-w-[190px] appearance-none border border-[#c9c3b8] bg-[#fffdf9] pl-3.5 pr-10 text-sm text-[#303732] outline-none focus:border-neutral-700 focus:ring-1 focus:ring-neutral-700"
       >
         {options.map((option) => (
           <option
@@ -1233,7 +1233,7 @@ function FilterSelect({
         ))}
       </select>
 
-      <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+      <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#a7aaa2]" />
     </div>
   );
 }
@@ -1271,7 +1271,7 @@ function ProductRow({
   return (
     <tr
       className={cn(
-        "border-b border-neutral-100 transition last:border-b-0 hover:bg-neutral-50/70",
+        "border-b border-[#ebe7df] transition last:border-b-0 hover:bg-[#f1eee7]/70",
         selected && "bg-[#fafafa]",
       )}
     >
@@ -1294,12 +1294,12 @@ function ProductRow({
           <ProductImage product={product} />
 
           <span className="min-w-0">
-            <span className="block max-w-[260px] truncate text-sm font-semibold text-neutral-950 group-hover:underline group-hover:underline-offset-2">
+            <span className="block max-w-[260px] truncate text-sm font-semibold text-[#202522] group-hover:underline group-hover:underline-offset-2">
               {product.name}
             </span>
 
             {product.description && (
-              <span className="mt-0.5 block max-w-[260px] truncate text-xs text-neutral-400">
+              <span className="mt-0.5 block max-w-[260px] truncate text-xs text-[#a7aaa2]">
                 {product.description}
               </span>
             )}
@@ -1311,14 +1311,14 @@ function ProductRow({
         <button
           type="button"
           onClick={onCopySku}
-          className="text-xs text-neutral-500 hover:text-neutral-950"
+          className="text-xs text-[#747b73] hover:text-[#202522]"
         >
           {product.sku || "—"}
         </button>
       </td>
 
       <td className="px-4 py-4">
-        <span className="text-sm text-neutral-600">
+        <span className="text-sm text-[#747b73]">
           {product.category || "Sem categoria"}
         </span>
       </td>
@@ -1326,7 +1326,7 @@ function ProductRow({
       <td className="px-4 py-4 text-right">
         {product.promo_price != null ? (
           <div>
-            <p className="text-sm font-semibold text-neutral-950">
+            <p className="text-sm font-semibold text-[#202522]">
               {formatMoney(
                 product.promo_price,
                 currency,
@@ -1334,7 +1334,7 @@ function ProductRow({
             </p>
 
             <div className="mt-0.5 flex items-center justify-end gap-1.5">
-              <s className="text-[11px] text-neutral-400">
+              <s className="text-[11px] text-[#a7aaa2]">
                 {formatMoney(
                   product.price,
                   currency,
@@ -1342,14 +1342,14 @@ function ProductRow({
               </s>
 
               {discount !== null && (
-                <span className="text-[10px] font-semibold text-neutral-500">
+                <span className="text-[10px] font-semibold text-[#747b73]">
                   -{discount}%
                 </span>
               )}
             </div>
           </div>
         ) : (
-          <span className="text-sm font-semibold text-neutral-950">
+          <span className="text-sm font-semibold text-[#202522]">
             {formatMoney(
               product.price,
               currency,
@@ -1366,7 +1366,7 @@ function ProductRow({
             onClick={() =>
               onStockChange(product.stock - 1)
             }
-            className="grid h-6 w-6 place-items-center border border-neutral-200 text-neutral-500 hover:border-neutral-400 hover:text-neutral-950 disabled:cursor-not-allowed disabled:opacity-30"
+            className="grid h-6 w-6 place-items-center border border-[#ded9d0] text-[#747b73] hover:border-neutral-400 hover:text-[#202522] disabled:cursor-not-allowed disabled:opacity-30"
             aria-label={`Diminuir stock de ${product.name}`}
           >
             −
@@ -1386,14 +1386,14 @@ function ProductRow({
             onClick={() =>
               onStockChange(product.stock + 1)
             }
-            className="grid h-6 w-6 place-items-center border border-neutral-200 text-neutral-500 hover:border-neutral-400 hover:text-neutral-950"
+            className="grid h-6 w-6 place-items-center border border-[#ded9d0] text-[#747b73] hover:border-neutral-400 hover:text-[#202522]"
             aria-label={`Aumentar stock de ${product.name}`}
           >
             +
           </button>
         </div>
 
-        <p className="mt-1 text-[10px] text-neutral-400">
+        <p className="mt-1 text-[10px] text-[#a7aaa2]">
           {stock.label}
         </p>
       </td>
@@ -1402,7 +1402,7 @@ function ProductRow({
         <button
           type="button"
           onClick={onToggle}
-          className="inline-flex items-center gap-2 text-xs font-medium text-neutral-700"
+          className="inline-flex items-center gap-2 text-xs font-medium text-[#5f625d]"
           title={
             product.active
               ? "Ocultar da loja"
@@ -1411,7 +1411,7 @@ function ProductRow({
         >
           <span
             className={cn(
-              "h-1.5 w-1.5 rounded-full",
+              "h-1.5 w-1.5 rounded-[7px]",
               product.active
                 ? "bg-black"
                 : "bg-neutral-300",
@@ -1427,7 +1427,7 @@ function ProductRow({
           type="button"
           onClick={onMenu}
           aria-label={`Ações para ${product.name}`}
-          className="grid h-8 w-8 place-items-center text-neutral-400 hover:bg-neutral-100 hover:text-neutral-950"
+          className="grid h-8 w-8 place-items-center text-[#a7aaa2] hover:bg-[#ebe7df] hover:text-[#202522]"
         >
           <MoreHorizontal className="h-4 w-4" />
         </button>
@@ -1479,7 +1479,7 @@ function MobileProduct({
   return (
     <article
       className={cn(
-        "relative border-b border-neutral-100 p-4",
+        "relative border-b border-[#ebe7df] p-4",
         selected && "bg-[#fafafa]",
       )}
     >
@@ -1508,11 +1508,11 @@ function MobileProduct({
               onClick={onEdit}
               className="min-w-0 text-left"
             >
-              <p className="truncate text-sm font-semibold text-neutral-950">
+              <p className="truncate text-sm font-semibold text-[#202522]">
                 {product.name}
               </p>
 
-              <p className="mt-0.5 truncate text-xs text-neutral-400">
+              <p className="mt-0.5 truncate text-xs text-[#a7aaa2]">
                 {product.sku || "Sem SKU"}{" "}
                 ·{" "}
                 {product.category ||
@@ -1523,7 +1523,7 @@ function MobileProduct({
             <button
               type="button"
               onClick={onMenu}
-              className="grid h-8 w-8 shrink-0 place-items-center text-neutral-400 hover:bg-neutral-100 hover:text-neutral-950"
+              className="grid h-8 w-8 shrink-0 place-items-center text-[#a7aaa2] hover:bg-[#ebe7df] hover:text-[#202522]"
               aria-label={`Ações para ${product.name}`}
             >
               <MoreHorizontal className="h-4 w-4" />
@@ -1534,14 +1534,14 @@ function MobileProduct({
             <div>
               {product.promo_price != null ? (
                 <>
-                  <p className="text-sm font-semibold text-neutral-950">
+                  <p className="text-sm font-semibold text-[#202522]">
                     {formatMoney(
                       product.promo_price,
                       currency,
                     )}
                   </p>
 
-                  <s className="text-[11px] text-neutral-400">
+                  <s className="text-[11px] text-[#a7aaa2]">
                     {formatMoney(
                       product.price,
                       currency,
@@ -1549,7 +1549,7 @@ function MobileProduct({
                   </s>
                 </>
               ) : (
-                <p className="text-sm font-semibold text-neutral-950">
+                <p className="text-sm font-semibold text-[#202522]">
                   {formatMoney(
                     product.price,
                     currency,
@@ -1571,7 +1571,7 @@ function MobileProduct({
               <button
                 type="button"
                 onClick={onToggle}
-                className="mt-0.5 text-[11px] text-neutral-400"
+                className="mt-0.5 text-[11px] text-[#a7aaa2]"
               >
                 {product.active
                   ? "Publicado"
@@ -1594,8 +1594,8 @@ function MobileProduct({
         />
       )}
 
-      <div className="ml-7 mt-3 flex items-center gap-2 border-t border-neutral-100 pt-3">
-        <span className="text-[11px] text-neutral-400">
+      <div className="ml-7 mt-3 flex items-center gap-2 border-t border-[#ebe7df] pt-3">
+        <span className="text-[11px] text-[#a7aaa2]">
           Ajustar stock
         </span>
 
@@ -1605,7 +1605,7 @@ function MobileProduct({
           onClick={() =>
             onStockChange(product.stock - 1)
           }
-          className="grid h-7 w-7 place-items-center border border-neutral-200 text-neutral-600 disabled:opacity-30"
+          className="grid h-7 w-7 place-items-center border border-[#ded9d0] text-[#747b73] disabled:opacity-30"
         >
           −
         </button>
@@ -1619,7 +1619,7 @@ function MobileProduct({
           onClick={() =>
             onStockChange(product.stock + 1)
           }
-          className="grid h-7 w-7 place-items-center border border-neutral-200 text-neutral-600"
+          className="grid h-7 w-7 place-items-center border border-[#ded9d0] text-[#747b73]"
         >
           +
         </button>
@@ -1648,7 +1648,7 @@ function ProductMenu({
   return (
     <div
       className={cn(
-        "absolute z-30 w-52 border border-neutral-200 bg-white p-1 shadow-xl",
+        "absolute z-30 w-52 border border-[#ded9d0] bg-[#fffdf9] p-1 shadow-xl",
         mobile
           ? "right-4 top-16"
           : "right-4 top-12",
@@ -1657,7 +1657,7 @@ function ProductMenu({
       <button
         type="button"
         onClick={onEdit}
-        className="flex min-h-9 w-full items-center gap-2 px-3 text-left text-xs font-medium text-neutral-700 hover:bg-neutral-50 hover:text-neutral-950"
+        className="flex min-h-9 w-full items-center gap-2 px-3 text-left text-xs font-medium text-[#5f625d] hover:bg-[#f1eee7] hover:text-[#202522]"
       >
         <Pencil className="h-3.5 w-3.5" />
         Editar produto
@@ -1666,7 +1666,7 @@ function ProductMenu({
       <button
         type="button"
         onClick={onToggle}
-        className="flex min-h-9 w-full items-center gap-2 px-3 text-left text-xs font-medium text-neutral-700 hover:bg-neutral-50 hover:text-neutral-950"
+        className="flex min-h-9 w-full items-center gap-2 px-3 text-left text-xs font-medium text-[#5f625d] hover:bg-[#f1eee7] hover:text-[#202522]"
       >
         {product.active ? (
           <Archive className="h-3.5 w-3.5" />
@@ -1682,7 +1682,7 @@ function ProductMenu({
       <button
         type="button"
         onClick={onCopySku}
-        className="flex min-h-9 w-full items-center gap-2 px-3 text-left text-xs font-medium text-neutral-700 hover:bg-neutral-50 hover:text-neutral-950"
+        className="flex min-h-9 w-full items-center gap-2 px-3 text-left text-xs font-medium text-[#5f625d] hover:bg-[#f1eee7] hover:text-[#202522]"
       >
         <Copy className="h-3.5 w-3.5" />
         Copiar SKU
@@ -1694,19 +1694,19 @@ function ProductMenu({
           target="_blank"
           rel="noreferrer"
           onClick={onClose}
-          className="flex min-h-9 w-full items-center gap-2 px-3 text-xs font-medium text-neutral-700 hover:bg-neutral-50 hover:text-neutral-950"
+          className="flex min-h-9 w-full items-center gap-2 px-3 text-xs font-medium text-[#5f625d] hover:bg-[#f1eee7] hover:text-[#202522]"
         >
           <ExternalLink className="h-3.5 w-3.5" />
           Ver na loja
         </a>
       )}
 
-      <div className="my-1 border-t border-neutral-100" />
+      <div className="my-1 border-t border-[#ebe7df]" />
 
       <button
         type="button"
         onClick={onDelete}
-        className="flex min-h-9 w-full items-center gap-2 px-3 text-left text-xs font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-950"
+        className="flex min-h-9 w-full items-center gap-2 px-3 text-left text-xs font-medium text-[#747b73] hover:bg-[#f1eee7] hover:text-[#202522]"
       >
         <Trash2 className="h-3.5 w-3.5" />
         Apagar
@@ -1725,7 +1725,7 @@ function ProductImage({
   return (
     <div
       className={cn(
-        "grid shrink-0 place-items-center overflow-hidden border border-neutral-200 bg-[#f5f5f2]",
+        "grid shrink-0 place-items-center overflow-hidden border border-[#ded9d0] bg-[#f5f5f2]",
         large
           ? "h-16 w-16"
           : "h-11 w-11",
@@ -1738,7 +1738,7 @@ function ProductImage({
           className="h-full w-full object-cover"
         />
       ) : (
-        <div className="flex flex-col items-center justify-center gap-1 text-neutral-400">
+        <div className="flex flex-col items-center justify-center gap-1 text-[#a7aaa2]">
           <ImageOff
             className={cn(
               large
@@ -1800,14 +1800,14 @@ function ProductEditor({
 
   return (
     <div className="fixed inset-0 z-[90] bg-black/45">
-      <div className="absolute inset-y-0 right-0 flex w-full max-w-2xl flex-col bg-white shadow-2xl">
-        <header className="flex shrink-0 items-center justify-between border-b border-neutral-200 px-5 py-4 sm:px-7">
+      <div className="absolute inset-y-0 right-0 flex w-full max-w-2xl flex-col bg-[#fffdf9] shadow-2xl">
+        <header className="flex shrink-0 items-center justify-between border-b border-[#ded9d0] px-5 py-4 sm:px-7">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-400">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#a7aaa2]">
               Catálogo
             </p>
 
-            <h2 className="mt-1 text-lg font-semibold tracking-tight text-neutral-950">
+            <h2 className="mt-1 text-lg font-semibold tracking-tight text-[#202522]">
               {editing
                 ? "Editar produto"
                 : "Novo produto"}
@@ -1819,7 +1819,7 @@ function ProductEditor({
             onClick={onClose}
             disabled={saving}
             aria-label="Fechar"
-            className="grid h-9 w-9 place-items-center text-neutral-400 hover:bg-neutral-100 hover:text-neutral-950 disabled:opacity-40"
+            className="grid h-9 w-9 place-items-center text-[#a7aaa2] hover:bg-[#ebe7df] hover:text-[#202522] disabled:opacity-40"
           >
             <X className="h-5 w-5" />
           </button>
@@ -1848,7 +1848,7 @@ function ProductEditor({
                 />
 
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-neutral-700">
+                  <label className="mb-1.5 block text-xs font-semibold text-[#5f625d]">
                     Descrição
                   </label>
 
@@ -1863,10 +1863,10 @@ function ProductEditor({
                     placeholder="Descreva o produto para os seus clientes..."
                     maxLength={2000}
                     rows={5}
-                    className="w-full resize-y border border-neutral-300 bg-white px-3.5 py-3 text-sm leading-6 text-neutral-950 outline-none placeholder:text-neutral-400 focus:border-neutral-700 focus:ring-1 focus:ring-neutral-700"
+                    className="w-full resize-y border border-[#c9c3b8] bg-[#fffdf9] px-3.5 py-3 text-sm leading-6 text-[#202522] outline-none placeholder:text-[#a7aaa2] focus:border-neutral-700 focus:ring-1 focus:ring-neutral-700"
                   />
 
-                  <p className="mt-1 text-right text-[10px] text-neutral-400">
+                  <p className="mt-1 text-right text-[10px] text-[#a7aaa2]">
                     {form.description.length}/2000
                   </p>
                 </div>
@@ -1900,7 +1900,7 @@ function ProductEditor({
 
             {/* PRICE & STOCK */}
 
-            <section className="border-t border-neutral-200 pt-8">
+            <section className="border-t border-[#ded9d0] pt-8">
               <SectionHeading
                 eyebrow="Comercial"
                 title="Preço e inventário"
@@ -1949,8 +1949,8 @@ function ProductEditor({
                 Number.isFinite(price) &&
                 promo >= 0 &&
                 promo < price && (
-                  <div className="mt-4 flex items-center gap-2 bg-[#f5f5f2] px-3.5 py-3 text-xs text-neutral-700">
-                    <Tag className="h-4 w-4 text-neutral-500" />
+                  <div className="mt-4 flex items-center gap-2 bg-[#f5f5f2] px-3.5 py-3 text-xs text-[#5f625d]">
+                    <Tag className="h-4 w-4 text-[#747b73]" />
 
                     <span>
                       Promoção de{" "}
@@ -1969,7 +1969,7 @@ function ProductEditor({
 
             {/* PUBLICATION */}
 
-            <section className="border-t border-neutral-200 pt-8">
+            <section className="border-t border-[#ded9d0] pt-8">
               <SectionHeading
                 eyebrow="Publicação"
                 title="Visibilidade na loja"
@@ -1983,7 +1983,7 @@ function ProductEditor({
                     !form.active,
                   )
                 }
-                className="mt-5 flex w-full items-center justify-between border border-neutral-200 px-4 py-4 text-left transition hover:border-neutral-400"
+                className="mt-5 flex w-full items-center justify-between border border-[#ded9d0] px-4 py-4 text-left transition hover:border-neutral-400"
               >
                 <div className="flex items-center gap-3">
                   <span
@@ -1991,7 +1991,7 @@ function ProductEditor({
                       "grid h-9 w-9 place-items-center",
                       form.active
                         ? "bg-black text-white"
-                        : "bg-neutral-100 text-neutral-400",
+                        : "bg-[#ebe7df] text-[#a7aaa2]",
                     )}
                   >
                     {form.active ? (
@@ -2002,13 +2002,13 @@ function ProductEditor({
                   </span>
 
                   <div>
-                    <p className="text-sm font-semibold text-neutral-950">
+                    <p className="text-sm font-semibold text-[#202522]">
                       {form.active
                         ? "Produto publicado"
                         : "Produto oculto"}
                     </p>
 
-                    <p className="mt-0.5 text-xs text-neutral-500">
+                    <p className="mt-0.5 text-xs text-[#747b73]">
                       {form.active
                         ? "Os clientes podem encontrar este produto na loja."
                         : "Este produto não aparece no catálogo público."}
@@ -2018,15 +2018,15 @@ function ProductEditor({
 
                 <span
                   className={cn(
-                    "relative h-6 w-11 rounded-full transition",
+                    "relative h-6 w-11 rounded-[7px] transition",
                     form.active
                       ? "bg-black"
-                      : "bg-neutral-200",
+                      : "bg-[#e7e2d9]",
                   )}
                 >
                   <span
                     className={cn(
-                      "absolute top-1 h-4 w-4 rounded-full bg-white transition",
+                      "absolute top-1 h-4 w-4 rounded-[7px] bg-[#fffdf9] transition",
                       form.active
                         ? "left-6"
                         : "left-1",
@@ -2038,7 +2038,7 @@ function ProductEditor({
 
             {/* IMAGES */}
 
-            <section className="border-t border-neutral-200 pt-8">
+            <section className="border-t border-[#ded9d0] pt-8">
               <SectionHeading
                 eyebrow="Conteúdo"
                 title="Imagens"
@@ -2050,7 +2050,7 @@ function ProductEditor({
                     (image, index) => (
                       <div
                         key={`${image}-${index}`}
-                        className="aspect-square overflow-hidden border border-neutral-200 bg-[#f5f5f2]"
+                        className="aspect-square overflow-hidden border border-[#ded9d0] bg-[#f5f5f2]"
                       >
                         <img
                           src={image}
@@ -2062,11 +2062,11 @@ function ProductEditor({
                   )}
 
                   {previewImages.length < 8 && (
-                    <div className="grid aspect-square place-items-center border border-dashed border-neutral-300 bg-neutral-50 text-center">
+                    <div className="grid aspect-square place-items-center border border-dashed border-[#c9c3b8] bg-[#f1eee7] text-center">
                       <div>
-                        <Plus className="mx-auto h-5 w-5 text-neutral-400" />
+                        <Plus className="mx-auto h-5 w-5 text-[#a7aaa2]" />
 
-                        <p className="mt-1 text-[10px] font-medium text-neutral-500">
+                        <p className="mt-1 text-[10px] font-medium text-[#747b73]">
                           Adicionar
                         </p>
                       </div>
@@ -2074,7 +2074,7 @@ function ProductEditor({
                   )}
                 </div>
 
-                <label className="mt-4 block text-xs font-semibold text-neutral-700">
+                <label className="mt-4 block text-xs font-semibold text-[#5f625d]">
                   Links das imagens
                 </label>
 
@@ -2090,10 +2090,10 @@ function ProductEditor({
                     "https://exemplo.com/imagem-1.jpg\nhttps://exemplo.com/imagem-2.jpg"
                   }
                   rows={4}
-                  className="mt-1.5 w-full resize-y border border-neutral-300 bg-white px-3.5 py-3 text-xs leading-5 text-neutral-950 outline-none placeholder:text-neutral-400 focus:border-neutral-700 focus:ring-1 focus:ring-neutral-700"
+                  className="mt-1.5 w-full resize-y border border-[#c9c3b8] bg-[#fffdf9] px-3.5 py-3 text-xs leading-5 text-[#202522] outline-none placeholder:text-[#a7aaa2] focus:border-neutral-700 focus:ring-1 focus:ring-neutral-700"
                 />
 
-                <p className="mt-2 text-[11px] leading-5 text-neutral-400">
+                <p className="mt-2 text-[11px] leading-5 text-[#a7aaa2]">
                   Até 8 links HTTPS, um por linha. O
                   armazenamento direto de imagens pode ser
                   ligado posteriormente ao Storage.
@@ -2103,13 +2103,13 @@ function ProductEditor({
 
             {/* PREVIEW */}
 
-            <section className="border-t border-neutral-200 pt-8">
+            <section className="border-t border-[#ded9d0] pt-8">
               <SectionHeading
                 eyebrow="Pré-visualização"
                 title="Como ficará na loja"
               />
 
-              <div className="mt-5 max-w-sm border border-neutral-200 bg-white">
+              <div className="mt-5 max-w-sm border border-[#ded9d0] bg-[#fffdf9]">
                 <div className="aspect-square bg-[#f5f5f2]">
                   {previewImages[0] ? (
                     <img
@@ -2118,20 +2118,20 @@ function ProductEditor({
                       className="h-full w-full object-cover"
                     />
                   ) : (
-                    <div className="grid h-full place-items-center text-neutral-300">
+                    <div className="grid h-full place-items-center text-[#c9c3b8]">
                       <ImageOff className="h-8 w-8" />
                     </div>
                   )}
                 </div>
 
                 <div className="p-4">
-                  <p className="truncate text-sm font-semibold text-neutral-950">
+                  <p className="truncate text-sm font-semibold text-[#202522]">
                     {form.name.trim() ||
                       "Nome do produto"}
                   </p>
 
                   <div className="mt-2 flex items-center gap-2">
-                    <span className="text-sm font-semibold text-neutral-950">
+                    <span className="text-sm font-semibold text-[#202522]">
                       {Number.isFinite(previewPrice)
                         ? formatMoney(
                             previewPrice,
@@ -2146,7 +2146,7 @@ function ProductEditor({
                     {form.promo_price.trim() &&
                       promo < price &&
                       price > 0 && (
-                        <s className="text-xs text-neutral-400">
+                        <s className="text-xs text-[#a7aaa2]">
                           {formatMoney(
                             price,
                             currency,
@@ -2160,12 +2160,12 @@ function ProductEditor({
           </div>
         </div>
 
-        <footer className="flex shrink-0 items-center justify-end gap-2 border-t border-neutral-200 bg-white px-5 py-4 sm:px-7">
+        <footer className="flex shrink-0 items-center justify-end gap-2 border-t border-[#ded9d0] bg-[#fffdf9] px-5 py-4 sm:px-7">
           <button
             type="button"
             onClick={onClose}
             disabled={saving}
-            className="min-h-10 px-4 text-sm font-medium text-neutral-600 hover:bg-neutral-100 disabled:opacity-40"
+            className="min-h-10 px-4 text-sm font-medium text-[#747b73] hover:bg-[#ebe7df] disabled:opacity-40"
           >
             Cancelar
           </button>
@@ -2178,7 +2178,7 @@ function ProductEditor({
           >
             {saving ? (
               <>
-                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                <span className="h-4 w-4 animate-spin rounded-[7px] border-2 border-white/30 border-t-white" />
                 A guardar...
               </>
             ) : (
@@ -2204,11 +2204,11 @@ function SectionHeading({
 }) {
   return (
     <div>
-      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-400">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#a7aaa2]">
         {eyebrow}
       </p>
 
-      <h3 className="mt-1 text-base font-semibold tracking-tight text-neutral-950">
+      <h3 className="mt-1 text-base font-semibold tracking-tight text-[#202522]">
         {title}
       </h3>
     </div>
@@ -2232,10 +2232,10 @@ function Field({
 }) {
   return (
     <div>
-      <label className="mb-1.5 block text-xs font-semibold text-neutral-700">
+      <label className="mb-1.5 block text-xs font-semibold text-[#5f625d]">
         {label}
         {required && (
-          <span className="ml-1 text-neutral-400">
+          <span className="ml-1 text-[#a7aaa2]">
             *
           </span>
         )}
@@ -2248,7 +2248,7 @@ function Field({
         }
         placeholder={placeholder}
         maxLength={maxLength}
-        className="min-h-11 w-full border border-neutral-300 bg-white px-3.5 text-sm text-neutral-950 outline-none placeholder:text-neutral-400 focus:border-neutral-700 focus:ring-1 focus:ring-neutral-700"
+        className="min-h-11 w-full border border-[#c9c3b8] bg-[#fffdf9] px-3.5 text-sm text-[#202522] outline-none placeholder:text-[#a7aaa2] focus:border-neutral-700 focus:ring-1 focus:ring-neutral-700"
       />
     </div>
   );
@@ -2271,7 +2271,7 @@ function NumberField({
 }) {
   return (
     <div>
-      <label className="mb-1.5 block text-xs font-semibold text-neutral-700">
+      <label className="mb-1.5 block text-xs font-semibold text-[#5f625d]">
         {label}
       </label>
 
@@ -2284,7 +2284,7 @@ function NumberField({
           onChange(event.target.value)
         }
         placeholder={placeholder}
-        className="min-h-11 w-full border border-neutral-300 bg-white px-3.5 text-sm text-neutral-950 outline-none placeholder:text-neutral-400 focus:border-neutral-700 focus:ring-1 focus:ring-neutral-700"
+        className="min-h-11 w-full border border-[#c9c3b8] bg-[#fffdf9] px-3.5 text-sm text-[#202522] outline-none placeholder:text-[#a7aaa2] focus:border-neutral-700 focus:ring-1 focus:ring-neutral-700"
       />
     </div>
   );
@@ -2327,21 +2327,21 @@ function EmptyProductsContent({
 }) {
   return (
     <div className="flex min-h-[300px] flex-col items-center justify-center px-6 py-12 text-center">
-      <div className="grid h-12 w-12 place-items-center bg-neutral-100">
+      <div className="grid h-12 w-12 place-items-center bg-[#ebe7df]">
         {hasFilters ? (
-          <Search className="h-5 w-5 text-neutral-400" />
+          <Search className="h-5 w-5 text-[#a7aaa2]" />
         ) : (
-          <Package className="h-5 w-5 text-neutral-400" />
+          <Package className="h-5 w-5 text-[#a7aaa2]" />
         )}
       </div>
 
-      <h3 className="mt-5 text-sm font-semibold text-neutral-950">
+      <h3 className="mt-5 text-sm font-semibold text-[#202522]">
         {hasFilters
           ? "Nenhum produto encontrado"
           : "O catálogo ainda está vazio"}
       </h3>
 
-      <p className="mt-1 max-w-sm text-xs leading-5 text-neutral-400">
+      <p className="mt-1 max-w-sm text-xs leading-5 text-[#a7aaa2]">
         {hasFilters
           ? "Experimente alterar a pesquisa ou remover alguns filtros."
           : "Adicione o primeiro produto para começar a construir a sua loja."}
@@ -2371,40 +2371,40 @@ function LoadingRows() {
       {Array.from({ length: 6 }).map((_, index) => (
         <tr
           key={index}
-          className="border-b border-neutral-100"
+          className="border-b border-[#ebe7df]"
         >
           <td className="px-4 py-5">
-            <div className="h-4 w-4 animate-pulse bg-neutral-100" />
+            <div className="h-4 w-4 animate-pulse bg-[#ebe7df]" />
           </td>
 
           <td className="px-4 py-5">
             <div className="flex items-center gap-3">
-              <div className="h-11 w-11 animate-pulse bg-neutral-100" />
+              <div className="h-11 w-11 animate-pulse bg-[#ebe7df]" />
               <div className="space-y-2">
-                <div className="h-3.5 w-36 animate-pulse bg-neutral-100" />
-                <div className="h-2.5 w-24 animate-pulse bg-neutral-100" />
+                <div className="h-3.5 w-36 animate-pulse bg-[#ebe7df]" />
+                <div className="h-2.5 w-24 animate-pulse bg-[#ebe7df]" />
               </div>
             </div>
           </td>
 
           <td className="px-4 py-5">
-            <div className="h-3 w-16 animate-pulse bg-neutral-100" />
+            <div className="h-3 w-16 animate-pulse bg-[#ebe7df]" />
           </td>
 
           <td className="px-4 py-5">
-            <div className="h-3 w-20 animate-pulse bg-neutral-100" />
+            <div className="h-3 w-20 animate-pulse bg-[#ebe7df]" />
           </td>
 
           <td className="px-4 py-5">
-            <div className="ml-auto h-3 w-20 animate-pulse bg-neutral-100" />
+            <div className="ml-auto h-3 w-20 animate-pulse bg-[#ebe7df]" />
           </td>
 
           <td className="px-4 py-5">
-            <div className="ml-auto h-3 w-12 animate-pulse bg-neutral-100" />
+            <div className="ml-auto h-3 w-12 animate-pulse bg-[#ebe7df]" />
           </td>
 
           <td className="px-4 py-5">
-            <div className="h-3 w-12 animate-pulse bg-neutral-100" />
+            <div className="h-3 w-12 animate-pulse bg-[#ebe7df]" />
           </td>
 
           <td />

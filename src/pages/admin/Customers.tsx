@@ -332,9 +332,9 @@ export default function Customers() {
     <AdminLayout title="Clientes">
       <div className="space-y-8">
         {/* HEADER */}
-        <section className="flex flex-col gap-5 border-b border-neutral-200 pb-7 lg:flex-row lg:items-end lg:justify-between">
+        <section className="flex flex-col gap-5 border-b border-[#ded9d0] pb-7 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-neutral-400">
+            <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#a7aaa2]">
               Relacionamento Comercial
             </p>
 
@@ -342,7 +342,7 @@ export default function Customers() {
               Clientes
             </h2>
 
-            <p className="mt-2 text-sm leading-6 text-neutral-500">
+            <p className="mt-2 text-sm leading-6 text-[#747b73]">
               Compreenda quem compra na sua loja e o histórico de cada cliente.
             </p>
           </div>
@@ -351,7 +351,7 @@ export default function Customers() {
             <button
               type="button"
               onClick={exportCustomers}
-              className="inline-flex min-h-10 items-center gap-2 border border-neutral-200 bg-white px-4 text-sm font-medium transition hover:border-neutral-400 hover:bg-neutral-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+              className="inline-flex min-h-10 items-center gap-2 border border-[#ded9d0] bg-[#fffdf9] px-4 text-sm font-medium transition hover:border-neutral-400 hover:bg-[#f1eee7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
             >
               <Download className="h-4 w-4" />
               Exportar
@@ -360,7 +360,7 @@ export default function Customers() {
             <button
               type="button"
               onClick={() => setNewModalOpen(true)}
-              className="inline-flex min-h-10 items-center gap-2 bg-black px-4 text-sm font-medium text-white transition hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+              className="inline-flex min-h-10 items-center gap-2 bg-black px-4 text-sm font-medium text-white transition hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
             >
               <Plus className="h-4 w-4" />
               Novo cliente
@@ -369,7 +369,7 @@ export default function Customers() {
         </section>
 
         {/* METRICS */}
-        <section className="grid border-y border-neutral-200 sm:grid-cols-2 lg:grid-cols-4">
+        <section className="grid border-y border-[#ded9d0] sm:grid-cols-2 lg:grid-cols-4">
           <MetricCard
             label="Total de Clientes"
             value={String(stats.total)}
@@ -400,18 +400,18 @@ export default function Customers() {
         {/* FILTERS & SEARCH */}
         <section className="flex flex-col gap-3 lg:flex-row lg:items-center">
           <div className="relative min-w-0 flex-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#a7aaa2]" />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Pesquisar cliente por nome, email ou telefone..."
-              className="h-11 w-full rounded-sm border border-neutral-200 bg-white pl-10 pr-4 text-sm outline-none transition placeholder:text-neutral-400 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
+              className="h-11 w-full rounded-sm border border-[#ded9d0] bg-[#fffdf9] pl-10 pr-4 text-sm outline-none transition placeholder:text-[#a7aaa2] focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
             />
             {query && (
               <button
                 type="button"
                 onClick={() => setQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-black"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#a7aaa2] hover:text-[#202522]"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -422,7 +422,7 @@ export default function Customers() {
             <select
               value={channelFilter}
               onChange={(e) => setChannelFilter(e.target.value)}
-              className="h-11 rounded-sm border border-neutral-200 bg-white px-3 text-sm font-medium outline-none focus:border-neutral-900"
+              className="h-11 rounded-sm border border-[#ded9d0] bg-[#fffdf9] px-3 text-sm font-medium outline-none focus:border-neutral-900"
             >
               <option value="all">Todos os canais</option>
               <option value="website">Website</option>
@@ -434,7 +434,7 @@ export default function Customers() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as "spent" | "orders" | "recent")}
-              className="h-11 rounded-sm border border-neutral-200 bg-white px-3 text-sm font-medium outline-none focus:border-neutral-900"
+              className="h-11 rounded-sm border border-[#ded9d0] bg-[#fffdf9] px-3 text-sm font-medium outline-none focus:border-neutral-900"
             >
               <option value="spent">Ordenar: Maior gasto</option>
               <option value="orders">Ordenar: Mais pedidos</option>
@@ -444,18 +444,18 @@ export default function Customers() {
         </section>
 
         {/* CUSTOMERS LIST */}
-        <section className="border-y border-neutral-200 bg-white">
+        <section className="border-y border-[#ded9d0] bg-[#fffdf9]">
           {loading ? (
             <div className="p-8 space-y-4">
               {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="h-12 w-full animate-pulse bg-neutral-100" />
+                <div key={i} className="h-12 w-full animate-pulse bg-[#ebe7df]" />
               ))}
             </div>
           ) : filteredCustomers.length === 0 ? (
             <div className="py-16 text-center">
-              <Users className="mx-auto h-8 w-8 text-neutral-300" />
-              <p className="mt-3 text-sm font-semibold text-neutral-900">Nenhum cliente encontrado</p>
-              <p className="mt-1 text-xs text-neutral-400">
+              <Users className="mx-auto h-8 w-8 text-[#c9c3b8]" />
+              <p className="mt-3 text-sm font-semibold text-[#202522]">Nenhum cliente encontrado</p>
+              <p className="mt-1 text-xs text-[#a7aaa2]">
                 {query ? "Tente ajustar a pesquisa ou os filtros." : "Quando receber pedidos, os clientes aparecerão aqui."}
               </p>
             </div>
@@ -463,7 +463,7 @@ export default function Customers() {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-neutral-200 bg-neutral-50/50 text-[10px] font-semibold uppercase tracking-[0.14em] text-neutral-400">
+                  <tr className="border-b border-[#ded9d0] bg-[#f1eee7]/50 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#a7aaa2]">
                     <th className="px-5 py-3.5">Cliente</th>
                     <th className="px-5 py-3.5">Contactos</th>
                     <th className="px-5 py-3.5">Canal</th>
@@ -479,60 +479,60 @@ export default function Customers() {
                     <tr
                       key={customer.id}
                       onClick={() => setSelectedCustomer(customer)}
-                      className="group cursor-pointer transition hover:bg-neutral-50"
+                      className="group cursor-pointer transition hover:bg-[#f1eee7]"
                     >
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-neutral-900 text-xs font-semibold text-white">
+                          <div className="grid h-9 w-9 shrink-0 place-items-center rounded-[7px] bg-[#202522] text-xs font-semibold text-white">
                             {customer.name.slice(0, 2).toUpperCase()}
                           </div>
                           <div>
-                            <p className="text-sm font-semibold text-neutral-950 group-hover:underline">
+                            <p className="text-sm font-semibold text-[#202522] group-hover:underline">
                               {customer.name}
                             </p>
-                            <p className="text-xs text-neutral-400">
+                            <p className="text-xs text-[#a7aaa2]">
                               Cliente desde {formatDate(customer.created_at)}
                             </p>
                           </div>
                         </div>
                       </td>
 
-                      <td className="px-5 py-4 text-xs text-neutral-600">
+                      <td className="px-5 py-4 text-xs text-[#747b73]">
                         {customer.phone && (
                           <div className="flex items-center gap-1.5">
-                            <Phone className="h-3 w-3 text-neutral-400" />
+                            <Phone className="h-3 w-3 text-[#a7aaa2]" />
                             <span>{customer.phone}</span>
                           </div>
                         )}
                         {customer.email && (
                           <div className="flex items-center gap-1.5 mt-0.5">
-                            <Mail className="h-3 w-3 text-neutral-400" />
+                            <Mail className="h-3 w-3 text-[#a7aaa2]" />
                             <span>{customer.email}</span>
                           </div>
                         )}
-                        {!customer.phone && !customer.email && <span className="text-neutral-400">—</span>}
+                        {!customer.phone && !customer.email && <span className="text-[#a7aaa2]">—</span>}
                       </td>
 
-                      <td className="px-5 py-4 text-xs font-medium text-neutral-700">
-                        <span className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1 text-[11px]">
+                      <td className="px-5 py-4 text-xs font-medium text-[#5f625d]">
+                        <span className="inline-flex items-center gap-1.5 rounded-[7px] border border-[#ded9d0] bg-[#f1eee7] px-2.5 py-1 text-[11px]">
                           {channelLabel(customer.channel)}
                         </span>
                       </td>
 
-                      <td className="px-5 py-4 text-center text-sm font-semibold text-neutral-950">
+                      <td className="px-5 py-4 text-center text-sm font-semibold text-[#202522]">
                         {customer.orders_count}
                       </td>
 
-                      <td className="px-5 py-4 text-right text-sm font-semibold text-neutral-950">
+                      <td className="px-5 py-4 text-right text-sm font-semibold text-[#202522]">
                         {formatMoney(customer.total_spent, currency)}
                       </td>
 
-                      <td className="px-5 py-4 text-xs text-neutral-500">
+                      <td className="px-5 py-4 text-xs text-[#747b73]">
                         {formatDate(customer.last_order_at)}
                       </td>
 
                       <td className="px-5 py-4">
-                        <ArrowRight className="h-4 w-4 text-neutral-300 transition-transform group-hover:translate-x-0.5 group-hover:text-neutral-950" />
+                        <ArrowRight className="h-4 w-4 text-[#c9c3b8] transition-transform group-hover:translate-x-0.5 group-hover:text-[#202522]" />
                       </td>
                     </tr>
                   ))}
@@ -547,26 +547,26 @@ export default function Customers() {
       {selectedCustomer && (
         <div className="fixed inset-0 z-[70]">
           <div
-            className="absolute inset-0 bg-black/20 backdrop-blur-[1px]"
+            className="absolute inset-0 bg-black/20"
             onClick={() => setSelectedCustomer(null)}
           />
 
-          <aside className="absolute inset-y-0 right-0 flex w-full max-w-xl flex-col border-l border-neutral-200 bg-white shadow-2xl">
-            <header className="flex min-h-[68px] items-center justify-between border-b border-neutral-200 px-6">
+          <aside className="absolute inset-y-0 right-0 flex w-full max-w-xl flex-col border-l border-[#ded9d0] bg-[#fffdf9] shadow-2xl">
+            <header className="flex min-h-[68px] items-center justify-between border-b border-[#ded9d0] px-6">
               <div className="flex items-center gap-3">
-                <div className="grid h-10 w-10 place-items-center rounded-full bg-black text-sm font-semibold text-white">
+                <div className="grid h-10 w-10 place-items-center rounded-[7px] bg-black text-sm font-semibold text-white">
                   {selectedCustomer.name.slice(0, 2).toUpperCase()}
                 </div>
                 <div>
-                  <h3 className="text-base font-semibold text-neutral-950">{selectedCustomer.name}</h3>
-                  <p className="text-xs text-neutral-400">Cliente desde {formatDate(selectedCustomer.created_at)}</p>
+                  <h3 className="text-base font-semibold text-[#202522]">{selectedCustomer.name}</h3>
+                  <p className="text-xs text-[#a7aaa2]">Cliente desde {formatDate(selectedCustomer.created_at)}</p>
                 </div>
               </div>
 
               <button
                 type="button"
                 onClick={() => setSelectedCustomer(null)}
-                className="grid h-9 w-9 place-items-center text-neutral-400 hover:text-black"
+                className="grid h-9 w-9 place-items-center text-[#a7aaa2] hover:text-[#202522]"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -574,22 +574,22 @@ export default function Customers() {
 
             <div className="min-h-0 flex-1 overflow-y-auto p-6 space-y-7">
               {/* CONTACT & OVERVIEW */}
-              <section className="grid grid-cols-3 gap-4 border border-neutral-200 bg-neutral-50 p-4 rounded-sm">
+              <section className="grid grid-cols-3 gap-4 border border-[#ded9d0] bg-[#f1eee7] p-4 rounded-sm">
                 <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400">Total Gasto</p>
-                  <p className="mt-1 text-base font-semibold text-neutral-950">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-[#a7aaa2]">Total Gasto</p>
+                  <p className="mt-1 text-base font-semibold text-[#202522]">
                     {formatMoney(selectedCustomer.total_spent, currency)}
                   </p>
                 </div>
 
                 <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400">Pedidos</p>
-                  <p className="mt-1 text-base font-semibold text-neutral-950">{selectedCustomer.orders_count}</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-[#a7aaa2]">Pedidos</p>
+                  <p className="mt-1 text-base font-semibold text-[#202522]">{selectedCustomer.orders_count}</p>
                 </div>
 
                 <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400">Ticket Médio</p>
-                  <p className="mt-1 text-base font-semibold text-neutral-950">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-[#a7aaa2]">Ticket Médio</p>
+                  <p className="mt-1 text-base font-semibold text-[#202522]">
                     {formatMoney(
                       selectedCustomer.orders_count > 0
                         ? selectedCustomer.total_spent / selectedCustomer.orders_count
@@ -602,25 +602,25 @@ export default function Customers() {
 
               {/* CONTACT DETAILS */}
               <section className="space-y-3">
-                <p className="text-xs font-semibold uppercase tracking-wider text-neutral-400">Contactos</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-[#a7aaa2]">Contactos</p>
 
-                <div className="space-y-2 text-sm text-neutral-700">
+                <div className="space-y-2 text-sm text-[#5f625d]">
                   {selectedCustomer.phone && (
-                    <a href={`tel:${selectedCustomer.phone}`} className="flex items-center gap-3 hover:text-black">
-                      <Phone className="h-4 w-4 text-neutral-400" />
+                    <a href={`tel:${selectedCustomer.phone}`} className="flex items-center gap-3 hover:text-[#202522]">
+                      <Phone className="h-4 w-4 text-[#a7aaa2]" />
                       <span>{selectedCustomer.phone}</span>
                     </a>
                   )}
 
                   {selectedCustomer.email && (
-                    <a href={`mailto:${selectedCustomer.email}`} className="flex items-center gap-3 hover:text-black">
-                      <Mail className="h-4 w-4 text-neutral-400" />
+                    <a href={`mailto:${selectedCustomer.email}`} className="flex items-center gap-3 hover:text-[#202522]">
+                      <Mail className="h-4 w-4 text-[#a7aaa2]" />
                       <span>{selectedCustomer.email}</span>
                     </a>
                   )}
 
-                  <div className="flex items-center gap-3 text-neutral-500">
-                    <MessageCircle className="h-4 w-4 text-neutral-400" />
+                  <div className="flex items-center gap-3 text-[#747b73]">
+                    <MessageCircle className="h-4 w-4 text-[#a7aaa2]" />
                     <span>Canal de origem: {channelLabel(selectedCustomer.channel)}</span>
                   </div>
                 </div>
@@ -628,24 +628,24 @@ export default function Customers() {
 
               {/* ORDER HISTORY */}
               <section className="space-y-3">
-                <p className="text-xs font-semibold uppercase tracking-wider text-neutral-400">Histórico de Pedidos</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-[#a7aaa2]">Histórico de Pedidos</p>
 
                 {loadingOrders ? (
-                  <p className="text-xs text-neutral-400">A carregar pedidos...</p>
+                  <p className="text-xs text-[#a7aaa2]">A carregar pedidos...</p>
                 ) : customerOrders.length === 0 ? (
-                  <p className="text-xs text-neutral-400">Nenhum pedido efetuado ainda.</p>
+                  <p className="text-xs text-[#a7aaa2]">Nenhum pedido efetuado ainda.</p>
                 ) : (
-                  <div className="divide-y divide-neutral-100 border-y border-neutral-200">
+                  <div className="divide-y divide-neutral-100 border-y border-[#ded9d0]">
                     {customerOrders.map((order) => (
                       <div key={order.id} className="flex items-center justify-between py-3 text-sm">
                         <div>
-                          <p className="font-mono text-xs font-semibold text-neutral-950">#{order.id.slice(0, 8).toUpperCase()}</p>
-                          <p className="text-xs text-neutral-400">{formatShortDate(order.created_at)} · {channelLabel(order.channel)}</p>
+                          <p className="font-mono text-xs font-semibold text-[#202522]">#{order.id.slice(0, 8).toUpperCase()}</p>
+                          <p className="text-xs text-[#a7aaa2]">{formatShortDate(order.created_at)} · {channelLabel(order.channel)}</p>
                         </div>
 
                         <div className="text-right">
-                          <p className="font-semibold text-neutral-950">{formatMoney(order.total, currency)}</p>
-                          <span className="text-[10px] uppercase font-medium text-neutral-500">{order.status}</span>
+                          <p className="font-semibold text-[#202522]">{formatMoney(order.total, currency)}</p>
+                          <span className="text-[10px] uppercase font-medium text-[#747b73]">{order.status}</span>
                         </div>
                       </div>
                     ))}
@@ -655,19 +655,19 @@ export default function Customers() {
 
               {/* ACTIVITY TIMELINE */}
               <section className="space-y-3">
-                <p className="text-xs font-semibold uppercase tracking-wider text-neutral-400">Atividade</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-[#a7aaa2]">Atividade</p>
 
-                <div className="space-y-3 border-l-2 border-neutral-200 pl-4 text-xs text-neutral-600">
+                <div className="space-y-3 border-l-2 border-[#ded9d0] pl-4 text-xs text-[#747b73]">
                   {selectedCustomer.last_order_at && (
                     <div>
-                      <p className="font-semibold text-neutral-900">Última compra realizada</p>
-                      <p className="text-neutral-400">{formatDate(selectedCustomer.last_order_at)}</p>
+                      <p className="font-semibold text-[#202522]">Última compra realizada</p>
+                      <p className="text-[#a7aaa2]">{formatDate(selectedCustomer.last_order_at)}</p>
                     </div>
                   )}
 
                   <div>
-                    <p className="font-semibold text-neutral-900">Registo de cliente</p>
-                    <p className="text-neutral-400">{formatDate(selectedCustomer.created_at)} via {channelLabel(selectedCustomer.channel)}</p>
+                    <p className="font-semibold text-[#202522]">Registo de cliente</p>
+                    <p className="text-[#a7aaa2]">{formatDate(selectedCustomer.created_at)} via {channelLabel(selectedCustomer.channel)}</p>
                   </div>
                 </div>
               </section>
@@ -679,13 +679,13 @@ export default function Customers() {
       {/* NEW CUSTOMER MODAL */}
       {newModalOpen && (
         <div className="fixed inset-0 z-[80] grid place-items-center bg-black/40 px-4">
-          <div className="w-full max-w-md bg-white p-6 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-neutral-200 pb-4">
-              <h3 className="text-lg font-semibold text-neutral-950">Novo Cliente</h3>
+          <div className="w-full max-w-md bg-[#fffdf9] p-6 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-[#ded9d0] pb-4">
+              <h3 className="text-lg font-semibold text-[#202522]">Novo Cliente</h3>
               <button
                 type="button"
                 onClick={() => setNewModalOpen(false)}
-                className="text-neutral-400 hover:text-black"
+                className="text-[#a7aaa2] hover:text-[#202522]"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -693,41 +693,41 @@ export default function Customers() {
 
             <div className="mt-4 space-y-4">
               <div>
-                <label className="mb-1 block text-xs font-semibold text-neutral-700">Nome *</label>
+                <label className="mb-1 block text-xs font-semibold text-[#5f625d]">Nome *</label>
                 <input
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   placeholder="Ex: Maria Silva"
-                  className="h-10 w-full border border-neutral-300 px-3 text-sm outline-none focus:border-black"
+                  className="h-10 w-full border border-[#c9c3b8] px-3 text-sm outline-none focus:border-black"
                 />
               </div>
 
               <div>
-                <label className="mb-1 block text-xs font-semibold text-neutral-700">Email</label>
+                <label className="mb-1 block text-xs font-semibold text-[#5f625d]">Email</label>
                 <input
                   value={formEmail}
                   onChange={(e) => setFormEmail(e.target.value)}
                   placeholder="maria@exemplo.com"
-                  className="h-10 w-full border border-neutral-300 px-3 text-sm outline-none focus:border-black"
+                  className="h-10 w-full border border-[#c9c3b8] px-3 text-sm outline-none focus:border-black"
                 />
               </div>
 
               <div>
-                <label className="mb-1 block text-xs font-semibold text-neutral-700">Telefone</label>
+                <label className="mb-1 block text-xs font-semibold text-[#5f625d]">Telefone</label>
                 <input
                   value={formPhone}
                   onChange={(e) => setFormPhone(e.target.value)}
                   placeholder="+244 9xx xxx xxx"
-                  className="h-10 w-full border border-neutral-300 px-3 text-sm outline-none focus:border-black"
+                  className="h-10 w-full border border-[#c9c3b8] px-3 text-sm outline-none focus:border-black"
                 />
               </div>
 
               <div>
-                <label className="mb-1 block text-xs font-semibold text-neutral-700">Canal Principal</label>
+                <label className="mb-1 block text-xs font-semibold text-[#5f625d]">Canal Principal</label>
                 <select
                   value={formChannel}
                   onChange={(e) => setFormChannel(e.target.value)}
-                  className="h-10 w-full border border-neutral-300 px-3 text-sm outline-none focus:border-black bg-white"
+                  className="h-10 w-full border border-[#c9c3b8] px-3 text-sm outline-none focus:border-black bg-[#fffdf9]"
                 >
                   <option value="website">Website</option>
                   <option value="whatsapp">WhatsApp</option>
@@ -737,13 +737,13 @@ export default function Customers() {
               </div>
 
               <div>
-                <label className="mb-1 block text-xs font-semibold text-neutral-700">Notas</label>
+                <label className="mb-1 block text-xs font-semibold text-[#5f625d]">Notas</label>
                 <textarea
                   value={formNotes}
                   onChange={(e) => setFormNotes(e.target.value)}
                   placeholder="Preferências, notas de entrega..."
                   rows={3}
-                  className="w-full border border-neutral-300 p-3 text-sm outline-none focus:border-black"
+                  className="w-full border border-[#c9c3b8] p-3 text-sm outline-none focus:border-black"
                 />
               </div>
             </div>
@@ -752,7 +752,7 @@ export default function Customers() {
               <button
                 type="button"
                 onClick={() => setNewModalOpen(false)}
-                className="h-10 px-4 text-sm font-medium text-neutral-600 hover:bg-neutral-100"
+                className="h-10 px-4 text-sm font-medium text-[#747b73] hover:bg-[#ebe7df]"
               >
                 Cancelar
               </button>
@@ -786,18 +786,18 @@ function MetricCard({
   loading: boolean;
 }) {
   return (
-    <div className="border-b border-neutral-200 px-5 py-5 sm:border-r last:border-r-0 lg:border-b-0">
-      <div className="flex items-center justify-between text-neutral-400">
+    <div className="border-b border-[#ded9d0] px-5 py-5 sm:border-r last:border-r-0 lg:border-b-0">
+      <div className="flex items-center justify-between text-[#a7aaa2]">
         <p className="text-xs font-medium uppercase tracking-[0.12em]">{label}</p>
         <Icon className="h-4 w-4" />
       </div>
 
       {loading ? (
-        <div className="mt-3 h-7 w-24 animate-pulse bg-neutral-100" />
+        <div className="mt-3 h-7 w-24 animate-pulse bg-[#ebe7df]" />
       ) : (
         <>
-          <p className="mt-2 text-2xl font-semibold tracking-tight text-neutral-950">{value}</p>
-          {subText && <p className="mt-1 text-[11px] text-neutral-400">{subText}</p>}
+          <p className="mt-2 text-2xl font-semibold tracking-tight text-[#202522]">{value}</p>
+          {subText && <p className="mt-1 text-[11px] text-[#a7aaa2]">{subText}</p>}
         </>
       )}
     </div>

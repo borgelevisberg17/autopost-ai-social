@@ -195,16 +195,16 @@ export default function OrderStatus() {
   };
 
   return (
-    <main className="min-h-screen bg-white text-neutral-950">
+    <main className="min-h-screen bg-[#fffdf9] text-[#202522]">
       {/* HEADER */}
 
-      <header className="border-b border-neutral-200 bg-white">
+      <header className="border-b border-[#ded9d0] bg-[#fffdf9]">
         <div className="mx-auto flex h-16 w-full max-w-[1400px] items-center justify-between px-5 sm:px-6 lg:px-8">
           <Link
             to={`/loja/${slug}`}
-            className="group flex min-w-0 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+            className="group flex min-w-0 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
           >
-            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-black text-white">
+            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-[7px] bg-black text-white">
               <span className="text-sm font-bold">
                 {company?.name?.charAt(0).toUpperCase() || "L"}
               </span>
@@ -217,7 +217,7 @@ export default function OrderStatus() {
 
           <Link
             to={`/loja/${slug}`}
-            className="inline-flex min-h-10 items-center gap-2 rounded-full border border-neutral-300 px-4 text-sm font-semibold transition hover:border-neutral-500 hover:bg-neutral-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+            className="inline-flex min-h-10 items-center gap-2 rounded-[7px] border border-[#c9c3b8] px-4 text-sm font-semibold transition hover:border-neutral-500 hover:bg-[#f1eee7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
           >
             <ArrowLeft className="h-4 w-4" />
 
@@ -239,33 +239,33 @@ export default function OrderStatus() {
 
         {loading ? (
           <div className="animate-pulse">
-            <div className="h-3 w-32 rounded bg-neutral-200" />
+            <div className="h-3 w-32 rounded bg-[#e7e2d9]" />
 
-            <div className="mt-5 h-12 w-[420px] max-w-full rounded bg-neutral-200" />
+            <div className="mt-5 h-12 w-[420px] max-w-full rounded bg-[#e7e2d9]" />
 
-            <div className="mt-4 h-5 w-[520px] max-w-full rounded bg-neutral-100" />
+            <div className="mt-4 h-5 w-[520px] max-w-full rounded bg-[#ebe7df]" />
 
-            <div className="mt-12 border-t border-neutral-200 pt-10">
-              <div className="h-4 w-24 rounded bg-neutral-200" />
+            <div className="mt-12 border-t border-[#ded9d0] pt-10">
+              <div className="h-4 w-24 rounded bg-[#e7e2d9]" />
 
               <div className="mt-8 grid gap-3 sm:grid-cols-4">
                 {Array.from({ length: 4 }).map((_, index) => (
                   <div
                     key={index}
-                    className="h-20 rounded bg-neutral-100"
+                    className="h-20 rounded bg-[#ebe7df]"
                   />
                 ))}
               </div>
 
               <div className="mt-14 grid gap-12 lg:grid-cols-[1fr_320px]">
                 <div className="space-y-4">
-                  <div className="h-4 w-24 rounded bg-neutral-200" />
-                  <div className="h-20 rounded bg-neutral-100" />
-                  <div className="h-20 rounded bg-neutral-100" />
-                  <div className="h-20 rounded bg-neutral-100" />
+                  <div className="h-4 w-24 rounded bg-[#e7e2d9]" />
+                  <div className="h-20 rounded bg-[#ebe7df]" />
+                  <div className="h-20 rounded bg-[#ebe7df]" />
+                  <div className="h-20 rounded bg-[#ebe7df]" />
                 </div>
 
-                <div className="h-48 rounded bg-neutral-100" />
+                <div className="h-48 rounded bg-[#ebe7df]" />
               </div>
             </div>
           </div>
@@ -273,22 +273,22 @@ export default function OrderStatus() {
           /* NOT FOUND */
 
           <section className="mx-auto max-w-xl py-12 text-center sm:py-20">
-            <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-neutral-100">
-              <XCircle className="h-6 w-6 text-neutral-700" />
+            <div className="mx-auto grid h-14 w-14 place-items-center rounded-[7px] bg-[#ebe7df]">
+              <XCircle className="h-6 w-6 text-[#5f625d]" />
             </div>
 
             <h1 className="mt-7 text-2xl font-bold tracking-tight sm:text-3xl">
               Pedido não encontrado
             </h1>
 
-            <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-neutral-600">
+            <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-[#747b73]">
               O pedido pode ter sido removido ou o link pode
               estar incorreto.
             </p>
 
             <Link
               to={`/loja/${slug}`}
-              className="mt-8 inline-flex min-h-12 items-center justify-center rounded-full bg-black px-6 text-sm font-bold text-white transition hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+              className="mt-8 inline-flex min-h-12 items-center justify-center rounded-[7px] bg-black px-6 text-sm font-bold text-white transition hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
             >
               Voltar à loja
             </Link>
@@ -299,13 +299,13 @@ export default function OrderStatus() {
 
             <section>
               <div className="flex flex-wrap items-center gap-3">
-                <p className="text-xs font-bold uppercase tracking-[0.2em] text-neutral-500">
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#747b73]">
                   Acompanhamento
                 </p>
 
-                <span className="h-1 w-1 rounded-full bg-neutral-300" />
+                <span className="h-1 w-1 rounded-[7px] bg-neutral-300" />
 
-                <p className="text-xs font-medium text-neutral-500">
+                <p className="text-xs font-medium text-[#747b73]">
                   {formatShortDate(order.created_at)}
                 </p>
               </div>
@@ -318,7 +318,7 @@ export default function OrderStatus() {
                 <button
                   type="button"
                   onClick={copyOrderId}
-                  className="inline-flex min-h-9 items-center gap-2 rounded-full border border-neutral-300 px-3 text-xs font-semibold text-neutral-700 transition hover:border-neutral-500 hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+                  className="inline-flex min-h-9 items-center gap-2 rounded-[7px] border border-[#c9c3b8] px-3 text-xs font-semibold text-[#5f625d] transition hover:border-neutral-500 hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
                   aria-label="Copiar número do pedido"
                 >
                   {copied ? (
@@ -335,9 +335,9 @@ export default function OrderStatus() {
                 </button>
               </div>
 
-              <p className="mt-5 max-w-2xl text-base leading-7 text-neutral-600">
+              <p className="mt-5 max-w-2xl text-base leading-7 text-[#747b73]">
                 Olá,{" "}
-                <span className="font-semibold text-neutral-950">
+                <span className="font-semibold text-[#202522]">
                   {order.customer_name}
                 </span>
                 . {getStatusMessage(order.status)}
@@ -346,10 +346,10 @@ export default function OrderStatus() {
 
             {/* STATUS */}
 
-            <section className="mt-12 border-y border-neutral-200 py-8 sm:mt-14 sm:py-10">
+            <section className="mt-12 border-y border-[#ded9d0] py-8 sm:mt-14 sm:py-10">
               <div className="flex flex-wrap items-end justify-between gap-4">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-neutral-500">
+                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#747b73]">
                     Estado do pedido
                   </p>
 
@@ -361,17 +361,17 @@ export default function OrderStatus() {
                 </div>
 
                 {!isCancelled && (
-                  <div className="inline-flex items-center gap-2 rounded-full bg-neutral-100 px-3 py-1.5 text-xs font-bold text-neutral-800">
-                    <span className="h-1.5 w-1.5 rounded-full bg-black" />
+                  <div className="inline-flex items-center gap-2 rounded-[7px] bg-[#ebe7df] px-3 py-1.5 text-xs font-bold text-[#303732]">
+                    <span className="h-1.5 w-1.5 rounded-[7px] bg-black" />
                     Em acompanhamento
                   </div>
                 )}
               </div>
 
               {isCancelled ? (
-                <div className="mt-8 flex items-start gap-4 border-t border-neutral-200 pt-7">
-                  <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-neutral-100">
-                    <XCircle className="h-5 w-5 text-neutral-700" />
+                <div className="mt-8 flex items-start gap-4 border-t border-[#ded9d0] pt-7">
+                  <div className="grid h-10 w-10 shrink-0 place-items-center rounded-[7px] bg-[#ebe7df]">
+                    <XCircle className="h-5 w-5 text-[#5f625d]" />
                   </div>
 
                   <div>
@@ -379,7 +379,7 @@ export default function OrderStatus() {
                       Este pedido foi cancelado.
                     </p>
 
-                    <p className="mt-1 text-sm leading-6 text-neutral-600">
+                    <p className="mt-1 text-sm leading-6 text-[#747b73]">
                       Não é necessário realizar mais nenhuma ação
                       neste pedido.
                     </p>
@@ -406,7 +406,7 @@ export default function OrderStatus() {
                               className={`absolute left-[34px] right-0 top-4 h-px ${
                                 index < currentIndex
                                   ? "bg-black"
-                                  : "bg-neutral-200"
+                                  : "bg-[#e7e2d9]"
                               }`}
                               aria-hidden="true"
                             />
@@ -414,10 +414,10 @@ export default function OrderStatus() {
 
                           <div className="relative">
                             <div
-                              className={`grid h-8 w-8 place-items-center rounded-full border ${
+                              className={`grid h-8 w-8 place-items-center rounded-[7px] border ${
                                 active
                                   ? "border-black bg-black text-white"
-                                  : "border-neutral-300 bg-white text-neutral-400"
+                                  : "border-[#c9c3b8] bg-[#fffdf9] text-[#a7aaa2]"
                               } ${
                                 current
                                   ? "ring-4 ring-neutral-100"
@@ -427,21 +427,21 @@ export default function OrderStatus() {
                               {active ? (
                                 <Icon className="h-3.5 w-3.5" />
                               ) : (
-                                <span className="h-2 w-2 rounded-full bg-neutral-300" />
+                                <span className="h-2 w-2 rounded-[7px] bg-neutral-300" />
                               )}
                             </div>
 
                             <p
                               className={`mt-4 text-sm font-bold ${
                                 active
-                                  ? "text-neutral-950"
-                                  : "text-neutral-500"
+                                  ? "text-[#202522]"
+                                  : "text-[#747b73]"
                               }`}
                             >
                               {step.label}
                             </p>
 
-                            <p className="mt-1 text-xs text-neutral-500">
+                            <p className="mt-1 text-xs text-[#747b73]">
                               {step.description}
                             </p>
                           </div>
@@ -470,17 +470,17 @@ export default function OrderStatus() {
                               className={`absolute left-4 top-8 h-[calc(100%-8px)] w-px ${
                                 index < currentIndex
                                   ? "bg-black"
-                                  : "bg-neutral-200"
+                                  : "bg-[#e7e2d9]"
                               }`}
                               aria-hidden="true"
                             />
                           )}
 
                           <div
-                            className={`relative z-10 grid h-8 w-8 shrink-0 place-items-center rounded-full border ${
+                            className={`relative z-10 grid h-8 w-8 shrink-0 place-items-center rounded-[7px] border ${
                               active
                                 ? "border-black bg-black text-white"
-                                : "border-neutral-300 bg-white text-neutral-400"
+                                : "border-[#c9c3b8] bg-[#fffdf9] text-[#a7aaa2]"
                             } ${
                               current
                                 ? "ring-4 ring-neutral-100"
@@ -490,7 +490,7 @@ export default function OrderStatus() {
                             {active ? (
                               <Icon className="h-3.5 w-3.5" />
                             ) : (
-                              <span className="h-2 w-2 rounded-full bg-neutral-300" />
+                              <span className="h-2 w-2 rounded-[7px] bg-neutral-300" />
                             )}
                           </div>
 
@@ -498,19 +498,19 @@ export default function OrderStatus() {
                             <p
                               className={`text-sm font-bold ${
                                 active
-                                  ? "text-neutral-950"
-                                  : "text-neutral-500"
+                                  ? "text-[#202522]"
+                                  : "text-[#747b73]"
                               }`}
                             >
                               {step.label}
                             </p>
 
-                            <p className="mt-1 text-sm text-neutral-500">
+                            <p className="mt-1 text-sm text-[#747b73]">
                               {step.description}
                             </p>
 
                             {current && (
-                              <span className="mt-2 inline-flex text-[10px] font-bold uppercase tracking-[0.15em] text-neutral-500">
+                              <span className="mt-2 inline-flex text-[10px] font-bold uppercase tracking-[0.15em] text-[#747b73]">
                                 Estado atual
                               </span>
                             )}
@@ -529,9 +529,9 @@ export default function OrderStatus() {
               {/* ITEMS */}
 
               <section>
-                <div className="flex items-end justify-between border-b border-neutral-200 pb-5">
+                <div className="flex items-end justify-between border-b border-[#ded9d0] pb-5">
                   <div>
-                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-neutral-500">
+                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#747b73]">
                       Pedido
                     </p>
 
@@ -559,16 +559,16 @@ export default function OrderStatus() {
                           key={`${item.product_name}-${index}`}
                           className="flex gap-4 py-6"
                         >
-                          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-neutral-100 text-xs font-bold text-neutral-500">
+                          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-[#ebe7df] text-xs font-bold text-[#747b73]">
                             {String(item.quantity).padStart(2, "0")}
                           </div>
 
                           <div className="min-w-0 flex-1">
-                            <p className="font-semibold text-neutral-950">
+                            <p className="font-semibold text-[#202522]">
                               {item.product_name}
                             </p>
 
-                            <p className="mt-1 text-sm text-neutral-500">
+                            <p className="mt-1 text-sm text-[#747b73]">
                               {item.quantity} ×{" "}
                               {formatMoney(
                                 item.unit_price,
@@ -577,7 +577,7 @@ export default function OrderStatus() {
                             </p>
                           </div>
 
-                          <p className="shrink-0 text-sm font-bold text-neutral-950">
+                          <p className="shrink-0 text-sm font-bold text-[#202522]">
                             {formatMoney(
                               lineTotal,
                               currency,
@@ -588,15 +588,15 @@ export default function OrderStatus() {
                     })}
                   </div>
                 ) : (
-                  <div className="py-8 text-sm text-neutral-500">
+                  <div className="py-8 text-sm text-[#747b73]">
                     Os itens deste pedido não estão disponíveis
                     para visualização.
                   </div>
                 )}
 
-                <div className="border-t border-neutral-200 pt-5">
+                <div className="border-t border-[#ded9d0] pt-5">
                   <div className="flex items-center justify-between gap-6">
-                    <span className="text-sm text-neutral-500">
+                    <span className="text-sm text-[#747b73]">
                       Total
                     </span>
 
@@ -614,13 +614,13 @@ export default function OrderStatus() {
 
               <aside className="self-start lg:sticky lg:top-8">
                 <div className="border-t-2 border-black pt-5">
-                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-neutral-500">
+                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#747b73]">
                     Resumo
                   </p>
 
                   <div className="mt-7 space-y-5">
                     <div className="flex items-center justify-between gap-5">
-                      <span className="text-sm text-neutral-500">
+                      <span className="text-sm text-[#747b73]">
                         Estado
                       </span>
 
@@ -631,7 +631,7 @@ export default function OrderStatus() {
                     </div>
 
                     <div className="flex items-center justify-between gap-5">
-                      <span className="text-sm text-neutral-500">
+                      <span className="text-sm text-[#747b73]">
                         Data
                       </span>
 
@@ -641,9 +641,9 @@ export default function OrderStatus() {
                     </div>
                   </div>
 
-                  <div className="mt-7 border-y border-neutral-200 py-6">
+                  <div className="mt-7 border-y border-[#ded9d0] py-6">
                     <div className="flex items-end justify-between gap-5">
-                      <span className="text-sm font-medium text-neutral-600">
+                      <span className="text-sm font-medium text-[#747b73]">
                         Total do pedido
                       </span>
 
@@ -658,7 +658,7 @@ export default function OrderStatus() {
 
                   <Link
                     to={`/loja/${slug}`}
-                    className="mt-6 flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-black px-5 text-sm font-bold text-white transition hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+                    className="mt-6 flex min-h-12 w-full items-center justify-center gap-2 rounded-[7px] bg-black px-5 text-sm font-bold text-white transition hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
                   >
                     Continuar a comprar
                     <ArrowRight className="h-4 w-4" />
@@ -669,10 +669,10 @@ export default function OrderStatus() {
 
             {/* FOOT NOTE */}
 
-            <div className="mt-12 border-t border-neutral-200 pt-6">
-              <p className="text-xs leading-5 text-neutral-500">
+            <div className="mt-12 border-t border-[#ded9d0] pt-6">
+              <p className="text-xs leading-5 text-[#747b73]">
                 Pedido realizado em{" "}
-                <span className="font-medium text-neutral-700">
+                <span className="font-medium text-[#5f625d]">
                   {formatOrderDate(order.created_at)}
                 </span>
                 .
@@ -684,13 +684,13 @@ export default function OrderStatus() {
 
       {/* FOOTER */}
 
-      <footer className="mt-8 border-t border-neutral-200 bg-[#f5f5f2]">
+      <footer className="mt-8 border-t border-[#ded9d0] bg-[#f5f5f2]">
         <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-3 px-5 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
-          <p className="text-sm font-bold tracking-tight text-neutral-950">
+          <p className="text-sm font-bold tracking-tight text-[#202522]">
             {company?.name || "Loja"}
           </p>
 
-          <p className="text-xs font-medium text-neutral-500">
+          <p className="text-xs font-medium text-[#747b73]">
             © {new Date().getFullYear()}{" "}
             {company?.name || "Loja"}
           </p>
