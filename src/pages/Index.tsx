@@ -561,15 +561,15 @@ function ChannelShowcase() {
   return (
     <section
       id="channels"
-      className="border-b border-[#35453d] bg-[#202522] text-[#f6f3ed]"
+      className="border-b border-[#d8d3c8] bg-[#f1eee7] text-[#202522]"
     >
       <div className="mx-auto max-w-[1240px] px-5 py-24 lg:px-8 lg:py-32">
         <div className="max-w-3xl">
-          <Eyebrow light>Every channel, in its own language</Eyebrow>
+          <Eyebrow>Every channel, in its own language</Eyebrow>
           <h2 className="text-5xl font-semibold leading-[0.96] tracking-[-0.07em] sm:text-6xl">
             The sale changes shape. Your operation stays clear.
           </h2>
-          <p className="mt-6 max-w-xl text-base leading-7 text-white/55">
+          <p className="mt-6 max-w-xl text-base leading-7 text-[#5f625d]">
             Facebook and Instagram each get their own space, their own visual
             rhythm and their own campaign story — without making the operator
             switch modes to understand the system.

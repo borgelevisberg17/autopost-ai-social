@@ -41,3 +41,8 @@ DM Sans para a interface e IBM Plex Mono para metadados. Voz direta, humana e op
 ## Área Canais — referência de acompanhamento de plataformas (2026-09)
 
 A captura enviada pelo utilizador é a referência visual para `/admin/canais`: o destino deve acompanhar plataformas de venda separadamente da visão geral, com escolha da plataforma, contexto do canal, estado de ligação e última sincronização, catálogo e pedidos recentes em painéis próprios. Reutilizar `social_connections`, `products` e `orders`; apresentar apenas estados reais. O catálogo base não equivale a catálogo sincronizado por plataforma, e um pedido registado não equivale a uma integração ativa. Não exibir estados fictícios, OAuth ou coleções sem suporte no backend.
+
+## Autenticação e ritmo da landing (2026-09)
+
+- **Autenticação:** um único ponto de marca por ecrã; formulário como foco; uma manchete específica por fluxo e apenas a instrução indispensável. Remover claims, listas e links duplicados do shell, sem remover estados/validações funcionais.
+- **Landing:** preservar “Livro & Mercado” e a paleta papel quente, carvão, sálvia e terracota, mas evitar grandes áreas consecutivas com o mesmo fundo. A secção de canais usa papel quente (`#f1eee7`) para separar a secção WhatsApp/sálvia dos painéis carvão; os cartões de campanha conservam os seus próprios contrastes.
