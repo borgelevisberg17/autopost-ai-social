@@ -1,5 +1,11 @@
-import { ReactNode, useEffect, useState } from "react";
-import { Link, NavLink, Navigate, useNavigate } from "react-router-dom";
+import { ReactNode, useEffect, useRef, useState } from "react";
+import {
+  Link,
+  NavLink,
+  Navigate,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import {
   Activity,
   Bell,
@@ -17,6 +23,7 @@ import {
   ListChecks,
   Megaphone,
   CreditCard,
+  MoreHorizontal,
   Search,
   Settings,
   Share2,
@@ -175,12 +182,9 @@ const mobileNav = [
     icon: Share2,
     label: "Canais",
   },
-  {
-    to: "/admin/config",
-    icon: Settings,
-    label: "Config.",
-  },
 ];
+
+const mobilePrimaryRoutes = new Set(mobileNav.map((item) => item.to));
 
 export function AdminLayout({
   title,
@@ -201,10 +205,14 @@ export function AdminLayout({
   } = useCompany();
   const { signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const moreTriggerRef = useRef<HTMLButtonElement>(null);
+  const moreDialogRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const handleShortcut = (event: KeyboardEvent) => {
@@ -237,6 +245,27 @@ export function AdminLayout({
   }, [company?.id]);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
+  const moreActive = !mobilePrimaryRoutes.has(location.pathname);
+
+  useEffect(() => {
+    if (!moreOpen) return;
+    const previouslyFocused =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+    const focusFrame = window.requestAnimationFrame(() =>
+      moreDialogRef.current?.focus(),
+    );
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMoreOpen(false);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => {
+      window.cancelAnimationFrame(focusFrame);
+      window.removeEventListener("keydown", closeOnEscape);
+      if (previouslyFocused?.isConnected) previouslyFocused.focus();
+    };
+  }, [moreOpen]);
 
   const markAllAsRead = async () => {
     if (!company) return;
@@ -300,7 +329,7 @@ export function AdminLayout({
       />
 
       {/* SIDEBAR */}
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-[252px] border-r border-[#e4e0d7] bg-[#faf9f4] text-[#202522] lg:flex lg:flex-col">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-[252px] border-r border-[#eeeae2] bg-[#faf9f4] text-[#202522] lg:flex lg:flex-col">
         {/* BRAND */}
         <div className="px-6 pb-5 pt-6">
           <Link
@@ -370,11 +399,11 @@ export function AdminLayout({
                         end
                         className={({ isActive }) =>
                           cn(
-                            "flex min-h-10 items-center gap-3 rounded-[4px] border-l-2 px-3 text-[13px] transition-colors",
+                            "flex min-h-10 items-center gap-3 rounded-[6px] px-3 text-[13px] transition-colors",
                             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2",
                             isActive
-                              ? "border-[#2c6457] bg-[#e7eadf] font-semibold text-[#202522]"
-                              : "border-transparent font-medium text-[#666e66] hover:bg-[#f0efe9] hover:text-[#202522]",
+                              ? "bg-[#e7eadf] font-semibold text-[#202522]"
+                              : "font-medium text-[#666e66] hover:bg-[#f0efe9] hover:text-[#202522]",
                           )
                         }
                       >
@@ -416,7 +445,10 @@ export function AdminLayout({
       {/* MAIN */}
       <main className="min-w-0 pb-[calc(76px+env(safe-area-inset-bottom))] lg:ml-[252px] lg:pb-0">
         {/* HEADER */}
-        <header className="sticky top-0 z-30 border-b border-[#e5e1d8] bg-[#f8f7f1]/95 backdrop-blur-sm">
+        <header
+          aria-label={`${title} — navegação do painel`}
+          className="sticky top-0 z-30 border-b border-[#eeeae2] bg-[#f8f7f1]/95 backdrop-blur-sm"
+        >
           <div className="mx-auto flex min-h-[68px] max-w-[1480px] items-center justify-between gap-3 px-4 sm:min-h-[76px] sm:px-7 lg:px-10">
             <div className="flex min-w-0 items-center gap-3">
               <img
@@ -426,9 +458,15 @@ export function AdminLayout({
                 className="h-8 w-8 shrink-0 lg:hidden"
               />
               <div className="min-w-0">
-                <h1 className="truncate font-serif text-[21px] font-medium tracking-[-0.03em] text-[#202522] sm:text-[25px]">
-                  {title}
-                </h1>
+                {title === "Configurações" ? (
+                  <h1 className="truncate font-serif text-[21px] font-medium tracking-[-0.03em] text-[#202522] sm:text-[25px]">
+                    {title}
+                  </h1>
+                ) : (
+                  <p className="hidden font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-[#858c83] lg:block">
+                    Espaço de trabalho
+                  </p>
+                )}
                 {companies.length > 1 ? (
                   <select
                     value={company.id}
@@ -564,13 +602,16 @@ export function AdminLayout({
         </header>
 
         {/* PAGE */}
-        <div className="mx-auto w-full max-w-[1480px] px-4 py-5 sm:px-7 sm:py-7 lg:px-10 lg:py-8">
+        <div className="admin-workspace mx-auto w-full max-w-[1480px] px-4 py-6 sm:px-7 sm:py-8 lg:px-10 lg:py-10">
           {children}
         </div>
       </main>
 
       {/* MOBILE HEADER / NAV */}
-      <nav className="fixed inset-x-0 bottom-0 pb-[env(safe-area-inset-bottom)] z-50 border-t border-[#e4e0d7] bg-[#fbfaf6]/95 shadow-[0_-8px_26px_rgba(32,37,34,0.08)] backdrop-blur-sm lg:hidden">
+      <nav
+        aria-label="Navegação principal no telemóvel"
+        className="fixed inset-x-0 bottom-0 z-50 border-t border-[#eeeae2] bg-[#fbfaf6]/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_26px_rgba(32,37,34,0.06)] backdrop-blur-sm lg:hidden"
+      >
         <div className="mx-auto grid h-[68px] max-w-lg grid-cols-6">
           {mobileNav.map((item) => {
             const Icon = item.icon;
@@ -608,8 +649,133 @@ export function AdminLayout({
               </NavLink>
             );
           })}
+          <button
+            type="button"
+            ref={moreTriggerRef}
+            aria-haspopup="dialog"
+            aria-expanded={moreOpen}
+            aria-label="Mais áreas do painel"
+            onClick={() => setMoreOpen((open) => !open)}
+            className={cn(
+              "flex min-w-0 flex-col items-center justify-center gap-1 px-1 text-[10px] font-medium transition-colors",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-inset",
+              moreActive || moreOpen ? "text-[#2c6457]" : "text-[#858c83]",
+            )}
+          >
+            <span
+              className={cn(
+                "grid h-7 w-10 place-items-center rounded-[7px] transition-colors",
+                (moreActive || moreOpen) && "bg-[#e7eadf]",
+              )}
+            >
+              <MoreHorizontal className="h-[18px] w-[18px]" strokeWidth={1.8} />
+            </span>
+            <span>Mais</span>
+          </button>
         </div>
       </nav>
+
+      {moreOpen && (
+        <div className="fixed inset-0 z-[60] lg:hidden">
+          <button
+            type="button"
+            aria-label="Fechar menu de áreas"
+            onClick={() => setMoreOpen(false)}
+            className="absolute inset-0 bg-[#202522]/25"
+          />
+          <section
+            role="dialog"
+            aria-modal="true"
+            tabIndex={-1}
+            ref={moreDialogRef}
+            aria-labelledby="mobile-more-title"
+            onKeyDown={(event) => {
+              if (event.key !== "Tab" || !moreDialogRef.current) return;
+              const focusable = Array.from(
+                moreDialogRef.current.querySelectorAll<HTMLElement>(
+                  'a[href], button:not([disabled]), select:not([disabled]), input:not([disabled])',
+                ),
+              );
+              if (focusable.length === 0) return;
+              const first = focusable[0];
+              const last = focusable[focusable.length - 1];
+              if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+              } else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+              }
+            }}
+            className="absolute inset-x-0 bottom-0 max-h-[82dvh] overflow-hidden rounded-t-[16px] border-t border-[#e7e3da] bg-[#fbfaf6] pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-[0_-16px_48px_rgba(32,37,34,0.14)]"
+          >
+            <div className="flex items-center justify-between px-5 pb-3 pt-5">
+              <div>
+                <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#747b73]">
+                  Vendora · painel
+                </p>
+                <h2
+                  id="mobile-more-title"
+                  className="mt-1 font-serif text-xl tracking-[-0.03em] text-[#202522]"
+                >
+                  Explorar áreas
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setMoreOpen(false)}
+                aria-label="Fechar menu de áreas"
+                className="grid h-10 w-10 place-items-center rounded-full text-[#5f625d] hover:bg-[#efede6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="max-h-[calc(82dvh-90px)] space-y-5 overflow-y-auto px-5 pb-3">
+              {navSections.map((section) => {
+                const items = section.items.filter(
+                  (item) => !mobilePrimaryRoutes.has(item.to),
+                );
+                if (items.length === 0) return null;
+                return (
+                  <section key={section.label}>
+                    <h3 className="mb-2 font-mono text-[9px] uppercase tracking-[0.14em] text-[#858c83]">
+                      {section.label}
+                    </h3>
+                    <div className="grid grid-cols-2 gap-2">
+                      {items.map((item) => {
+                        const Icon = item.icon;
+                        return (
+                          <NavLink
+                            key={item.to}
+                            to={item.to}
+                            onClick={() => setMoreOpen(false)}
+                            className={({ isActive }) =>
+                              cn(
+                                "flex min-h-12 items-center gap-3 rounded-[7px] px-3 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]",
+                                isActive
+                                  ? "bg-[#e7eadf] text-[#202522]"
+                                  : "bg-[#f1eee7] text-[#5f625d] hover:bg-[#ebe8df]",
+                              )
+                            }
+                          >
+                            <Icon
+                              className="h-4 w-4 shrink-0 text-[#2c6457]"
+                              strokeWidth={1.8}
+                            />
+                            <span className="min-w-0 truncate">
+                              {item.label}
+                            </span>
+                          </NavLink>
+                        );
+                      })}
+                    </div>
+                  </section>
+                );
+              })}
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   );
 }

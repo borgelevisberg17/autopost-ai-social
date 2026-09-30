@@ -27,7 +27,9 @@ import Channels from "./pages/admin/Channels";
 import Team from "./pages/admin/Team";
 import Activity from "./pages/admin/Activity";
 import Audit from "./pages/admin/Audit";
-import { RoadmapSurface } from "@/components/admin/RoadmapSurface";
+import Content from "./pages/admin/Content";
+import Automations from "./pages/admin/Automations";
+import Payments from "./pages/admin/Payments";
 
 import Store from "./pages/store/Store";
 import OrderStatus from "./pages/store/OrderStatus";
@@ -177,9 +179,9 @@ const App = () => (
               <Route path="/admin/equipa" element={<P><Team /></P>} />
               <Route path="/admin/atividade" element={<P><Activity /></P>} />
               <Route path="/admin/auditoria" element={<P><Audit /></P>} />
-              <Route path="/admin/conteudo" element={<P><RoadmapSurface eyebrow="Automação / Conteúdo" title="Conteúdo" description="Espaço para preparar, rever e acompanhar conteúdo por canal." backendNote="A base atual tem content_history e aprovações, mas não existe uma entidade de calendário com estados draft, scheduled, published e failed." capabilities={["Lista de rascunhos", "Filtros por canal", "Fluxo de aprovação"]} next="Adicionar scheduling persistente no backend antes de apresentar calendário ou publicação automática." /></P>} />
-              <Route path="/admin/automacoes" element={<P><RoadmapSurface eyebrow="Automação" title="Automações" description="Regras operacionais para reduzir trabalho repetitivo sem esconder o que o sistema executa." backendNote="O backend atual suporta agentes, runs, permissions e actions, mas não possui uma tabela de automações ou triggers configuráveis." capabilities={["Regras e triggers", "Histórico de execuções", "Permissões por ação"]} next="Criar o contrato de automações no backend antes de permitir edição e ativação." /></P>} />
-              <Route path="/admin/pagamentos" element={<P><RoadmapSurface eyebrow="Commerce / Pagamentos" title="Pagamentos" description="Estado de pagamento por pedido, separado de estado do pedido e fulfillment." backendNote="Os pedidos possuem payment_status no pipeline enriquecido, mas não existe uma entidade de pagamentos ou gateway configurado." capabilities={["Estado de pagamento", "Reconciliação", "Métodos de pagamento"]} next="Ligar um provedor de pagamentos e persistência própria antes de oferecer ações financeiras." /></P>} />
+              <Route path="/admin/conteudo" element={<P><Content /></P>} />
+              <Route path="/admin/automacoes" element={<P><Automations /></P>} />
+              <Route path="/admin/pagamentos" element={<P><Payments /></P>} />
 
               <Route path="*" element={<NotFound />} />
             </Routes>

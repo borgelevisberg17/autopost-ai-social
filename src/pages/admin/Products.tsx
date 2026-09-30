@@ -132,6 +132,7 @@ export default function Products() {
 
   const [items, setItems] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
@@ -155,6 +156,7 @@ export default function Products() {
     if (!company) return;
 
     setLoading(true);
+    setLoadError(null);
 
     const { data, error } = await supabase
       .from("products")
@@ -167,9 +169,10 @@ export default function Products() {
       });
 
     if (error) {
-      toast.error("Não foi possível carregar os produtos.");
+      setLoadError(error.message || "Não foi possível carregar os produtos.");
       setItems([]);
     } else {
+      setLoadError(null);
       setItems((data as Product[]) ?? []);
     }
 
@@ -274,10 +277,8 @@ export default function Products() {
 
   const selectedProducts = useMemo(
     () =>
-      items.filter((product) =>
-        selectedIds.includes(product.id),
-      ),
-    [items, selectedIds],
+      filtered.filter((product) => selectedIds.includes(product.id)),
+    [filtered, selectedIds],
   );
 
   const allVisibleSelected =
@@ -653,7 +654,13 @@ export default function Products() {
     toast.success("Produtos exportados.");
   };
 
+  const clearSelectionAnd = (change: () => void) => {
+    setSelectedIds([]);
+    change();
+  };
+
   const clearFilters = () => {
+    setSelectedIds([]);
     setQuery("");
     setFilter("all");
     setCategoryFilter("all");
@@ -721,45 +728,52 @@ export default function Products() {
           </div>
         </section>
 
+        {loadError && (
+          <div className="mb-6 flex flex-col gap-3 rounded-xl bg-[#fff4ed] px-4 py-4 text-sm text-[#7b3f24] shadow-sm ring-1 ring-[#f0c7ad] sm:flex-row sm:items-center sm:justify-between">
+            <p>Não foi possível carregar o catálogo. Os valores abaixo não representam dados atuais.</p>
+            <button type="button" onClick={load} className="min-h-10 shrink-0 bg-[#202522] px-4 text-sm font-semibold text-white hover:bg-neutral-800">Tentar novamente</button>
+          </div>
+        )}
+
         {/* SUMMARY FILTERS */}
 
-        <section className="mb-7 border-y border-[#ded9d0]">
+        <section className="mb-7 overflow-hidden rounded-xl bg-[#fffdf9] shadow-sm ring-1 ring-[#ebe7df]">
           <div className="grid grid-cols-2 sm:grid-cols-5">
             <SummaryFilter
               label="Todos"
-              value={stats.total}
+              value={loading || loadError ? "—" : stats.total}
               active={filter === "all"}
-              onClick={() => setFilter("all")}
+              onClick={() => clearSelectionAnd(() => setFilter("all"))}
             />
 
             <SummaryFilter
               label="Ativos"
-              value={stats.active}
+              value={loading || loadError ? "—" : stats.active}
               active={filter === "active"}
-              onClick={() => setFilter("active")}
+              onClick={() => clearSelectionAnd(() => setFilter("active"))}
             />
 
             <SummaryFilter
               label="Sem stock"
-              value={stats.out}
+              value={loading || loadError ? "—" : stats.out}
               active={filter === "out"}
-              onClick={() => setFilter("out")}
+              onClick={() => clearSelectionAnd(() => setFilter("out"))}
               warning={stats.out > 0}
             />
 
             <SummaryFilter
               label="Stock baixo"
-              value={stats.low}
+              value={loading || loadError ? "—" : stats.low}
               active={filter === "low"}
-              onClick={() => setFilter("low")}
+              onClick={() => clearSelectionAnd(() => setFilter("low"))}
               warning={stats.low > 0}
             />
 
             <SummaryFilter
               label="Promoções"
-              value={stats.promo}
+              value={loading || loadError ? "—" : stats.promo}
               active={filter === "promo"}
-              onClick={() => setFilter("promo")}
+              onClick={() => clearSelectionAnd(() => setFilter("promo"))}
             />
           </div>
         </section>
@@ -773,7 +787,7 @@ export default function Products() {
             <input
               value={query}
               onChange={(event) =>
-                setQuery(event.target.value)
+                clearSelectionAnd(() => setQuery(event.target.value))
               }
               placeholder="Pesquisar produto, SKU ou categoria..."
               className="min-h-11 w-full border border-[#c9c3b8] bg-[#fffdf9] pl-10 pr-10 text-sm text-[#202522] outline-none transition placeholder:text-[#a7aaa2] focus:border-neutral-700 focus:ring-1 focus:ring-neutral-700"
@@ -782,7 +796,7 @@ export default function Products() {
             {query && (
               <button
                 type="button"
-                onClick={() => setQuery("")}
+                onClick={() => clearSelectionAnd(() => setQuery(""))}
                 aria-label="Limpar pesquisa"
                 className="absolute right-3 top-1/2 grid h-6 w-6 -translate-y-1/2 place-items-center text-[#a7aaa2] hover:text-[#202522]"
               >
@@ -793,7 +807,7 @@ export default function Products() {
 
           <FilterSelect
             value={categoryFilter}
-            onChange={setCategoryFilter}
+            onChange={(value) => clearSelectionAnd(() => setCategoryFilter(value))}
             options={[
               { value: "all", label: "Todas as categorias" },
               ...categories.map((category) => ({
@@ -819,13 +833,14 @@ export default function Products() {
         {/* BULK ACTION BAR */}
 
         {selectedIds.length > 0 && (
-          <section className="mb-4 flex flex-col gap-3 border border-[#c9c3b8] bg-[#f5f5f2] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <section className="mb-4 flex flex-col gap-3 rounded-xl bg-[#f5f5f2] px-4 py-3 shadow-sm ring-1 ring-[#ebe7df] sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm font-medium text-[#202522]">
               {selectedIds.length}{" "}
               {selectedIds.length === 1
                 ? "produto selecionado"
                 : "produtos selecionados"}
             </p>
+            <p className="text-xs text-[#747b73]">A seleção é limpa ao mudar pesquisa, categoria ou filtros.</p>
 
             <div className="flex flex-wrap gap-2">
               <button
@@ -858,7 +873,7 @@ export default function Products() {
 
         {/* RESULTS */}
 
-        <section className="border-y border-[#ded9d0]">
+        <section className="overflow-hidden rounded-xl bg-[#fffdf9] shadow-sm ring-1 ring-[#ebe7df]">
           {/* DESKTOP TABLE */}
 
           <div className="hidden overflow-x-auto lg:block">
@@ -906,6 +921,8 @@ export default function Products() {
               <tbody>
                 {loading ? (
                   <LoadingRows />
+                ) : loadError ? (
+                  <tr><td colSpan={8}><div className="p-8"><p className="text-sm text-[#7b3f24]">O catálogo não está disponível.</p><button type="button" onClick={load} className="mt-3 min-h-10 bg-[#202522] px-4 text-sm font-semibold text-white">Tentar novamente</button></div></td></tr>
                 ) : filtered.length === 0 ? (
                   <EmptyProducts
                     hasFilters={
@@ -922,6 +939,7 @@ export default function Products() {
                       key={product.id}
                       product={product}
                       currency={company.currency}
+                      storeSlug={company.slug}
                       selected={selectedIds.includes(
                         product.id,
                       )}
@@ -965,14 +983,14 @@ export default function Products() {
 
           {/* MOBILE */}
 
-          <div className="lg:hidden">
+          <div className="lg:hidden p-3">
             {loading ? (
-              <div className="space-y-px">
+              <div className="space-y-3">
                 {Array.from({ length: 5 }).map(
                   (_, index) => (
                     <div
                       key={index}
-                      className="flex animate-pulse gap-3 border-b border-[#ebe7df] p-4"
+                      className="flex animate-pulse gap-3 rounded-xl bg-[#f5f5f2] p-4"
                     >
                       <div className="h-16 w-16 shrink-0 bg-[#ebe7df]" />
                       <div className="flex-1 space-y-2">
@@ -984,6 +1002,8 @@ export default function Products() {
                   ),
                 )}
               </div>
+            ) : loadError ? (
+              <div className="p-8"><p className="text-sm text-[#7b3f24]">O catálogo não está disponível.</p><button type="button" onClick={load} className="mt-3 min-h-10 bg-[#202522] px-4 text-sm font-semibold text-white">Tentar novamente</button></div>
             ) : filtered.length === 0 ? (
               <div className="p-8">
                 <EmptyProductsContent
@@ -1002,6 +1022,7 @@ export default function Products() {
                   key={product.id}
                   product={product}
                   currency={company.currency}
+                  storeSlug={company.slug}
                   selected={selectedIds.includes(
                     product.id,
                   )}
@@ -1155,7 +1176,7 @@ function SummaryFilter({
   onClick,
 }: {
   label: string;
-  value: number;
+  value: number | string;
   active: boolean;
   warning?: boolean;
   onClick: () => void;
@@ -1183,7 +1204,7 @@ function SummaryFilter({
           {label}
         </span>
 
-        {warning && value > 0 && (
+        {warning && typeof value === "number" && value > 0 && (
           <span className="h-1.5 w-1.5 rounded-[7px] bg-black" />
         )}
       </div>
@@ -1241,6 +1262,7 @@ function FilterSelect({
 function ProductRow({
   product,
   currency,
+  storeSlug,
   selected,
   menuOpen,
   onSelect,
@@ -1254,6 +1276,7 @@ function ProductRow({
 }: {
   product: Product;
   currency: string;
+  storeSlug: string;
   selected: boolean;
   menuOpen: boolean;
   onSelect: () => void;
@@ -1366,7 +1389,7 @@ function ProductRow({
             onClick={() =>
               onStockChange(product.stock - 1)
             }
-            className="grid h-6 w-6 place-items-center border border-[#ded9d0] text-[#747b73] hover:border-neutral-400 hover:text-[#202522] disabled:cursor-not-allowed disabled:opacity-30"
+            className="grid h-10 w-10 place-items-center border border-[#ded9d0] text-[#747b73] hover:border-neutral-400 hover:text-[#202522] disabled:cursor-not-allowed disabled:opacity-30"
             aria-label={`Diminuir stock de ${product.name}`}
           >
             −
@@ -1386,7 +1409,7 @@ function ProductRow({
             onClick={() =>
               onStockChange(product.stock + 1)
             }
-            className="grid h-6 w-6 place-items-center border border-[#ded9d0] text-[#747b73] hover:border-neutral-400 hover:text-[#202522]"
+            className="grid h-10 w-10 place-items-center border border-[#ded9d0] text-[#747b73] hover:border-neutral-400 hover:text-[#202522]"
             aria-label={`Aumentar stock de ${product.name}`}
           >
             +
@@ -1427,7 +1450,7 @@ function ProductRow({
           type="button"
           onClick={onMenu}
           aria-label={`Ações para ${product.name}`}
-          className="grid h-8 w-8 place-items-center text-[#a7aaa2] hover:bg-[#ebe7df] hover:text-[#202522]"
+          className="grid h-10 w-10 place-items-center text-[#a7aaa2] hover:bg-[#ebe7df] hover:text-[#202522]"
         >
           <MoreHorizontal className="h-4 w-4" />
         </button>
@@ -1435,6 +1458,7 @@ function ProductRow({
         {menuOpen && (
           <ProductMenu
             product={product}
+            storeSlug={storeSlug}
             onEdit={onEdit}
             onToggle={onToggle}
             onDelete={onDelete}
@@ -1450,6 +1474,7 @@ function ProductRow({
 function MobileProduct({
   product,
   currency,
+  storeSlug,
   selected,
   menuOpen,
   onSelect,
@@ -1463,6 +1488,7 @@ function MobileProduct({
 }: {
   product: Product;
   currency: string;
+  storeSlug: string;
   selected: boolean;
   menuOpen: boolean;
   onSelect: () => void;
@@ -1479,7 +1505,7 @@ function MobileProduct({
   return (
     <article
       className={cn(
-        "relative border-b border-[#ebe7df] p-4",
+        "relative mb-3 rounded-xl bg-[#fffdf9] p-4 shadow-sm ring-1 ring-[#ebe7df]",
         selected && "bg-[#fafafa]",
       )}
     >
@@ -1605,7 +1631,8 @@ function MobileProduct({
           onClick={() =>
             onStockChange(product.stock - 1)
           }
-          className="grid h-7 w-7 place-items-center border border-[#ded9d0] text-[#747b73] disabled:opacity-30"
+          className="grid h-10 w-10 place-items-center border border-[#ded9d0] text-[#747b73] disabled:opacity-30"
+          aria-label={`Diminuir stock de ${product.name}`}
         >
           −
         </button>
@@ -1619,7 +1646,8 @@ function MobileProduct({
           onClick={() =>
             onStockChange(product.stock + 1)
           }
-          className="grid h-7 w-7 place-items-center border border-[#ded9d0] text-[#747b73]"
+          className="grid h-10 w-10 place-items-center border border-[#ded9d0] text-[#747b73]"
+          aria-label={`Aumentar stock de ${product.name}`}
         >
           +
         </button>
@@ -1630,6 +1658,7 @@ function MobileProduct({
 
 function ProductMenu({
   product,
+  storeSlug,
   mobile,
   onEdit,
   onToggle,
@@ -1638,6 +1667,7 @@ function ProductMenu({
   onClose,
 }: {
   product: Product;
+  storeSlug: string;
   mobile?: boolean;
   onEdit: () => void;
   onToggle: () => void;
@@ -1690,7 +1720,7 @@ function ProductMenu({
 
       {product.active && (
         <a
-          href={`/loja/${product.company_id}`}
+          href={`/loja/${storeSlug}`}
           target="_blank"
           rel="noreferrer"
           onClick={onClose}
@@ -1799,7 +1829,7 @@ function ProductEditor({
     .filter((value) => /^https:\/\//i.test(value));
 
   return (
-    <div className="fixed inset-0 z-[90] bg-black/45">
+    <div className="fixed inset-0 z-[90] bg-black/45" role="dialog" aria-modal="true" aria-labelledby="product-editor-title">
       <div className="absolute inset-y-0 right-0 flex w-full max-w-2xl flex-col bg-[#fffdf9] shadow-2xl">
         <header className="flex shrink-0 items-center justify-between border-b border-[#ded9d0] px-5 py-4 sm:px-7">
           <div>
@@ -1807,7 +1837,7 @@ function ProductEditor({
               Catálogo
             </p>
 
-            <h2 className="mt-1 text-lg font-semibold tracking-tight text-[#202522]">
+            <h2 id="product-editor-title" className="mt-1 text-lg font-semibold tracking-tight text-[#202522]">
               {editing
                 ? "Editar produto"
                 : "Novo produto"}
@@ -2160,7 +2190,7 @@ function ProductEditor({
           </div>
         </div>
 
-        <footer className="flex shrink-0 items-center justify-end gap-2 border-t border-[#ded9d0] bg-[#fffdf9] px-5 py-4 sm:px-7">
+        <footer className="flex shrink-0 items-center justify-end gap-2 border-t border-[#ded9d0] bg-[#fffdf9] px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:px-7">
           <button
             type="button"
             onClick={onClose}

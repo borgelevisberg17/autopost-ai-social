@@ -120,6 +120,8 @@ export default function Overview() {
   const [lowStock, setLowStock] = useState<Product[]>([]);
   const [period, setPeriod] = useState<Period>("30d");
   const [loading, setLoading] = useState(true);
+  const [dataError, setDataError] = useState<string | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     if (!company) return;
@@ -128,6 +130,7 @@ export default function Overview() {
 
     async function load() {
       setLoading(true);
+      setDataError(null);
 
       const [ordersResult, productsResult] = await Promise.all([
         supabase
@@ -149,6 +152,15 @@ export default function Overview() {
 
       if (cancelled) return;
 
+      if (ordersResult.error || productsResult.error) {
+        setDataError("Não foi possível carregar os dados do resumo.");
+        setOrders([]);
+        setLowStock([]);
+        setItems([]);
+        setLoading(false);
+        return;
+      }
+
       const orderList = (ordersResult.data as Order[]) ?? [];
 
       setOrders(orderList);
@@ -160,10 +172,16 @@ export default function Overview() {
         .slice(0, 500);
 
       if (validOrderIds.length > 0) {
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from("order_items")
           .select("product_name,quantity,unit_price,order_id")
           .in("order_id", validOrderIds);
+
+        if (error) {
+          setDataError("Não foi possível carregar os itens dos pedidos.");
+          setLoading(false);
+          return;
+        }
 
         if (!cancelled) {
           setItems((data as Item[]) ?? []);
@@ -180,7 +198,7 @@ export default function Overview() {
     return () => {
       cancelled = true;
     };
-  }, [company]);
+  }, [company, refreshKey]);
 
   const stats = useMemo(() => {
     const now = new Date();
@@ -324,16 +342,12 @@ export default function Overview() {
 
     const revenueChange =
       previousRevenue === 0
-        ? revenue > 0
-          ? 100
-          : 0
+        ? null
         : ((revenue - previousRevenue) / previousRevenue) * 100;
 
     const orderChange =
       previousOrders.length === 0
-        ? currentOrders.length > 0
-          ? 100
-          : 0
+        ? null
         : ((currentOrders.length - previousOrders.length) /
             previousOrders.length) *
           100;
@@ -365,19 +379,36 @@ export default function Overview() {
 
   const currency = company.currency;
 
+  if (dataError) {
+    return (
+      <AdminLayout title="Visão geral">
+        <div className="flex min-h-[360px] flex-col items-center justify-center px-5 text-center">
+          <p className="text-sm font-medium text-[#5f625d]">{dataError}</p>
+          <button
+            type="button"
+            onClick={() => setRefreshKey((current) => current + 1)}
+            className="mt-4 text-xs font-semibold text-[#2c6457] underline underline-offset-4 hover:text-[#202522]"
+          >
+            Tentar novamente
+          </button>
+        </div>
+      </AdminLayout>
+    );
+  }
+
   return (
     <AdminLayout title="Visão geral">
       <div className="space-y-5 sm:space-y-6">
         {/* INTRO */}
-        <section className="flex flex-col justify-between gap-3 border-b border-[#e4e0d7] pb-5 sm:flex-row sm:items-end sm:pb-6">
+        <section className="flex flex-col justify-between gap-3 pb-2 sm:flex-row sm:items-end">
           <div>
             <p className="mb-2 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-[#718071]">
               Painel de controlo
             </p>
 
-            <h2 className="font-serif text-[30px] font-medium leading-tight tracking-[-0.045em] text-[#202522] sm:text-[38px]">
+            <h1 className="font-serif text-[30px] font-medium leading-tight tracking-[-0.045em] text-[#202522] sm:text-[38px]">
               Olá, {company.name}.
-            </h2>
+            </h1>
 
             <p className="mt-2 max-w-xl text-[13px] leading-5 text-[#697168] sm:text-sm sm:leading-6">
               Aqui está o estado atual da sua operação e o que merece atenção.
@@ -438,7 +469,7 @@ export default function Overview() {
                 </p>
 
                 <h2 className="mt-1 font-serif text-lg font-semibold tracking-[-0.03em] text-[#202522]">
-                  Receita e pedidos
+                  Receita por dia
                 </h2>
               </div>
 
@@ -920,50 +951,6 @@ export default function Overview() {
           </div>
         </section>
 
-        {/* STORE STATUS */}
-        <section>
-          <div className="mb-3 flex items-end justify-between gap-3">
-            <div>
-              <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#7f897e]">
-                Hoje / Ritmo da operação
-              </p>
-              <h2 className="mt-1 text-base font-semibold tracking-[-0.03em] text-[#202522] sm:text-lg">
-                Resumo do dia
-              </h2>
-            </div>
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <StoreStat
-              label="Pedidos hoje"
-              value={String(stats.todayOrders)}
-              icon={ShoppingBag}
-              loading={loading}
-            />
-
-            <StoreStat
-              label="Receita hoje"
-              value={formatMoney(stats.todayRevenue, currency)}
-              icon={Wallet}
-              loading={loading}
-            />
-
-            <StoreStat
-              label="Stock baixo"
-              value={String(lowStock.length)}
-              icon={AlertTriangle}
-              warning={lowStock.length > 0}
-              loading={loading}
-            />
-
-            <StoreStat
-              label="Cancelados"
-              value={String(stats.cancelledOrders.length)}
-              icon={XCircle}
-              loading={loading}
-            />
-          </div>
-        </section>
       </div>
     </AdminLayout>
   );
@@ -979,12 +966,12 @@ function Metric({
 }: {
   label: string;
   value: string;
-  change?: number;
+  change?: number | null;
   icon: typeof Wallet;
   loading: boolean;
   warning?: boolean;
 }) {
-  const positive = change !== undefined && change >= 0;
+  const positive = change !== undefined && change !== null && change >= 0;
 
   return (
     <div className="min-w-0 rounded-[5px] border border-[#e4e0d7] bg-[#fffdf9] p-4 shadow-[0_2px_10px_rgba(32,37,34,0.025)] sm:p-5">
@@ -1012,22 +999,26 @@ function Metric({
 
       {change !== undefined && !loading && (
         <div className="mt-2 flex items-center gap-1 text-[11px]">
-          {positive ? (
-            <ArrowUpRight className="h-3.5 w-3.5" />
+          {change === null ? (
+            <span className="text-[#a7aaa2]">sem base comparável</span>
           ) : (
-            <ArrowDownRight className="h-3.5 w-3.5" />
+            <>
+              {positive ? (
+                <ArrowUpRight className="h-3.5 w-3.5" />
+              ) : (
+                <ArrowDownRight className="h-3.5 w-3.5" />
+              )}
+              <span
+                className={cn(
+                  "font-semibold",
+                  positive ? "text-[#2c6457]" : "text-[#bd592f]",
+                )}
+              >
+                {Math.abs(change).toFixed(1)}%
+              </span>
+              <span className="text-[#a7aaa2]">vs. período anterior</span>
+            </>
           )}
-
-          <span
-            className={cn(
-              "font-semibold",
-              positive ? "text-[#2c6457]" : "text-[#bd592f]",
-            )}
-          >
-            {Math.abs(change).toFixed(1)}%
-          </span>
-
-          <span className="text-[#a7aaa2]">vs. período anterior</span>
         </div>
       )}
 

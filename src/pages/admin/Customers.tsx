@@ -45,13 +45,17 @@ type OrderRecord = {
   channel: string;
 };
 
+function channelKey(channel: string | null) {
+  const lower = channel?.toLowerCase();
+  return !lower || lower === "website" || lower === "store" ? "website" : lower;
+}
+
 function channelLabel(channel: string | null) {
-  if (!channel) return "Loja";
-  const lower = channel.toLowerCase();
+  const lower = channelKey(channel);
   if (lower === "whatsapp") return "WhatsApp";
   if (lower === "instagram") return "Instagram";
   if (lower === "facebook") return "Facebook";
-  if (lower === "website" || lower === "store") return "Website";
+  if (lower === "website") return "Loja";
   return channel;
 }
 
@@ -78,6 +82,7 @@ export default function Customers() {
 
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [query, setQuery] = useState("");
   const [channelFilter, setChannelFilter] = useState("all");
   const [sortBy, setSortBy] = useState<"spent" | "orders" | "recent">("spent");
@@ -85,6 +90,8 @@ export default function Customers() {
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [customerOrders, setCustomerOrders] = useState<OrderRecord[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
+  const [customerOrdersError, setCustomerOrdersError] = useState(false);
+  const [ordersRefreshKey, setOrdersRefreshKey] = useState(0);
 
   const [newModalOpen, setNewModalOpen] = useState(false);
   const [formName, setFormName] = useState("");
@@ -98,6 +105,7 @@ export default function Customers() {
     if (!company) return;
 
     setLoading(true);
+    setLoadError(false);
 
     // 1. Fetch from customers table
     const { data: dbCustomers, error } = await supabase
@@ -108,16 +116,27 @@ export default function Customers() {
 
     if (error) {
       console.error("Error fetching customers table:", error);
+      setLoadError(true);
+      setCustomers([]);
+      setLoading(false);
+      return;
     }
 
     let list: Customer[] = (dbCustomers as Customer[]) ?? [];
 
     // 2. Derive/Aggregate from orders table to include historical buyers not yet synced
-    const { data: ordersData } = await supabase
+    const { data: ordersData, error: ordersError } = await supabase
       .from("orders")
       .select("id, customer_name, customer_email, customer_phone, total, created_at, channel, status")
       .eq("company_id", company.id)
       .order("created_at", { ascending: false });
+
+    if (ordersError) {
+      setLoadError(true);
+      setCustomers([]);
+      setLoading(false);
+      return;
+    }
 
     if (ordersData && ordersData.length > 0) {
       const derivedMap = new Map<string, Customer>();
@@ -177,6 +196,9 @@ export default function Customers() {
   useEffect(() => {
     if (!selectedCustomer || !company) return;
 
+    let cancelled = false;
+    setCustomerOrders([]);
+    setCustomerOrdersError(false);
     async function loadCustomerOrders() {
       setLoadingOrders(true);
 
@@ -194,13 +216,18 @@ export default function Customers() {
         queryFilter.eq("customer_name", selectedCustomer.name);
       }
 
-      const { data } = await queryFilter.limit(50);
+      const { data, error } = await queryFilter.limit(50);
+      if (cancelled) return;
       setCustomerOrders((data as OrderRecord[]) ?? []);
+      setCustomerOrdersError(Boolean(error));
       setLoadingOrders(false);
     }
 
-    loadCustomerOrders();
-  }, [selectedCustomer, company]);
+    void loadCustomerOrders();
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedCustomer, company, ordersRefreshKey]);
 
   const stats = useMemo(() => {
     const totalSpent = customers.reduce((sum, c) => sum + Number(c.total_spent), 0);
@@ -220,7 +247,7 @@ export default function Customers() {
 
     return customers
       .filter((c) => {
-        if (channelFilter !== "all" && (c.channel || "website") !== channelFilter) {
+        if (channelFilter !== "all" && channelKey(c.channel) !== channelFilter) {
           return false;
         }
 
@@ -332,15 +359,15 @@ export default function Customers() {
     <AdminLayout title="Clientes">
       <div className="space-y-8">
         {/* HEADER */}
-        <section className="flex flex-col gap-5 border-b border-[#ded9d0] pb-7 lg:flex-row lg:items-end lg:justify-between">
+        <section className="flex flex-col gap-5 pb-2 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#a7aaa2]">
               Relacionamento Comercial
             </p>
 
-            <h2 className="text-2xl font-semibold tracking-[-0.045em] sm:text-3xl">
+            <h1 className="font-serif text-[clamp(2rem,4vw,2.8rem)] font-medium leading-[1.04] tracking-[-0.045em] text-[#202522]">
               Clientes
-            </h2>
+            </h1>
 
             <p className="mt-2 text-sm leading-6 text-[#747b73]">
               Compreenda quem compra na sua loja e o histórico de cada cliente.
@@ -451,6 +478,17 @@ export default function Customers() {
                 <div key={i} className="h-12 w-full animate-pulse bg-[#ebe7df]" />
               ))}
             </div>
+          ) : loadError ? (
+            <div className="flex min-h-[220px] flex-col items-center justify-center px-5 text-center">
+              <p className="text-sm font-medium text-[#5f625d]">Não foi possível carregar os clientes.</p>
+              <button
+                type="button"
+                onClick={loadData}
+                className="mt-4 text-xs font-semibold text-[#2c6457] underline underline-offset-4"
+              >
+                Tentar novamente
+              </button>
+            </div>
           ) : filteredCustomers.length === 0 ? (
             <div className="py-16 text-center">
               <Users className="mx-auto h-8 w-8 text-[#c9c3b8]" />
@@ -460,7 +498,33 @@ export default function Customers() {
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <>
+              <div className="divide-y divide-[#eeeae2] lg:hidden">
+                {filteredCustomers.map((customer) => (
+                  <button
+                    key={customer.id}
+                    type="button"
+                    onClick={() => setSelectedCustomer(customer)}
+                    className="flex w-full items-start gap-3 px-4 py-4 text-left transition hover:bg-[#f1eee7]"
+                  >
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[7px] bg-[#202522] text-xs font-semibold text-white">
+                      {customer.name.slice(0, 2).toUpperCase()}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-semibold text-[#202522]">{customer.name}</span>
+                      <span className="mt-1 block truncate text-xs text-[#747b73]">
+                        {customer.phone || customer.email || "Sem contacto"}
+                      </span>
+                      <span className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#747b73]">
+                        <span>{customer.orders_count} {customer.orders_count === 1 ? "pedido" : "pedidos"}</span>
+                        <span className="font-semibold text-[#202522]">{formatMoney(customer.total_spent, currency)}</span>
+                      </span>
+                    </span>
+                    <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-[#c9c3b8]" />
+                  </button>
+                ))}
+              </div>
+              <div className="hidden overflow-x-auto lg:block">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-[#ded9d0] bg-[#f1eee7]/50 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#a7aaa2]">
@@ -538,7 +602,8 @@ export default function Customers() {
                   ))}
                 </tbody>
               </table>
-            </div>
+              </div>
+            </>
           )}
         </section>
       </div>
@@ -632,6 +697,17 @@ export default function Customers() {
 
                 {loadingOrders ? (
                   <p className="text-xs text-[#a7aaa2]">A carregar pedidos...</p>
+                ) : customerOrdersError ? (
+                  <div>
+                    <p className="text-xs text-[#a44d2e]">Não foi possível carregar o histórico.</p>
+                    <button
+                      type="button"
+                      onClick={() => setOrdersRefreshKey((current) => current + 1)}
+                      className="mt-2 text-xs font-semibold text-[#2c6457] underline underline-offset-4"
+                    >
+                      Tentar novamente
+                    </button>
+                  </div>
                 ) : customerOrders.length === 0 ? (
                   <p className="text-xs text-[#a7aaa2]">Nenhum pedido efetuado ainda.</p>
                 ) : (

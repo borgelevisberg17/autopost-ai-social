@@ -120,16 +120,21 @@ function statusFor(
   channel: ChannelDefinition,
   connection?: Connection,
   connectionError = false,
+  connectionLoading = false,
 ) {
   if (channel.id === "website") {
     return { label: "Loja pública", tone: "positive" as const };
+  }
+
+  if (connectionLoading) {
+    return { label: "A verificar ligação", tone: "neutral" as const };
   }
 
   if (connectionError) {
     return { label: "Estado indisponível", tone: "warning" as const };
   }
 
-  if (connection?.status === "connected") {
+  if (connection?.status.toLowerCase() === "connected") {
     return { label: "Ligado", tone: "positive" as const };
   }
 
@@ -310,6 +315,7 @@ export default function Channels() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [orderCount, setOrderCount] = useState(0);
   const [connectionsError, setConnectionsError] = useState(false);
+  const [connectionsLoading, setConnectionsLoading] = useState(true);
   const [productsError, setProductsError] = useState(false);
   const [ordersError, setOrdersError] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -334,8 +340,11 @@ export default function Channels() {
     selectedChannel,
     selectedConnection,
     connectionsError,
+    connectionsLoading,
   );
   const currency = company?.currency || "EUR";
+  const usesCentralStoreData = selectedProvider !== "website";
+  const ordersSourceLabel = usesCentralStoreData ? "Loja Vendora" : "Loja online";
 
   const filteredProducts = useMemo(() => {
     const search = productQuery.trim().toLocaleLowerCase("pt");
@@ -355,6 +364,7 @@ export default function Channels() {
 
     async function load() {
       setLoading(true);
+      setConnectionsLoading(true);
       const [connectionResult, productResult] = await Promise.all([
         supabase
           .from("social_connections")
@@ -388,6 +398,7 @@ export default function Channels() {
         setProducts((productResult.data as Product[]) ?? []);
       }
 
+      setConnectionsLoading(false);
       setLoading(false);
     }
 
@@ -415,8 +426,6 @@ export default function Channels() {
 
       if (selectedProvider === "website") {
         query = query.in("channel", ["website", "store"]);
-      } else {
-        query = query.ilike("channel", selectedProvider);
       }
 
       const { data, count, error } = await query
@@ -426,7 +435,7 @@ export default function Channels() {
       if (cancelled) return;
 
       if (error) {
-        toast.error("Não foi possível carregar os pedidos deste canal.");
+        toast.error("Não foi possível carregar os pedidos da loja.");
         setOrdersError(true);
         setOrders([]);
         setOrderCount(0);
@@ -469,9 +478,19 @@ export default function Channels() {
   const selectedPlatformIsActive: boolean | null =
     selectedProvider === "website"
       ? true
-      : connectionsError
+      : connectionsLoading || connectionsError
         ? null
-        : selectedConnection?.status === "connected";
+        : selectedConnection?.status.toLowerCase() === "connected";
+  const selectedPlatformNeedsAttention =
+    selectedProvider !== "website" &&
+    !connectionsLoading &&
+    !connectionsError &&
+    Boolean(
+      selectedConnection &&
+        ["error", "expired", "failed", "revoked"].includes(
+          selectedConnection.status.toLowerCase(),
+        ),
+    );
   const Icon = selectedChannel.icon;
 
   return (
@@ -495,14 +514,14 @@ export default function Channels() {
       }
     >
       <div className="space-y-5 sm:space-y-6">
-        <section className="flex flex-col justify-between gap-3 border-b border-[#e4e0d7] pb-5 sm:flex-row sm:items-end sm:pb-6">
+        <section className="flex flex-col justify-between gap-3 pb-2 sm:flex-row sm:items-end">
           <div>
             <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.16em] text-[#718071]">
               Plataformas / Distribuição
             </p>
-            <h2 className="font-serif text-[29px] font-medium leading-tight tracking-[-0.045em] text-[#202522] sm:text-[37px]">
-              Acompanhe os seus canais.
-            </h2>
+            <h1 className="font-serif text-[clamp(2rem,4vw,2.8rem)] font-medium leading-[1.04] tracking-[-0.045em] text-[#202522]">
+              Plataformas de venda
+            </h1>
             <p className="mt-2 max-w-2xl text-[13px] leading-5 text-[#697168] sm:text-sm sm:leading-6">
               Estado das plataformas, catálogo da loja e pedidos por origem num
               só lugar.
@@ -513,68 +532,144 @@ export default function Channels() {
           </span>
         </section>
 
-        <section
-          aria-label="Selecionar plataforma"
-          className="grid grid-cols-2 gap-2 sm:grid-cols-4"
-        >
-          {CHANNELS.map((channel) => {
-            const ChannelIcon = channel.icon;
-            const connection = connectionMap.get(channel.id);
-            const state = statusFor(channel, connection, connectionsError);
-            const selected = selectedProvider === channel.id;
+        <section aria-label="Selecionar plataforma" className="space-y-4">
+          <div>
+            <div className="mb-2 flex items-end justify-between gap-3">
+              <div>
+                <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#7f897e]">
+                  Canal próprio
+                </p>
+                <p className="mt-1 text-xs text-[#697168]">
+                  A operação da sua loja online, separada das plataformas-alvo.
+                </p>
+              </div>
+              <span className="text-[10px] text-[#858c83]">Website</span>
+            </div>
+            {(() => {
+              const channel = CHANNELS[0];
+              const ChannelIcon = channel.icon;
+              const selected = selectedProvider === channel.id;
 
-            return (
-              <button
-                key={channel.id}
-                type="button"
-                aria-pressed={selected}
-                onClick={() => {
-                  setSelectedProvider(channel.id);
-                  setActiveTab("products");
-                }}
-                className={cn(
-                  "min-w-0 rounded-[4px] border p-3 text-left transition sm:p-3.5",
-                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]",
-                  selected
-                    ? "border-[#aebba9] bg-[#edf0e8] shadow-[inset_0_0_0_1px_#aebba9]"
-                    : "border-[#e4e0d7] bg-[#fffdf9] hover:border-[#c9d0c5] hover:bg-white",
-                )}
-              >
-                <span className="flex items-center gap-2.5">
-                  <span
-                    className={cn(
-                      "grid h-9 w-9 shrink-0 place-items-center rounded-full",
-                      channel.tone,
-                    )}
-                  >
-                    <ChannelIcon className="h-4 w-4" strokeWidth={1.8} />
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block truncate text-xs font-semibold text-[#202522]">
-                      {channel.label}
-                    </span>
+              return (
+                <button
+                  type="button"
+                  aria-pressed={selected}
+                  onClick={() => {
+                    setSelectedProvider(channel.id);
+                    setActiveTab("products");
+                  }}
+                  className={cn(
+                    "flex min-h-[76px] w-full items-center justify-between gap-4 border-l-4 px-4 py-3 text-left transition sm:px-5",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]",
+                    selected
+                      ? "border-[#2c6457] bg-[#edf0e8]"
+                      : "border-[#d9dfd3] bg-[#f8f7f1] hover:border-[#2c6457] hover:bg-[#f1f3ed]",
+                  )}
+                >
+                  <span className="flex min-w-0 items-center gap-3">
                     <span
                       className={cn(
-                        "mt-1 block truncate text-[10px]",
-                        state.tone === "positive"
-                          ? "text-[#2c6457]"
-                          : state.tone === "warning"
-                            ? "text-[#a44d2e]"
-                            : "text-[#858c83]",
+                        "grid h-10 w-10 shrink-0 place-items-center rounded-full",
+                        channel.tone,
                       )}
                     >
-                      {state.label}
+                      <ChannelIcon className="h-[18px] w-[18px]" strokeWidth={1.8} />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block truncate font-serif text-base font-semibold text-[#202522]">
+                        {channel.label}
+                      </span>
+                      <span className="mt-0.5 block truncate text-[11px] text-[#697168]">
+                        {channel.description}
+                      </span>
                     </span>
                   </span>
-                </span>
-              </button>
-            );
-          })}
+                  <span className="shrink-0 text-[10px] font-medium text-[#2c6457]">
+                    Loja pública
+                  </span>
+                </button>
+              );
+            })()}
+          </div>
+
+          <div className="border-t border-[#e4e0d7] pt-4">
+            <div className="mb-2 flex items-end justify-between gap-3">
+              <div>
+                <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#7f897e]">
+                  Plataformas-alvo
+                </p>
+                <p className="mt-1 text-xs text-[#697168]">
+                  Destinos externos para distribuição, quando houver ligação disponível.
+                </p>
+              </div>
+              <span className="text-[10px] text-[#858c83]">3 destinos</span>
+            </div>
+            <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-3">
+              {CHANNELS.slice(1).map((channel) => {
+                const ChannelIcon = channel.icon;
+                const connection = connectionMap.get(channel.id);
+                const state = statusFor(
+                  channel,
+                  connection,
+                  connectionsError,
+                  connectionsLoading,
+                );
+                const selected = selectedProvider === channel.id;
+
+                return (
+                  <button
+                    key={channel.id}
+                    type="button"
+                    aria-pressed={selected}
+                    onClick={() => {
+                      setSelectedProvider(channel.id);
+                      setActiveTab("products");
+                    }}
+                    className={cn(
+                      "min-w-0 border-l-2 px-3 py-3 text-left transition sm:p-3.5",
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]",
+                      selected
+                        ? "border-[#ad6b43] bg-[#f1f2eb]"
+                        : "border-[#d9dfd3] bg-[#fffdf9] hover:border-[#ad6b43] hover:bg-[#f8f7f1]",
+                    )}
+                  >
+                    <span className="flex items-center gap-2.5">
+                      <span
+                        className={cn(
+                          "grid h-8 w-8 shrink-0 place-items-center rounded-full",
+                          channel.tone,
+                        )}
+                      >
+                        <ChannelIcon className="h-3.5 w-3.5" strokeWidth={1.8} />
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block truncate text-xs font-semibold text-[#202522]">
+                          {channel.label}
+                        </span>
+                        <span
+                          className={cn(
+                            "mt-1 block truncate text-[10px]",
+                            state.tone === "positive"
+                              ? "text-[#2c6457]"
+                              : state.tone === "warning"
+                                ? "text-[#a44d2e]"
+                                : "text-[#858c83]",
+                          )}
+                        >
+                          {state.label}
+                        </span>
+                      </span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </section>
 
         <section className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_300px]">
           <div className="min-w-0 space-y-4">
-            <article className="rounded-[5px] border border-[#e4e0d7] bg-[#fffdf9] p-4 shadow-[0_2px_10px_rgba(32,37,34,0.025)] sm:p-5">
+            <article className="border-y border-[#e4e0d7] bg-[#fffdf9] py-4 sm:py-5">
               <div className="mb-4 flex items-center gap-2 text-[10px] text-[#858c83]">
                 <Link
                   to="/admin/canais"
@@ -616,7 +711,9 @@ export default function Channels() {
                         statusClass(selectedStatus.tone),
                       )}
                     >
-                      {selectedStatus.tone === "positive" ? (
+                      {selectedProvider !== "website" && connectionsLoading ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : selectedStatus.tone === "positive" ? (
                         <Check className="h-3 w-3" />
                       ) : (
                         <CircleAlert className="h-3 w-3" />
@@ -627,10 +724,10 @@ export default function Channels() {
                       {connectionsError && selectedProvider !== "website"
                         ? "Estado de sincronização indisponível"
                         : selectedConnection?.last_synced_at
-                          ? `Última sincronização ${formatSync(selectedConnection.last_synced_at)}`
+                          ? `Última sincronização registada ${formatSync(selectedConnection.last_synced_at)}`
                           : selectedProvider === "website"
                             ? "Loja pública da Vendora"
-                            : "Sem sincronização registada"}
+                            : "Nenhuma sincronização registada"}
                     </p>
                   </div>
                   {selectedProvider === "website" ? (
@@ -697,7 +794,7 @@ export default function Channels() {
                 <div className="mb-4 flex flex-col justify-between gap-3 border-b border-[#ece8df] pb-3 sm:flex-row sm:items-end">
                   <div>
                     <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#7f897e]">
-                      Catálogo central
+                      {usesCentralStoreData ? "Loja / Empresa" : "Catálogo central"}
                     </p>
                     <h2 className="mt-1 font-serif text-lg font-semibold tracking-[-0.03em] text-[#202522] sm:text-xl">
                       Produtos da loja
@@ -705,7 +802,7 @@ export default function Channels() {
                     <p className="mt-1 text-[11px] text-[#858c83]">
                       {loading
                         ? "A carregar catálogo..."
-                        : `${products.length} produtos no catálogo Vendora`}
+                        : `${products.length} produtos no catálogo da loja Vendora`}
                     </p>
                   </div>
                   <Link
@@ -724,9 +821,9 @@ export default function Channels() {
                       className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#9a805d]"
                     />
                     <p>
-                      Este é o catálogo central da Vendora. O estado de
-                      sincronização individual por produto não está disponível
-                      para esta plataforma.
+                      Estes são os produtos da loja Vendora, apresentados como
+                      referência da empresa. Não há sincronização nativa deste
+                      catálogo com {selectedChannel.label}.
                     </p>
                   </div>
                 )}
@@ -804,10 +901,10 @@ export default function Channels() {
                 <div className="mb-3 flex items-end justify-between gap-3 border-b border-[#ece8df] pb-3">
                   <div>
                     <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#7f897e]">
-                      Origem / {selectedChannel.label}
+                      Origem / {ordersSourceLabel}
                     </p>
                     <h2 className="mt-1 font-serif text-lg font-semibold tracking-[-0.03em] text-[#202522] sm:text-xl">
-                      Pedidos deste canal
+                      {usesCentralStoreData ? "Pedidos da loja" : "Pedidos da loja online"}
                     </h2>
                   </div>
                   <Link
@@ -832,7 +929,7 @@ export default function Channels() {
                   </div>
                 ) : ordersError ? (
                   <DataError
-                    message="Não foi possível carregar os pedidos deste canal. Tente novamente."
+                    message="Não foi possível carregar os pedidos da loja. Tente novamente."
                     onRetry={() => setRefreshKey((current) => current + 1)}
                   />
                 ) : orders.length === 0 ? (
@@ -845,8 +942,8 @@ export default function Channels() {
                       Sem pedidos para mostrar
                     </p>
                     <p className="mt-1 text-xs leading-5 text-[#858c83]">
-                      Os pedidos registados para {selectedChannel.label}{" "}
-                      aparecerão aqui.
+                      Os pedidos registados na {ordersSourceLabel} aparecerão
+                      aqui.
                     </p>
                   </div>
                 ) : (
@@ -901,6 +998,20 @@ export default function Channels() {
                       </a>
                     </div>
                   </div>
+                ) : connectionsLoading ? (
+                  <div className="flex min-h-[180px] flex-col items-center justify-center px-5 text-center">
+                    <Loader2
+                      aria-hidden="true"
+                      className="mb-3 h-5 w-5 animate-spin text-[#718071]"
+                    />
+                    <p className="text-sm font-medium text-[#525c54]">
+                      A verificar a ligação
+                    </p>
+                    <p className="mt-1 max-w-md text-xs leading-5 text-[#858c83]">
+                      O estado desta plataforma só será apresentado quando a
+                      consulta terminar.
+                    </p>
+                  </div>
                 ) : connectionsError ? (
                   <DataError
                     message="Não foi possível verificar a ligação desta plataforma. Atualize para consultar novamente."
@@ -926,14 +1037,12 @@ export default function Channels() {
                           statusFor(selectedChannel, selectedConnection).label
                         }
                       />
-                      <InfoCell
-                        label="Última sincronização"
-                        value={
-                          selectedConnection.last_synced_at
-                            ? formatSync(selectedConnection.last_synced_at)
-                            : "Ainda sem sincronização"
-                        }
-                      />
+                      {selectedConnection.last_synced_at && (
+                        <InfoCell
+                          label="Última sincronização"
+                          value={formatSync(selectedConnection.last_synced_at)}
+                        />
+                      )}
                     </div>
                     <div className="flex flex-col justify-between gap-3 border-t border-[#eeeae2] pt-4 sm:flex-row sm:items-center">
                       <p className="max-w-lg text-[11px] leading-5 text-[#737a72]">
@@ -986,32 +1095,40 @@ export default function Channels() {
                 <span
                   className={cn(
                     "inline-flex items-center gap-1.5 text-[10px] font-medium",
-                    selectedPlatformIsActive === true
-                      ? "text-[#2c6457]"
-                      : selectedPlatformIsActive === false
-                        ? "text-[#858c83]"
-                        : "text-[#a44d2e]",
+                    selectedPlatformNeedsAttention
+                      ? "text-[#a44d2e]"
+                      : selectedPlatformIsActive === true
+                        ? "text-[#2c6457]"
+                        : selectedPlatformIsActive === false || connectionsLoading
+                          ? "text-[#858c83]"
+                          : "text-[#a44d2e]",
                   )}
                 >
                   <span
                     className={cn(
                       "h-1.5 w-1.5 rounded-full",
-                      selectedPlatformIsActive === true
-                        ? "bg-[#477b55]"
-                        : selectedPlatformIsActive === false
-                          ? "bg-[#aaa99f]"
-                          : "bg-[#bd592f]",
+                      selectedPlatformNeedsAttention
+                        ? "bg-[#bd592f]"
+                        : selectedPlatformIsActive === true
+                          ? "bg-[#477b55]"
+                          : selectedPlatformIsActive === false || connectionsLoading
+                            ? "bg-[#aaa99f]"
+                            : "bg-[#bd592f]",
                     )}
                   />
-                  {selectedPlatformIsActive === null
-                    ? "Estado indisponível"
-                    : selectedPlatformIsActive
-                      ? "Canal ativo"
-                      : "Canal não ligado"}
+                  {connectionsLoading && selectedProvider !== "website"
+                    ? "A verificar ligação"
+                    : selectedPlatformNeedsAttention
+                    ? "Requer atenção"
+                    : selectedPlatformIsActive === null
+                      ? "Estado indisponível"
+                      : selectedPlatformIsActive
+                        ? "Canal ativo"
+                        : "Canal não ligado"}
                 </span>
               </div>
               <h2 className="mt-2 font-serif text-lg font-semibold tracking-[-0.03em] text-[#202522]">
-                Pedidos registados
+                Registo de pedidos
               </h2>
               <div className="mt-4 border-y border-[#ece8df] py-4">
                 {ordersLoading ? (
@@ -1026,7 +1143,9 @@ export default function Channels() {
                   </p>
                 )}
                 <p className="mt-2 text-[11px] leading-4 text-[#858c83]">
-                  Guardados com origem {selectedChannel.label}
+                  {usesCentralStoreData
+                    ? "Dados da loja Vendora; sem ligação nativa a esta plataforma."
+                    : "Pedidos com origem na loja online."}
                 </p>
               </div>
               <Link
@@ -1043,10 +1162,10 @@ export default function Channels() {
                 <div className="mb-3 flex items-end justify-between gap-2 border-b border-[#ece8df] pb-3">
                   <div>
                     <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#7f897e]">
-                      Atividade / Loja
+                      Atividade / {ordersSourceLabel}
                     </p>
                     <h2 className="mt-1 font-serif text-base font-semibold tracking-[-0.03em] text-[#202522]">
-                      Pedidos recentes
+                      Pedidos recentes da loja
                     </h2>
                   </div>
                   <Link
@@ -1072,11 +1191,11 @@ export default function Channels() {
                   </div>
                 ) : ordersError ? (
                   <p className="py-5 text-xs leading-5 text-[#a44d2e]">
-                    Não foi possível consultar os pedidos desta plataforma.
+                    Não foi possível consultar os pedidos da loja.
                   </p>
                 ) : orders.length === 0 ? (
                   <p className="py-5 text-xs leading-5 text-[#858c83]">
-                    Ainda não há pedidos associados a esta origem.
+                    Ainda não há pedidos associados à {ordersSourceLabel}.
                   </p>
                 ) : (
                   <div className="divide-y divide-[#eeeae2]">
@@ -1167,7 +1286,7 @@ function DataError({
 
 function InfoCell({ label, value }: { label: string; value: string }) {
   return (
-    <div className="border border-[#ece8df] bg-[#faf9f4] p-3">
+    <div className="border-b border-[#ece8df] pb-3">
       <p className="font-mono text-[9px] uppercase tracking-[0.12em] text-[#858c83]">
         {label}
       </p>

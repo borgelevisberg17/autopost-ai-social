@@ -46,3 +46,12 @@ A captura enviada pelo utilizador é a referência visual para `/admin/canais`: 
 
 - **Autenticação:** um único ponto de marca por ecrã; formulário como foco; uma manchete específica por fluxo e apenas a instrução indispensável. Remover claims, listas e links duplicados do shell, sem remover estados/validações funcionais.
 - **Landing:** preservar “Livro & Mercado” e a paleta papel quente, carvão, sálvia e terracota, mas evitar grandes áreas consecutivas com o mesmo fundo. A secção de canais usa papel quente (`#f1eee7`) para separar a secção WhatsApp/sálvia dos painéis carvão; os cartões de campanha conservam os seus próprios contrastes.
+
+## Sistema admin — hierarquia e operação (2026-09)
+
+- **Settings continua intacta** e serve de referência para clareza de rótulos, agrupamento, contraste e estados; não copiar seu layout como template.
+- Cada rota tem **um único título principal** no conteúdo, um contexto curto e uma tarefa operacional própria. O header fixo identifica o espaço da loja, não repete o H1 da página.
+- Reduzir grades de bordas e cartões encaixados: agrupar por espaço, alinhamento tipográfico e superfícies opacas. Manter linhas só quando carregam estrutura, seleção ou affordance; preservar foco e contraste.
+- Toda página distingue **carregamento, erro, vazio verdadeiro e filtro sem resultados**; erro nunca se apresenta como ausência de dados. Indicar limites de amostra ao lado de contagens e listas.
+- Mobile não é uma tabela comprimida: registos refluem em blocos legíveis, controlos têm alvos confortáveis e o menu “Mais” dá acesso a todas as rotas sem sobrecarregar a navegação inferior.
+- Usar apenas dados e ações existentes. Histórico não é calendário, uma alteração de status não é publicação externa, `payment_status` não é gateway e agentes/runs não equivalem a automações configuráveis.

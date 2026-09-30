@@ -49,6 +49,8 @@ export default function Inventory() {
   const [products, setProducts] = useState<ProductStock[]>([]);
   const [movements, setMovements] = useState<InventoryMovement[]>([]);
   const [loading, setLoading] = useState(true);
+  const [productsError, setProductsError] = useState<string | null>(null);
+  const [movementsError, setMovementsError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [stockFilter, setStockFilter] = useState<"all" | "low" | "out">("all");
 
@@ -63,6 +65,8 @@ export default function Inventory() {
     if (!company) return;
 
     setLoading(true);
+    setProductsError(null);
+    setMovementsError(null);
 
     const [productsRes, movementsRes] = await Promise.all([
       supabase
@@ -80,12 +84,17 @@ export default function Inventory() {
     ]);
 
     if (productsRes.error) {
-      toast.error("Não foi possível carregar os produtos.");
+      setProductsError(productsRes.error.message || "Não foi possível carregar os produtos.");
+      setProducts([]);
     } else {
+      setProductsError(null);
       setProducts((productsRes.data as ProductStock[]) ?? []);
     }
 
-    if (!movementsRes.error && movementsRes.data) {
+    if (movementsRes.error) {
+      setMovementsError(movementsRes.error.message || "Não foi possível carregar a atividade.");
+      setMovements([]);
+    } else if (movementsRes.data) {
       const pMap = new Map((productsRes.data as ProductStock[])?.map((p) => [p.id, p.name]));
       const list = (movementsRes.data as InventoryMovement[]).map((m) => ({
         ...m,
@@ -135,19 +144,32 @@ export default function Inventory() {
     });
   }, [products, query, stockFilter]);
 
+  const closeAdjustModal = () => {
+    setAdjustModalOpen(false);
+    setSelectedProduct(null);
+    setAdjustQty("");
+    setAdjustType("in");
+    setAdjustReason("");
+  };
+
   const handleAdjustStock = async () => {
     if (!selectedProduct || !company) return;
 
-    const qtyNum = parseInt(adjustQty, 10);
-    if (isNaN(qtyNum) || qtyNum <= 0) {
+    const qtyNum = Number(adjustQty);
+    if (!adjustQty.trim() || !Number.isInteger(qtyNum) || qtyNum <= 0) {
       toast.error("Indique uma quantidade válida.");
+      return;
+    }
+
+    if (adjustType === "out" && qtyNum > selectedProduct.stock) {
+      toast.error("A saída não pode ser maior que o stock atual.");
       return;
     }
 
     const newStock =
       adjustType === "in"
         ? selectedProduct.stock + qtyNum
-        : Math.max(0, selectedProduct.stock - qtyNum);
+        : selectedProduct.stock - qtyNum;
 
     setSaving(true);
 
@@ -164,7 +186,7 @@ export default function Inventory() {
     }
 
     // Log movement in inventory_movements
-    await supabase.from("inventory_movements").insert({
+    const { error: movementError } = await supabase.from("inventory_movements").insert({
       company_id: company.id,
       product_id: selectedProduct.id,
       type: adjustType,
@@ -173,11 +195,14 @@ export default function Inventory() {
     });
 
     setSaving(false);
-    toast.success("Stock atualizado com sucesso.");
-    setAdjustModalOpen(false);
-    setSelectedProduct(null);
-    setAdjustQty("");
-    setAdjustReason("");
+    if (movementError) {
+      toast.error("O stock foi atualizado, mas o movimento não foi registado. O histórico pode estar incompleto.");
+      closeAdjustModal();
+      await loadData();
+      return;
+    }
+    toast.success("Stock e movimento atualizados com sucesso.");
+    closeAdjustModal();
     await loadData();
   };
 
@@ -192,6 +217,12 @@ export default function Inventory() {
   return (
     <AdminLayout title="Inventário">
       <div className="space-y-8">
+        {(productsError || movementsError) && (
+          <div className="flex flex-col gap-3 rounded-xl bg-[#fff4ed] px-4 py-4 text-sm text-[#7b3f24] shadow-sm ring-1 ring-[#f0c7ad] sm:flex-row sm:items-center sm:justify-between">
+            <p>Não foi possível carregar todos os dados do inventário. Os valores em falta não são apresentados como zero.</p>
+            <button type="button" onClick={loadData} className="min-h-10 shrink-0 bg-[#202522] px-4 text-sm font-semibold text-white hover:bg-neutral-800">Tentar novamente</button>
+          </div>
+        )}
         <PageHeader eyebrow="Gestão de stock" title="Inventário" description="Controle o stock disponível, limites mínimos e movimentações do seu catálogo." actions={<button
             type="button"
             onClick={loadData}
@@ -205,21 +236,21 @@ export default function Inventory() {
         <section className="grid border-y border-[#ded9d0] sm:grid-cols-2 lg:grid-cols-4">
           <MetricCard
             label="Total de Unidades"
-            value={String(stats.totalOnHand)}
+            value={productsError ? "—" : String(stats.totalOnHand)}
             icon={Box}
             loading={loading}
           />
 
           <MetricCard
             label="Produtos no Catálogo"
-            value={String(stats.totalProducts)}
+            value={productsError ? "—" : String(stats.totalProducts)}
             icon={PackageCheck}
             loading={loading}
           />
 
           <MetricCard
             label="Stock Baixo (≤5)"
-            value={String(stats.lowStockCount)}
+            value={productsError ? "—" : String(stats.lowStockCount)}
             warning={stats.lowStockCount > 0}
             icon={AlertTriangle}
             loading={loading}
@@ -227,7 +258,7 @@ export default function Inventory() {
 
           <MetricCard
             label="Esgotados"
-            value={String(stats.outOfStockCount)}
+            value={productsError ? "—" : String(stats.outOfStockCount)}
             danger={stats.outOfStockCount > 0}
             icon={PackageX}
             loading={loading}
@@ -266,7 +297,7 @@ export default function Inventory() {
                 stockFilter === "low" ? "bg-black text-white border-black" : "bg-[#fffdf9] text-[#5f625d] border-[#ded9d0]"
               )}
             >
-              Stock Baixo ({stats.lowStockCount})
+              Stock Baixo ({productsError ? "—" : stats.lowStockCount})
             </button>
 
             <button
@@ -277,7 +308,7 @@ export default function Inventory() {
                 stockFilter === "out" ? "bg-black text-white border-black" : "bg-[#fffdf9] text-[#5f625d] border-[#ded9d0]"
               )}
             >
-              Esgotados ({stats.outOfStockCount})
+              Esgotados ({productsError ? "—" : stats.outOfStockCount})
             </button>
           </div>
         </section>
@@ -285,12 +316,20 @@ export default function Inventory() {
         {/* MAIN CONTENT GRID */}
         <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
           {/* STOCK TABLE */}
-          <section className="border-y border-[#ded9d0] bg-[#fffdf9]">
+          <section className="rounded-xl bg-[#fffdf9] shadow-sm ring-1 ring-[#ebe7df]">
             {loading ? (
               <LoadingState label="A carregar inventário" className="border-0" />
+            ) : productsError ? (
+              <div className="p-8 text-sm text-[#7b3f24]">
+                <p>Os produtos do inventário não estão disponíveis.</p>
+                <button type="button" onClick={loadData} className="mt-3 min-h-10 bg-[#202522] px-4 text-sm font-semibold text-white hover:bg-neutral-800">
+                  Tentar novamente
+                </button>
+              </div>
             ) : filteredProducts.length === 0 ? (
               <EmptyState title={query || stockFilter !== "all" ? "Nenhum produto corresponde aos filtros" : "O inventário está vazio"} description={query || stockFilter !== "all" ? "Altere a pesquisa ou o filtro para ver outros produtos." : "Adicione produtos ao catálogo para começar a controlar o stock."} className="border-0" />
             ) : (
+              <div className="hidden overflow-x-auto md:block">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-[#ded9d0] bg-[#f1eee7]/50 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#a7aaa2]">
@@ -344,6 +383,22 @@ export default function Inventory() {
                   ))}
                 </tbody>
               </table>
+            </div>
+            )}
+            {!loading && !productsError && (
+              <div className="space-y-3 p-3 md:hidden">
+                {filteredProducts.length === 0 ? (
+                  <EmptyState title={query || stockFilter !== "all" ? "Nenhum produto corresponde aos filtros" : "O inventário está vazio"} description={query || stockFilter !== "all" ? "Altere a pesquisa ou o filtro para ver outros produtos." : "Adicione produtos ao catálogo para começar a controlar o stock."} className="border-0" />
+                ) : filteredProducts.map((p) => (
+                  <article key={p.id} className="rounded-xl bg-[#fffdf9] p-4 shadow-sm ring-1 ring-[#ebe7df]">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0"><p className="truncate text-sm font-semibold text-[#202522]">{p.name}</p><p className="mt-1 truncate text-xs text-[#a7aaa2]">{p.sku || "Sem SKU"} · {p.category || "Sem categoria"}</p></div>
+                      <span className={cn("shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold", p.stock <= 0 ? "bg-red-100 text-red-800" : p.stock <= LOW_STOCK_THRESHOLD ? "bg-amber-100 text-amber-800" : "bg-[#ebe7df] text-[#303732]")}>{p.stock} {p.stock === 1 ? "unidade" : "unidades"}</span>
+                    </div>
+                    <button type="button" onClick={() => { setSelectedProduct(p); setAdjustModalOpen(true); }} className="mt-4 min-h-10 w-full rounded-md bg-[#202522] px-3 text-xs font-semibold text-white hover:bg-neutral-800">Ajustar stock</button>
+                  </article>
+                ))}
+              </div>
             )}
           </section>
 
@@ -354,14 +409,18 @@ export default function Inventory() {
               <h3 className="text-sm font-semibold text-[#202522]">Atividade de Inventário</h3>
             </div>
 
-            <div className="border border-[#ded9d0] bg-[#fffdf9] divide-y divide-neutral-100">
-              {movements.length === 0 ? (
+            <div className="space-y-2 rounded-xl bg-[#fffdf9] shadow-sm ring-1 ring-[#ebe7df]">
+              {loading ? (
+                <div className="p-6 text-center text-xs text-[#a7aaa2]">A carregar atividade…</div>
+              ) : movementsError ? (
+                <div className="p-6 text-center text-xs text-[#7b3f24]">Não foi possível carregar a atividade. <button type="button" onClick={loadData} className="font-semibold underline">Tentar novamente</button></div>
+              ) : movements.length === 0 ? (
                 <div className="p-6 text-center text-xs text-[#a7aaa2]">
                   Nenhuma movimentação registada ainda.
                 </div>
               ) : (
                 movements.map((m) => (
-                  <div key={m.id} className="p-3.5 text-xs">
+                  <div key={m.id} className="rounded-xl bg-[#f8f6f1] p-3.5 text-xs">
                     <div className="flex items-center justify-between">
                       <span className="font-semibold text-[#202522]">{m.product_name}</span>
                       <span
@@ -393,17 +452,18 @@ export default function Inventory() {
 
       {/* ADJUSTMENT MODAL */}
       {adjustModalOpen && selectedProduct && (
-        <div className="fixed inset-0 z-[80] grid place-items-center bg-black/40 px-4">
-          <div className="w-full max-w-md bg-[#fffdf9] p-6 shadow-2xl">
+        <div className="fixed inset-0 z-[80] grid place-items-center bg-black/40 px-4 py-4" role="dialog" aria-modal="true" aria-labelledby="adjust-stock-title">
+          <div className="max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto rounded-xl bg-[#fffdf9] p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] shadow-2xl">
             <div className="flex items-center justify-between border-b border-[#ded9d0] pb-4">
               <div>
-                <h3 className="text-base font-semibold text-[#202522]">Ajustar Stock</h3>
+                <h3 id="adjust-stock-title" className="text-base font-semibold text-[#202522]">Ajustar Stock</h3>
                 <p className="text-xs text-[#a7aaa2]">{selectedProduct.name}</p>
               </div>
               <button
                 type="button"
-                onClick={() => setAdjustModalOpen(false)}
-                className="text-[#a7aaa2] hover:text-[#202522]"
+                onClick={closeAdjustModal}
+                aria-label="Fechar ajuste"
+                className="grid h-10 w-10 place-items-center text-[#a7aaa2] hover:bg-[#ebe7df] hover:text-[#202522]"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -442,7 +502,7 @@ export default function Inventory() {
                   value={adjustQty}
                   onChange={(e) => setAdjustQty(e.target.value)}
                   placeholder="Ex: 10"
-                  className="h-10 w-full border border-[#c9c3b8] px-3 text-sm outline-none focus:border-black"
+                  className="min-h-11 w-full border border-[#c9c3b8] px-3 text-sm outline-none focus:border-black"
                 />
               </div>
 
@@ -452,7 +512,7 @@ export default function Inventory() {
                   value={adjustReason}
                   onChange={(e) => setAdjustReason(e.target.value)}
                   placeholder="Ex: Recebimento de fornecedor, contagem..."
-                  className="h-10 w-full border border-[#c9c3b8] px-3 text-sm outline-none focus:border-black"
+                  className="min-h-11 w-full border border-[#c9c3b8] px-3 text-sm outline-none focus:border-black"
                 />
               </div>
             </div>
@@ -460,7 +520,7 @@ export default function Inventory() {
             <div className="mt-6 flex justify-end gap-2">
               <button
                 type="button"
-                onClick={() => setAdjustModalOpen(false)}
+                onClick={closeAdjustModal}
                 className="h-10 px-4 text-sm font-medium text-[#747b73] hover:bg-[#ebe7df]"
               >
                 Cancelar

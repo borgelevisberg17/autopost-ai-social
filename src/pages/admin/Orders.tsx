@@ -165,10 +165,14 @@ export default function Orders() {
 
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [selectedOrderEvents, setSelectedOrderEvents] = useState<OrderEvent[]>([]);
+  const [eventsLoading, setEventsLoading] = useState(false);
+  const [eventsError, setEventsError] = useState(false);
+  const [eventsRefreshKey, setEventsRefreshKey] = useState(0);
 
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [bulkUpdating, setBulkUpdating] = useState(false);
 
@@ -176,6 +180,7 @@ export default function Orders() {
     if (!company) return;
 
     setLoading(true);
+    setLoadError(false);
 
     const { data, error } = await supabase
       .from("orders")
@@ -188,6 +193,7 @@ export default function Orders() {
 
     if (error) {
       toast.error("Não foi possível carregar os pedidos.");
+      setLoadError(true);
       setOrders([]);
     } else {
       setOrders((data as Order[]) ?? []);
@@ -204,18 +210,33 @@ export default function Orders() {
   useEffect(() => {
     if (!selectedOrder || !company) return;
 
+    let cancelled = false;
+    setSelectedOrderEvents([]);
+    setEventsError(false);
+    setEventsLoading(true);
+
     async function loadEvents() {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("order_events")
         .select("id, type, actor_type, description, created_at")
         .eq("order_id", selectedOrder.id)
         .order("created_at", { ascending: true });
 
+      if (cancelled) return;
+      setEventsLoading(false);
+      if (error) {
+        setEventsError(true);
+        setSelectedOrderEvents([]);
+        return;
+      }
       setSelectedOrderEvents((data as OrderEvent[]) ?? []);
     }
 
-    loadEvents();
-  }, [selectedOrder, company]);
+    void loadEvents();
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedOrder, company, eventsRefreshKey]);
 
   const stats = useMemo(() => {
     return {
@@ -275,6 +296,12 @@ export default function Orders() {
       );
     });
   }, [orders, filter, channelFilter, search]);
+
+  useEffect(() => {
+    setSelectedIds((current) =>
+      current.filter((id) => filteredOrders.some((order) => order.id === id)),
+    );
+  }, [filteredOrders]);
 
   const allVisibleSelected =
     filteredOrders.length > 0 &&
@@ -419,6 +446,12 @@ export default function Orders() {
     );
   }
 
+  function openOrder(order: Order) {
+    setSelectedOrderEvents([]);
+    setEventsError(false);
+    setSelectedOrder(order);
+  }
+
   function toggleAllVisible() {
     if (allVisibleSelected) {
       setSelectedIds((current) =>
@@ -533,15 +566,15 @@ export default function Orders() {
     <AdminLayout title="Pedidos">
       <div className="space-y-7">
         {/* HEADER */}
-        <section className="flex flex-col gap-5 border-b border-[#ded9d0] pb-7 lg:flex-row lg:items-end lg:justify-between">
+        <section className="flex flex-col gap-5 pb-2 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#a7aaa2]">
               Operação
             </p>
 
-            <h2 className="text-2xl font-semibold tracking-[-0.045em] sm:text-3xl">
+            <h1 className="font-serif text-[clamp(2rem,4vw,2.8rem)] font-medium leading-[1.04] tracking-[-0.045em] text-[#202522]">
               Pedidos
-            </h2>
+            </h1>
 
             <p className="mt-2 text-sm leading-6 text-[#747b73]">
               Gerencie pedidos, clientes, pagamentos e o envio das vendas.
@@ -754,6 +787,11 @@ export default function Orders() {
         {/* ORDERS */}
         {loading ? (
           <OrdersSkeleton />
+        ) : loadError ? (
+          <DataError
+            message="Não foi possível carregar os pedidos. Tente novamente."
+            onRetry={load}
+          />
         ) : filteredOrders.length === 0 ? (
           <EmptyOrders
             hasFilters={
@@ -809,9 +847,7 @@ export default function Orders() {
                           "group cursor-pointer border-b border-[#ebe7df] transition-colors last:border-b-0 hover:bg-[#f1eee7]",
                           selected && "bg-[#f1eee7]",
                         )}
-                        onClick={() =>
-                          setSelectedOrder(order)
-                        }
+                        onClick={() => openOrder(order)}
                       >
                         <td
                           className="px-4 py-4"
@@ -920,9 +956,7 @@ export default function Orders() {
 
                     <button
                       type="button"
-                      onClick={() =>
-                        setSelectedOrder(order)
-                      }
+                      onClick={() => openOrder(order)}
                       className="flex min-w-0 flex-1 items-start gap-3 text-left"
                     >
                       <div className="grid h-9 w-9 shrink-0 place-items-center rounded-[7px] bg-[#ebe7df]">
@@ -957,12 +991,12 @@ export default function Orders() {
                             status={order.status}
                           />
 
-                          <span className="text-[11px] text-[#a7aaa2]">
-                            {PAYMENT_STATUS[order.payment_status] ?? order.payment_status}
+                          <span className="inline-flex rounded-[7px] bg-[#ebe7df] px-2 py-1 text-[10px] font-medium text-[#5f625d]">
+                            Pagamento: {PAYMENT_STATUS[order.payment_status] ?? order.payment_status}
                           </span>
 
-                          <span className="text-[11px] text-[#c9c3b8]">
-                            ·
+                          <span className="inline-flex rounded-[7px] bg-[#ebe7df] px-2 py-1 text-[10px] font-medium text-[#5f625d]">
+                            Envio: {FULFILLMENT_STATUS[order.fulfillment_status] ?? order.fulfillment_status}
                           </span>
 
                           <span className="text-[11px] text-[#a7aaa2]">
@@ -983,10 +1017,13 @@ export default function Orders() {
 
       {/* DETAIL DRAWER */}
       {selectedOrder && (
-        <OrderDrawer
-          order={selectedOrder}
-          events={selectedOrderEvents}
-          currency={company.currency}
+          <OrderDrawer
+            order={selectedOrder}
+            events={selectedOrderEvents}
+            eventsLoading={eventsLoading}
+            eventsError={eventsError}
+            onRetryEvents={() => setEventsRefreshKey((current) => current + 1)}
+            currency={company.currency}
           updating={updating}
           onClose={() => setSelectedOrder(null)}
           onStatusChange={setStatus}
@@ -1095,6 +1132,9 @@ function StatusBadge({ status }: { status: string }) {
 function OrderDrawer({
   order,
   events,
+  eventsLoading,
+  eventsError,
+  onRetryEvents,
   currency,
   updating,
   onClose,
@@ -1103,6 +1143,9 @@ function OrderDrawer({
 }: {
   order: Order;
   events: OrderEvent[];
+  eventsLoading: boolean;
+  eventsError: boolean;
+  onRetryEvents: () => void;
   currency?: string;
   updating: boolean;
   onClose: () => void;
@@ -1331,7 +1374,20 @@ function OrderDrawer({
             <SectionLabel>Order Timeline (Eventos)</SectionLabel>
 
             <div className="mt-4 space-y-4 border-l-2 border-[#ded9d0] pl-4 text-xs text-[#747b73]">
-              {events.length === 0 ? (
+              {eventsLoading ? (
+                <p className="text-[#a7aaa2]">A carregar eventos...</p>
+              ) : eventsError ? (
+                <div>
+                  <p className="text-[#a44d2e]">Não foi possível carregar a timeline.</p>
+                  <button
+                    type="button"
+                    onClick={onRetryEvents}
+                    className="mt-2 font-semibold text-[#2c6457] underline underline-offset-4"
+                  >
+                    Tentar novamente
+                  </button>
+                </div>
+              ) : events.length === 0 ? (
                 <div>
                   <p className="font-semibold text-[#202522]">Pedido criado</p>
                   <p className="text-[#a7aaa2]">{formatDate(order.created_at)} via {channelLabel(order.channel)}</p>

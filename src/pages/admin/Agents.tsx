@@ -1,16 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { FunctionsHttpError } from "@supabase/supabase-js";
 import {
   Activity,
   AlertTriangle,
   ArrowLeft,
-  Bot,
   Check,
   CheckCircle2,
   ChevronRight,
   Clock3,
   Copy,
-  ExternalLink,
   Facebook,
   FileText,
   Instagram,
@@ -75,11 +73,11 @@ const STATUS_LABEL: Record<string, string> = {
   DRAFT: "Rascunho",
   BLOCKED: "Bloqueado",
   FAILED: "Falhou",
-  PUBLISHED: "Publicado",
+  PUBLISHED: "Aprovado no sistema",
 };
 
 const ACTION_LABEL: Record<string, string> = {
-  CREATE_POST: "Gerou publicação",
+  CREATE_POST: "Gerou rascunho",
 };
 
 const platformLabel = (platform: string | null) => {
@@ -170,7 +168,10 @@ export default function Agents() {
   const [products, setProducts] = useState<Product[]>([]);
   const [log, setLog] = useState<Action[]>([]);
 
-  const [loading, setLoading] = useState(true);
+  const [productsLoading, setProductsLoading] = useState(true);
+  const [actionsLoading, setActionsLoading] = useState(true);
+  const [productsError, setProductsError] = useState<string | null>(null);
+  const [actionsError, setActionsError] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
 
   const [selectedProductId, setSelectedProductId] = useState("");
@@ -184,10 +185,13 @@ export default function Agents() {
   const [showRunPanel, setShowRunPanel] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     if (!company) return;
 
-    setLoading(true);
+    setProductsLoading(true);
+    setActionsLoading(true);
+    setProductsError(null);
+    setActionsError(null);
 
     const [productsResponse, actionsResponse] = await Promise.all([
       supabase
@@ -209,24 +213,43 @@ export default function Agents() {
     ]);
 
     if (productsResponse.error) {
+      setProductsError("Não foi possível carregar os produtos.");
       toast.error("Não foi possível carregar os produtos.");
+    } else {
+      setProducts((productsResponse.data as Product[]) ?? []);
     }
 
     if (actionsResponse.error) {
+      setActionsError("Não foi possível carregar a atividade dos agentes.");
       toast.error("Não foi possível carregar a atividade dos agentes.");
+    } else {
+      setLog((actionsResponse.data as Action[]) ?? []);
     }
 
-    setProducts((productsResponse.data as Product[]) ?? []);
-    setLog((actionsResponse.data as Action[]) ?? []);
-
-    setLoading(false);
-  };
+    setProductsLoading(false);
+    setActionsLoading(false);
+  }, [company]);
 
   useEffect(() => {
     if (!company) return;
 
     loadData();
-  }, [company]);
+  }, [company, loadData]);
+
+  useEffect(() => {
+    if (!showRunPanel && !selectedAction) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setShowRunPanel(false);
+        setSelectedAction(null);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedAction, showRunPanel]);
 
   const productName = (id: string | null) => {
     if (!id) return "Sem produto";
@@ -264,7 +287,9 @@ export default function Agents() {
     ).length;
   }, [log]);
 
-  const latestAction = log[0];
+  const hasActionsData = !actionsLoading && !actionsError;
+  const hasProductsData = !productsLoading && !productsError;
+  const latestAction = hasActionsData ? log[0] : undefined;
 
   const recentActivity = log.slice(0, 8);
 
@@ -334,19 +359,6 @@ export default function Agents() {
     );
   };
 
-  if (loading) {
-    return (
-      <AdminLayout title="Agentes">
-        <div className="grid min-h-[420px] place-items-center">
-          <div className="flex items-center gap-3 text-sm text-[#747b73]">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            A carregar agentes...
-          </div>
-        </div>
-      </AdminLayout>
-    );
-  }
-
   return (
     <AdminLayout
       title="Agentes"
@@ -370,13 +382,13 @@ export default function Agents() {
                 Automação
               </p>
 
-              <h2 className="text-3xl font-semibold tracking-[-0.045em] text-[#202522]">
-                AI workforce
-              </h2>
+              <h1 className="font-serif text-[clamp(2rem,4vw,2.8rem)] font-medium leading-[1.04] tracking-[-0.045em] text-[#202522]">
+                Agentes
+              </h1>
 
               <p className="mt-2 max-w-2xl text-sm leading-6 text-[#747b73]">
-                Gerencie os agentes que trabalham sobre o catálogo,
-                conteúdo e canais da sua loja.
+                Execute o Marketing Agent manualmente sobre o catálogo e
+                reveja os rascunhos por canal. Não há execução contínua.
               </p>
             </div>
 
@@ -398,7 +410,7 @@ export default function Agents() {
               Workforce
             </h3>
 
-            {attentionCount > 0 && (
+            {hasActionsData && attentionCount > 0 && (
               <span className="inline-flex items-center gap-1.5 text-xs font-medium text-amber-700">
                 <AlertTriangle className="h-3.5 w-3.5" />
                 {attentionCount}{" "}
@@ -411,7 +423,7 @@ export default function Agents() {
 
           <div className="grid border-y border-[#ded9d0] sm:grid-cols-3">
             <div className="border-b border-[#ded9d0] px-0 py-5 sm:border-b-0 sm:border-r sm:px-5">
-              <p className="text-xs text-[#a7aaa2]">Agentes</p>
+                <p className="text-xs text-[#a7aaa2]">Disponíveis</p>
               <p className="mt-1 text-2xl font-semibold tracking-[-0.04em]">
                 1
               </p>
@@ -420,11 +432,11 @@ export default function Agents() {
             <div className="border-b border-[#ded9d0] px-0 py-5 sm:border-b-0 sm:border-r sm:px-5">
               <div className="flex items-center gap-2">
                 <span className="h-1.5 w-1.5 rounded-[7px] bg-[#202522]" />
-                <p className="text-xs text-[#a7aaa2]">Ativo</p>
+                  <p className="text-xs text-[#a7aaa2]">Automação contínua</p>
               </div>
 
               <p className="mt-1 text-2xl font-semibold tracking-[-0.04em]">
-                1
+                Não
               </p>
             </div>
 
@@ -434,7 +446,7 @@ export default function Agents() {
               </p>
 
               <p className="mt-1 text-2xl font-semibold tracking-[-0.04em]">
-                {attentionCount}
+                {hasActionsData ? attentionCount : "—"}
               </p>
             </div>
           </div>
@@ -472,7 +484,7 @@ export default function Agents() {
                         <span className="h-1.5 w-1.5 rounded-[7px] bg-[#202522]" />
 
                         <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#747b73]">
-                          Ativo
+                          Disponível · manual
                         </span>
                       </div>
 
@@ -481,7 +493,7 @@ export default function Agents() {
                       </h4>
 
                       <p className="mt-0.5 text-sm text-[#747b73]">
-                        Content & Publishing
+                        Conteúdo para revisão
                       </p>
                     </div>
                   </div>
@@ -491,37 +503,29 @@ export default function Agents() {
                       type="button"
                       onClick={() => setShowMenu((value) => !value)}
                       aria-label="Mais opções"
-                      className="grid h-8 w-8 place-items-center rounded-sm text-[#a7aaa2] transition-colors hover:bg-[#ebe7df] hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+                      aria-expanded={showMenu}
+                      aria-haspopup="menu"
+                      className="grid h-9 w-9 touch-manipulation place-items-center rounded-sm text-[#a7aaa2] transition-colors hover:bg-[#ebe7df] hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
                     >
                       <MoreHorizontal className="h-4 w-4" />
                     </button>
 
                     {showMenu && (
-                      <div className="absolute right-0 top-9 z-20 w-44 border border-[#ded9d0] bg-[#fffdf9] p-1 shadow-sm">
+                      <div
+                        role="menu"
+                        aria-label="Informações do agente"
+                        className="absolute right-0 top-10 z-20 w-56 border border-[#ded9d0] bg-[#fffdf9] p-1 shadow-sm"
+                      >
                         <button
                           type="button"
+                          role="menuitem"
                           onClick={() => {
                             setShowMenu(false);
-                            toast.info(
-                              "Configurações avançadas estarão disponíveis quando os agentes configuráveis forem ativados.",
-                            );
+                            toast.info("O Marketing Agent é executado manualmente e cria rascunhos para revisão.");
                           }}
-                          className="flex w-full items-center gap-2 rounded-sm px-3 py-2 text-left text-xs font-medium text-[#5f625d] hover:bg-[#f1eee7]"
+                          className="flex min-h-10 w-full items-center gap-2 rounded-sm px-3 py-2 text-left text-xs font-medium text-[#5f625d] hover:bg-[#f1eee7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
                         >
-                          Configurações
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setShowMenu(false);
-                            toast.info(
-                              "O agente atualmente é controlado pelo sistema.",
-                            );
-                          }}
-                          className="flex w-full items-center gap-2 rounded-sm px-3 py-2 text-left text-xs font-medium text-[#5f625d] hover:bg-[#f1eee7]"
-                        >
-                          Ver regras
+                          Execução manual e rascunhos
                         </button>
                       </div>
                     )}
@@ -549,47 +553,38 @@ export default function Agents() {
 
                 <div className="my-5 border-t border-[#ded9d0]" />
 
-                <div className="grid grid-cols-2 gap-y-5 sm:grid-cols-4">
-                  <div>
-                    <p className="text-[11px] text-[#a7aaa2]">
-                      Hoje
-                    </p>
-
-                    <p className="mt-1 text-lg font-semibold">
-                      {stats.totalToday}
-                    </p>
+                {actionsLoading ? (
+                  <div className="flex items-center gap-2 text-xs text-[#747b73]">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    A carregar o resumo da atividade...
                   </div>
+                ) : actionsError ? (
+                  <p className="text-xs leading-5 text-red-700">
+                    Resumo indisponível. Os dados anteriores podem estar desatualizados.
+                  </p>
+                ) : (
+                  <div className="grid grid-cols-2 gap-y-5 sm:grid-cols-4">
+                    <div>
+                      <p className="text-[11px] text-[#a7aaa2]">Hoje</p>
+                      <p className="mt-1 text-lg font-semibold">{stats.totalToday}</p>
+                    </div>
 
-                  <div>
-                    <p className="text-[11px] text-[#a7aaa2]">
-                      Rascunhos
-                    </p>
+                    <div>
+                      <p className="text-[11px] text-[#a7aaa2]">Rascunhos</p>
+                      <p className="mt-1 text-lg font-semibold">{stats.drafts}</p>
+                    </div>
 
-                    <p className="mt-1 text-lg font-semibold">
-                      {stats.drafts}
-                    </p>
+                    <div>
+                      <p className="text-[11px] text-[#a7aaa2]">Bloqueados</p>
+                      <p className="mt-1 text-lg font-semibold">{stats.blocked}</p>
+                    </div>
+
+                    <div>
+                      <p className="text-[11px] text-[#a7aaa2]">Falhas</p>
+                      <p className="mt-1 text-lg font-semibold">{stats.failed}</p>
+                    </div>
                   </div>
-
-                  <div>
-                    <p className="text-[11px] text-[#a7aaa2]">
-                      Bloqueados
-                    </p>
-
-                    <p className="mt-1 text-lg font-semibold">
-                      {stats.blocked}
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="text-[11px] text-[#a7aaa2]">
-                      Falhas
-                    </p>
-
-                    <p className="mt-1 text-lg font-semibold">
-                      {stats.failed}
-                    </p>
-                  </div>
-                </div>
+                )}
 
                 {latestAction && (
                   <>
@@ -684,8 +679,8 @@ export default function Agents() {
                   </div>
                 </div>
 
-                <div className="mt-6 space-y-0 border-y border-[#ded9d0] bg-[#fffdf9]">
-                  <div className="flex items-center gap-3 border-b border-[#ded9d0] px-4 py-3.5">
+                <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                  <div className="flex items-start gap-3 bg-[#fffdf9] px-4 py-3.5">
                     <Check className="h-4 w-4 shrink-0 text-[#303732]" />
 
                     <div>
@@ -698,7 +693,7 @@ export default function Agents() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 border-b border-[#ded9d0] px-4 py-3.5">
+                  <div className="flex items-start gap-3 bg-[#fffdf9] px-4 py-3.5">
                     <Check className="h-4 w-4 shrink-0 text-[#303732]" />
 
                     <div>
@@ -711,7 +706,7 @@ export default function Agents() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 border-b border-[#ded9d0] px-4 py-3.5">
+                  <div className="flex items-start gap-3 bg-[#fffdf9] px-4 py-3.5">
                     <Check className="h-4 w-4 shrink-0 text-[#303732]" />
 
                     <div>
@@ -724,7 +719,7 @@ export default function Agents() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 px-4 py-3.5">
+                  <div className="flex items-start gap-3 bg-[#fffdf9] px-4 py-3.5">
                     <Check className="h-4 w-4 shrink-0 text-[#303732]" />
 
                     <div>
@@ -765,7 +760,7 @@ export default function Agents() {
           </div>
 
           <div className="grid gap-4 lg:grid-cols-3">
-            <div className="border border-[#ded9d0] bg-[#fffdf9] p-5">
+            <div className="bg-[#f1eee7] p-5">
               <div className="flex items-center gap-2">
                 <Package className="h-4 w-4 text-[#747b73]" />
                 <h4 className="text-sm font-semibold">
@@ -774,21 +769,21 @@ export default function Agents() {
               </div>
 
               <div className="mt-4 space-y-3">
-                <div className="flex items-center justify-between border-b border-[#ebe7df] pb-3">
+                <div className="flex items-center justify-between pb-3">
                   <span className="text-sm text-[#747b73]">
                     Produtos
                   </span>
                   <span className="text-xs font-medium text-[#202522]">
-                    {products.length}
+                    {productsLoading ? "…" : productsError ? "Indisponível" : products.length}
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between border-b border-[#ebe7df] pb-3">
+                <div className="flex items-center justify-between pb-3">
                   <span className="text-sm text-[#747b73]">
                     Informações da loja
                   </span>
                   <span className="text-xs font-medium text-[#202522]">
-                    Ligado
+                    No contexto
                   </span>
                 </div>
 
@@ -797,13 +792,13 @@ export default function Agents() {
                     Preços e stock
                   </span>
                   <span className="text-xs font-medium text-[#202522]">
-                    Ligado
+                    No contexto
                   </span>
                 </div>
               </div>
             </div>
 
-            <div className="border border-[#ded9d0] bg-[#fffdf9] p-5">
+            <div className="bg-[#f1eee7] p-5">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="h-4 w-4 text-[#747b73]" />
                 <h4 className="text-sm font-semibold">
@@ -840,7 +835,7 @@ export default function Agents() {
               </div>
             </div>
 
-            <div className="border border-[#ded9d0] bg-[#fffdf9] p-5">
+            <div className="bg-[#f1eee7] p-5">
               <div className="flex items-center gap-2">
                 <Clock3 className="h-4 w-4 text-[#747b73]" />
                 <h4 className="text-sm font-semibold">
@@ -850,30 +845,17 @@ export default function Agents() {
 
               <div className="mt-4">
                 <p className="text-sm leading-6 text-[#747b73]">
-                  O agente é executado manualmente nesta fase.
-                  Agendamento automático será adicionado quando o
-                  scheduler fizer parte da infraestrutura dos agentes.
+                  O agente é executado manualmente nesta fase. Cada
+                  execução usa o produto e os canais escolhidos e cria
+                  rascunhos para revisão; não existe automação contínua.
                 </p>
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    toast.info(
-                      "Agendamento automático será disponibilizado numa próxima fase.",
-                    )
-                  }
-                  className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-[#202522] underline underline-offset-4"
-                >
-                  Configurar quando disponível
-                  <ChevronRight className="h-3 w-3" />
-                </button>
               </div>
             </div>
           </div>
         </section>
 
         {/* ATTENTION */}
-        {attentionCount > 0 && (
+        {hasActionsData && attentionCount > 0 && (
           <section>
             <div className="mb-4 flex items-end justify-between">
               <div>
@@ -908,7 +890,7 @@ export default function Agents() {
                       key={item.id}
                       onClick={() => setSelectedAction(item)}
                       className={cn(
-                        "flex w-full items-start gap-3 px-4 py-4 text-left transition-colors hover:bg-[#f1eee7]",
+                        "flex min-h-14 w-full items-start gap-3 px-4 py-4 text-left transition-colors hover:bg-[#f1eee7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#e36c3f]",
                         index < array.length - 1 &&
                           "border-b border-[#ded9d0]",
                       )}
@@ -954,20 +936,43 @@ export default function Agents() {
           <div className="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
             <div>
               <h3 className="text-lg font-semibold tracking-[-0.025em]">
-                Activity
+                Atividade
               </h3>
 
               <p className="mt-1 text-sm text-[#747b73]">
-                Histórico recente das ações executadas pelo agente.
+                Amostra das últimas 100 ações registadas; não é o histórico completo.
               </p>
             </div>
 
             <span className="text-xs text-[#a7aaa2]">
-              Últimas {Math.min(log.length, 100)} ações
+              Amostra: {Math.min(log.length, 100)} de 100 máximas
             </span>
           </div>
 
-          {recentActivity.length === 0 ? (
+          {actionsLoading ? (
+            <div className="flex min-h-36 items-center justify-center gap-2 bg-[#f1eee7] px-6 py-10 text-sm text-[#747b73]">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              A carregar a amostra de atividade...
+            </div>
+          ) : actionsError ? (
+            <div className="bg-red-50 px-6 py-10 text-center">
+              <TriangleAlert className="mx-auto h-5 w-5 text-red-600" />
+              <p className="mt-3 text-sm font-medium text-red-800">
+                Não foi possível carregar a atividade.
+              </p>
+              <p className="mx-auto mt-1 max-w-md text-xs leading-5 text-red-700">
+                O conteúdo anterior pode estar desatualizado. Tente novamente para consultar a amostra real.
+              </p>
+              <button
+                type="button"
+                onClick={loadData}
+                className="mt-4 inline-flex min-h-10 items-center gap-2 border border-red-200 bg-white px-3 text-xs font-medium text-red-800 hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+              >
+                <RefreshCw className="h-3.5 w-3.5" />
+                Tentar novamente
+              </button>
+            </div>
+          ) : recentActivity.length === 0 ? (
             <div className="border border-dashed border-[#c9c3b8] px-6 py-14 text-center">
               <div className="mx-auto grid h-10 w-10 place-items-center border border-[#ded9d0]">
                 <Activity className="h-4 w-4 text-[#747b73]" />
@@ -994,7 +999,7 @@ export default function Agents() {
                     key={item.id}
                     onClick={() => setSelectedAction(item)}
                     className={cn(
-                      "flex w-full items-start gap-3.5 px-4 py-4 text-left transition-colors hover:bg-[#f1eee7] sm:px-5",
+                      "flex w-full items-start gap-3.5 px-4 py-4 text-left transition-colors hover:bg-[#f1eee7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#e36c3f] sm:px-5",
                       index < recentActivity.length - 1 &&
                         "border-b border-[#ded9d0]",
                     )}
@@ -1068,14 +1073,19 @@ export default function Agents() {
             }
           }}
         >
-          <aside className="absolute inset-y-0 right-0 flex w-full max-w-md flex-col border-l border-[#ded9d0] bg-[#fffdf9] shadow-xl">
-            <div className="flex h-16 shrink-0 items-center justify-between border-b border-[#ded9d0] px-5">
+          <aside
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="run-panel-title"
+            className="absolute inset-y-0 right-0 flex w-full max-w-md flex-col border-l border-[#ded9d0] bg-[#fffdf9] shadow-xl"
+          >
+            <div className="flex min-h-16 shrink-0 items-center justify-between border-b border-[#ded9d0] px-5 pt-[env(safe-area-inset-top)]">
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#a7aaa2]">
                   Marketing Agent
                 </p>
 
-                <h3 className="mt-0.5 text-base font-semibold tracking-[-0.02em]">
+                <h3 id="run-panel-title" className="mt-0.5 text-base font-semibold tracking-[-0.02em]">
                   Executar agente
                 </h3>
               </div>
@@ -1084,7 +1094,7 @@ export default function Agents() {
                 type="button"
                 onClick={() => setShowRunPanel(false)}
                 aria-label="Fechar"
-                className="grid h-8 w-8 place-items-center rounded-sm text-[#a7aaa2] hover:bg-[#ebe7df] hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+                className="grid h-10 w-10 touch-manipulation place-items-center rounded-sm text-[#a7aaa2] hover:bg-[#ebe7df] hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
               >
                 <XCircle className="h-4 w-4" />
               </button>
@@ -1105,27 +1115,44 @@ export default function Agents() {
                     produto.
                   </p>
 
-                  <select
-                    id="agent-product"
-                    value={selectedProductId}
-                    onChange={(event) =>
-                      setSelectedProductId(event.target.value)
-                    }
-                    className="mt-3 h-11 w-full rounded-sm border border-[#ded9d0] bg-[#fffdf9] px-3 text-sm text-[#202522] outline-none transition focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
-                  >
-                    <option value="">
-                      Escolher produto...
-                    </option>
-
-                    {products.map((product) => (
-                      <option
-                        key={product.id}
-                        value={product.id}
+                  {productsLoading ? (
+                    <div className="mt-3 flex min-h-11 items-center gap-2 bg-[#f1eee7] px-3 text-xs text-[#747b73]">
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      A carregar produtos...
+                    </div>
+                  ) : productsError ? (
+                    <div className="mt-3 bg-red-50 px-3 py-3 text-xs leading-5 text-red-700">
+                      <p>Não foi possível consultar o catálogo. A lista anterior pode estar desatualizada.</p>
+                      <button
+                        type="button"
+                        onClick={loadData}
+                        className="mt-2 inline-flex min-h-9 items-center gap-1.5 border border-red-200 bg-white px-2.5 font-medium text-red-800 hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
                       >
-                        {product.name} · stock {product.stock}
-                      </option>
-                    ))}
-                  </select>
+                        <RefreshCw className="h-3.5 w-3.5" />
+                        Tentar novamente
+                      </button>
+                    </div>
+                  ) : products.length === 0 ? (
+                    <div className="mt-3 bg-[#f1eee7] px-3 py-3 text-xs leading-5 text-[#747b73]">
+                      Nenhum produto disponível para uma execução manual.
+                    </div>
+                  ) : (
+                    <select
+                      id="agent-product"
+                      value={selectedProductId}
+                      onChange={(event) =>
+                        setSelectedProductId(event.target.value)
+                      }
+                      className="mt-3 h-11 w-full rounded-sm border border-[#ded9d0] bg-[#fffdf9] px-3 text-sm text-[#202522] outline-none transition focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+                    >
+                      <option value="">Escolher produto...</option>
+                      {products.map((product) => (
+                        <option key={product.id} value={product.id}>
+                          {product.name} · stock {product.stock}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </div>
 
                 <div>
@@ -1214,7 +1241,7 @@ export default function Agents() {
               </div>
             </div>
 
-            <div className="shrink-0 border-t border-[#ded9d0] bg-[#fffdf9] p-5">
+            <div className="shrink-0 border-t border-[#ded9d0] bg-[#fffdf9] p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
               <div className="mb-3 flex items-center justify-between text-xs text-[#747b73]">
                 <span>
                   {selectedPlatforms.length}{" "}
@@ -1236,6 +1263,8 @@ export default function Agents() {
                 disabled={
                   running ||
                   !selectedProductId ||
+                  !hasProductsData ||
+                  products.length === 0 ||
                   selectedPlatforms.length === 0
                 }
                 className="flex h-11 w-full items-center justify-center gap-2 bg-[#202522] text-sm font-medium text-white transition-colors hover:bg-neutral-800 disabled:cursor-not-allowed disabled:bg-neutral-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
@@ -1243,12 +1272,12 @@ export default function Agents() {
                 {running ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    A gerar publicações...
+                    A gerar rascunhos...
                   </>
                 ) : (
                   <>
                     <Sparkles className="h-4 w-4" />
-                    Gerar publicações
+                    Gerar rascunhos
                   </>
                 )}
               </button>
@@ -1268,20 +1297,25 @@ export default function Agents() {
             }
           }}
         >
-          <aside className="absolute inset-y-0 right-0 flex w-full max-w-xl flex-col border-l border-[#ded9d0] bg-[#fffdf9] shadow-xl">
-            <div className="flex h-16 shrink-0 items-center justify-between border-b border-[#ded9d0] px-5">
+          <aside
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="action-detail-title"
+            className="absolute inset-y-0 right-0 flex w-full max-w-xl flex-col border-l border-[#ded9d0] bg-[#fffdf9] shadow-xl"
+          >
+            <div className="flex min-h-16 shrink-0 items-center justify-between border-b border-[#ded9d0] px-5 pt-[env(safe-area-inset-top)]">
               <div className="flex min-w-0 items-center gap-3">
                 <button
                   type="button"
                   onClick={() => setSelectedAction(null)}
                   aria-label="Voltar"
-                  className="grid h-8 w-8 shrink-0 place-items-center rounded-sm text-[#747b73] hover:bg-[#ebe7df] hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+                  className="grid h-10 w-10 shrink-0 touch-manipulation place-items-center rounded-sm text-[#747b73] hover:bg-[#ebe7df] hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
                 >
                   <ArrowLeft className="h-4 w-4" />
                 </button>
 
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold">
+                  <p id="action-detail-title" className="truncate text-sm font-semibold">
                     {ACTION_LABEL[selectedAction.action] ??
                       selectedAction.action}
                   </p>
@@ -1390,7 +1424,7 @@ export default function Agents() {
               </div>
             </div>
 
-            <div className="shrink-0 border-t border-[#ded9d0] px-5 py-4">
+            <div className="shrink-0 border-t border-[#ded9d0] px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
               <button
                 type="button"
                 onClick={() => setSelectedAction(null)}
