@@ -1,7 +1,16 @@
 import { useState } from "react";
-import { ArrowRight, Check, Circle, HelpCircle, ShieldCheck, Sparkles, Zap } from "lucide-react";
+import {
+  ArrowRight,
+  Check,
+  HelpCircle,
+  ShieldCheck,
+  Sparkles,
+  Zap,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { SiteHeader } from "@/components/site/SiteHeader";
+import { SiteFooter } from "@/components/site/SiteFooter";
 
 const plans = [
   {
@@ -21,7 +30,8 @@ const plans = [
   {
     name: "Growth",
     kicker: "For growing brands",
-    description: "Keep every channel, campaign and customer conversation moving together.",
+    description:
+      "Keep every channel, campaign and customer conversation moving together.",
     monthly: 79,
     featured: true,
     features: [
@@ -36,7 +46,8 @@ const plans = [
   {
     name: "Scale",
     kicker: "For multi-brand operations",
-    description: "More control for teams with high volume, multi-user permissions and custom spaces.",
+    description:
+      "More control for teams with high volume, multi-user permissions and custom spaces.",
     monthly: 199,
     features: [
       "Unlimited operating spaces",
@@ -52,20 +63,20 @@ const plans = [
 const FAQ_PRICING = [
   {
     q: "Posso alterar o meu plano mais tarde?",
-    a: "Sim. Pode fazer upgrade, downgrade ou cancelar o seu plano a qualquer momento diretamente nas configurações da sua empresa."
+    a: "Sim. Pode fazer upgrade, downgrade ou cancelar o seu plano a qualquer momento diretamente nas configurações da sua empresa.",
   },
   {
     q: "Existe período de fidelização?",
-    a: "Não. Os planos mensais podem ser cancelados mensalmente sem custos de penalização. Os planos anuais são faturados uma vez por ano com desconto."
+    a: "Não. Os planos mensais podem ser cancelados mensalmente sem custos de penalização. Os planos anuais são faturados uma vez por ano com desconto.",
   },
   {
     q: "Preciso de cartão de crédito para experimentar?",
-    a: "Não é necessário cartão para iniciar a configuração da sua conta e testar o sistema."
+    a: "Não é necessário cartão para iniciar a configuração da sua conta e testar o sistema.",
   },
   {
     q: "Como funciona o suporte?",
-    a: "Todos os planos contam com suporte por email e documentação. Os planos Growth e Scale têm prioridade e acompanhamento dedicado."
-  }
+    a: "Todos os planos contam com suporte por email e documentação. Os planos Growth e Scale têm prioridade e acompanhamento dedicado.",
+  },
 ];
 
 export default function Pricing() {
@@ -76,57 +87,7 @@ export default function Pricing() {
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-[#f6f3ed] text-[#202522]">
-      {/* Shared Site Header */}
-      <header className="fixed inset-x-0 top-0 z-50 border-b border-[#e2ded5] bg-[#f6f3ed]/95 backdrop-blur">
-        <div className="mx-auto flex h-[72px] max-w-[1240px] items-center justify-between px-5 lg:px-8">
-          <Link to="/" className="flex items-center gap-2.5">
-            <span className="grid h-8 w-8 place-items-center bg-[#202522] text-[#f6f3ed]">
-              <Circle className="h-3 w-3 fill-current" />
-            </span>
-            <span className="text-[19px] font-bold tracking-[-0.05em]">Vendora</span>
-          </Link>
-
-          <nav className="hidden items-center gap-8 md:flex">
-            <Link to="/#proof" className="text-sm text-[#6e716b] transition hover:text-[#202522]">
-              Proof
-            </Link>
-            <Link to="/#whatsapp" className="text-sm text-[#6e716b] transition hover:text-[#202522]">
-              WhatsApp
-            </Link>
-            <Link to="/#channels" className="text-sm text-[#6e716b] transition hover:text-[#202522]">
-              Channels
-            </Link>
-            <Link to="/#agents" className="text-sm text-[#6e716b] transition hover:text-[#202522]">
-              Agent system
-            </Link>
-            <Link to="/#faq" className="text-sm text-[#6e716b] transition hover:text-[#202522]">
-              FAQ
-            </Link>
-            <Link to="/#process" className="text-sm text-[#6e716b] transition hover:text-[#202522]">
-              How it works
-            </Link>
-            <Link to="/pricing" className="text-sm font-semibold text-[#2c6457] transition hover:text-[#202522]">
-              Plans
-            </Link>
-          </nav>
-
-          <div className="flex items-center gap-2">
-            <Link
-              to="/login"
-              className="hidden px-3 py-2 text-sm font-semibold text-[#5f625d] transition hover:text-[#202522] sm:block"
-            >
-              Sign in
-            </Link>
-            <Link
-              to={startPath}
-              className="inline-flex items-center gap-2 bg-[#e36c3f] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#c95735]"
-            >
-              Start for free
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-        </div>
-      </header>
+      <SiteHeader ctaHref={startPath} />
 
       {/* Main Content */}
       <main className="pt-[72px]">
@@ -152,7 +113,8 @@ export default function Pricing() {
               </h1>
 
               <p className="mx-auto mt-6 max-w-xl text-base leading-7 text-white/70 sm:text-lg">
-                Choose the operating rhythm that fits your team today. Add channels, people and control as your business grows.
+                Choose the operating rhythm that fits your team today. Add
+                channels, people and control as your business grows.
               </p>
 
               {/* Billing Toggle */}
@@ -161,7 +123,9 @@ export default function Pricing() {
                   type="button"
                   onClick={() => setAnnual(false)}
                   className={`rounded-full px-5 py-2.5 transition ${
-                    !annual ? "bg-white text-[#202522] shadow-sm" : "text-white/70 hover:text-white"
+                    !annual
+                      ? "bg-white text-[#202522] shadow-sm"
+                      : "text-white/70 hover:text-white"
                   }`}
                 >
                   Faturação Mensal
@@ -170,7 +134,9 @@ export default function Pricing() {
                   type="button"
                   onClick={() => setAnnual(true)}
                   className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 transition ${
-                    annual ? "bg-white text-[#202522] shadow-sm" : "text-white/70 hover:text-white"
+                    annual
+                      ? "bg-white text-[#202522] shadow-sm"
+                      : "text-white/70 hover:text-white"
                   }`}
                 >
                   Faturação Anual
@@ -184,7 +150,8 @@ export default function Pricing() {
               <div className="mx-auto mt-6 max-w-md flex items-center justify-center gap-2 border border-[#e6d4aa]/30 bg-[#fbf3dd]/10 px-4 py-2.5 text-xs text-[#f3b08e] backdrop-blur-sm">
                 <Sparkles className="h-4 w-4 shrink-0 text-[#e36c3f]" />
                 <span>
-                  <strong>Promoção de lançamento:</strong> 30% de desconto nos primeiros 3 meses no plano anual.
+                  <strong>Promoção de lançamento:</strong> 30% de desconto nos
+                  primeiros 3 meses no plano anual.
                 </span>
               </div>
             </div>
@@ -226,7 +193,9 @@ export default function Pricing() {
                       </h2>
 
                       <div className="mt-6 flex items-end gap-2 border-b border-black/10 pb-6">
-                        <span className="text-5xl font-semibold tracking-[-0.08em]">${price}</span>
+                        <span className="text-5xl font-semibold tracking-[-0.08em]">
+                          ${price}
+                        </span>
                         <span className="pb-1 text-xs text-[#6e716b]">
                           /mês{annual ? " (faturado anualmente)" : ""}
                         </span>
@@ -234,7 +203,10 @@ export default function Pricing() {
 
                       <ul className="mt-6 space-y-3.5 text-xs leading-5 text-[#5f625d]">
                         {plan.features.map((feature) => (
-                          <li key={feature} className="flex items-start gap-2.5">
+                          <li
+                            key={feature}
+                            className="flex items-start gap-2.5"
+                          >
                             <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#2c6457]" />
                             <span>{feature}</span>
                           </li>
@@ -262,13 +234,15 @@ export default function Pricing() {
 
             <div className="mt-10 flex flex-wrap items-center justify-center gap-6 font-mono text-[10px] uppercase tracking-[0.14em] text-[#8f8a80]">
               <span className="flex items-center gap-1.5">
-                <ShieldCheck className="h-4 w-4 text-[#2c6457]" /> Sem cartão de crédito
+                <ShieldCheck className="h-4 w-4 text-[#2c6457]" /> Sem cartão de
+                crédito
               </span>
               <span className="flex items-center gap-1.5">
                 <Zap className="h-4 w-4 text-[#2c6457]" /> Configuração imediata
               </span>
               <span className="flex items-center gap-1.5">
-                <Check className="h-4 w-4 text-[#2c6457]" /> Cancele quando quiser
+                <Check className="h-4 w-4 text-[#2c6457]" /> Cancele quando
+                quiser
               </span>
             </div>
           </div>
@@ -288,9 +262,16 @@ export default function Pricing() {
 
             <div className="mt-10 grid gap-6 md:grid-cols-2">
               {FAQ_PRICING.map((item) => (
-                <div key={item.q} className="border border-[#d8d3c8] bg-[#fffdf9] p-6">
-                  <h3 className="text-base font-semibold text-[#202522]">{item.q}</h3>
-                  <p className="mt-3 text-sm leading-6 text-[#6e716b]">{item.a}</p>
+                <div
+                  key={item.q}
+                  className="border border-[#d8d3c8] bg-[#fffdf9] p-6"
+                >
+                  <h3 className="text-base font-semibold text-[#202522]">
+                    {item.q}
+                  </h3>
+                  <p className="mt-3 text-sm leading-6 text-[#6e716b]">
+                    {item.a}
+                  </p>
                 </div>
               ))}
             </div>
@@ -298,14 +279,7 @@ export default function Pricing() {
         </section>
       </main>
 
-      {/* Shared Site Footer */}
-      <footer className="bg-[#202522] text-white/50">
-        <div className="mx-auto flex max-w-[1240px] flex-col justify-between gap-4 px-5 py-8 text-xs sm:flex-row lg:px-8">
-          <span className="font-semibold text-white">Vendora</span>
-          <span>Commerce operations, made legible.</span>
-          <span>© {new Date().getFullYear()} Vendora</span>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }
