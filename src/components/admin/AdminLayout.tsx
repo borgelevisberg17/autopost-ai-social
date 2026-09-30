@@ -191,7 +191,14 @@ export function AdminLayout({
   actions?: ReactNode;
   children: ReactNode;
 }) {
-  const { company, companies, loading, select } = useCompany();
+  const {
+    company,
+    companies,
+    loading,
+    error: companyError,
+    reload,
+    select,
+  } = useCompany();
   const { signOut } = useAuth();
   const navigate = useNavigate();
 
@@ -258,6 +265,25 @@ export function AdminLayout({
       <div className="grid min-h-screen place-items-center bg-[#fffdf9]">
         <Loader2 className="h-5 w-5 animate-spin text-[#747b73]" />
       </div>
+    );
+  }
+
+  if (companyError) {
+    return (
+      <main className="grid min-h-screen place-items-center bg-[#f6f3ed] px-5 text-[#202522]">
+        <div className="w-full max-w-sm border border-[#ded9d0] bg-[#fffdf9] p-6 text-center">
+          <p className="font-serif text-xl">
+            Não foi possível carregar a sua loja.
+          </p>
+          <button
+            type="button"
+            onClick={() => void reload()}
+            className="mt-5 h-10 bg-[#202522] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#2c6457]"
+          >
+            Tentar novamente
+          </button>
+        </div>
+      </main>
     );
   }
 

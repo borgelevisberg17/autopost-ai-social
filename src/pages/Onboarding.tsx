@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Check, Circle, Store } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -21,7 +21,7 @@ const inputClass = "h-11 w-full border border-[#d8d6ce] bg-[#fffdf9] px-3 text-s
 
 export default function Onboarding() {
   const { user } = useAuth();
-  const { reload, select } = useCompany();
+  const { company, loading: companyLoading, error: companyError, reload, select } = useCompany();
   const navigate = useNavigate();
   const [step, setStep] = useState<Step>(1);
   const [form, setForm] = useState<FormState>(initialForm);
@@ -29,6 +29,35 @@ export default function Onboarding() {
   const update = <K extends keyof FormState>(key: K, value: FormState[K]) => setForm((current) => ({ ...current, [key]: value }));
   const hasProduct = form.productName.trim().length > 0;
   const currency = useMemo(() => CURRENCIES.find((item) => item.code === form.currency), [form.currency]);
+
+  if (companyLoading) {
+    return (
+      <main className="grid min-h-screen place-items-center bg-[#f6f3ed] text-[#202522]">
+        <p role="status" className="text-sm text-[#747b73]">
+          A validar o acesso à loja…
+        </p>
+      </main>
+    );
+  }
+
+  if (companyError) {
+    return (
+      <main className="grid min-h-screen place-items-center bg-[#f6f3ed] px-5 text-[#202522]">
+        <section className="w-full max-w-sm border border-[#ded9d0] bg-[#fffdf9] p-6 text-center">
+          <p className="font-serif text-xl">Não foi possível carregar a sua loja.</p>
+          <button
+            type="button"
+            onClick={() => void reload()}
+            className="mt-5 h-10 bg-[#202522] px-5 text-sm font-semibold text-white hover:bg-[#2c6457]"
+          >
+            Tentar novamente
+          </button>
+        </section>
+      </main>
+    );
+  }
+
+  if (company) return <Navigate to="/dashboard" replace />;
 
   const validate = (current: Step) => {
     if (current === 1) {

@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -10,18 +10,24 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const redirectingToOnboarding = useRef(false);
 
-  const { signUp, user } = useAuth();
+  const { signUp, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const selectedPlan = searchParams.get("plan");
   const billing = searchParams.get("billing");
 
   useEffect(() => {
-    if (user) {
-      navigate("/onboarding", { replace: true });
+    if (
+      user &&
+      !authLoading &&
+      !isLoading &&
+      !redirectingToOnboarding.current
+    ) {
+      navigate("/dashboard", { replace: true });
     }
-  }, [user, navigate]);
+  }, [user, authLoading, isLoading, navigate]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -32,6 +38,7 @@ export default function Signup() {
     const { error } = await signUp(email.trim(), password, name.trim());
 
     if (!error) {
+      redirectingToOnboarding.current = true;
       navigate("/onboarding", { replace: true });
     }
 
