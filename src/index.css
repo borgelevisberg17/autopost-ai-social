@@ -103,3 +103,10 @@
 @media (prefers-reduced-motion: reduce) {
   .people-profile { animation: none; }
 }
+@keyframes case-study-progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .case-study-progress { animation: none !important; }
+}
