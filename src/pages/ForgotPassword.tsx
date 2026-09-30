@@ -37,14 +37,14 @@ export default function ForgotPassword() {
   return (
     <AuthShell
       eyebrow="RECUPERAR ACESSO"
-      title="Volte para a sua operação."
-      description="Enviaremos um link para o email associado à sua conta para criar uma nova palavra-passe."
+      title="Volte a aceder à sua conta."
+      description="Enviaremos um hiperligação para redefinir a sua palavra-passe com segurança."
       footer={
         <Link
           to="/login"
-          className="flex items-center gap-2 text-sm font-medium text-[#666666] transition-colors hover:text-[#202522]"
+          className="flex items-center gap-1.5 text-xs font-semibold text-[#6e716b] hover:text-[#202522] transition-colors"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ArrowLeft className="h-3.5 w-3.5" />
           Voltar ao login
         </Link>
       }
@@ -52,34 +52,29 @@ export default function ForgotPassword() {
     >
       {!sent ? (
         <div>
-          <div className="mb-9">
-            <p className="mb-3 text-[12px] font-medium uppercase tracking-[0.12em] text-[#999999]">
-              Recuperação
-            </p>
-
-            <h1 className="text-[34px] font-semibold leading-[1.05] tracking-[-0.045em] text-[#202522] sm:text-[40px]">
-              Esqueceu a palavra-passe?
+          <div className="mb-7">
+            <h1 className="text-[32px] font-semibold leading-[1.05] tracking-[-0.04em] text-[#202522] sm:text-[36px]">
+              Recuperar palavra-passe
             </h1>
 
-            <p className="mt-3 text-[15px] leading-6 text-[#707070]">
-              Introduza o seu email e enviaremos as instruções para recuperar
-              o acesso.
+            <p className="mt-2.5 text-[14px] text-[#6e716b]">
+              Introduza o seu email registado para receber as instruções.
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label
                 htmlFor="email"
-                className="mb-2 block text-[13px] font-medium text-[#333333]"
+                className="mb-1.5 block text-[13px] font-medium text-[#202522]"
               >
-                Email
+                Email profissional
               </label>
 
               <div className="relative">
                 <Mail
                   aria-hidden="true"
-                  className="pointer-events-none absolute left-4 top-1/2 h-[17px] w-[17px] -translate-y-1/2 text-[#999999]"
+                  className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8f8a80]"
                   strokeWidth={1.8}
                 />
 
@@ -94,7 +89,7 @@ export default function ForgotPassword() {
                   onChange={(event) => setEmail(event.target.value)}
                   disabled={isLoading}
                   required
-                  className="h-[52px] w-full rounded-[7px] border border-[#ddddda] bg-[#fffdf9] pl-11 pr-4 text-[14px] text-[#202522] outline-none transition-all placeholder:text-[#aaaaaa] hover:border-[#c8c8c4] focus:border-[#2c6457] focus:ring-2 focus:ring-[#2c6457]/10 disabled:cursor-not-allowed disabled:bg-[#f7f7f5]"
+                  className="h-12 w-full rounded-lg border border-[#e2ded5] bg-[#fffdf9] pl-10 pr-4 text-[14px] text-[#202522] outline-none transition-all placeholder:text-[#a09b90] hover:border-[#c8c1b4] focus:border-[#202522] focus:ring-1 focus:ring-[#202522] disabled:cursor-not-allowed disabled:bg-[#f6f3ed]"
                 />
               </div>
             </div>
@@ -102,61 +97,47 @@ export default function ForgotPassword() {
             <button
               type="submit"
               disabled={isLoading}
-              className="group flex h-[52px] w-full items-center justify-center gap-2 rounded-[7px] bg-[#202522] text-[14px] font-semibold text-white transition-all hover:bg-[#2c6457] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#202522] text-[14px] font-semibold text-white transition-all hover:bg-[#2c6457] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isLoading ? "A enviar..." : "Enviar instruções"}
-
-              {!isLoading && (
-                <ArrowRight
-                  className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
-                  strokeWidth={1.8}
-                />
-              )}
+              {!isLoading && <ArrowRight className="h-4 w-4" strokeWidth={2} />}
             </button>
           </form>
 
-          <div className="mt-7 text-center">
+          <div className="mt-6 text-center">
             <Link
               to="/login"
-              className="inline-flex items-center gap-2 text-[13px] font-medium text-[#666666] transition-colors hover:text-[#202522]"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-[#6e716b] hover:text-[#202522] transition-colors"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
-              Voltar para entrar
+              Regressar ao login
             </Link>
           </div>
         </div>
       ) : (
-        <div>
-          <div className="mb-8 grid h-12 w-12 place-items-center rounded-full bg-[#f2f2ef]">
-            <CheckCircle2
-              className="h-6 w-6 text-[#202522]"
-              strokeWidth={1.7}
-            />
+        <div className="text-left">
+          <div className="mb-6 grid h-11 w-11 place-items-center rounded-full bg-[#d9e7de] text-[#2c6457]">
+            <CheckCircle2 className="h-6 w-6" strokeWidth={1.8} />
           </div>
 
-          <p className="mb-3 text-[12px] font-medium uppercase tracking-[0.12em] text-[#999999]">
-            Pedido enviado
-          </p>
-
-          <h1 className="text-[34px] font-semibold leading-[1.05] tracking-[-0.045em] text-[#202522] sm:text-[40px]">
-            Verifique o seu email.
+          <h1 className="text-[32px] font-semibold leading-[1.05] tracking-[-0.04em] text-[#202522] sm:text-[36px]">
+            Email enviado
           </h1>
 
-          <p className="mt-4 text-[15px] leading-6 text-[#707070]">
-            Se existir uma conta associada a este endereço, receberá as
-            instruções para redefinir a sua palavra-passe.
+          <p className="mt-3 text-[14px] leading-6 text-[#6e716b]">
+            Enviámos as instruções de recuperação para o email:
           </p>
 
-          <div className="mt-7 rounded-[7px] border border-[#e8e8e5] bg-[#fafaf8] px-4 py-3 text-[13px] text-[#555555]">
-            <span className="font-medium text-[#222222]">{email}</span>
+          <div className="mt-4 rounded-lg border border-[#e2ded5] bg-[#f6f3ed] p-3.5 font-mono text-xs text-[#202522]">
+            {email}
           </div>
 
           <Link
             to="/login"
-            className="mt-7 flex h-[52px] w-full items-center justify-center gap-2 rounded-[7px] border border-[#ddddda] text-[14px] font-semibold text-[#202522] transition-colors hover:bg-[#f7f7f5]"
+            className="mt-7 flex h-12 w-full items-center justify-center gap-2 rounded-lg border border-[#c8c1b4] text-[14px] font-semibold text-[#202522] transition-colors hover:bg-[#202522] hover:text-white"
           >
             <ArrowLeft className="h-4 w-4" />
-            Voltar para entrar
+            Voltar para o login
           </Link>
         </div>
       )}

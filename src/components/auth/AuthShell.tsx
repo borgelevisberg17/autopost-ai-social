@@ -1,11 +1,120 @@
 import { ReactNode } from "react";
-import { ArrowUpRight, Check, Circle } from "lucide-react";
+import { Circle, ShieldCheck, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
-type AuthShellProps = { children: ReactNode; eyebrow?: string; title?: string; description?: string; footer?: ReactNode; compact?: boolean; };
-const highlights = ["Catálogo e stock num só lugar", "Pedidos de todos os canais", "Automação com controlo humano"];
+type AuthShellProps = {
+  children: ReactNode;
+  eyebrow?: string;
+  title?: string;
+  description?: string;
+  footer?: ReactNode;
+  compact?: boolean;
+};
 
-export function AuthShell({ children, eyebrow = "VENDA · OPERAÇÃO · CRESCIMENTO", title = "A operação da sua loja, num só lugar.", description = "Catálogo, pedidos, canais e automação conectados à realidade do seu negócio.", footer, compact = false }: AuthShellProps) {
-  return <main className="min-h-screen bg-[#f6f3ed] text-[#202522]"><div className="min-h-screen lg:grid lg:grid-cols-[minmax(420px,0.9fr)_minmax(520px,1.1fr)]"><section className="relative flex min-h-[340px] overflow-hidden bg-[#202522] text-[#f6f3ed] lg:min-h-screen"><img src="/media/optimized/auth-human-commerce.webp" alt="Shop owner confirming an online purchase in an independent store" className="absolute inset-0 h-full w-full object-cover object-center opacity-80 auth-image-drift" /><div className="absolute inset-0 bg-gradient-to-br from-[#101512]/95 via-[#101512]/60 to-[#e36c3f]/30" /><div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_20%,rgba(217,231,222,.16),transparent_36%)]" /><div className="relative z-10 flex min-h-[340px] w-full flex-col p-6 sm:p-10 lg:min-h-screen xl:p-14"><Link to="/" className="inline-flex w-fit items-center gap-2 text-[#f6f3ed] transition-opacity hover:opacity-70"><span className="grid h-9 w-9 place-items-center border border-white/20 bg-[#e36c3f] text-white"><Circle className="h-3.5 w-3.5 fill-current" /></span><span className="text-[18px] font-bold tracking-[-0.04em]">Vendora</span></Link><div className="my-auto max-w-[500px] pb-5 lg:pb-10"><p className="mb-6 font-mono text-[11px] font-medium tracking-[0.18em] text-[#f3b08e]">{eyebrow}</p><h2 className="max-w-[490px] text-[38px] font-semibold leading-[0.98] tracking-[-0.06em] sm:text-[46px] xl:text-[62px]">{title}</h2><p className="mt-7 max-w-[430px] text-[16px] leading-7 text-white/70">{description}</p><div className="mt-6 space-y-3 lg:mt-10">{highlights.map((item) => <div key={item} className="flex items-center gap-3 text-[13px] text-white/75"><Check className="h-4 w-4 text-[#f3b08e]" />{item}</div>)}</div><div className="mt-6 max-w-[430px] border border-white/20 bg-[#101512]/45 p-4 backdrop-blur-sm"><div className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#f3b08e]">Commerce in motion</div><p className="mt-3 max-w-xs text-sm leading-6 text-white/75">The customer is buying. Your operation is already keeping up.</p></div></div><div className="hidden items-end justify-between border-t border-white/15 pt-5 text-[11px] lg:flex text-white/50"><span>Commerce operations, made legible.</span><span className="flex items-center gap-1">Luanda <ArrowUpRight className="h-3 w-3" /></span></div></div></section><section className="relative flex min-h-screen flex-col bg-[#fffdf9]"><header className="flex items-center justify-between px-5 py-5 sm:px-8 lg:px-12 lg:py-7"><Link to="/" className="flex items-center gap-2 text-[#202522] lg:hidden"><span className="grid h-8 w-8 place-items-center bg-[#202522] text-[#f6f3ed]"><Circle className="h-3 w-3 fill-current" /></span><span className="font-bold tracking-[-0.04em]">Vendora</span></Link><div className="ml-auto">{footer}</div></header><div className={cn("mx-auto flex w-full max-w-[470px] flex-1 flex-col justify-center px-5 pb-12 sm:px-8 lg:px-12", compact ? "py-10" : "py-8")}>{children}</div><div className="px-5 pb-5 text-center font-mono text-[10px] text-[#9a968d] sm:px-8 lg:px-12 lg:pb-7">© {new Date().getFullYear()} Vendora</div></section></div></main>;
+export function AuthShell({
+  children,
+  eyebrow = "SISTEMA OPERACIONAL COMERCIAL",
+  title = "Uma forma mais calma de gerir o seu negócio.",
+  description = "Catálogo, pedidos, canais de venda e automação inteligente num só lugar.",
+  footer,
+  compact = false,
+}: AuthShellProps) {
+  return (
+    <main className="min-h-screen bg-[#f6f3ed] text-[#202522]">
+      <div className="min-h-screen lg:grid lg:grid-cols-[0.88fr_1.12fr]">
+        {/* Left Side: Editorial Brand Panel with Background Image */}
+        <section className="relative hidden flex-col justify-between overflow-hidden bg-[#202522] p-10 text-[#f6f3ed] lg:flex xl:p-14">
+          {/* Background Image & Gradient Overlays */}
+          <img
+            src="/media/optimized/auth-human-commerce.webp"
+            alt="Comerciante a gerir a loja"
+            className="absolute inset-0 h-full w-full object-cover object-center opacity-65"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#101512] via-[#101512]/80 to-[#101512]/40" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(44,100,87,0.3),transparent_60%)]" />
+
+          {/* Top Logo */}
+          <div className="relative z-10">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2.5 text-[#f6f3ed] transition-opacity hover:opacity-80"
+            >
+              <span className="grid h-9 w-9 place-items-center bg-[#e36c3f] text-white">
+                <Circle className="h-3.5 w-3.5 fill-current" />
+              </span>
+              <span className="text-[20px] font-bold tracking-[-0.05em]">Vendora</span>
+            </Link>
+          </div>
+
+          {/* Middle Content */}
+          <div className="relative z-10 my-auto max-w-[460px] py-12">
+            <div className="mb-6 inline-flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-[#f3b08e]">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#e36c3f]" />
+              {eyebrow}
+            </div>
+
+            <h2 className="text-balance text-[42px] font-semibold leading-[0.96] tracking-[-0.06em] text-white">
+              {title}
+            </h2>
+
+            <p className="mt-6 text-[15px] leading-7 text-white/70">
+              {description}
+            </p>
+
+            {/* Feature Highlights */}
+            <div className="mt-10 space-y-3.5 border-t border-white/15 pt-8 text-xs font-medium text-white/80">
+              <div className="flex items-center gap-3">
+                <Sparkles className="h-4 w-4 text-[#f3b08e]" />
+                <span>Integração de loja online, WhatsApp, Instagram e Facebook</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <ShieldCheck className="h-4 w-4 text-[#8bad9d]" />
+                <span>Dados operacionais isolados e protegidos por permissões</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Caption */}
+          <div className="relative z-10 flex items-center justify-between border-t border-white/15 pt-6 font-mono text-[10px] uppercase tracking-[0.16em] text-white/50">
+            <span>Vendora Commerce OS</span>
+            <span>Segurança Ativa</span>
+          </div>
+        </section>
+
+        {/* Right Side: Clean Form Container */}
+        <section className="flex min-h-screen flex-col justify-between bg-[#fffdf9] px-6 py-8 sm:px-12 lg:px-16 xl:px-20">
+          {/* Header */}
+          <header className="flex items-center justify-between">
+            <Link to="/" className="flex items-center gap-2.5 text-[#202522]">
+              <span className="grid h-8 w-8 place-items-center bg-[#202522] text-[#f6f3ed]">
+                <Circle className="h-3 w-3 fill-current" />
+              </span>
+              <span className="text-[18px] font-bold tracking-[-0.05em]">Vendora</span>
+            </Link>
+
+            <div>{footer}</div>
+          </header>
+
+          {/* Main Form Content */}
+          <div
+            className={cn(
+              "mx-auto my-auto w-full max-w-[420px] py-8",
+              compact ? "max-w-[400px]" : "max-w-[420px]"
+            )}
+          >
+            {children}
+          </div>
+
+          {/* Footer */}
+          <footer className="flex flex-col items-center justify-between gap-2 border-t border-[#f0ece1] pt-6 text-center font-mono text-[10px] uppercase tracking-[0.12em] text-[#9a968d] sm:flex-row">
+            <span>© {new Date().getFullYear()} Vendora</span>
+            <Link to="/pricing" className="transition-colors hover:text-[#202522]">
+              Ver Planos & Preços →
+            </Link>
+          </footer>
+        </section>
+      </div>
+    </main>
+  );
 }
