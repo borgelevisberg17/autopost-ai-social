@@ -92,14 +92,14 @@
 }
 
 
-@keyframes orbit-profile-in {
+@keyframes people-profile-in {
   0% { opacity: 0; transform: translateY(26px) scale(.72) rotate(-7deg); }
-  62% { opacity: 1; transform: translateY(-4px) scale(1.04) rotate(2deg); }
+  62% { opacity: 1; transform: translateY(-7px) scale(1.04) rotate(2deg); }
   100% { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
 }
 
-.orbit-profile { animation: orbit-profile-in 900ms cubic-bezier(.2,.8,.2,1) both; }
+.people-profile { animation: people-profile-in 900ms cubic-bezier(.2,.8,.2,1) both; }
 
 @media (prefers-reduced-motion: reduce) {
-  .orbit-profile { animation: none; }
+  .people-profile { animation: none; }
 }
