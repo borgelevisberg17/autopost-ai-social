@@ -1519,7 +1519,7 @@ export default function Index() {
         ctaHref={startPath}
         onCtaClick={() => setOnboardingOpen(true)}
       />
-      <main className="pt-[72px]">
+      <main className="pt-[72px] sm:pt-[76px]">
         <HeroSection
           startPath={startPath}
           onStart={() => setOnboardingOpen(true)}

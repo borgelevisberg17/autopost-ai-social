@@ -90,7 +90,7 @@ export default function Pricing() {
       <SiteHeader ctaHref={startPath} />
 
       {/* Main Content */}
-      <main className="pt-[72px]">
+      <main className="pt-[72px] sm:pt-[76px]">
         {/* Editorial Hero with Background Image */}
         <section className="relative overflow-hidden bg-[#202522] text-white">
           <img

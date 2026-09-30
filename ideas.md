@@ -55,3 +55,8 @@ A captura enviada pelo utilizador é a referência visual para `/admin/canais`: 
 - Toda página distingue **carregamento, erro, vazio verdadeiro e filtro sem resultados**; erro nunca se apresenta como ausência de dados. Indicar limites de amostra ao lado de contagens e listas.
 - Mobile não é uma tabela comprimida: registos refluem em blocos legíveis, controlos têm alvos confortáveis e o menu “Mais” dá acesso a todas as rotas sem sobrecarregar a navegação inferior.
 - Usar apenas dados e ações existentes. Histórico não é calendário, uma alteração de status não é publicação externa, `payment_status` não é gateway e agentes/runs não equivalem a automações configuráveis.
+
+## Header e consentimento de cookies (2026-09)
+
+- **Navegação pública:** header fixo com presença suficiente, links legíveis e alvos de toque confortáveis; no desktop manter hierarquia simples e no mobile menu recolhível, respeitando a altura do conteúdo seguinte.
+- **Cookies:** cartão compacto flutuante, com escolhas explícitas e preferência de movimento reduzido. Informar só as categorias realmente usadas; não sugerir analytics/publicidade quando não estão ativos.

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Check, Cookie, X } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
@@ -7,6 +7,7 @@ const CONSENT_KEY = "vendora-cookie-consent";
 
 export function CookieBanner() {
   const [visible, setVisible] = useState(false);
+  const [preferencesOpen, setPreferencesOpen] = useState(false);
   const location = useLocation();
   const reduceMotion = useReducedMotion();
 
@@ -18,6 +19,7 @@ export function CookieBanner() {
 
   const choose = (value: "accepted" | "essential") => {
     window.localStorage.setItem(CONSENT_KEY, value);
+    setPreferencesOpen(false);
     setVisible(false);
   };
 
@@ -25,76 +27,93 @@ export function CookieBanner() {
     <AnimatePresence>
       {visible && (
         <motion.aside
-          initial={reduceMotion ? { opacity: 0 } : { y: 32, opacity: 0 }}
+          initial={reduceMotion ? { opacity: 0 } : { y: 18, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          exit={reduceMotion ? { opacity: 0 } : { y: 24, opacity: 0 }}
+          exit={reduceMotion ? { opacity: 0 } : { y: 12, opacity: 0 }}
           transition={
             reduceMotion
               ? { duration: 0.15 }
-              : { type: "spring", stiffness: 250, damping: 25, mass: 0.85 }
+              : { type: "spring", stiffness: 280, damping: 27, mass: 0.8 }
           }
-          className="safe-area-bottom fixed inset-x-0 bottom-0 z-[90] overflow-hidden border-t border-[#d8d3c8] bg-[#fffdf9] shadow-[0_-12px_40px_rgba(32,37,34,0.16)]"
-          role="dialog"
-          aria-label="Preferências de cookies"
+          className="safe-area-bottom fixed inset-x-3 bottom-3 z-[90] max-h-[min(88dvh,520px)] overflow-y-auto rounded-xl border border-[#e2ded5] bg-[#fffdf9] shadow-[0_16px_48px_rgba(32,37,34,0.18)] sm:inset-x-auto sm:right-5 sm:bottom-5 sm:w-[min(420px,calc(100vw-2.5rem))]"
+          role="region"
+          aria-labelledby="cookie-banner-title"
           aria-live="polite"
         >
-          <motion.span
-            aria-hidden="true"
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={
-              reduceMotion
-                ? { duration: 0 }
-                : { duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] }
-            }
-            className="absolute inset-x-0 top-0 h-[3px] origin-left bg-[#e36c3f]"
-          />
-          <div className="mx-auto flex max-w-[1240px] flex-col gap-4 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:py-5">
-            <div className="flex gap-3">
-              <motion.span
-                initial={reduceMotion ? false : { scale: 0.7, rotate: -12 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={
-                  reduceMotion
-                    ? { duration: 0 }
-                    : {
-                        type: "spring",
-                        stiffness: 320,
-                        damping: 18,
-                        delay: 0.12,
-                      }
-                }
-                className="mt-0.5 grid h-10 w-10 shrink-0 place-items-center border border-[#b9cabe] bg-[#d9e7de] text-[#2c6457]"
+          <div className="px-5 pt-5 pb-4 sm:px-6 sm:pt-6">
+            <h2
+              id="cookie-banner-title"
+              className="text-lg font-semibold tracking-[-0.025em] text-[#202522]"
+            >
+              Usamos cookies
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-[#6e716b]">
+              Cookies essenciais mantêm a sessão e guardam as preferências. Não
+              ativamos cookies de análise ou publicidade nesta versão.
+            </p>
+          </div>
+
+          <AnimatePresence initial={false}>
+            {preferencesOpen && (
+              <motion.div
+                id="cookie-preferences"
+                initial={reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
+                transition={reduceMotion ? { duration: 0.1 } : { duration: 0.2 }}
+                className="overflow-hidden"
               >
-                <Cookie className="h-4 w-4" />
-              </motion.span>
-              <div>
-                <p className="text-sm font-semibold text-[#202522]">
-                  A sua privacidade, ao seu ritmo.
-                </p>
-                <p className="mt-1 max-w-2xl text-xs leading-5 text-[#6e716b]">
-                  Usamos cookies essenciais para manter a Vendora segura e, se
-                  autorizar, cookies de análise para perceber o que ajuda as
-                  equipas a vender.
-                </p>
-              </div>
-            </div>
-            <div className="grid w-full grid-cols-1 gap-2 sm:grid-cols-2 lg:w-auto lg:flex lg:shrink-0 lg:items-center">
-              <button
-                type="button"
-                onClick={() => choose("essential")}
-                className="inline-flex min-h-11 items-center justify-center gap-2 border border-[#d8d3c8] px-4 text-xs font-semibold text-[#5f625d] transition hover:border-[#8bad9d] hover:bg-[#f6f3ed] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2c6457] focus-visible:ring-offset-2"
-              >
-                <X className="h-3.5 w-3.5" /> Apenas essenciais
-              </button>
-              <button
-                type="button"
-                onClick={() => choose("accepted")}
-                className="inline-flex min-h-11 items-center justify-center gap-2 bg-[#202522] px-4 text-xs font-semibold text-white transition hover:bg-[#2c6457] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
-              >
-                <Check className="h-3.5 w-3.5" /> Aceitar todos
-              </button>
-            </div>
+                <div className="mx-5 border-y border-[#ebe7df] py-3 text-xs leading-5 text-[#6e716b] sm:mx-6">
+                  <p>
+                    <span className="font-semibold text-[#202522]">
+                      Essenciais
+                    </span>
+                    <span className="ml-2 text-[#2c6457]">Sempre ativos</span>
+                    <br />
+                    Necessários para manter a sessão e as preferências da
+                    interface.
+                  </p>
+                  <p className="mt-3">
+                    <span className="font-semibold text-[#202522]">
+                      Análise e publicidade
+                    </span>
+                    <br />
+                    Não são utilizadas neste momento.
+                  </p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <div className="grid gap-2 px-5 pt-1 pb-5 sm:px-6 sm:pb-6">
+            <button
+              type="button"
+              onClick={() => choose("accepted")}
+              className="inline-flex min-h-11 items-center justify-center bg-[#202522] px-4 text-sm font-semibold text-white transition hover:bg-[#2c6457] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
+            >
+              Aceitar
+            </button>
+            <button
+              type="button"
+              onClick={() => choose("essential")}
+              className="inline-flex min-h-11 items-center justify-center border border-[#d8d3c8] bg-[#fffdf9] px-4 text-sm font-semibold text-[#3f4840] transition hover:bg-[#f6f3ed] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2c6457] focus-visible:ring-offset-2"
+            >
+              Apenas essenciais
+            </button>
+            <button
+              type="button"
+              aria-expanded={preferencesOpen}
+              aria-controls="cookie-preferences"
+              onClick={() => setPreferencesOpen((open) => !open)}
+              className="inline-flex min-h-11 items-center justify-center gap-2 bg-[#f1eee7] px-4 text-sm font-medium text-[#3f4840] transition hover:bg-[#e9eee9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2c6457] focus-visible:ring-offset-2"
+            >
+              Gerir preferências
+              {preferencesOpen ? (
+                <ChevronUp aria-hidden="true" className="h-4 w-4" />
+              ) : (
+                <ChevronDown aria-hidden="true" className="h-4 w-4" />
+              )}
+            </button>
           </div>
         </motion.aside>
       )}
