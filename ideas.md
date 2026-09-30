@@ -37,3 +37,7 @@ DM Sans para a interface e IBM Plex Mono para metadados. Voz direta, humana e op
 - **Cor:** papel quente e branco marfim, carvão para texto, verde-sálvia para estados positivos e terracota para chamadas/alertas.
 - **Interação:** preservar pesquisa global, notificações, troca de loja, seletor de período, links, ações e navegação inferior móvel; manter foco visível e estados de carregamento/vazio.
 - **Tipografia:** DM Sans para controlos e corpo, a serif system (`font-serif`) em títulos e valores para o tom editorial da referência, e IBM Plex Mono nos metadados; sem dependências novas.
+
+## Área Canais — referência de acompanhamento de plataformas (2026-09)
+
+A captura enviada pelo utilizador é a referência visual para `/admin/canais`: o destino deve acompanhar plataformas de venda separadamente da visão geral, com escolha da plataforma, contexto do canal, estado de ligação e última sincronização, catálogo e pedidos recentes em painéis próprios. Reutilizar `social_connections`, `products` e `orders`; apresentar apenas estados reais. O catálogo base não equivale a catálogo sincronizado por plataforma, e um pedido registado não equivale a uma integração ativa. Não exibir estados fictícios, OAuth ou coleções sem suporte no backend.

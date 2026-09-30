@@ -675,12 +675,16 @@ export default function Overview() {
                   Vendas / Origem
                 </p>
                 <h2 className="mt-1 font-serif text-base font-semibold tracking-[-0.03em] text-[#202522] sm:text-lg">
-                  Canais de venda
+                  Vendas por origem
                 </h2>
               </div>
-              <span className="shrink-0 text-[10px] text-[#858c83]">
-                No período
-              </span>
+              <Link
+                to="/admin/canais"
+                className="group inline-flex shrink-0 items-center gap-1 text-[10px] font-medium text-[#687168] transition hover:text-[#202522]"
+              >
+                Plataformas
+                <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+              </Link>
             </div>
 
             {loading ? (
