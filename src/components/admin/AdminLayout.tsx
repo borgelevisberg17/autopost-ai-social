@@ -21,7 +21,6 @@ import {
   Settings,
   Share2,
   ShoppingBag,
-  Store,
   Users,
   X,
 } from "lucide-react";
@@ -201,13 +200,26 @@ export function AdminLayout({
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
   useEffect(() => {
-    if (!company) return;
+    const handleShortcut = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setCommandPaletteOpen((open) => !open);
+      }
+    };
+
+    window.addEventListener("keydown", handleShortcut);
+    return () => window.removeEventListener("keydown", handleShortcut);
+  }, []);
+
+  useEffect(() => {
+    const companyId = company?.id;
+    if (!companyId) return;
 
     async function loadNotifications() {
       const { data } = await supabase
         .from("notifications")
         .select("*")
-        .eq("company_id", company.id)
+        .eq("company_id", companyId)
         .order("created_at", { ascending: false })
         .limit(20);
 
@@ -233,7 +245,7 @@ export function AdminLayout({
   const markAsRead = async (id: string, link?: string | null) => {
     await supabase.from("notifications").update({ read: true }).eq("id", id);
     setNotifications((curr) =>
-      curr.map((n) => (n.id === id ? { ...n, read: true } : n))
+      curr.map((n) => (n.id === id ? { ...n, read: true } : n)),
     );
     if (link) {
       navigate(link);
@@ -262,41 +274,30 @@ export function AdminLayout({
       />
 
       {/* SIDEBAR */}
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-[240px] border-r border-white/10 bg-[#202522] text-[#f6f3ed] lg:flex lg:flex-col">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-[252px] border-r border-[#e4e0d7] bg-[#faf9f4] text-[#202522] lg:flex lg:flex-col">
         {/* BRAND */}
         <div className="px-6 pb-5 pt-6">
           <Link
             to="/dashboard"
             className="inline-flex items-center gap-3 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-4"
           >
-            <div className="grid h-8 w-8 place-items-center bg-[#e36c3f] text-white">
-              <Store className="h-[15px] w-[15px]" strokeWidth={1.8} />
-            </div>
+            <img
+              src="/vendora-mark.png"
+              alt=""
+              aria-hidden="true"
+              className="h-9 w-9"
+            />
 
-            <span className="text-[17px] font-semibold tracking-[-0.04em]">
+            <span className="font-serif text-[23px] font-medium tracking-[-0.045em] text-[#202522]">
               Vendora
             </span>
           </Link>
         </div>
 
-        {/* STORE & COMMAND PALETTE BUTTON */}
-        <div className="px-4 space-y-2">
-          <button
-            type="button"
-            onClick={() => setCommandPaletteOpen(true)}
-            className="flex h-9 w-full items-center justify-between rounded-sm border border-[#d9d5cc] bg-[#fffdf9] px-3 text-xs font-medium text-[#747b73] transition hover:bg-[#fffdf9]/10 hover:text-white"
-          >
-            <span className="flex items-center gap-2">
-              <Search className="h-3.5 w-3.5 text-[#a7aaa2]" />
-              <span>Pesquisar...</span>
-            </span>
-            <kbd className="rounded border border-[#ded9d0] bg-[#fffdf9] px-1.5 py-0.5 font-mono text-[10px] text-[#a7aaa2]">
-              ⌘K
-            </kbd>
-          </button>
-
-          <div className="border-b border-[#ded9d0] pb-4">
-            <p className="mb-1.5 px-2 text-[10px] font-medium uppercase tracking-[0.16em] text-[#a7aaa2]">
+        {/* STORE SWITCHER */}
+        <div className="px-4">
+          <div className="border-b border-[#e5e1d8] pb-4">
+            <p className="mb-1.5 px-2 text-[10px] font-medium uppercase tracking-[0.16em] text-[#858c83]">
               Sua loja
             </p>
 
@@ -305,7 +306,7 @@ export function AdminLayout({
                 value={company.id}
                 onChange={(e) => select(e.target.value)}
                 aria-label="Selecionar loja"
-                className="h-9 w-full rounded-sm border border-[#ded9d0] bg-[#fffdf9] px-2.5 text-xs font-medium text-[#202522] outline-none transition focus:border-[#2c6457] focus:ring-1 focus:ring-[#2c6457]"
+                className="h-10 w-full rounded-[4px] border border-[#e3dfd6] bg-[#fffdf9] px-3 text-xs font-medium text-[#202522] outline-none transition focus:border-[#2c6457] focus:ring-2 focus:ring-[#2c6457]/20"
               >
                 {companies.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -314,7 +315,7 @@ export function AdminLayout({
                 ))}
               </select>
             ) : (
-              <div className="flex h-9 items-center rounded-sm border border-[#ded9d0] px-3">
+              <div className="flex h-10 items-center rounded-[4px] border border-[#e3dfd6] bg-[#fffdf9] px-3">
                 <span className="truncate text-xs font-semibold">
                   {company.name}
                 </span>
@@ -324,11 +325,11 @@ export function AdminLayout({
         </div>
 
         {/* NAV */}
-        <nav className="flex-1 overflow-y-auto px-4 py-4">
-          <div className="space-y-6">
+        <nav className="flex-1 overflow-y-auto px-4 py-5">
+          <div className="space-y-5">
             {navSections.map((section) => (
               <section key={section.label}>
-                <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#a7aaa2]">
+                <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#858c83]">
                   {section.label}
                 </p>
 
@@ -343,18 +344,15 @@ export function AdminLayout({
                         end
                         className={({ isActive }) =>
                           cn(
-                            "flex min-h-9 items-center gap-3 rounded-sm px-3 text-xs transition-colors",
+                            "flex min-h-10 items-center gap-3 rounded-[4px] border-l-2 px-3 text-[13px] transition-colors",
                             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2",
                             isActive
-                              ? "bg-white/10 font-semibold text-[#fffdf9]"
-                              : "font-medium text-[#747b73] hover:bg-[#f1eee7] hover:text-[#202522]",
+                              ? "border-[#2c6457] bg-[#e7eadf] font-semibold text-[#202522]"
+                              : "border-transparent font-medium text-[#666e66] hover:bg-[#f0efe9] hover:text-[#202522]",
                           )
                         }
                       >
-                        <Icon
-                          className="h-4 w-4 shrink-0"
-                          strokeWidth={1.8}
-                        />
+                        <Icon className="h-4 w-4 shrink-0" strokeWidth={1.8} />
 
                         <span>{item.label}</span>
                       </NavLink>
@@ -367,90 +365,116 @@ export function AdminLayout({
         </nav>
 
         {/* BOTTOM */}
-        <div className="border-t border-[#ded9d0] px-4 py-3">
+        <div className="border-t border-[#e5e1d8] px-4 py-3">
           <a
             href={`/loja/${company.slug}`}
             target="_blank"
             rel="noreferrer"
-            className="flex min-h-9 items-center gap-3 rounded-sm px-3 text-xs font-medium text-[#747b73] transition-colors hover:bg-[#f1eee7] hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
+            className="flex min-h-10 items-center gap-3 rounded-[4px] px-3 text-[13px] font-medium text-[#666e66] transition-colors hover:bg-[#f0efe9] hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
           >
-            <ExternalLink
-              className="h-4 w-4"
-              strokeWidth={1.8}
-            />
+            <ExternalLink className="h-4 w-4" strokeWidth={1.8} />
             <span>Ver loja pública</span>
           </a>
 
           <button
             type="button"
             onClick={signOut}
-            className="mt-0.5 flex min-h-9 w-full items-center gap-3 rounded-sm px-3 text-xs font-medium text-[#a7aaa2] transition-colors hover:bg-[#f1eee7] hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
+            className="mt-0.5 flex min-h-10 w-full items-center gap-3 rounded-[4px] px-3 text-[13px] font-medium text-[#777e76] transition-colors hover:bg-[#f0efe9] hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
           >
-            <LogOut
-              className="h-4 w-4"
-              strokeWidth={1.8}
-            />
+            <LogOut className="h-4 w-4" strokeWidth={1.8} />
             <span>Sair</span>
           </button>
         </div>
       </aside>
 
       {/* MAIN */}
-      <main className="min-w-0 pb-[76px] lg:ml-[240px] lg:pb-0">
+      <main className="min-w-0 pb-[calc(76px+env(safe-area-inset-bottom))] lg:ml-[252px] lg:pb-0">
         {/* HEADER */}
-        <header className="sticky top-0 z-30 border-b border-[#ded9d0] bg-[#fffdf9]">
-          <div className="flex min-h-[64px] items-center justify-between gap-4 px-5 sm:px-7 lg:px-10">
-            <div className="flex items-center gap-3 min-w-0">
-              <h1 className="truncate text-[19px] font-semibold tracking-[-0.035em]">
-                {title}
-              </h1>
+        <header className="sticky top-0 z-30 border-b border-[#e5e1d8] bg-[#f8f7f1]/95 backdrop-blur-sm">
+          <div className="mx-auto flex min-h-[68px] max-w-[1480px] items-center justify-between gap-3 px-4 sm:min-h-[76px] sm:px-7 lg:px-10">
+            <div className="flex min-w-0 items-center gap-3">
+              <img
+                src="/vendora-mark.png"
+                alt=""
+                aria-hidden="true"
+                className="h-8 w-8 shrink-0 lg:hidden"
+              />
+              <div className="min-w-0">
+                <h1 className="truncate font-serif text-[21px] font-medium tracking-[-0.03em] text-[#202522] sm:text-[25px]">
+                  {title}
+                </h1>
+                {companies.length > 1 ? (
+                  <select
+                    value={company.id}
+                    onChange={(e) => select(e.target.value)}
+                    aria-label="Selecionar loja"
+                    className="mt-0.5 block w-full max-w-[190px] truncate bg-transparent text-[10px] font-medium text-[#687168] outline-none focus-visible:ring-2 focus-visible:ring-[#2c6457] lg:hidden"
+                  >
+                    {companies.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <p className="truncate text-[10px] text-[#858c83] lg:hidden">
+                    {company.name}
+                  </p>
+                )}
+              </div>
+            </div>
 
+            <div className="flex shrink-0 items-center gap-2 sm:gap-3">
               <button
                 type="button"
                 onClick={() => setCommandPaletteOpen(true)}
-                className="hidden sm:inline-flex items-center gap-2 rounded border border-[#d9d5cc] bg-[#fffdf9] px-2.5 py-1 text-xs text-[#747b73] hover:bg-[#fffdf9]/10 hover:text-white"
+                aria-label="Pesquisar pedidos, produtos e clientes"
+                className="group flex h-10 w-10 items-center justify-center gap-2 rounded-[4px] border border-[#e3dfd6] bg-[#fffdf9] px-3 text-left text-xs text-[#737a72] transition hover:border-[#b9c6b7] hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] sm:w-[min(32vw,290px)] sm:justify-start lg:w-[min(28vw,340px)]"
               >
-                <Search className="h-3.5 w-3.5" />
-                <span>⌘K</span>
+                <Search className="h-4 w-4 shrink-0 text-[#687168]" />
+                <span className="hidden min-w-0 flex-1 truncate sm:block">
+                  Pesquisar pedidos, produtos, clientes...
+                </span>
+                <kbd className="ml-auto hidden shrink-0 border border-[#e5e1d8] bg-[#f8f7f1] px-1.5 py-0.5 font-mono text-[10px] text-[#858c83] lg:block">
+                  ⌘ K
+                </kbd>
               </button>
-            </div>
 
-            <div className="flex shrink-0 items-center gap-2">
-              {/* NOTIFICATION BELL */}
               <div className="relative">
                 <button
                   type="button"
                   onClick={() => setNotificationsOpen((v) => !v)}
-                  className="relative grid h-9 w-9 place-items-center rounded-sm border border-[#ded9d0] bg-[#fffdf9] text-neutral-600 transition hover:bg-[#f1eee7] hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+                  className="relative grid h-10 w-10 place-items-center rounded-[4px] border border-[#e3dfd6] bg-[#fffdf9] text-[#525c54] transition hover:border-[#b9c6b7] hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
                   aria-label="Notificações"
+                  aria-expanded={notificationsOpen}
                 >
                   <Bell className="h-4 w-4" />
                   {unreadCount > 0 && (
-                    <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#e36c3f] text-[9px] font-bold text-white">
+                    <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-[#bd592f] px-1 text-[9px] font-bold text-white">
                       {unreadCount}
                     </span>
                   )}
                 </button>
 
-                {/* NOTIFICATIONS DROPDOWN */}
                 {notificationsOpen && (
-                  <div className="absolute right-0 top-11 z-50 w-80 sm:w-96 rounded-lg border border-[#ded9d0] bg-[#fffdf9] shadow-2xl">
-                    <div className="flex items-center justify-between border-b border-[#ded9d0] px-4 py-3">
+                  <div className="fixed left-3 right-3 top-[76px] z-50 overflow-hidden rounded-[4px] border border-[#ded9d0] bg-[#fffdf9] shadow-[0_16px_48px_rgba(32,37,34,0.16)] sm:absolute sm:left-auto sm:right-0 sm:top-12 sm:w-96">
+                    <div className="flex items-center justify-between border-b border-[#e9e5dc] px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-semibold text-neutral-950">Notificações</span>
+                        <span className="text-sm font-semibold text-[#202522]">
+                          Notificações
+                        </span>
                         {unreadCount > 0 && (
-                          <span className="rounded bg-[#ebe7df] px-1.5 py-0.5 text-[10px] font-semibold text-neutral-800">
+                          <span className="bg-[#e9eee9] px-1.5 py-0.5 text-[10px] font-semibold text-[#2c6457]">
                             {unreadCount} novas
                           </span>
                         )}
                       </div>
-
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-3">
                         {unreadCount > 0 && (
                           <button
                             type="button"
                             onClick={markAllAsRead}
-                            className="text-[11px] font-medium text-[#747b73] hover:text-[#202522]"
+                            className="text-[11px] font-medium text-[#687168] hover:text-[#202522]"
                           >
                             Marcar lidas
                           </button>
@@ -458,44 +482,49 @@ export function AdminLayout({
                         <button
                           type="button"
                           onClick={() => setNotificationsOpen(false)}
-                          className="text-[#a7aaa2] hover:text-[#202522]"
+                          aria-label="Fechar notificações"
+                          className="grid h-7 w-7 place-items-center text-[#858c83] hover:bg-[#f1eee7] hover:text-[#202522]"
                         >
                           <X className="h-4 w-4" />
                         </button>
                       </div>
                     </div>
-
-                    <div className="max-h-[320px] overflow-y-auto divide-y divide-neutral-100">
+                    <div className="max-h-[min(65vh,420px)] divide-y divide-[#eeeae2] overflow-y-auto">
                       {notifications.length === 0 ? (
-                        <div className="p-6 text-center text-xs text-[#a7aaa2]">
+                        <div className="p-8 text-center text-xs text-[#858c83]">
                           Sem notificações de momento.
                         </div>
                       ) : (
                         notifications.map((n) => (
-                          <div
+                          <button
                             key={n.id}
+                            type="button"
                             onClick={() => markAsRead(n.id, n.link)}
                             className={cn(
-                              "cursor-pointer p-3.5 transition hover:bg-[#f1eee7]",
-                              !n.read && "bg-[#f1eee7]/80"
+                              "w-full cursor-pointer p-4 text-left transition hover:bg-[#f5f4ee]",
+                              !n.read && "bg-[#f1f3ed]",
                             )}
                           >
-                            <div className="flex items-start justify-between gap-2">
-                              <p className="text-xs font-semibold text-neutral-950">{n.title}</p>
+                            <span className="flex items-start justify-between gap-3">
+                              <span className="text-xs font-semibold text-[#202522]">
+                                {n.title}
+                              </span>
                               {!n.read && (
-                                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#e36c3f]" />
+                                <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#e36c3f]" />
                               )}
-                            </div>
-                            <p className="mt-1 text-xs text-neutral-600 line-clamp-2">{n.message}</p>
-                            <p className="mt-1.5 text-[10px] text-[#a7aaa2]">
+                            </span>
+                            <span className="mt-1 block line-clamp-2 text-xs leading-5 text-[#687168]">
+                              {n.message}
+                            </span>
+                            <span className="mt-2 block font-mono text-[10px] text-[#92978e]">
                               {new Intl.DateTimeFormat("pt-PT", {
                                 day: "2-digit",
                                 month: "short",
                                 hour: "2-digit",
                                 minute: "2-digit",
                               }).format(new Date(n.created_at))}
-                            </p>
-                          </div>
+                            </span>
+                          </button>
                         ))
                       )}
                     </div>
@@ -509,13 +538,13 @@ export function AdminLayout({
         </header>
 
         {/* PAGE */}
-        <div className="mx-auto w-full max-w-[1440px] px-5 py-7 sm:px-7 lg:px-10 lg:py-8">
+        <div className="mx-auto w-full max-w-[1480px] px-4 py-5 sm:px-7 sm:py-7 lg:px-10 lg:py-8">
           {children}
         </div>
       </main>
 
       {/* MOBILE HEADER / NAV */}
-      <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-[#ded9d0] bg-[#fffdf9] lg:hidden">
+      <nav className="fixed inset-x-0 bottom-0 pb-[env(safe-area-inset-bottom)] z-50 border-t border-[#e4e0d7] bg-[#fbfaf6]/95 shadow-[0_-8px_26px_rgba(32,37,34,0.08)] backdrop-blur-sm lg:hidden">
         <div className="mx-auto grid h-[68px] max-w-lg grid-cols-6">
           {mobileNav.map((item) => {
             const Icon = item.icon;
@@ -529,9 +558,7 @@ export function AdminLayout({
                   cn(
                     "flex min-w-0 flex-col items-center justify-center gap-1 px-1 text-[10px] font-medium transition-colors",
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-inset",
-                    isActive
-                      ? "text-neutral-950"
-                      : "text-[#a7aaa2]",
+                    isActive ? "text-[#2c6457]" : "text-[#858c83]",
                   )
                 }
               >
@@ -539,8 +566,8 @@ export function AdminLayout({
                   <>
                     <span
                       className={cn(
-                      "grid h-7 w-10 place-items-center rounded-[7px] transition-colors",
-                        isActive && "bg-[#ebe7df]",
+                        "grid h-7 w-10 place-items-center rounded-[7px] transition-colors",
+                        isActive && "bg-[#e7eadf]",
                       )}
                     >
                       <Icon

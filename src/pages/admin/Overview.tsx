@@ -23,6 +23,7 @@ import {
 } from "recharts";
 
 import { AdminLayout } from "@/components/admin/AdminLayout";
+import { OverviewActivity } from "@/components/admin/OverviewActivity";
 import { useCompany } from "@/hooks/useCompany";
 import { supabase } from "@/integrations/supabase/client";
 import { formatMoney, ORDER_STATUS } from "@/lib/format";
@@ -131,9 +132,7 @@ export default function Overview() {
       const [ordersResult, productsResult] = await Promise.all([
         supabase
           .from("orders")
-          .select(
-            "id,total,status,created_at,customer_name,channel",
-          )
+          .select("id,total,status,created_at,customer_name,channel")
           .eq("company_id", company.id)
           .order("created_at", { ascending: false })
           .limit(1000),
@@ -163,9 +162,7 @@ export default function Overview() {
       if (validOrderIds.length > 0) {
         const { data } = await supabase
           .from("order_items")
-          .select(
-            "product_name,quantity,unit_price,order_id",
-          )
+          .select("product_name,quantity,unit_price,order_id")
           .in("order_id", validOrderIds);
 
         if (!cancelled) {
@@ -190,9 +187,7 @@ export default function Overview() {
     const today = startOfDay(now);
     const days = getPeriodDays(period);
 
-    const validOrders = orders.filter(
-      (order) => order.status !== "cancelled",
-    );
+    const validOrders = orders.filter((order) => order.status !== "cancelled");
 
     const periodStart = new Date(today);
     periodStart.setDate(periodStart.getDate() - (days - 1));
@@ -221,8 +216,7 @@ export default function Overview() {
 
     const todayOrders = validOrders.filter(
       (order) =>
-        startOfDay(new Date(order.created_at)).getTime() ===
-        today.getTime(),
+        startOfDay(new Date(order.created_at)).getTime() === today.getTime(),
     );
 
     const todayRevenue = todayOrders.reduce(
@@ -230,44 +224,36 @@ export default function Overview() {
       0,
     );
 
-    const pendingOrders = orders.filter(
-      (order) => order.status === "pending",
-    );
+    const pendingOrders = orders.filter((order) => order.status === "pending");
 
     const cancelledOrders = orders.filter(
       (order) => order.status === "cancelled",
     );
 
-    const chart: ChartPoint[] = Array.from(
-      { length: days },
-      (_, index) => {
-        const date = new Date(periodStart);
-        date.setDate(periodStart.getDate() + index);
+    const chart: ChartPoint[] = Array.from({ length: days }, (_, index) => {
+      const date = new Date(periodStart);
+      date.setDate(periodStart.getDate() + index);
 
-        const dayStart = startOfDay(date);
-        const nextDay = new Date(dayStart);
-        nextDay.setDate(nextDay.getDate() + 1);
+      const dayStart = startOfDay(date);
+      const nextDay = new Date(dayStart);
+      nextDay.setDate(nextDay.getDate() + 1);
 
-        const dayOrders = validOrders.filter((order) => {
-          const created = new Date(order.created_at);
-          return created >= dayStart && created < nextDay;
-        });
+      const dayOrders = validOrders.filter((order) => {
+        const created = new Date(order.created_at);
+        return created >= dayStart && created < nextDay;
+      });
 
-        return {
-          label:
-            days <= 7
-              ? new Intl.DateTimeFormat("pt-PT", {
-                  weekday: "short",
-                }).format(date)
-              : `${date.getDate()}/${date.getMonth() + 1}`,
-          receita: dayOrders.reduce(
-            (sum, order) => sum + Number(order.total),
-            0,
-          ),
-          pedidos: dayOrders.length,
-        };
-      },
-    );
+      return {
+        label:
+          days <= 7
+            ? new Intl.DateTimeFormat("pt-PT", {
+                weekday: "short",
+              }).format(date)
+            : `${date.getDate()}/${date.getMonth() + 1}`,
+        receita: dayOrders.reduce((sum, order) => sum + Number(order.total), 0),
+        pedidos: dayOrders.length,
+      };
+    });
 
     const productSales = Object.values(
       items.reduce<
@@ -365,9 +351,7 @@ export default function Overview() {
       productSales,
       channelSales,
       averageOrder:
-        currentOrders.length > 0
-          ? revenue / currentOrders.length
-          : 0,
+        currentOrders.length > 0 ? revenue / currentOrders.length : 0,
     };
   }, [orders, items, period]);
 
@@ -383,25 +367,24 @@ export default function Overview() {
 
   return (
     <AdminLayout title="Visão geral">
-      <div className="space-y-10">
+      <div className="space-y-5 sm:space-y-6">
         {/* INTRO */}
-        <section className="flex flex-col justify-between gap-5 border-b border-[#ded9d0] pb-7 sm:flex-row sm:items-end">
+        <section className="flex flex-col justify-between gap-3 border-b border-[#e4e0d7] pb-5 sm:flex-row sm:items-end sm:pb-6">
           <div>
-            <p className="mb-2 text-xs font-medium uppercase tracking-[0.16em] text-[#a7aaa2]">
-              Visão geral
+            <p className="mb-2 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-[#718071]">
+              Painel de controlo
             </p>
 
-            <h2 className="text-2xl font-semibold tracking-[-0.045em] sm:text-3xl">
+            <h2 className="font-serif text-[30px] font-medium leading-tight tracking-[-0.045em] text-[#202522] sm:text-[38px]">
               Olá, {company.name}.
             </h2>
 
-            <p className="mt-2 max-w-xl text-sm leading-6 text-[#747b73]">
-              Aqui está o estado atual da sua operação e o que merece
-              atenção.
+            <p className="mt-2 max-w-xl text-[13px] leading-5 text-[#697168] sm:text-sm sm:leading-6">
+              Aqui está o estado atual da sua operação e o que merece atenção.
             </p>
           </div>
 
-          <div className="text-sm text-[#a7aaa2]">
+          <div className="font-mono text-[11px] text-[#858c83]">
             {new Intl.DateTimeFormat("pt-PT", {
               weekday: "long",
               day: "numeric",
@@ -411,7 +394,7 @@ export default function Overview() {
         </section>
 
         {/* KEY METRICS */}
-        <section className="grid border-y border-[#ded9d0] sm:grid-cols-2 lg:grid-cols-4">
+        <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <Metric
             label="Receita"
             value={formatMoney(stats.revenue, currency)}
@@ -445,21 +428,21 @@ export default function Overview() {
         </section>
 
         {/* PERFORMANCE + ATTENTION */}
-        <section className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <section className="grid gap-4 xl:grid-cols-[minmax(0,1.65fr)_minmax(300px,0.85fr)]">
           {/* CHART */}
-          <div className="min-w-0">
-            <div className="mb-5 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+          <div className="min-w-0 rounded-[5px] border border-[#e4e0d7] bg-[#fffdf9] p-4 shadow-[0_2px_10px_rgba(32,37,34,0.025)] sm:p-5">
+            <div className="mb-3 flex flex-col justify-between gap-3 border-b border-[#ece8df] pb-3 sm:flex-row sm:items-end">
               <div>
                 <p className="text-xs font-medium uppercase tracking-[0.16em] text-[#a7aaa2]">
                   Desempenho
                 </p>
 
-                <h2 className="mt-1 text-lg font-semibold tracking-tight">
+                <h2 className="mt-1 font-serif text-lg font-semibold tracking-[-0.03em] text-[#202522]">
                   Receita e pedidos
                 </h2>
               </div>
 
-              <div className="flex w-fit border border-[#ded9d0] bg-[#fffdf9]">
+              <div className="flex w-fit border border-[#e4e0d7] bg-[#faf9f4]">
                 {(
                   [
                     ["7d", "7 dias"],
@@ -485,7 +468,7 @@ export default function Overview() {
               </div>
             </div>
 
-            <div className="h-[300px] w-full border-y border-[#ded9d0] py-6">
+            <div className="h-[270px] w-full sm:h-[310px]">
               {loading ? (
                 <div className="grid h-full place-items-center text-sm text-[#a7aaa2]">
                   A carregar dados...
@@ -498,8 +481,8 @@ export default function Overview() {
                       Ainda não existem vendas neste período.
                     </p>
                     <p className="mt-1 text-xs text-[#a7aaa2]">
-                      Os dados de vendas aparecerão aqui quando os pedidos
-                      forem recebidos.
+                      Os dados de vendas aparecerão aqui quando os pedidos forem
+                      recebidos.
                     </p>
                   </div>
                 </div>
@@ -524,12 +507,12 @@ export default function Overview() {
                       >
                         <stop
                           offset="0%"
-                          stopColor="#0a0a0a"
-                          stopOpacity={0.12}
+                          stopColor="#2c6457"
+                          stopOpacity={0.16}
                         />
                         <stop
                           offset="100%"
-                          stopColor="#0a0a0a"
+                          stopColor="#2c6457"
                           stopOpacity={0}
                         />
                       </linearGradient>
@@ -588,8 +571,8 @@ export default function Overview() {
                     <Area
                       type="monotone"
                       dataKey="receita"
-                      stroke="#0a0a0a"
-                      strokeWidth={1.8}
+                      stroke="#2c6457"
+                      strokeWidth={2.2}
                       fill="url(#overviewRevenue)"
                     />
                   </AreaChart>
@@ -599,27 +582,40 @@ export default function Overview() {
           </div>
 
           {/* ATTENTION */}
-          <div>
-            <div className="mb-5">
-              <p className="text-xs font-medium uppercase tracking-[0.16em] text-[#a7aaa2]">
+          <div className="rounded-[5px] border border-[#e4e0d7] bg-[#fffdf9] p-4 shadow-[0_2px_10px_rgba(32,37,34,0.025)] sm:p-5">
+            <div className="mb-3 border-b border-[#ece8df] pb-3">
+              <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#9d684d]">
                 Atenção
               </p>
 
-              <h2 className="mt-1 text-lg font-semibold tracking-tight">
+              <h2 className="mt-1 font-serif text-lg font-semibold tracking-[-0.03em] text-[#202522]">
                 O que precisa de si
               </h2>
             </div>
 
-            <div className="border-y border-[#ded9d0]">
-              {lowStock.length > 0 && (
+            <div className="divide-y divide-[#eeeae2]">
+              {loading && (
+                <div className="space-y-3 py-5" aria-label="A carregar tarefas">
+                  {[0, 1].map((item) => (
+                    <div key={item} className="flex items-center gap-3">
+                      <span className="h-4 w-4 animate-pulse bg-[#f0efe9]" />
+                      <span className="flex-1 space-y-2">
+                        <span className="block h-3 w-2/3 animate-pulse bg-[#f0efe9]" />
+                        <span className="block h-2.5 w-1/3 animate-pulse bg-[#f0efe9]" />
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {!loading && lowStock.length > 0 && (
                 <AttentionItem
                   icon={AlertTriangle}
                   title={`${lowStock.length} produto${
                     lowStock.length > 1 ? "s" : ""
                   } com stock baixo`}
                   description={
-                    lowStock.filter((product) => product.stock === 0)
-                      .length > 0
+                    lowStock.filter((product) => product.stock === 0).length > 0
                       ? `${lowStock.filter((product) => product.stock === 0).length} sem stock`
                       : "Verifique o inventário"
                   }
@@ -628,42 +624,37 @@ export default function Overview() {
                 />
               )}
 
-              {stats.pendingOrders.length > 0 && (
+              {!loading && stats.pendingOrders.length > 0 && (
                 <AttentionItem
                   icon={Clock3}
                   title={`${stats.pendingOrders.length} pedido${
                     stats.pendingOrders.length > 1 ? "s" : ""
-                  } pendente${
-                    stats.pendingOrders.length > 1 ? "s" : ""
-                  }`}
+                  } pendente${stats.pendingOrders.length > 1 ? "s" : ""}`}
                   description="Aguardam processamento"
                   href="/admin/pedidos"
                 />
               )}
 
-              {stats.cancelledOrders.length > 0 && (
+              {!loading && stats.cancelledOrders.length > 0 && (
                 <AttentionItem
                   icon={XCircle}
                   title={`${stats.cancelledOrders.length} pedido${
                     stats.cancelledOrders.length > 1 ? "s" : ""
-                  } cancelado${
-                    stats.cancelledOrders.length > 1 ? "s" : ""
-                  }`}
+                  } cancelado${stats.cancelledOrders.length > 1 ? "s" : ""}`}
                   description="Consulte o histórico"
                   href="/admin/pedidos"
                 />
               )}
 
-              {lowStock.length === 0 &&
+              {!loading &&
+                lowStock.length === 0 &&
                 stats.pendingOrders.length === 0 &&
                 stats.cancelledOrders.length === 0 && (
                   <div className="flex items-start gap-3 py-5">
                     <CheckCircle2 className="mt-0.5 h-4 w-4 text-[#5f625d]" />
 
                     <div>
-                      <p className="text-sm font-medium">
-                        Tudo em ordem
-                      </p>
+                      <p className="text-sm font-medium">Tudo em ordem</p>
 
                       <p className="mt-1 text-xs leading-5 text-[#a7aaa2]">
                         Não há tarefas urgentes neste momento.
@@ -675,81 +666,105 @@ export default function Overview() {
           </div>
         </section>
 
-        {/* CHANNELS */}
-        {stats.channelSales.length > 0 && (
-          <section>
-            <div className="mb-5">
-              <p className="text-xs font-medium uppercase tracking-[0.16em] text-[#a7aaa2]">
-                Origem dos pedidos
-              </p>
-
-              <h2 className="mt-1 text-lg font-semibold tracking-tight">
-                Canais de venda
-              </h2>
+        {/* CHANNELS + ACTIVITY */}
+        <section className="grid gap-4 xl:grid-cols-2">
+          <div className="rounded-[5px] border border-[#e4e0d7] bg-[#fffdf9] p-4 shadow-[0_2px_10px_rgba(32,37,34,0.025)] sm:p-5">
+            <div className="mb-3 flex items-end justify-between gap-3 border-b border-[#ece8df] pb-3">
+              <div>
+                <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#7f897e]">
+                  Vendas / Origem
+                </p>
+                <h2 className="mt-1 font-serif text-base font-semibold tracking-[-0.03em] text-[#202522] sm:text-lg">
+                  Canais de venda
+                </h2>
+              </div>
+              <span className="shrink-0 text-[10px] text-[#858c83]">
+                No período
+              </span>
             </div>
 
-            <div className="border-y border-[#ded9d0]">
-              {stats.channelSales.map((channel, index) => {
-                const totalRevenue = stats.channelSales.reduce(
-                  (sum, item) => sum + item.revenue,
-                  0,
-                );
-
-                const percentage =
-                  totalRevenue > 0
-                    ? (channel.revenue / totalRevenue) * 100
-                    : 0;
-
-                return (
+            {loading ? (
+              <div className="space-y-2 py-3" aria-label="A carregar canais">
+                {[0, 1, 2].map((item) => (
                   <div
-                    key={channel.channel}
-                    className="grid grid-cols-[130px_1fr_100px] items-center gap-4 border-b border-[#ebe7df] py-4 last:border-b-0 sm:grid-cols-[160px_1fr_120px]"
+                    key={item}
+                    className="flex items-center gap-3 border-b border-[#f0ede6] py-4 last:border-0"
                   >
-                    <div className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-[7px] bg-[#202522]" />
-                      <span className="text-sm font-medium">
+                    <span className="h-3 w-16 animate-pulse bg-[#f0efe9]" />
+                    <span className="h-1.5 flex-1 animate-pulse bg-[#f0efe9]" />
+                    <span className="h-3 w-20 animate-pulse bg-[#f0efe9]" />
+                  </div>
+                ))}
+              </div>
+            ) : stats.channelSales.length === 0 ? (
+              <div className="flex min-h-[200px] flex-col items-center justify-center px-5 text-center">
+                <ShoppingBag className="mb-3 h-5 w-5 text-[#a7ada2]" />
+                <p className="text-sm font-medium text-[#525c54]">
+                  Ainda sem vendas por canal
+                </p>
+                <p className="mt-1 text-xs leading-5 text-[#858c83]">
+                  As origens dos pedidos aparecerão quando houver vendas neste
+                  período.
+                </p>
+              </div>
+            ) : (
+              <div className="divide-y divide-[#f0ede6]">
+                {stats.channelSales.map((channel) => {
+                  const totalRevenue = stats.channelSales.reduce(
+                    (sum, item) => sum + item.revenue,
+                    0,
+                  );
+                  const percentage =
+                    totalRevenue > 0
+                      ? (channel.revenue / totalRevenue) * 100
+                      : 0;
+
+                  return (
+                    <div
+                      key={channel.channel}
+                      className="grid grid-cols-[minmax(72px,0.7fr)_minmax(42px,1fr)_auto] items-center gap-3 py-4 sm:grid-cols-[minmax(100px,0.7fr)_minmax(60px,1fr)_auto] sm:gap-4"
+                    >
+                      <span className="truncate text-xs font-medium text-[#39423a]">
                         {channel.channel}
                       </span>
+                      <div className="h-1.5 overflow-hidden bg-[#eeeae2]">
+                        <div
+                          className="h-full bg-[#2c6457] transition-all"
+                          style={{
+                            width: `${Math.min(Math.max(percentage, 0), 100)}%`,
+                          }}
+                        />
+                      </div>
+                      <div className="text-right">
+                        <p className="whitespace-nowrap text-xs font-semibold text-[#202522]">
+                          {formatMoney(channel.revenue, currency)}
+                        </p>
+                        <p className="mt-0.5 whitespace-nowrap text-[10px] text-[#858c83]">
+                          {channel.orders} pedido
+                          {channel.orders !== 1 ? "s" : ""}
+                        </p>
+                      </div>
                     </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
 
-                    <div className="h-1.5 overflow-hidden bg-[#ebe7df]">
-                      <div
-                        className="h-full bg-[#202522] transition-all"
-                        style={{
-                          width: `${Math.max(percentage, 2)}%`,
-                        }}
-                      />
-                    </div>
-
-                    <div className="text-right">
-                      <p className="text-sm font-semibold">
-                        {formatMoney(channel.revenue, currency)}
-                      </p>
-                      <p className="text-[11px] text-[#a7aaa2]">
-                        {channel.orders} pedido
-                        {channel.orders !== 1 ? "s" : ""}
-                      </p>
-                    </div>
-
-                    {index === stats.channelSales.length - 1 && null}
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-        )}
+          <OverviewActivity />
+        </section>
 
         {/* PRODUCTS + ORDERS */}
-        <section className="grid gap-10 lg:grid-cols-2">
+        <section className="grid gap-4 xl:grid-cols-2">
           {/* TOP PRODUCTS */}
-          <div>
+          <div className="rounded-[5px] border border-[#e4e0d7] bg-[#fffdf9] p-4 shadow-[0_2px_10px_rgba(32,37,34,0.025)] sm:p-5">
             <div className="mb-5 flex items-end justify-between gap-4">
               <div>
                 <p className="text-xs font-medium uppercase tracking-[0.16em] text-[#a7aaa2]">
                   Produtos
                 </p>
 
-                <h2 className="mt-1 text-lg font-semibold tracking-tight">
+                <h2 className="mt-1 font-serif text-lg font-semibold tracking-[-0.03em] text-[#202522]">
                   Mais vendidos
                 </h2>
               </div>
@@ -764,7 +779,23 @@ export default function Overview() {
             </div>
 
             <div className="border-y border-[#ded9d0]">
-              {stats.productSales.length === 0 ? (
+              {loading ? (
+                <div
+                  className="space-y-3 py-6"
+                  aria-label="A carregar produtos"
+                >
+                  {[0, 1, 2].map((item) => (
+                    <div key={item} className="flex items-center gap-4 py-2">
+                      <span className="h-3 w-5 animate-pulse bg-[#f0efe9]" />
+                      <span className="flex-1 space-y-2">
+                        <span className="block h-3 w-2/3 animate-pulse bg-[#f0efe9]" />
+                        <span className="block h-2.5 w-1/3 animate-pulse bg-[#f0efe9]" />
+                      </span>
+                      <span className="h-3 w-16 animate-pulse bg-[#f0efe9]" />
+                    </div>
+                  ))}
+                </div>
+              ) : stats.productSales.length === 0 ? (
                 <EmptyState
                   icon={Package}
                   title="Ainda sem vendas"
@@ -781,7 +812,7 @@ export default function Overview() {
                     </span>
 
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium">
+                      <p className="truncate font-serif text-[15px] font-medium text-[#202522]">
                         {product.name}
                       </p>
 
@@ -802,14 +833,14 @@ export default function Overview() {
           </div>
 
           {/* RECENT ORDERS */}
-          <div>
+          <div className="rounded-[5px] border border-[#e4e0d7] bg-[#fffdf9] p-4 shadow-[0_2px_10px_rgba(32,37,34,0.025)] sm:p-5">
             <div className="mb-5 flex items-end justify-between gap-4">
               <div>
                 <p className="text-xs font-medium uppercase tracking-[0.16em] text-[#a7aaa2]">
                   Operação
                 </p>
 
-                <h2 className="mt-1 text-lg font-semibold tracking-tight">
+                <h2 className="mt-1 font-serif text-lg font-semibold tracking-[-0.03em] text-[#202522]">
                   Pedidos recentes
                 </h2>
               </div>
@@ -824,7 +855,20 @@ export default function Overview() {
             </div>
 
             <div className="border-y border-[#ded9d0]">
-              {orders.length === 0 ? (
+              {loading ? (
+                <div className="space-y-3 py-6" aria-label="A carregar pedidos">
+                  {[0, 1, 2].map((item) => (
+                    <div key={item} className="flex items-center gap-4 py-2">
+                      <span className="h-9 w-9 animate-pulse bg-[#f0efe9]" />
+                      <span className="flex-1 space-y-2">
+                        <span className="block h-3 w-2/3 animate-pulse bg-[#f0efe9]" />
+                        <span className="block h-2.5 w-1/3 animate-pulse bg-[#f0efe9]" />
+                      </span>
+                      <span className="h-3 w-16 animate-pulse bg-[#f0efe9]" />
+                    </div>
+                  ))}
+                </div>
+              ) : orders.length === 0 ? (
                 <EmptyState
                   icon={ShoppingBag}
                   title="Ainda sem pedidos"
@@ -836,7 +880,7 @@ export default function Overview() {
                     key={order.id}
                     className="flex items-center gap-4 border-b border-[#ebe7df] py-4 last:border-b-0"
                   >
-                    <div className="grid h-8 w-8 shrink-0 place-items-center rounded-[7px] bg-[#ebe7df]">
+                    <div className="grid h-9 w-9 shrink-0 place-items-center rounded-[4px] bg-[#e9eee9]">
                       <ShoppingBag className="h-3.5 w-3.5 text-[#747b73]" />
                     </div>
 
@@ -852,7 +896,7 @@ export default function Overview() {
                     </div>
 
                     <div className="shrink-0 text-right">
-                      <p className="text-sm font-semibold">
+                      <p className="font-serif text-[15px] font-semibold text-[#202522]">
                         {formatMoney(order.total, currency)}
                       </p>
 
@@ -874,27 +918,30 @@ export default function Overview() {
 
         {/* STORE STATUS */}
         <section>
-          <div className="mb-5">
-            <p className="text-xs font-medium uppercase tracking-[0.16em] text-[#a7aaa2]">
-              Estado da loja
-            </p>
-
-            <h2 className="mt-1 text-lg font-semibold tracking-tight">
-              Resumo operacional
-            </h2>
+          <div className="mb-3 flex items-end justify-between gap-3">
+            <div>
+              <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#7f897e]">
+                Hoje / Ritmo da operação
+              </p>
+              <h2 className="mt-1 text-base font-semibold tracking-[-0.03em] text-[#202522] sm:text-lg">
+                Resumo do dia
+              </h2>
+            </div>
           </div>
 
-          <div className="grid border-y border-[#ded9d0] sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <StoreStat
               label="Pedidos hoje"
               value={String(stats.todayOrders)}
               icon={ShoppingBag}
+              loading={loading}
             />
 
             <StoreStat
               label="Receita hoje"
               value={formatMoney(stats.todayRevenue, currency)}
               icon={Wallet}
+              loading={loading}
             />
 
             <StoreStat
@@ -902,12 +949,14 @@ export default function Overview() {
               value={String(lowStock.length)}
               icon={AlertTriangle}
               warning={lowStock.length > 0}
+              loading={loading}
             />
 
             <StoreStat
               label="Cancelados"
               value={String(stats.cancelledOrders.length)}
               icon={XCircle}
+              loading={loading}
             />
           </div>
         </section>
@@ -934,16 +983,16 @@ function Metric({
   const positive = change !== undefined && change >= 0;
 
   return (
-    <div className="border-b border-[#ded9d0] px-1 py-5 sm:border-r sm:px-5 lg:border-b-0 lg:px-6 first:pl-0 last:border-r-0">
+    <div className="min-w-0 rounded-[5px] border border-[#e4e0d7] bg-[#fffdf9] p-4 shadow-[0_2px_10px_rgba(32,37,34,0.025)] sm:p-5">
       <div className="flex items-center justify-between">
-        <p className="text-xs font-medium uppercase tracking-[0.12em] text-[#a7aaa2]">
+        <p className="font-mono text-[9px] font-medium uppercase tracking-[0.12em] text-[#858c83]">
           {label}
         </p>
 
         <Icon
           className={cn(
             "h-4 w-4",
-            warning ? "text-[#202522]" : "text-[#c9c3b8]",
+            warning ? "text-[#bd592f]" : "text-[#95a092]",
           )}
           strokeWidth={1.7}
         />
@@ -952,7 +1001,7 @@ function Metric({
       {loading ? (
         <div className="mt-3 h-7 w-28 animate-pulse bg-[#ebe7df]" />
       ) : (
-        <p className="mt-2 truncate text-xl font-semibold tracking-[-0.035em] sm:text-2xl">
+        <p className="mt-2 truncate font-serif text-[25px] font-normal tracking-[-0.03em] text-[#202522] sm:text-[29px]">
           {value}
         </p>
       )}
@@ -965,13 +1014,16 @@ function Metric({
             <ArrowDownRight className="h-3.5 w-3.5" />
           )}
 
-          <span className="font-medium">
+          <span
+            className={cn(
+              "font-semibold",
+              positive ? "text-[#2c6457]" : "text-[#bd592f]",
+            )}
+          >
             {Math.abs(change).toFixed(1)}%
           </span>
 
-          <span className="text-[#a7aaa2]">
-            vs. período anterior
-          </span>
+          <span className="text-[#a7aaa2]">vs. período anterior</span>
         </div>
       )}
 
@@ -1005,19 +1057,17 @@ function AttentionItem({
       <Icon
         className={cn(
           "mt-0.5 h-4 w-4 shrink-0",
-          danger ? "text-[#202522]" : "text-[#a7aaa2]",
+          danger ? "text-[#bd592f]" : "text-[#7d8c7d]",
         )}
         strokeWidth={1.8}
       />
 
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium group-hover:underline group-hover:underline-offset-2">
+        <p className="font-serif text-[15px] font-medium group-hover:underline group-hover:underline-offset-2">
           {title}
         </p>
 
-        <p className="mt-1 text-xs text-[#a7aaa2]">
-          {description}
-        </p>
+        <p className="mt-1 text-xs text-[#a7aaa2]">{description}</p>
       </div>
 
       <ArrowRight className="mt-1 h-3.5 w-3.5 shrink-0 text-[#c9c3b8] transition-transform group-hover:translate-x-0.5 group-hover:text-[#5f625d]" />
@@ -1042,9 +1092,7 @@ function EmptyState({
 
       <div>
         <p className="text-sm font-medium">{title}</p>
-        <p className="mt-1 text-xs text-[#a7aaa2]">
-          {description}
-        </p>
+        <p className="mt-1 text-xs text-[#a7aaa2]">{description}</p>
       </div>
     </div>
   );
@@ -1055,14 +1103,16 @@ function StoreStat({
   value,
   icon: Icon,
   warning,
+  loading,
 }: {
   label: string;
   value: string;
   icon: typeof Package;
   warning?: boolean;
+  loading?: boolean;
 }) {
   return (
-    <div className="flex items-center gap-3 border-b border-[#ded9d0] px-1 py-5 last:border-b-0 sm:border-r sm:px-5 sm:last:border-r-0 lg:border-b-0 lg:px-6">
+    <div className="flex min-w-0 items-center gap-3 rounded-[5px] border border-[#e4e0d7] bg-[#fffdf9] p-4 shadow-[0_2px_10px_rgba(32,37,34,0.025)]">
       <div className="grid h-8 w-8 shrink-0 place-items-center rounded-[7px] bg-[#ebe7df]">
         <Icon
           className={cn(
@@ -1075,7 +1125,7 @@ function StoreStat({
 
       <div className="min-w-0">
         <p className="text-xs text-[#a7aaa2]">{label}</p>
-        <p className="mt-0.5 truncate text-sm font-semibold">
+        <p className="mt-0.5 truncate font-serif text-base font-medium">
           {value}
         </p>
       </div>

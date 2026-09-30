@@ -41,14 +41,7 @@ export function CommandPalette({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        if (open) onClose();
-        else setQuery("");
-      }
-      if (e.key === "Escape" && open) {
-        onClose();
-      }
+      if (e.key === "Escape" && open) onClose();
     };
 
     window.addEventListener("keydown", handleKeyDown);
@@ -59,15 +52,69 @@ export function CommandPalette({
     if (!open || !company) return;
 
     const navShortcuts: SearchResult[] = [
-      { id: "nav-dash", type: "nav", title: "Visão Geral", subtitle: "Navegação", url: "/dashboard" },
-      { id: "nav-prod", type: "nav", title: "Produtos", subtitle: "Navegação", url: "/admin/produtos" },
-      { id: "nav-inv", type: "nav", title: "Inventário", subtitle: "Navegação", url: "/admin/inventario" },
-      { id: "nav-ord", type: "nav", title: "Pedidos", subtitle: "Navegação", url: "/admin/pedidos" },
-      { id: "nav-cust", type: "nav", title: "Clientes", subtitle: "Navegação", url: "/admin/clientes" },
-      { id: "nav-ag", type: "nav", title: "Agentes", subtitle: "Navegação", url: "/admin/agentes" },
-      { id: "nav-appr", type: "nav", title: "Central de Aprovações", subtitle: "Navegação", url: "/admin/aprovacoes" },
-      { id: "nav-analytics", type: "nav", title: "Analytics", subtitle: "Navegação", url: "/admin/analytics" },
-      { id: "nav-[#nav-config]", type: "nav", title: "Configurações", subtitle: "Navegação", url: "/admin/config" },
+      {
+        id: "nav-dash",
+        type: "nav",
+        title: "Visão Geral",
+        subtitle: "Navegação",
+        url: "/dashboard",
+      },
+      {
+        id: "nav-prod",
+        type: "nav",
+        title: "Produtos",
+        subtitle: "Navegação",
+        url: "/admin/produtos",
+      },
+      {
+        id: "nav-inv",
+        type: "nav",
+        title: "Inventário",
+        subtitle: "Navegação",
+        url: "/admin/inventario",
+      },
+      {
+        id: "nav-ord",
+        type: "nav",
+        title: "Pedidos",
+        subtitle: "Navegação",
+        url: "/admin/pedidos",
+      },
+      {
+        id: "nav-cust",
+        type: "nav",
+        title: "Clientes",
+        subtitle: "Navegação",
+        url: "/admin/clientes",
+      },
+      {
+        id: "nav-ag",
+        type: "nav",
+        title: "Agentes",
+        subtitle: "Navegação",
+        url: "/admin/agentes",
+      },
+      {
+        id: "nav-appr",
+        type: "nav",
+        title: "Central de Aprovações",
+        subtitle: "Navegação",
+        url: "/admin/aprovacoes",
+      },
+      {
+        id: "nav-analytics",
+        type: "nav",
+        title: "Analytics",
+        subtitle: "Navegação",
+        url: "/admin/analytics",
+      },
+      {
+        id: "nav-[#nav-config]",
+        type: "nav",
+        title: "Configurações",
+        subtitle: "Navegação",
+        url: "/admin/config",
+      },
     ];
 
     if (!query.trim()) {
@@ -107,7 +154,8 @@ export function CommandPalette({
 
       // Filtered Nav
       const matchedNav = navShortcuts.filter(
-        (n) => n.title.toLowerCase().includes(q) || n.url.toLowerCase().includes(q)
+        (n) =>
+          n.title.toLowerCase().includes(q) || n.url.toLowerCase().includes(q),
       );
       items.push(...matchedNav);
 
@@ -157,31 +205,45 @@ export function CommandPalette({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] grid place-items-start pt-[12vh] justify-center bg-black/40-sm px-4">
-      <div className="w-full max-w-xl overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-2xl">
-        <div className="flex items-center border-b border-neutral-200 px-4">
-          <Search className="h-4 w-4 shrink-0 text-neutral-400" />
+    <div
+      role="presentation"
+      onMouseDown={(event) => event.target === event.currentTarget && onClose()}
+      className="fixed inset-0 z-[100] grid place-items-start justify-center bg-[#202522]/35 px-4 pt-[12vh] backdrop-blur-[2px]"
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Pesquisa global"
+        className="w-full max-w-2xl overflow-hidden rounded-[5px] border border-[#e4e0d7] bg-[#fffdf9] shadow-[0_24px_80px_rgba(32,37,34,0.2)]"
+      >
+        <div className="flex items-center border-b border-[#e9e5dc] px-4">
+          <Search className="h-4 w-4 shrink-0 text-[#687168]" />
           <input
             autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Pesquisar em Vendora (produtos, pedidos, clientes, navegar...)"
-            className="h-12 w-full bg-transparent px-3 text-sm text-neutral-950 outline-none placeholder:text-neutral-400"
+            className="h-14 w-full bg-transparent px-3 text-sm text-[#202522] outline-none placeholder:text-[#9a9e96]"
           />
           <button
             type="button"
             onClick={onClose}
-            className="rounded p-1 text-neutral-400 hover:text-black"
+            aria-label="Fechar pesquisa"
+            className="grid h-8 w-8 place-items-center text-[#858c83] transition hover:bg-[#f1eee7] hover:text-[#202522]"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
 
-        <div className="max-h-[340px] overflow-y-auto p-2">
+        <div className="max-h-[min(56vh,460px)] overflow-y-auto p-2">
           {loading ? (
-            <p className="p-4 text-center text-xs text-neutral-400">A pesquisar...</p>
+            <p className="p-4 text-center text-xs text-neutral-400">
+              A pesquisar...
+            </p>
           ) : results.length === 0 ? (
-            <p className="p-4 text-center text-xs text-neutral-400">Nenhum resultado para "{query}"</p>
+            <p className="p-4 text-center text-xs text-neutral-400">
+              Nenhum resultado para "{query}"
+            </p>
           ) : (
             <div className="space-y-0.5">
               {results.map((res) => (
@@ -192,30 +254,46 @@ export function CommandPalette({
                     navigate(res.url);
                     onClose();
                   }}
-                  className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left transition hover:bg-neutral-100"
+                  className="flex w-full items-center justify-between rounded-[3px] px-3 py-3 text-left transition hover:bg-[#f0f2ec] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2c6457]"
                 >
                   <div className="flex items-center gap-3">
-                    <span className="grid h-7 w-7 place-items-center rounded bg-neutral-100 text-neutral-700">
-                      {res.type === "product" && <Package className="h-3.5 w-3.5" />}
-                      {res.type === "order" && <ShoppingBag className="h-3.5 w-3.5" />}
-                      {res.type === "customer" && <Users className="h-3.5 w-3.5" />}
-                      {res.type === "nav" && <LayoutDashboard className="h-3.5 w-3.5" />}
+                    <span className="grid h-8 w-8 place-items-center rounded-[3px] bg-[#e9eee9] text-[#526755]">
+                      {res.type === "product" && (
+                        <Package className="h-3.5 w-3.5" />
+                      )}
+                      {res.type === "order" && (
+                        <ShoppingBag className="h-3.5 w-3.5" />
+                      )}
+                      {res.type === "customer" && (
+                        <Users className="h-3.5 w-3.5" />
+                      )}
+                      {res.type === "nav" && (
+                        <LayoutDashboard className="h-3.5 w-3.5" />
+                      )}
                     </span>
                     <div>
-                      <p className="text-sm font-semibold text-neutral-950">{res.title}</p>
-                      <p className="text-[11px] text-neutral-400">{res.subtitle}</p>
+                      <p className="text-sm font-semibold text-[#202522]">
+                        {res.title}
+                      </p>
+                      <p className="text-[11px] text-[#858c83]">
+                        {res.subtitle}
+                      </p>
                     </div>
                   </div>
 
-                  <span className="text-[10px] uppercase font-mono text-neutral-400">{res.type}</span>
+                  <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-[#858c83]">
+                    {res.type}
+                  </span>
                 </button>
               ))}
             </div>
           )}
         </div>
 
-        <div className="flex items-center justify-between border-t border-neutral-100 bg-neutral-50 px-4 py-2 text-[10px] text-neutral-400">
-          <span>Dica: Use <strong>⌘ K</strong> para abrir/fechar</span>
+        <div className="flex items-center justify-between border-t border-[#e9e5dc] bg-[#faf9f4] px-4 py-2.5 text-[10px] text-[#858c83]">
+          <span>
+            Dica: Use <strong>⌘ K</strong> para abrir/fechar
+          </span>
           <span>Vendora Commerce OS</span>
         </div>
       </div>
