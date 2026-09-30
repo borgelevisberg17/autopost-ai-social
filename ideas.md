@@ -7,7 +7,7 @@ A mesma direção “Livro & Mercado” existente: precisão editorial de um liv
 ## Princípios
 
 - Pessoas, perfis e canais fazem parte do cenário da operação — não são cartões SaaS soltos.
-- Superfícies opacas, linhas visíveis, cantos firmes e sombras discretas.
+- Superfícies opacas, divisórias leves, cantos suavemente arredondados e sombras discretas; evitar molduras e elementos decorativos redundantes.
 - A interação deve ser legível: hover, focus, seleção e navegação explícita.
 
 ## Cor e composição
@@ -64,3 +64,7 @@ A captura enviada pelo utilizador é a referência visual para `/admin/canais`: 
 ## Coerência entre Planos, Landing e Painel (2026-09)
 
 A página de planos partilha o header e footer públicos, o carvão e terracota do hero da landing, fundos de papel/sálvia nos cartões e o idioma principal da experiência. Os preços e fluxos de cadastro permanecem os existentes. No admin, o acabamento operacional privilegia espaço, planos de fundo e bordas suaves; Settings continua intacta. A revisão mobile deve preservar conteúdo, navegação e alvos de toque sem overflow.
+
+## Prova social — faixa de empresas (2026-09)
+
+“Teams already moving with Vendora” vira um marquee contínuo, sem cápsulas nem linhas de moldura: logotipos monocromáticos pretos e maiores, nomes sempre legíveis, fade suave nas extremidades e o mesmo fundo da secção. O conjunto de estudos de caso fica mais simples, com menos etiquetas, cartões arredondados e divisórias discretas. Pausar no hover e respeitar movimento reduzido; manter a lista acessível e não duplicar a cópia do ticker para leitores de ecrã.

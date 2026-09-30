@@ -365,7 +365,7 @@ function ProofSection() {
           <div className="mt-10 flex flex-col items-center justify-center gap-6 sm:flex-row">
             <a
               href="#process"
-              className="inline-flex items-center gap-2 bg-[#e36c3f] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#f08055]"
+              className="inline-flex items-center gap-2 rounded-full bg-[#e36c3f] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#f08055]"
             >
               See how it works <ArrowRight className="h-4 w-4" />
             </a>
@@ -734,7 +734,7 @@ function CaseStudiesSection() {
   return (
     <section
       id="proof-cases"
-      className="overflow-hidden border-b border-[#bda975] bg-[#e6d4aa] text-[#202522]"
+      className="overflow-hidden bg-[#e6d4aa] text-[#202522]"
     >
       <div className="mx-auto max-w-[1240px] px-5 py-24 lg:px-8 lg:py-32">
         <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
@@ -758,7 +758,7 @@ function CaseStudiesSection() {
                     (index - 1 + CASE_STUDIES.length) % CASE_STUDIES.length,
                 )
               }
-              className="grid h-10 w-10 place-items-center border border-[#a9976c] text-[#2c6457] transition hover:border-[#e36c3f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+              className="grid h-11 w-11 place-items-center rounded-full border border-[#a9976c]/70 bg-[#fffdf9]/50 text-[#2c6457] transition hover:border-[#e36c3f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
@@ -771,16 +771,16 @@ function CaseStudiesSection() {
               onClick={() =>
                 setActive((index) => (index + 1) % CASE_STUDIES.length)
               }
-              className="grid h-10 w-10 place-items-center border border-[#a9976c] text-[#2c6457] transition hover:border-[#e36c3f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+              className="grid h-11 w-11 place-items-center rounded-full border border-[#a9976c]/70 bg-[#fffdf9]/50 text-[#2c6457] transition hover:border-[#e36c3f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
           </div>
         </div>
-        <div className="mt-12 grid gap-px border border-[#8b6b36] bg-[#8b6b36] lg:grid-cols-2">
+        <div className="mt-12 grid gap-4 lg:grid-cols-2">
           <article
             aria-live="polite"
-            className="flex min-h-[420px] flex-col justify-between bg-[#202522] p-6 text-[#f6f3ed] sm:p-9"
+            className="flex min-h-[420px] flex-col justify-between rounded-2xl bg-[#202522] p-6 text-[#f6f3ed] shadow-[0_18px_48px_rgba(32,37,34,0.12)] sm:p-9"
           >
             <div>
               <div className="flex items-center gap-3">
@@ -807,7 +807,7 @@ function CaseStudiesSection() {
               <div className="mt-1 text-xs text-white/50">{current.role}</div>
             </div>
           </article>
-          <article className="flex min-h-[420px] flex-col justify-between bg-[#fffdf9] p-6 sm:p-9">
+          <article className="flex min-h-[420px] flex-col justify-between rounded-2xl bg-[#fffdf9] p-6 shadow-[0_18px_48px_rgba(32,37,34,0.07)] sm:p-9">
             <div>
               <div className="flex items-center justify-between">
                 <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#2c6457]">
@@ -836,32 +836,16 @@ function CaseStudiesSection() {
                   </div>
                 </div>
               </div>
-              <div className="mt-12 space-y-3 border-t border-[#d8d3c8] pt-5">
-                <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#8f8a80]">
-                  What changed
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <span className="border border-[#c8c1b4] px-3 py-2 text-xs text-[#5f625d]">
-                    Channel-aware content
-                  </span>
-                  <span className="border border-[#c8c1b4] px-3 py-2 text-xs text-[#5f625d]">
-                    Stock-aware replies
-                  </span>
-                  <span className="border border-[#c8c1b4] px-3 py-2 text-xs text-[#5f625d]">
-                    One shared record
-                  </span>
-                </div>
-              </div>
             </div>
             <div className="border-t border-[#d8d3c8] pt-4">
               <div className="flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.14em] text-[#8f8a80]">
                 <span>Customer story</span>
                 <span>Auto-advances</span>
               </div>
-              <div className="mt-3 h-1 overflow-hidden bg-[#d8d3c8]">
+              <div className="mt-3 h-1 overflow-hidden rounded-full bg-[#d8d3c8]">
                 <div
                   key={active}
-                  className="case-study-progress h-full origin-left bg-[#e36c3f]"
+                  className="case-study-progress h-full origin-left rounded-full bg-[#e36c3f]"
                   style={{
                     animation: "case-study-progress 5.6s linear forwards",
                   }}
@@ -870,26 +854,42 @@ function CaseStudiesSection() {
             </div>
           </article>
         </div>
-        <div className="mt-12 border-y border-[#bda975] py-5">
-          <div className="mb-4 font-mono text-[10px] uppercase tracking-[0.16em] text-[#8b6b36]">
+        <div className="mt-12">
+          <h3
+            id="company-marquee-title"
+            className="mb-4 font-mono text-[10px] uppercase tracking-[0.16em] text-[#8b6b36]"
+          >
             Teams already moving with Vendora
-          </div>
-          <div className="grid grid-cols-2 gap-y-5 sm:grid-cols-5 lg:grid-cols-10">
-            {COMPANY_LOGOS.map(([name, logo]) => (
-              <div
-                key={name}
-                className="flex items-center gap-2 text-xs font-semibold text-[#6e716b]"
-              >
-                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#fffdf9] p-1">
-                  <img
-                    src={logo}
-                    alt={`${name} logo`}
-                    className="h-full w-full object-contain"
-                  />
-                </span>
-                <span className="hidden xl:inline">{name}</span>
-              </div>
-            ))}
+          </h3>
+          <div
+            role="region"
+            aria-labelledby="company-marquee-title"
+            className="company-marquee py-3"
+          >
+            <div className="company-marquee__track">
+              {[0, 1].map((copy) => (
+                <ul
+                  key={copy}
+                  className="company-marquee__group"
+                  aria-hidden={copy === 1}
+                >
+                  {COMPANY_LOGOS.map(([name, logo]) => (
+                    <li key={name} className="company-marquee__item">
+                      <img
+                        src={logo}
+                        alt=""
+                        aria-hidden="true"
+                        loading="lazy"
+                        className="company-marquee__logo"
+                      />
+                      <span className="whitespace-nowrap text-[14px] font-semibold tracking-[-0.02em] text-[#202522] sm:text-[15px]">
+                        {name}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ))}
+            </div>
           </div>
         </div>
       </div>

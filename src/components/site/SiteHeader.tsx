@@ -26,7 +26,7 @@ export function SiteHeader({ ctaHref, onCtaClick }: SiteHeaderProps) {
   useEffect(() => setMenuOpen(false), [location.pathname, location.hash]);
 
   const ctaClassName =
-    "inline-flex min-h-10 items-center justify-center gap-2 rounded-[3px] bg-[#e36c3f] px-3 text-[13px] font-semibold text-white transition hover:bg-[#c95735] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#202522] focus-visible:ring-offset-2 sm:min-h-11 sm:px-5 sm:text-sm";
+    "inline-flex min-h-10 items-center justify-center gap-2 rounded-full bg-[#e36c3f] px-3 text-[13px] font-semibold text-white transition hover:bg-[#c95735] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#202522] focus-visible:ring-offset-2 sm:min-h-11 sm:px-5 sm:text-sm";
 
   const renderActionLabel = () =>
     authenticated ? (
@@ -127,7 +127,7 @@ export function SiteHeader({ ctaHref, onCtaClick }: SiteHeaderProps) {
             aria-expanded={menuOpen}
             aria-controls="mobile-site-menu"
             onClick={() => setMenuOpen((open) => !open)}
-            className="grid h-11 w-11 shrink-0 place-items-center rounded-[3px] border border-[#d8d3c8] bg-[#fffdf9] text-[#202522] transition hover:border-[#2c6457] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2c6457] focus-visible:ring-offset-2 lg:hidden"
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-[#d8d3c8] bg-[#fffdf9] text-[#202522] transition hover:border-[#2c6457] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2c6457] focus-visible:ring-offset-2 lg:hidden"
           >
             {menuOpen ? (
               <X aria-hidden="true" className="h-4 w-4" />
@@ -151,7 +151,7 @@ export function SiteHeader({ ctaHref, onCtaClick }: SiteHeaderProps) {
                 to={item.href}
                 tabIndex={menuOpen ? 0 : -1}
                 aria-current={isActive(item.href) ? "page" : undefined}
-                className={`rounded-[3px] px-3 py-3.5 text-[15px] font-medium transition hover:bg-[#f1eee7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2c6457] ${
+                className={`rounded-xl px-3 py-3.5 text-[15px] font-medium transition hover:bg-[#f1eee7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2c6457] ${
                   item.emphasis
                     ? "font-semibold text-[#2c6457]"
                     : "text-[#5f625d]"
@@ -164,7 +164,7 @@ export function SiteHeader({ ctaHref, onCtaClick }: SiteHeaderProps) {
               <Link
                 to={authenticated ? "/dashboard" : "/login"}
                 tabIndex={menuOpen ? 0 : -1}
-                className="col-span-2 mt-1 rounded-[3px] border border-[#d8d3c8] px-3 py-3.5 text-center text-[15px] font-semibold text-[#202522] transition hover:bg-[#f6f3ed] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2c6457]"
+                className="col-span-2 mt-1 rounded-xl border border-[#d8d3c8] px-3 py-3.5 text-center text-[15px] font-semibold text-[#202522] transition hover:bg-[#f6f3ed] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2c6457]"
               >
                 {authenticated ? "Open dashboard" : "Sign in to your account"}
               </Link>
