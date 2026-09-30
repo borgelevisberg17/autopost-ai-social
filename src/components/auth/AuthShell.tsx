@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Circle, ShieldCheck, Sparkles, ArrowRight } from "lucide-react";
+import { Circle, ShieldCheck, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -23,11 +23,16 @@ export function AuthShell({
   return (
     <main className="min-h-screen bg-[#f6f3ed] text-[#202522]">
       <div className="min-h-screen lg:grid lg:grid-cols-[0.88fr_1.12fr]">
-        {/* Left Side: Editorial Brand Panel (Desktop) */}
+        {/* Left Side: Editorial Brand Panel with Background Image */}
         <section className="relative hidden flex-col justify-between overflow-hidden bg-[#202522] p-10 text-[#f6f3ed] lg:flex xl:p-14">
-          {/* Subtle Ambient Background */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(44,100,87,0.35),transparent_60%)]" />
-          <div className="absolute -bottom-20 -left-20 h-80 w-80 rounded-full bg-[#e36c3f]/10 blur-3xl" />
+          {/* Background Image & Gradient Overlays */}
+          <img
+            src="/media/optimized/auth-human-commerce.webp"
+            alt="Comerciante a gerir a loja"
+            className="absolute inset-0 h-full w-full object-cover object-center opacity-65"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#101512] via-[#101512]/80 to-[#101512]/40" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(44,100,87,0.3),transparent_60%)]" />
 
           {/* Top Logo */}
           <div className="relative z-10">
@@ -58,7 +63,7 @@ export function AuthShell({
             </p>
 
             {/* Feature Highlights */}
-            <div className="mt-10 space-y-3.5 border-t border-white/10 pt-8 text-xs text-white/80 font-medium">
+            <div className="mt-10 space-y-3.5 border-t border-white/15 pt-8 text-xs font-medium text-white/80">
               <div className="flex items-center gap-3">
                 <Sparkles className="h-4 w-4 text-[#f3b08e]" />
                 <span>Integração de loja online, WhatsApp, Instagram e Facebook</span>
@@ -71,7 +76,7 @@ export function AuthShell({
           </div>
 
           {/* Bottom Caption */}
-          <div className="relative z-10 flex items-center justify-between border-t border-white/10 pt-6 font-mono text-[10px] uppercase tracking-[0.16em] text-white/40">
+          <div className="relative z-10 flex items-center justify-between border-t border-white/15 pt-6 font-mono text-[10px] uppercase tracking-[0.16em] text-white/50">
             <span>Vendora Commerce OS</span>
             <span>Segurança Ativa</span>
           </div>
@@ -104,7 +109,7 @@ export function AuthShell({
           {/* Footer */}
           <footer className="flex flex-col items-center justify-between gap-2 border-t border-[#f0ece1] pt-6 text-center font-mono text-[10px] uppercase tracking-[0.12em] text-[#9a968d] sm:flex-row">
             <span>© {new Date().getFullYear()} Vendora</span>
-            <Link to="/pricing" className="hover:text-[#202522] transition-colors">
+            <Link to="/pricing" className="transition-colors hover:text-[#202522]">
               Ver Planos & Preços →
             </Link>
           </footer>

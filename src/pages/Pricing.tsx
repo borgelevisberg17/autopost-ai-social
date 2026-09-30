@@ -130,31 +130,38 @@ export default function Pricing() {
 
       {/* Main Content */}
       <main className="pt-[72px]">
-        {/* Editorial Hero */}
-        <section className="border-b border-[#e2ded5] bg-[#fffdf9]">
-          <div className="mx-auto max-w-[1240px] px-5 py-16 lg:px-8 lg:py-24">
+        {/* Editorial Hero with Background Image */}
+        <section className="relative overflow-hidden bg-[#202522] text-white">
+          <img
+            src="/media/optimized/pricing-hero-editorial.webp"
+            alt="Loja comercial Vendora"
+            className="absolute inset-0 h-full w-full object-cover object-center opacity-60"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#101512]/90 via-[#101512]/80 to-[#101512]" />
+
+          <div className="relative mx-auto max-w-[1240px] px-5 py-16 lg:px-8 lg:py-24">
             <div className="mx-auto max-w-3xl text-center">
-              <div className="mb-6 inline-flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-[#2c6457]">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#2c6457]" />
+              <div className="mb-6 inline-flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-[#f3b08e]">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#e36c3f]" />
                 Transparent Pricing
               </div>
 
-              <h1 className="text-balance text-5xl font-semibold leading-[0.92] tracking-[-0.075em] text-[#202522] sm:text-6xl lg:text-7xl">
+              <h1 className="text-balance text-5xl font-semibold leading-[0.92] tracking-[-0.075em] text-white sm:text-6xl lg:text-7xl">
                 A calmer way to <br className="hidden sm:inline" />
-                <span className="text-[#2c6457]">keep selling.</span>
+                <span className="text-[#f3b08e]">keep selling.</span>
               </h1>
 
-              <p className="mx-auto mt-6 max-w-xl text-base leading-7 text-[#6e716b] sm:text-lg">
+              <p className="mx-auto mt-6 max-w-xl text-base leading-7 text-white/70 sm:text-lg">
                 Choose the operating rhythm that fits your team today. Add channels, people and control as your business grows.
               </p>
 
               {/* Billing Toggle */}
-              <div className="mt-9 inline-flex items-center gap-1 rounded-full border border-[#d8d3c8] bg-[#f6f3ed] p-1.5 text-xs font-semibold">
+              <div className="mt-9 inline-flex items-center gap-1 rounded-full border border-white/20 bg-black/40 p-1.5 text-xs font-semibold backdrop-blur-sm">
                 <button
                   type="button"
                   onClick={() => setAnnual(false)}
                   className={`rounded-full px-5 py-2.5 transition ${
-                    !annual ? "bg-[#202522] text-white shadow-sm" : "text-[#6e716b] hover:text-[#202522]"
+                    !annual ? "bg-white text-[#202522] shadow-sm" : "text-white/70 hover:text-white"
                   }`}
                 >
                   Faturação Mensal
@@ -163,7 +170,7 @@ export default function Pricing() {
                   type="button"
                   onClick={() => setAnnual(true)}
                   className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 transition ${
-                    annual ? "bg-[#202522] text-white shadow-sm" : "text-[#6e716b] hover:text-[#202522]"
+                    annual ? "bg-white text-[#202522] shadow-sm" : "text-white/70 hover:text-white"
                   }`}
                 >
                   Faturação Anual
@@ -174,16 +181,20 @@ export default function Pricing() {
               </div>
 
               {/* Launch Promo Banner */}
-              <div className="mx-auto mt-6 max-w-md flex items-center justify-center gap-2 border border-[#e6d4aa] bg-[#fbf3dd] px-4 py-2.5 text-xs text-[#8b6b36]">
+              <div className="mx-auto mt-6 max-w-md flex items-center justify-center gap-2 border border-[#e6d4aa]/30 bg-[#fbf3dd]/10 px-4 py-2.5 text-xs text-[#f3b08e] backdrop-blur-sm">
                 <Sparkles className="h-4 w-4 shrink-0 text-[#e36c3f]" />
                 <span>
                   <strong>Promoção de lançamento:</strong> 30% de desconto nos primeiros 3 meses no plano anual.
                 </span>
               </div>
             </div>
+          </div>
+        </section>
 
-            {/* Plans Grid */}
-            <div className="mt-14 grid gap-6 lg:grid-cols-3">
+        {/* Plans Grid Section */}
+        <section className="border-b border-[#e2ded5] bg-[#fffdf9]">
+          <div className="mx-auto max-w-[1240px] px-5 py-16 lg:px-8 lg:py-20">
+            <div className="grid gap-6 lg:grid-cols-3">
               {plans.map((plan) => {
                 const price = Math.round(plan.monthly * discount);
                 return (
