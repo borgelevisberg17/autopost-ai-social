@@ -42,15 +42,15 @@ export default function Login() {
 
   return (
     <AuthShell
-      eyebrow="BEM-VINDO DE VOLTA"
-      title="Continue a gerir o seu negócio."
-      description="Entre para acompanhar pedidos, produtos, canais e tudo o que acontece na sua operação."
+      eyebrow="ACESSO À CONTA"
+      title="Continue a gerir a sua operação."
+      description="Aceda ao seu painel para gerir catálogo, encomendas, vendas e automação."
       footer={
-        <div className="hidden items-center gap-2 text-sm text-[#666666] sm:flex">
-          <span>Não tem uma conta?</span>
+        <div className="flex items-center gap-2 text-xs text-[#6e716b]">
+          <span>Ainda não tem conta?</span>
           <Link
             to="/signup"
-            className="font-semibold text-[#202522] underline decoration-[#cccccc] underline-offset-4 transition-colors hover:decoration-[#202522]"
+            className="font-semibold text-[#202522] underline decoration-[#d8d3c8] underline-offset-4 transition-colors hover:decoration-[#202522]"
           >
             Criar conta
           </Link>
@@ -58,33 +58,30 @@ export default function Login() {
       }
     >
       <div>
-        <div className="mb-9">
-          <p className="mb-3 text-[12px] font-medium uppercase tracking-[0.12em] text-[#999999]">
-            Aceder à conta
-          </p>
-
-          <h1 className="text-[34px] font-semibold leading-[1.05] tracking-[-0.045em] text-[#202522] sm:text-[40px]">
-            Bem-vindo de volta.
+        {/* Form Title */}
+        <div className="mb-8">
+          <h1 className="text-[32px] font-semibold leading-[1.05] tracking-[-0.04em] text-[#202522] sm:text-[36px]">
+            Bem-vindo de volta
           </h1>
-
-          <p className="mt-3 text-[15px] leading-6 text-[#707070]">
-            Entre para continuar de onde parou.
+          <p className="mt-2.5 text-[14px] text-[#6e716b]">
+            Introduza as suas credenciais para entrar na conta.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Login Form */}
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label
               htmlFor="email"
-              className="mb-2 block text-[13px] font-medium text-[#333333]"
+              className="mb-1.5 block text-[13px] font-medium text-[#202522]"
             >
-              Email
+              Email profissional
             </label>
 
             <div className="relative">
               <Mail
                 aria-hidden="true"
-                className="pointer-events-none absolute left-4 top-1/2 h-[17px] w-[17px] -translate-y-1/2 text-[#999999]"
+                className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8f8a80]"
                 strokeWidth={1.8}
               />
 
@@ -99,32 +96,32 @@ export default function Login() {
                 onChange={(event) => setEmail(event.target.value)}
                 disabled={isLoading}
                 required
-                className="h-[52px] w-full rounded-[7px] border border-[#ddddda] bg-[#fffdf9] pl-11 pr-4 text-[14px] text-[#202522] outline-none transition-all placeholder:text-[#aaaaaa] hover:border-[#c8c8c4] focus:border-[#2c6457] focus:ring-2 focus:ring-[#2c6457]/10 disabled:cursor-not-allowed disabled:bg-[#f7f7f5]"
+                className="h-12 w-full rounded-lg border border-[#e2ded5] bg-[#fffdf9] pl-10 pr-4 text-[14px] text-[#202522] outline-none transition-all placeholder:text-[#a09b90] hover:border-[#c8c1b4] focus:border-[#202522] focus:ring-1 focus:ring-[#202522] disabled:cursor-not-allowed disabled:bg-[#f6f3ed]"
               />
             </div>
           </div>
 
           <div>
-            <div className="mb-2 flex items-center justify-between">
+            <div className="mb-1.5 flex items-center justify-between">
               <label
                 htmlFor="password"
-                className="text-[13px] font-medium text-[#333333]"
+                className="text-[13px] font-medium text-[#202522]"
               >
                 Palavra-passe
               </label>
 
               <Link
                 to="/forgot-password"
-                className="text-[12px] font-medium text-[#666666] underline decoration-[#cccccc] underline-offset-4 transition-colors hover:text-[#202522] hover:decoration-[#202522]"
+                className="text-[12px] font-medium text-[#6e716b] hover:text-[#202522] transition-colors"
               >
-                Esqueceu?
+                Esqueceu-se?
               </Link>
             </div>
 
             <div className="relative">
               <LockKeyhole
                 aria-hidden="true"
-                className="pointer-events-none absolute left-4 top-1/2 h-[17px] w-[17px] -translate-y-1/2 text-[#999999]"
+                className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8f8a80]"
                 strokeWidth={1.8}
               />
 
@@ -138,7 +135,7 @@ export default function Login() {
                 onChange={(event) => setPassword(event.target.value)}
                 disabled={isLoading}
                 required
-                className="h-[52px] w-full rounded-[7px] border border-[#ddddda] bg-[#fffdf9] pl-11 pr-12 text-[14px] text-[#202522] outline-none transition-all placeholder:text-[#aaaaaa] hover:border-[#c8c8c4] focus:border-[#2c6457] focus:ring-2 focus:ring-[#2c6457]/10 disabled:cursor-not-allowed disabled:bg-[#f7f7f5]"
+                className="h-12 w-full rounded-lg border border-[#e2ded5] bg-[#fffdf9] pl-10 pr-11 text-[14px] text-[#202522] outline-none transition-all placeholder:text-[#a09b90] hover:border-[#c8c1b4] focus:border-[#202522] focus:ring-1 focus:ring-[#202522] disabled:cursor-not-allowed disabled:bg-[#f6f3ed]"
               />
 
               <button
@@ -150,12 +147,12 @@ export default function Login() {
                 }
                 onClick={() => setShowPassword((value) => !value)}
                 disabled={isLoading}
-                className="absolute right-3 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-[7px] text-[#888888] transition-colors hover:bg-[#f5f5f3] hover:text-[#202522] disabled:opacity-50"
+                className="absolute right-2.5 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded text-[#8f8a80] hover:text-[#202522] transition-colors disabled:opacity-50"
               >
                 {showPassword ? (
-                  <EyeOff className="h-[17px] w-[17px]" strokeWidth={1.8} />
+                  <EyeOff className="h-4 w-4" strokeWidth={1.8} />
                 ) : (
-                  <Eye className="h-[17px] w-[17px]" strokeWidth={1.8} />
+                  <Eye className="h-4 w-4" strokeWidth={1.8} />
                 )}
               </button>
             </div>
@@ -164,34 +161,15 @@ export default function Login() {
           <button
             type="submit"
             disabled={isLoading}
-            className="group mt-2 flex h-[52px] w-full items-center justify-center gap-2 rounded-[7px] bg-[#202522] text-[14px] font-semibold text-white transition-all hover:bg-[#2c6457] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+            className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#202522] text-[14px] font-semibold text-white transition-all hover:bg-[#2c6457] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isLoading ? "A entrar..." : "Entrar na conta"}
-
-            {!isLoading && (
-              <ArrowRight
-                className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
-                strokeWidth={1.8}
-              />
-            )}
+            {!isLoading && <ArrowRight className="h-4 w-4" strokeWidth={2} />}
           </button>
         </form>
 
-        <div className="mt-8 border-t border-[#eeeeeb] pt-7 text-center sm:hidden">
-          <p className="text-[13px] text-[#777777]">
-            Não tem uma conta?{" "}
-            <Link
-              to="/signup"
-              className="font-semibold text-[#202522] underline decoration-[#cccccc] underline-offset-4"
-            >
-              Criar conta
-            </Link>
-          </p>
-        </div>
-
-        <p className="mt-8 text-center text-[11px] leading-5 text-[#aaaaaa]">
-          O acesso é protegido e os dados da sua empresa permanecem isolados
-          da operação de outras contas.
+        <p className="mt-8 text-center font-mono text-[10px] uppercase tracking-[0.1em] text-[#a09b90]">
+          Acesso encriptado & dados isolados por empresa
         </p>
       </div>
     </AuthShell>

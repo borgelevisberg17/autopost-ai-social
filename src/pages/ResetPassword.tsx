@@ -97,25 +97,21 @@ export default function ResetPassword() {
     return (
       <AuthShell
         eyebrow="RECUPERAÇÃO"
-        title="Estamos a verificar o acesso."
-        description="Aguarde enquanto validamos o link de recuperação da sua conta."
+        title="Validar ligação de acesso."
+        description="Por favor aguarde enquanto verificamos o seu link de recuperação."
         compact
       >
         <div className="flex flex-col items-center py-12 text-center">
-          <div className="mb-5 h-9 w-9 animate-spin rounded-full border-2 border-[#ddddda] border-t-[#111111]" />
-
-          <p className="text-[14px] font-medium text-[#333333]">
-            A verificar...
+          <div className="mb-4 h-8 w-8 animate-spin rounded-full border-2 border-[#e2ded5] border-t-[#202522]" />
+          <p className="text-[14px] font-medium text-[#202522]">
+            A verificar ligação...
           </p>
-
-          <p className="mt-2 text-[12px] text-[#999999]">
-            Se abriu esta página diretamente, solicite um novo link de
-            recuperação.
+          <p className="mt-1 text-xs text-[#8f8a80]">
+            Se abriu esta página diretamente, solicite um novo link de recuperação.
           </p>
-
           <Link
             to="/forgot-password"
-            className="mt-6 text-[13px] font-medium text-[#202522] underline decoration-[#cccccc] underline-offset-4"
+            className="mt-5 text-xs font-semibold text-[#202522] underline decoration-[#d8d3c8] underline-offset-4"
           >
             Solicitar novo link
           </Link>
@@ -127,31 +123,28 @@ export default function ResetPassword() {
   if (updated) {
     return (
       <AuthShell
-        eyebrow="CONTA ATUALIZADA"
-        title="O acesso está novamente protegido."
-        description="A sua nova palavra-passe foi guardada com sucesso."
+        eyebrow="PALAVRA-PASSE ATUALIZADA"
+        title="Conta novamente protegida."
+        description="A sua palavra-passe foi redefinida com sucesso."
         compact
       >
         <div>
-          <div className="mb-8 grid h-12 w-12 place-items-center rounded-full bg-[#f2f2ef]">
-            <CheckCircle2
-              className="h-6 w-6 text-[#202522]"
-              strokeWidth={1.7}
-            />
+          <div className="mb-6 grid h-11 w-11 place-items-center rounded-full bg-[#d9e7de] text-[#2c6457]">
+            <CheckCircle2 className="h-6 w-6" strokeWidth={1.8} />
           </div>
 
-          <h1 className="text-[34px] font-semibold leading-[1.05] tracking-[-0.045em] text-[#202522] sm:text-[40px]">
-            Palavra-passe atualizada.
+          <h1 className="text-[32px] font-semibold leading-[1.05] tracking-[-0.04em] text-[#202522] sm:text-[36px]">
+            Palavra-passe atualizada
           </h1>
 
-          <p className="mt-4 text-[15px] leading-6 text-[#707070]">
-            Já pode entrar novamente na sua conta com a nova palavra-passe.
+          <p className="mt-3 text-[14px] leading-6 text-[#6e716b]">
+            Já pode aceder à sua conta com a nova palavra-passe.
           </p>
 
           <button
             type="button"
             onClick={() => navigate("/login", { replace: true })}
-            className="mt-8 flex h-[52px] w-full items-center justify-center gap-2 rounded-[7px] bg-[#202522] text-[14px] font-semibold text-white transition-colors hover:bg-[#2c6457]"
+            className="mt-7 flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#202522] text-[14px] font-semibold text-white transition-colors hover:bg-[#2c6457]"
           >
             Entrar na conta
             <ArrowRight className="h-4 w-4" />
@@ -163,13 +156,13 @@ export default function ResetPassword() {
 
   return (
     <AuthShell
-      eyebrow="SEGURANÇA DA CONTA"
+      eyebrow="NOVA PALAVRA-PASSE"
       title="Defina uma nova palavra-passe."
-      description="Escolha uma palavra-passe que seja difícil de adivinhar e fácil de reconhecer para si."
+      description="Escolha uma palavra-passe segura para proteger a sua conta e os dados da sua empresa."
       footer={
         <Link
           to="/login"
-          className="text-sm font-medium text-[#666666] transition-colors hover:text-[#202522]"
+          className="text-xs font-medium text-[#6e716b] hover:text-[#202522] transition-colors"
         >
           Cancelar
         </Link>
@@ -177,25 +170,21 @@ export default function ResetPassword() {
       compact
     >
       <div>
-        <div className="mb-9">
-          <p className="mb-3 text-[12px] font-medium uppercase tracking-[0.12em] text-[#999999]">
+        <div className="mb-7">
+          <h1 className="text-[32px] font-semibold leading-[1.05] tracking-[-0.04em] text-[#202522] sm:text-[36px]">
             Nova palavra-passe
-          </p>
-
-          <h1 className="text-[34px] font-semibold leading-[1.05] tracking-[-0.045em] text-[#202522] sm:text-[40px]">
-            Proteja novamente a sua conta.
           </h1>
 
-          <p className="mt-3 text-[15px] leading-6 text-[#707070]">
-            Defina a nova palavra-passe abaixo.
+          <p className="mt-2.5 text-[14px] text-[#6e716b]">
+            Introduza e confirme a sua nova palavra-passe.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label
               htmlFor="password"
-              className="mb-2 block text-[13px] font-medium text-[#333333]"
+              className="mb-1.5 block text-[13px] font-medium text-[#202522]"
             >
               Nova palavra-passe
             </label>
@@ -203,7 +192,7 @@ export default function ResetPassword() {
             <div className="relative">
               <LockKeyhole
                 aria-hidden="true"
-                className="pointer-events-none absolute left-4 top-1/2 h-[17px] w-[17px] -translate-y-1/2 text-[#999999]"
+                className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8f8a80]"
                 strokeWidth={1.8}
               />
 
@@ -218,7 +207,7 @@ export default function ResetPassword() {
                 disabled={isLoading}
                 required
                 minLength={8}
-                className="h-[52px] w-full rounded-[7px] border border-[#ddddda] bg-[#fffdf9] pl-11 pr-12 text-[14px] text-[#202522] outline-none transition-all placeholder:text-[#aaaaaa] hover:border-[#c8c8c4] focus:border-[#2c6457] focus:ring-2 focus:ring-[#2c6457]/10"
+                className="h-12 w-full rounded-lg border border-[#e2ded5] bg-[#fffdf9] pl-10 pr-11 text-[14px] text-[#202522] outline-none transition-all placeholder:text-[#a09b90] hover:border-[#c8c1b4] focus:border-[#202522] focus:ring-1 focus:ring-[#202522]"
               />
 
               <button
@@ -229,12 +218,12 @@ export default function ResetPassword() {
                     : "Mostrar palavra-passe"
                 }
                 onClick={() => setShowPassword((value) => !value)}
-                className="absolute right-3 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-[7px] text-[#888888] hover:bg-[#f5f5f3] hover:text-[#202522]"
+                className="absolute right-2.5 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded text-[#8f8a80] hover:text-[#202522]"
               >
                 {showPassword ? (
-                  <EyeOff className="h-[17px] w-[17px]" strokeWidth={1.8} />
+                  <EyeOff className="h-4 w-4" strokeWidth={1.8} />
                 ) : (
-                  <Eye className="h-[17px] w-[17px]" strokeWidth={1.8} />
+                  <Eye className="h-4 w-4" strokeWidth={1.8} />
                 )}
               </button>
             </div>
@@ -243,7 +232,7 @@ export default function ResetPassword() {
           <div>
             <label
               htmlFor="confirmation"
-              className="mb-2 block text-[13px] font-medium text-[#333333]"
+              className="mb-1.5 block text-[13px] font-medium text-[#202522]"
             >
               Confirmar palavra-passe
             </label>
@@ -251,7 +240,7 @@ export default function ResetPassword() {
             <div className="relative">
               <LockKeyhole
                 aria-hidden="true"
-                className="pointer-events-none absolute left-4 top-1/2 h-[17px] w-[17px] -translate-y-1/2 text-[#999999]"
+                className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8f8a80]"
                 strokeWidth={1.8}
               />
 
@@ -265,7 +254,7 @@ export default function ResetPassword() {
                 onChange={(event) => setConfirmation(event.target.value)}
                 disabled={isLoading}
                 required
-                className="h-[52px] w-full rounded-[7px] border border-[#ddddda] bg-[#fffdf9] pl-11 pr-12 text-[14px] text-[#202522] outline-none transition-all placeholder:text-[#aaaaaa] hover:border-[#c8c8c4] focus:border-[#2c6457] focus:ring-2 focus:ring-[#2c6457]/10"
+                className="h-12 w-full rounded-lg border border-[#e2ded5] bg-[#fffdf9] pl-10 pr-11 text-[14px] text-[#202522] outline-none transition-all placeholder:text-[#a09b90] hover:border-[#c8c1b4] focus:border-[#202522] focus:ring-1 focus:ring-[#202522]"
               />
 
               <button
@@ -276,21 +265,21 @@ export default function ResetPassword() {
                     : "Mostrar confirmação"
                 }
                 onClick={() => setShowConfirmation((value) => !value)}
-                className="absolute right-3 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-[7px] text-[#888888] hover:bg-[#f5f5f3] hover:text-[#202522]"
+                className="absolute right-2.5 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded text-[#8f8a80] hover:text-[#202522]"
               >
                 {showConfirmation ? (
-                  <EyeOff className="h-[17px] w-[17px]" strokeWidth={1.8} />
+                  <EyeOff className="h-4 w-4" strokeWidth={1.8} />
                 ) : (
-                  <Eye className="h-[17px] w-[17px]" strokeWidth={1.8} />
+                  <Eye className="h-4 w-4" strokeWidth={1.8} />
                 )}
               </button>
             </div>
           </div>
 
-          <div className="space-y-2 rounded-[7px] border border-[#eeeeeb] bg-[#fafaf8] px-4 py-3">
+          <div className="space-y-1.5 rounded-lg border border-[#e2ded5] bg-[#f6f3ed] p-3 text-xs">
             <div
-              className={`flex items-center gap-2 text-[12px] ${
-                passwordHasLength ? "text-[#333333]" : "text-[#999999]"
+              className={`flex items-center gap-1.5 ${
+                passwordHasLength ? "text-[#2c6457] font-medium" : "text-[#8f8a80]"
               }`}
             >
               <Check className="h-3.5 w-3.5" strokeWidth={2} />
@@ -298,8 +287,8 @@ export default function ResetPassword() {
             </div>
 
             <div
-              className={`flex items-center gap-2 text-[12px] ${
-                passwordsMatch ? "text-[#333333]" : "text-[#999999]"
+              className={`flex items-center gap-1.5 ${
+                passwordsMatch ? "text-[#2c6457] font-medium" : "text-[#8f8a80]"
               }`}
             >
               <Check className="h-3.5 w-3.5" strokeWidth={2} />
@@ -310,16 +299,10 @@ export default function ResetPassword() {
           <button
             type="submit"
             disabled={isLoading || !passwordHasLength || !passwordsMatch}
-            className="group flex h-[52px] w-full items-center justify-center gap-2 rounded-[7px] bg-[#202522] text-[14px] font-semibold text-white transition-all hover:bg-[#2c6457] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40"
+            className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#202522] text-[14px] font-semibold text-white transition-all hover:bg-[#2c6457] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40"
           >
-            {isLoading ? "A atualizar..." : "Atualizar palavra-passe"}
-
-            {!isLoading && (
-              <ArrowRight
-                className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
-                strokeWidth={1.8}
-              />
-            )}
+            {isLoading ? "A redefinir..." : "Redefinir palavra-passe"}
+            {!isLoading && <ArrowRight className="h-4 w-4" strokeWidth={2} />}
           </button>
         </form>
       </div>

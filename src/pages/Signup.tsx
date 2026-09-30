@@ -49,15 +49,15 @@ export default function Signup() {
 
   return (
     <AuthShell
-      eyebrow="COMEÇAR"
-      title="Construa a operação da sua loja."
-      description="Crie a sua conta e depois configure a empresa, catálogo e canais no seu ritmo."
+      eyebrow="CRIAR CONTA DE OPERAÇÃO"
+      title="Inicie a sua operação em minutos."
+      description="Crie a sua conta e configure a sua empresa, catálogo e canais ao seu próprio ritmo."
       footer={
-        <div className="hidden items-center gap-2 text-sm text-[#666666] sm:flex">
+        <div className="flex items-center gap-2 text-xs text-[#6e716b]">
           <span>Já tem uma conta?</span>
           <Link
             to="/login"
-            className="font-semibold text-[#202522] underline decoration-[#cccccc] underline-offset-4 transition-colors hover:decoration-[#202522]"
+            className="font-semibold text-[#202522] underline decoration-[#d8d3c8] underline-offset-4 transition-colors hover:decoration-[#202522]"
           >
             Entrar
           </Link>
@@ -65,49 +65,33 @@ export default function Signup() {
       }
     >
       <div>
-        <div className="mb-8">
-          <p className="mb-3 text-[12px] font-medium uppercase tracking-[0.12em] text-[#999999]">
-            Nova conta
-          </p>
-
-          <h1 className="text-[34px] font-semibold leading-[1.05] tracking-[-0.045em] text-[#202522] sm:text-[40px]">
-            Comece por aqui.
+        {/* Form Title */}
+        <div className="mb-7">
+          <h1 className="text-[32px] font-semibold leading-[1.05] tracking-[-0.04em] text-[#202522] sm:text-[36px]">
+            Criar nova conta
           </h1>
 
-          <p className="mt-3 max-w-[410px] text-[15px] leading-6 text-[#707070]">
-            Primeiro criamos a sua conta. Depois, configuramos a sua empresa e
-            a sua loja.
+          <p className="mt-2.5 text-[14px] text-[#6e716b]">
+            Comece gratuitamente sem cartão de crédito.
           </p>
-          {selectedPlan && <div className="mt-5 flex items-start gap-3 border border-[#e6d4aa] bg-[#fbf3dd] p-3 text-xs text-[#8b6b36]"><span className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-[#e36c3f]" /><div><strong className="capitalize">{selectedPlan} plan</strong> selected{billing === "annual" ? " · annual billing" : " · monthly billing"}.<div className="mt-1">Launch promotion: 30% off your first 3 months.</div></div></div>}
+
+          {selectedPlan && (
+            <div className="mt-4 flex items-center gap-2.5 rounded-lg border border-[#e6d4aa] bg-[#fbf3dd] px-3.5 py-2.5 text-xs text-[#8b6b36]">
+              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#e36c3f]" />
+              <div>
+                Plano <strong className="capitalize">{selectedPlan}</strong> selecionado
+                {billing === "annual" ? " (anual)" : " (mensal)"}.
+              </div>
+            </div>
+          )}
         </div>
 
-        <div className="mb-8 flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <span className="grid h-6 w-6 place-items-center rounded-full bg-[#202522] text-[11px] font-semibold text-white">
-              1
-            </span>
-
-            <span className="text-[12px] font-medium text-[#333333]">
-              Conta
-            </span>
-          </div>
-
-          <div className="h-px flex-1 bg-[#e5e5e2]" />
-
-          <div className="flex items-center gap-2 text-[#aaaaaa]">
-            <span className="grid h-6 w-6 place-items-center rounded-full border border-[#ddddda] text-[11px] font-medium">
-              2
-            </span>
-
-            <span className="text-[12px]">Loja</span>
-          </div>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Signup Form */}
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label
               htmlFor="name"
-              className="mb-2 block text-[13px] font-medium text-[#333333]"
+              className="mb-1.5 block text-[13px] font-medium text-[#202522]"
             >
               Nome completo
             </label>
@@ -115,7 +99,7 @@ export default function Signup() {
             <div className="relative">
               <UserRound
                 aria-hidden="true"
-                className="pointer-events-none absolute left-4 top-1/2 h-[17px] w-[17px] -translate-y-1/2 text-[#999999]"
+                className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8f8a80]"
                 strokeWidth={1.8}
               />
 
@@ -129,7 +113,7 @@ export default function Signup() {
                 onChange={(event) => setName(event.target.value)}
                 disabled={isLoading}
                 required
-                className="h-[52px] w-full rounded-[7px] border border-[#ddddda] bg-[#fffdf9] pl-11 pr-4 text-[14px] text-[#202522] outline-none transition-all placeholder:text-[#aaaaaa] hover:border-[#c8c8c4] focus:border-[#2c6457] focus:ring-2 focus:ring-[#2c6457]/10 disabled:cursor-not-allowed disabled:bg-[#f7f7f5]"
+                className="h-12 w-full rounded-lg border border-[#e2ded5] bg-[#fffdf9] pl-10 pr-4 text-[14px] text-[#202522] outline-none transition-all placeholder:text-[#a09b90] hover:border-[#c8c1b4] focus:border-[#202522] focus:ring-1 focus:ring-[#202522] disabled:cursor-not-allowed disabled:bg-[#f6f3ed]"
               />
             </div>
           </div>
@@ -137,15 +121,15 @@ export default function Signup() {
           <div>
             <label
               htmlFor="email"
-              className="mb-2 block text-[13px] font-medium text-[#333333]"
+              className="mb-1.5 block text-[13px] font-medium text-[#202522]"
             >
-              Email
+              Email profissional
             </label>
 
             <div className="relative">
               <Mail
                 aria-hidden="true"
-                className="pointer-events-none absolute left-4 top-1/2 h-[17px] w-[17px] -translate-y-1/2 text-[#999999]"
+                className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8f8a80]"
                 strokeWidth={1.8}
               />
 
@@ -160,7 +144,7 @@ export default function Signup() {
                 onChange={(event) => setEmail(event.target.value)}
                 disabled={isLoading}
                 required
-                className="h-[52px] w-full rounded-[7px] border border-[#ddddda] bg-[#fffdf9] pl-11 pr-4 text-[14px] text-[#202522] outline-none transition-all placeholder:text-[#aaaaaa] hover:border-[#c8c8c4] focus:border-[#2c6457] focus:ring-2 focus:ring-[#2c6457]/10 disabled:cursor-not-allowed disabled:bg-[#f7f7f5]"
+                className="h-12 w-full rounded-lg border border-[#e2ded5] bg-[#fffdf9] pl-10 pr-4 text-[14px] text-[#202522] outline-none transition-all placeholder:text-[#a09b90] hover:border-[#c8c1b4] focus:border-[#202522] focus:ring-1 focus:ring-[#202522] disabled:cursor-not-allowed disabled:bg-[#f6f3ed]"
               />
             </div>
           </div>
@@ -168,7 +152,7 @@ export default function Signup() {
           <div>
             <label
               htmlFor="password"
-              className="mb-2 block text-[13px] font-medium text-[#333333]"
+              className="mb-1.5 block text-[13px] font-medium text-[#202522]"
             >
               Palavra-passe
             </label>
@@ -176,7 +160,7 @@ export default function Signup() {
             <div className="relative">
               <LockKeyhole
                 aria-hidden="true"
-                className="pointer-events-none absolute left-4 top-1/2 h-[17px] w-[17px] -translate-y-1/2 text-[#999999]"
+                className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8f8a80]"
                 strokeWidth={1.8}
               />
 
@@ -191,7 +175,7 @@ export default function Signup() {
                 disabled={isLoading}
                 required
                 minLength={8}
-                className="h-[52px] w-full rounded-[7px] border border-[#ddddda] bg-[#fffdf9] pl-11 pr-12 text-[14px] text-[#202522] outline-none transition-all placeholder:text-[#aaaaaa] hover:border-[#c8c8c4] focus:border-[#2c6457] focus:ring-2 focus:ring-[#2c6457]/10 disabled:cursor-not-allowed disabled:bg-[#f7f7f5]"
+                className="h-12 w-full rounded-lg border border-[#e2ded5] bg-[#fffdf9] pl-10 pr-11 text-[14px] text-[#202522] outline-none transition-all placeholder:text-[#a09b90] hover:border-[#c8c1b4] focus:border-[#202522] focus:ring-1 focus:ring-[#202522] disabled:cursor-not-allowed disabled:bg-[#f6f3ed]"
               />
 
               <button
@@ -203,36 +187,35 @@ export default function Signup() {
                 }
                 onClick={() => setShowPassword((value) => !value)}
                 disabled={isLoading}
-                className="absolute right-3 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-[7px] text-[#888888] transition-colors hover:bg-[#f5f5f3] hover:text-[#202522] disabled:opacity-50"
+                className="absolute right-2.5 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded text-[#8f8a80] hover:text-[#202522] transition-colors disabled:opacity-50"
               >
                 {showPassword ? (
-                  <EyeOff className="h-[17px] w-[17px]" strokeWidth={1.8} />
+                  <EyeOff className="h-4 w-4" strokeWidth={1.8} />
                 ) : (
-                  <Eye className="h-[17px] w-[17px]" strokeWidth={1.8} />
+                  <Eye className="h-4 w-4" strokeWidth={1.8} />
                 )}
               </button>
             </div>
 
-            <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5">
+            {/* Password check helper */}
+            <div className="mt-2.5 flex items-center gap-4 text-xs">
               <span
-                className={`flex items-center gap-1.5 text-[11px] ${
-                  password.length >= 8 ? "text-[#333333]" : "text-[#aaaaaa]"
+                className={`flex items-center gap-1 transition-colors ${
+                  password.length >= 8 ? "text-[#2c6457] font-medium" : "text-[#a09b90]"
                 }`}
               >
-                <Check className="h-3 w-3" strokeWidth={2} />
-                8 caracteres
+                <Check className="h-3.5 w-3.5" strokeWidth={2} />
+                8+ caracteres
               </span>
 
               <span
-                className={`flex items-center gap-1.5 text-[11px] ${
-                  password.length > 0
-                    ? /[A-Za-z]/.test(password) && /\d/.test(password)
-                      ? "text-[#333333]"
-                      : "text-[#aaaaaa]"
-                    : "text-[#aaaaaa]"
+                className={`flex items-center gap-1 transition-colors ${
+                  password.length > 0 && /[A-Za-z]/.test(password) && /\d/.test(password)
+                    ? "text-[#2c6457] font-medium"
+                    : "text-[#a09b90]"
                 }`}
               >
-                <Check className="h-3 w-3" strokeWidth={2} />
+                <Check className="h-3.5 w-3.5" strokeWidth={2} />
                 Letras e números
               </span>
             </div>
@@ -241,35 +224,16 @@ export default function Signup() {
           <button
             type="submit"
             disabled={isLoading}
-            className="group mt-2 flex h-[52px] w-full items-center justify-center gap-2 rounded-[7px] bg-[#202522] text-[14px] font-semibold text-white transition-all hover:bg-[#2c6457] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+            className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#202522] text-[14px] font-semibold text-white transition-all hover:bg-[#2c6457] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {isLoading ? "A criar conta..." : "Criar conta"}
-
-            {!isLoading && (
-              <ArrowRight
-                className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
-                strokeWidth={1.8}
-              />
-            )}
+            {isLoading ? "A criar conta..." : "Criar conta gratuita"}
+            {!isLoading && <ArrowRight className="h-4 w-4" strokeWidth={2} />}
           </button>
 
-          <p className="text-center text-[11px] leading-5 text-[#aaaaaa]">
-            Ao criar uma conta, você concorda com os Termos de Uso e a Política
-            de Privacidade.
+          <p className="pt-2 text-center text-[11px] leading-5 text-[#8f8a80]">
+            Ao criar uma conta, concorda com os Termos de Serviço e a Política de Privacidade.
           </p>
         </form>
-
-        <div className="mt-8 border-t border-[#eeeeeb] pt-7 text-center sm:hidden">
-          <p className="text-[13px] text-[#777777]">
-            Já tem uma conta?{" "}
-            <Link
-              to="/login"
-              className="font-semibold text-[#202522] underline decoration-[#cccccc] underline-offset-4"
-            >
-              Entrar
-            </Link>
-          </p>
-        </div>
       </div>
     </AuthShell>
   );
