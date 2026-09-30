@@ -32,6 +32,8 @@ import { RoadmapSurface } from "@/components/admin/RoadmapSurface";
 import Store from "./pages/store/Store";
 import OrderStatus from "./pages/store/OrderStatus";
 import NotFound from "./pages/NotFound";
+import Pricing from "./pages/Pricing";
+import { CookieBanner } from "@/components/CookieBanner";
 
 const queryClient = new QueryClient();
 
@@ -51,6 +53,7 @@ const App = () => (
             <Routes>
               {/* Public */}
               <Route path="/" element={<Index />} />
+              <Route path="/pricing" element={<Pricing />} />
 
               {/* Authentication */}
               <Route path="/login" element={<Login />} />
@@ -180,6 +183,7 @@ const App = () => (
 
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <CookieBanner />
           </CompanyProvider>
         </AuthProvider>
       </BrowserRouter>

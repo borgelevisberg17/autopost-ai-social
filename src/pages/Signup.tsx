@@ -8,7 +8,7 @@ import {
   Mail,
   UserRound,
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { AuthShell } from "@/components/auth/AuthShell";
 
@@ -21,6 +21,9 @@ export default function Signup() {
 
   const { signUp, user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const selectedPlan = searchParams.get("plan");
+  const billing = searchParams.get("billing");
 
   useEffect(() => {
     if (user) {
@@ -75,6 +78,7 @@ export default function Signup() {
             Primeiro criamos a sua conta. Depois, configuramos a sua empresa e
             a sua loja.
           </p>
+          {selectedPlan && <div className="mt-5 flex items-start gap-3 border border-[#e6d4aa] bg-[#fbf3dd] p-3 text-xs text-[#8b6b36]"><span className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-[#e36c3f]" /><div><strong className="capitalize">{selectedPlan} plan</strong> selected{billing === "annual" ? " · annual billing" : " · monthly billing"}.<div className="mt-1">Launch promotion: 30% off your first 3 months.</div></div></div>}
         </div>
 
         <div className="mb-8 flex items-center gap-3">
