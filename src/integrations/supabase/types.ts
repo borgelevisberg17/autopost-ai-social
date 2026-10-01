@@ -262,6 +262,7 @@ export type Database = {
           brand_voice: string | null
           business_name: string | null
           business_type: string | null
+          company_id: string | null
           created_at: string
           default_platform: string | null
           default_tone: string | null
@@ -288,6 +289,7 @@ export type Database = {
           brand_voice?: string | null
           business_name?: string | null
           business_type?: string | null
+          company_id?: string | null
           created_at?: string
           default_platform?: string | null
           default_tone?: string | null
@@ -314,6 +316,7 @@ export type Database = {
           brand_voice?: string | null
           business_name?: string | null
           business_type?: string | null
+          company_id?: string | null
           created_at?: string
           default_platform?: string | null
           default_tone?: string | null
@@ -334,7 +337,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "business_settings_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       companies: {
         Row: {
@@ -406,6 +417,7 @@ export type Database = {
       }
       content_history: {
         Row: {
+          company_id: string | null
           content_type: string
           created_at: string
           external_post_id: string | null
@@ -421,6 +433,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          company_id?: string | null
           content_type: string
           created_at?: string
           external_post_id?: string | null
@@ -436,6 +449,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          company_id?: string | null
           content_type?: string
           created_at?: string
           external_post_id?: string | null
@@ -450,7 +464,15 @@ export type Database = {
           topic?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "content_history_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       customers: {
         Row: {
