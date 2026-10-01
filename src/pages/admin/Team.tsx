@@ -158,6 +158,8 @@ export default function Team() {
                         <img
                           src={member.profile.avatar_url}
                           alt=""
+                          loading="lazy"
+                          decoding="async"
                           className="h-10 w-10 shrink-0 rounded-[7px] object-cover"
                         />
                       ) : (

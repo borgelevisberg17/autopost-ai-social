@@ -26,8 +26,8 @@ DM Sans para a interface e IBM Plex Mono para metadados. Voz direta, humana e op
 
 ## Ativos
 
-- `public/media/facebook-commerce.png`: composição larga full-bleed para Facebook.
-- `public/media/instagram-social-post.png`: composição vertical full-bleed para Instagram.
+- `docs/assets/social/facebook-commerce.png`: composição larga full-bleed para Facebook; fonte de documentação, fora dos assets servidos pelo site.
+- `docs/assets/social/instagram-social-post.png`: composição vertical full-bleed para Instagram; fonte de documentação, fora dos assets servidos pelo site.
 
 ## Painel admin — referência premium (2026-09)
 

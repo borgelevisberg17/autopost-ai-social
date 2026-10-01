@@ -467,6 +467,8 @@ function WhatsAppFlow() {
               <img
                 src={`/media/optimized/profile-0${(active % 4) + 1}.webp`}
                 alt=""
+                loading="lazy"
+                decoding="async"
                 className="h-full w-full object-cover"
               />
             </span>
@@ -788,6 +790,8 @@ function CaseStudiesSection() {
                   <img
                     src={current.logo}
                     alt={`${current.company} logo`}
+                    loading="lazy"
+                    decoding="async"
                     className="h-full w-full object-contain"
                   />
                 </span>

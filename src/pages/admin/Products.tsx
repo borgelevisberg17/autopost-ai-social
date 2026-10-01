@@ -1753,6 +1753,8 @@ function ProductImage({
         <img
           src={product.images[0]}
           alt=""
+          loading="lazy"
+          decoding="async"
           className="h-full w-full object-cover"
         />
       ) : (
@@ -2073,6 +2075,8 @@ function ProductEditor({
                         <img
                           src={image}
                           alt=""
+                          loading="lazy"
+                          decoding="async"
                           className="h-full w-full object-cover"
                         />
                       </div>
@@ -2133,6 +2137,8 @@ function ProductEditor({
                     <img
                       src={previewImages[0]}
                       alt=""
+                      loading="lazy"
+                      decoding="async"
                       className="h-full w-full object-cover"
                     />
                   ) : (
