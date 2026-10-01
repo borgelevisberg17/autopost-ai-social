@@ -6,6 +6,7 @@ import {
   BrowserRouter,
   Routes,
   Route,
+  Navigate,
   useLocation,
 } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
@@ -37,7 +38,6 @@ const Payments = lazy(() => import("./pages/admin/Payments"));
 const Store = lazy(() => import("./pages/store/Store"));
 const OrderStatus = lazy(() => import("./pages/store/OrderStatus"));
 const NotFound = lazy(() => import("./pages/NotFound"));
-const Pricing = lazy(() => import("./pages/Pricing"));
 const LazyCookieBanner = lazy(() =>
   import("@/components/CookieBanner").then(({ CookieBanner }) => ({
     default: CookieBanner,
@@ -89,7 +89,7 @@ const App = () => (
               <Routes>
                 {/* Public */}
                 <Route path="/" element={<Index />} />
-                <Route path="/pricing" element={<Pricing />} />
+                <Route path="/pricing" element={<Navigate to="/#plans" replace />} />
 
                 {/* Authentication */}
                 <Route path="/login" element={<Login />} />

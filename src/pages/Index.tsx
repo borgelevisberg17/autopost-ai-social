@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { PlansSection } from "@/components/site/PlansSection";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 
@@ -1202,7 +1203,7 @@ function HeroSection({
           </div>
         </div>
         <Link
-          to="/pricing"
+          to="/#plans"
           className="mt-4 inline-flex items-center gap-2 border border-[#e6d4aa] bg-[#fbf3dd] px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-[#8b6b36] transition hover:border-[#e36c3f]"
         >
           <span className="h-1.5 w-1.5 rounded-full bg-[#e36c3f]" />
@@ -1698,6 +1699,7 @@ export default function Index() {
             </div>
           </div>
         </section>
+        <PlansSection />
         <CaseStudiesSection />
         <FAQSection />
         <section id="process">

@@ -1,0 +1,10 @@
+.git
+.github
+.vite
+.lovable
+docs
+scripts
+*.log
+*.md
+DESIGN_ROADMAP.md
+ideas.md

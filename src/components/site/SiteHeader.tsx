@@ -14,7 +14,7 @@ const navItems = [
   { label: "Proof", href: "/#proof" },
   { label: "How it works", href: "/#process" },
   { label: "FAQ", href: "/#faq" },
-  { label: "Plans", href: "/pricing", emphasis: true },
+  { label: "Plans", href: "/#plans", emphasis: true },
 ];
 
 export function SiteHeader({ ctaHref, onCtaClick }: SiteHeaderProps) {
@@ -42,8 +42,8 @@ export function SiteHeader({ ctaHref, onCtaClick }: SiteHeaderProps) {
     );
 
   const isActive = (href: string) =>
-    href === "/pricing"
-      ? location.pathname === "/pricing"
+    href === "/#plans"
+      ? location.pathname === "/" && location.hash === "#plans"
       : location.pathname === "/" && location.hash === href.slice(1);
 
   return (

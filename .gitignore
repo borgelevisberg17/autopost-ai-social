@@ -26,3 +26,5 @@ dist-ssr
 # Local environment values
 .env.local
 .env.*.local
+
+.vite/

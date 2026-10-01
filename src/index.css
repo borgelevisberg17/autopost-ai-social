@@ -361,47 +361,20 @@ html {
 }
 
 @keyframes cookie-banner-in {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 18px, 0);
-  }
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
+  from { opacity: 0; transform: translate3d(0, 110%, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 @keyframes cookie-banner-out {
-  to {
-    opacity: 0;
-    transform: translate3d(0, 12px, 0);
-  }
+  from { opacity: 1; transform: translate3d(0, 0, 0); }
+  to { opacity: 0; transform: translate3d(0, 110%, 0); }
 }
-@keyframes cookie-preferences-in {
-  from {
-    max-height: 0;
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    max-height: 18rem;
-    opacity: 1;
-    transform: translateY(0);
-  }
+@keyframes cookie-orb-pulse {
+  0%, 100% { transform: rotate(0deg) scale(1); box-shadow: 0 0 0 0 rgba(44,100,87,0); }
+  50% { transform: rotate(-8deg) scale(1.08); box-shadow: 0 0 0 7px rgba(44,100,87,.08); }
 }
-.cookie-banner-enter {
-  animation: cookie-banner-in 260ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
-}
-.cookie-banner-exit {
-  animation: cookie-banner-out 180ms ease-in both;
-  pointer-events: none;
-}
-.cookie-preferences-enter {
-  animation: cookie-preferences-in 220ms ease-out both;
-}
+.cookie-banner-in { animation: cookie-banner-in 520ms cubic-bezier(.2,.8,.2,1) both; }
+.cookie-banner-out { animation: cookie-banner-out 280ms ease-in both; }
+.cookie-orb { animation: cookie-orb-pulse 3.2s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) {
-  .cookie-banner-enter,
-  .cookie-banner-exit,
-  .cookie-preferences-enter {
-    animation-duration: 1ms;
-  }
+  .cookie-banner-in, .cookie-banner-out, .cookie-orb { animation: none; }
 }
