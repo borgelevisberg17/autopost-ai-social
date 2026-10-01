@@ -19,6 +19,7 @@ import {
 } from "recharts";
 
 import { AdminLayout } from "@/components/admin/AdminLayout";
+import { AnalyticsAgentPanel } from "@/components/admin/AnalyticsAgentPanel";
 import { useCompany } from "@/hooks/useCompany";
 import { supabase } from "@/integrations/supabase/client";
 import { formatMoney } from "@/lib/format";
@@ -200,6 +201,12 @@ export default function Analytics() {
   return (
     <AdminLayout title="Analytics">
       <div className="space-y-10">
+        {company && (
+          <AnalyticsAgentPanel
+            companyId={company.id}
+            days={period === "7d" ? 7 : period === "90d" ? 90 : 30}
+          />
+        )}
         <section className="flex flex-col justify-between gap-5 pb-2 sm:flex-row sm:items-end">
           <div>
             <p className="mb-2 text-xs font-medium uppercase tracking-[0.16em] text-[#a7aaa2]">Desempenho Comercial</p>
