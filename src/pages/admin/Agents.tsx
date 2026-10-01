@@ -845,9 +845,8 @@ export default function Agents() {
 
               <div className="mt-4">
                 <p className="text-sm leading-6 text-[#747b73]">
-                  O agente é executado manualmente nesta fase. Cada
-                  execução usa o produto e os canais escolhidos e cria
-                  rascunhos para revisão; não existe automação contínua.
+                  A execução é manual. O agente usa o produto e os canais
+                  escolhidos e cria rascunhos para revisão.
                 </p>
               </div>
             </div>

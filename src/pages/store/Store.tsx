@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -92,6 +92,32 @@ export default function Store() {
     email: "",
     notes: "",
   });
+
+  const customerNameRef = useRef<HTMLInputElement>(null);
+  const customerPhoneRef = useRef<HTMLInputElement>(null);
+  const checkoutTitleRef = useRef<HTMLHeadingElement>(null);
+  const successHeadingRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    if (!cartOpen) return;
+
+    const focusTarget =
+      cartStep === "checkout"
+        ? window.matchMedia("(max-width: 639px)").matches
+          ? checkoutTitleRef.current
+          : customerNameRef.current
+        : cartStep === "success"
+          ? successHeadingRef.current
+          : null;
+
+    if (!focusTarget) return;
+
+    const frame = window.requestAnimationFrame(() => {
+      focusTarget.focus({ preventScroll: true });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [cartOpen, cartStep]);
 
   const loadStore = async () => {
     const { data: store, error: storeError } =
@@ -311,6 +337,7 @@ export default function Store() {
       toast.error(
         "Indique o seu nome.",
       );
+      customerNameRef.current?.focus();
       return;
     }
 
@@ -321,6 +348,7 @@ export default function Store() {
       toast.error(
         "Indique o telefone ou email.",
       );
+      customerPhoneRef.current?.focus();
       return;
     }
 
@@ -504,7 +532,7 @@ export default function Store() {
                 ? `Abrir carrinho com ${cartCount} produtos`
                 : "Abrir carrinho"
             }
-            className="flex min-h-10 items-center gap-2 rounded-[7px] border border-[#c9c3b8] px-3.5 py-2 text-sm font-semibold text-[#202522] transition hover:border-neutral-500 hover:bg-[#f1eee7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2 sm:px-4"
+            className="hidden min-h-10 items-center gap-2 rounded-[7px] border border-[#c9c3b8] px-3.5 py-2 text-sm font-semibold text-[#202522] transition hover:border-neutral-500 hover:bg-[#f1eee7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2 sm:px-4 md:flex"
           >
             <ShoppingBag className="h-4 w-4 shrink-0" />
 
@@ -1162,7 +1190,8 @@ export default function Store() {
       >
         <SheetContent
           side="right"
-          className="flex h-[100dvh] max-h-[100dvh] w-full flex-col overflow-hidden border-l border-[#ded9d0] bg-[#fffdf9] p-0 sm:max-w-lg"
+          style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+          className="flex h-[100dvh] max-h-[100dvh] w-full flex-col overflow-hidden border-l border-[#ded9d0] bg-[#fffdf9] p-0 max-sm:inset-x-0 max-sm:top-auto max-sm:bottom-0 max-sm:h-[92dvh] max-sm:max-h-[92dvh] max-sm:w-full max-sm:rounded-t-[28px] max-sm:rounded-b-none max-sm:border-l-0 max-sm:border-t sm:max-w-lg sm:rounded-l-2xl"
         >
           {/* HEADER */}
 
@@ -1177,14 +1206,18 @@ export default function Store() {
                       goBackToCart
                     }
                     aria-label="Voltar ao carrinho"
-                    className="grid h-9 w-9 shrink-0 place-items-center rounded-[7px] border border-[#ded9d0] text-[#303732] transition hover:bg-[#ebe7df] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+                    className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[#ded9d0] text-[#303732] transition hover:bg-[#ebe7df] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
                   >
                     <ArrowLeft className="h-4 w-4" />
                   </button>
                 )}
 
                 <div className="min-w-0">
-                  <SheetTitle className="text-xl font-bold tracking-tight text-[#202522]">
+                  <SheetTitle
+                    ref={checkoutTitleRef}
+                    tabIndex={-1}
+                    className="text-xl font-bold tracking-tight text-[#202522] focus:outline-none"
+                  >
                     {cartStep ===
                     "cart"
                       ? "Carrinho"
@@ -1225,7 +1258,7 @@ export default function Store() {
           cartStep ===
             "cart" ? (
             <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-8 text-center">
-              <div className="grid h-16 w-16 place-items-center rounded-[7px] bg-[#ebe7df]">
+              <div className="grid h-16 w-16 place-items-center rounded-2xl bg-[#ebe7df]">
                 <ShoppingCart className="h-6 w-6 text-[#5f625d]" />
               </div>
 
@@ -1242,7 +1275,7 @@ export default function Store() {
                 onClick={
                   continueShopping
                 }
-                className="mt-7 h-11 rounded-[7px] bg-black px-6 text-sm font-bold text-white hover:bg-neutral-800"
+                className="mt-7 h-11 rounded-full bg-black px-6 text-sm font-bold text-white hover:bg-neutral-800"
               >
                 Ver produtos
               </Button>
@@ -1335,7 +1368,7 @@ export default function Store() {
                                           );
                                         }}
                                         aria-label={`Remover ${product.name}`}
-                                        className="grid h-8 w-8 shrink-0 place-items-center rounded-[7px] text-[#747b73] transition hover:bg-[#ebe7df] hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+                                        className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-[#747b73] transition hover:bg-[#ebe7df] hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
                                       >
                                         <X className="h-4 w-4" />
                                       </button>
@@ -1349,7 +1382,7 @@ export default function Store() {
                                     </p>
 
                                     <div className="mt-4">
-                                      <div className="inline-flex h-9 items-center rounded-[7px] border border-[#c9c3b8]">
+                                      <div className="inline-flex h-9 items-center rounded-full border border-[#c9c3b8]">
                                         <button
                                           type="button"
                                           onClick={() =>
@@ -1359,7 +1392,7 @@ export default function Store() {
                                             )
                                           }
                                           aria-label={`Diminuir quantidade de ${product.name}`}
-                                          className="grid h-9 w-9 place-items-center rounded-[7px] text-[#303732] transition hover:bg-[#ebe7df] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+                                          className="grid h-9 w-9 place-items-center rounded-full text-[#303732] transition hover:bg-[#ebe7df] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
                                         >
                                           <Minus className="h-3.5 w-3.5" />
                                         </button>
@@ -1379,7 +1412,7 @@ export default function Store() {
                                             )
                                           }
                                           aria-label={`Aumentar quantidade de ${product.name}`}
-                                          className="grid h-9 w-9 place-items-center rounded-[7px] text-[#303732] transition hover:bg-[#ebe7df] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+                                          className="grid h-9 w-9 place-items-center rounded-full text-[#303732] transition hover:bg-[#ebe7df] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
                                         >
                                           <Plus className="h-3.5 w-3.5" />
                                         </button>
@@ -1419,6 +1452,7 @@ export default function Store() {
 
                           <Input
                             id="customer-name"
+                            ref={customerNameRef}
                             value={
                               customer.name
                             }
@@ -1435,7 +1469,7 @@ export default function Store() {
                               )
                             }
                             placeholder="O seu nome"
-                            className="h-12 rounded-[7px] border-[#c9c3b8] bg-[#fffdf9] text-sm font-medium text-[#202522] placeholder:text-[#747b73] focus-visible:border-black focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+                            className="h-12 rounded-xl border-[#c9c3b8] bg-[#fffdf9] text-base font-medium text-[#202522] placeholder:text-[#747b73] focus-visible:border-black focus-visible:ring-2 focus-visible:ring-[#e36c3f] sm:text-sm"
                             maxLength={
                               120
                             }
@@ -1453,6 +1487,7 @@ export default function Store() {
 
                           <Input
                             id="customer-phone"
+                            ref={customerPhoneRef}
                             value={
                               customer.phone
                             }
@@ -1469,7 +1504,7 @@ export default function Store() {
                               )
                             }
                             placeholder="+244 9xx xxx xxx"
-                            className="h-12 rounded-[7px] border-[#c9c3b8] bg-[#fffdf9] text-sm font-medium text-[#202522] placeholder:text-[#747b73] focus-visible:border-black focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+                            className="h-12 rounded-xl border-[#c9c3b8] bg-[#fffdf9] text-base font-medium text-[#202522] placeholder:text-[#747b73] focus-visible:border-black focus-visible:ring-2 focus-visible:ring-[#e36c3f] sm:text-sm"
                             maxLength={
                               40
                             }
@@ -1508,7 +1543,7 @@ export default function Store() {
                             }
                             placeholder="seu@email.com"
                             type="email"
-                            className="h-12 rounded-[7px] border-[#c9c3b8] bg-[#fffdf9] text-sm font-medium text-[#202522] placeholder:text-[#747b73] focus-visible:border-black focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+                            className="h-12 rounded-xl border-[#c9c3b8] bg-[#fffdf9] text-base font-medium text-[#202522] placeholder:text-[#747b73] focus-visible:border-black focus-visible:ring-2 focus-visible:ring-[#e36c3f] sm:text-sm"
                             maxLength={
                               160
                             }
@@ -1545,7 +1580,7 @@ export default function Store() {
                               )
                             }
                             placeholder="Morada, referência ou alguma observação"
-                            className="min-h-[110px] resize-none rounded-[7px] border-[#c9c3b8] bg-[#fffdf9] text-sm font-medium text-[#202522] placeholder:text-[#747b73] focus-visible:border-black focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+                            className="min-h-[110px] resize-none rounded-xl border-[#c9c3b8] bg-[#fffdf9] text-base font-medium text-[#202522] placeholder:text-[#747b73] focus-visible:border-black focus-visible:ring-2 focus-visible:ring-[#e36c3f] sm:text-sm"
                             maxLength={
                               1000
                             }
@@ -1563,7 +1598,7 @@ export default function Store() {
                 "success" && (
                 <div className="min-h-0 flex-1 overflow-y-auto">
                   <div className="flex min-h-full flex-col items-center justify-center px-7 py-12 text-center sm:px-10">
-                    <div className="grid h-20 w-20 place-items-center rounded-[7px] bg-black text-white">
+                    <div className="grid h-20 w-20 place-items-center rounded-2xl bg-black text-white">
                       <Check className="h-9 w-9 stroke-[2.5]" />
                     </div>
 
@@ -1571,7 +1606,11 @@ export default function Store() {
                       Pedido recebido
                     </p>
 
-                    <h2 className="mt-3 text-3xl font-bold tracking-[-0.04em] text-[#202522]">
+                    <h2
+                      ref={successHeadingRef}
+                      tabIndex={-1}
+                      className="mt-3 text-3xl font-bold tracking-[-0.04em] text-[#202522] focus:outline-none"
+                    >
                       Tudo certo.
                     </h2>
 
@@ -1580,7 +1619,7 @@ export default function Store() {
                     </p>
 
                     {orderId && (
-                      <div className="mt-7 rounded-[7px] border border-[#ded9d0] bg-[#f1eee7] px-5 py-4">
+                      <div className="mt-7 rounded-xl border border-[#ded9d0] bg-[#f1eee7] px-5 py-4">
                         <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#747b73]">
                           Pedido
                         </p>
@@ -1618,7 +1657,7 @@ export default function Store() {
                       onClick={
                         goToCheckout
                       }
-                      className="h-12 rounded-[7px] bg-black px-5 text-sm font-bold text-white hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
+                      className="h-12 rounded-full bg-black px-5 text-sm font-bold text-white hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
                     >
                       Finalizar pedido
                       <ArrowRight className="ml-2 h-4 w-4" />
@@ -1651,7 +1690,7 @@ export default function Store() {
                     disabled={
                       placing
                     }
-                    className="h-12 w-full rounded-[7px] bg-black text-sm font-bold text-white hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
+                    className="h-12 w-full rounded-full bg-black text-sm font-bold text-white hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
                   >
                     {placing ? (
                       <>
@@ -1674,22 +1713,14 @@ export default function Store() {
                   <Button
                     type="button"
                     onClick={() => {
-                      if (
-                        orderId
-                      ) {
-                        closeCart();
-
-                        window.setTimeout(
-                          () => {
-                            navigate(
-                              `/loja/${slug}/pedido/${orderId}`,
-                            );
-                          },
-                          180,
-                        );
-                      }
+                      if (!orderId) return;
+                      closeCart();
+                      window.setTimeout(
+                        () => navigate(`/loja/${slug}/pedido/${orderId}`),
+                        180,
+                      );
                     }}
-                    className="h-12 w-full rounded-[7px] bg-black text-sm font-bold text-white hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
+                    className="h-12 w-full rounded-full bg-black text-sm font-bold text-white hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
                   >
                     Ver pedido
                     <ArrowRight className="ml-2 h-4 w-4" />

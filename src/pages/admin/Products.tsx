@@ -675,19 +675,7 @@ export default function Products() {
   }
 
   return (
-    <AdminLayout
-      title="Produtos"
-      actions={
-        <button
-          type="button"
-          onClick={openNew}
-          className="inline-flex min-h-10 items-center gap-2 bg-black px-4 text-sm font-semibold text-white transition hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
-        >
-          <Plus className="h-4 w-4" />
-          <span>Novo produto</span>
-        </button>
-      }
-    >
+    <AdminLayout title="Produtos">
       <div className="mx-auto max-w-[1500px]">
         {/* PAGE HEADER */}
 

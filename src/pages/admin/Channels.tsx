@@ -697,9 +697,6 @@ export default function Channels() {
                     <h3 className="truncate font-serif text-[22px] font-medium tracking-[-0.035em] text-[#202522] sm:text-[27px]">
                       {selectedChannel.label}
                     </h3>
-                    <p className="mt-1 text-xs leading-5 text-[#737a72]">
-                      {selectedChannel.description}
-                    </p>
                   </div>
                 </div>
 

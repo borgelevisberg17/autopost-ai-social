@@ -230,8 +230,6 @@ export default function Approvals() {
                             )}
                           </span>
                           <span className="capitalize">{draft.platform || "Rede Social"}</span>
-                          <span className="text-[#a7aaa2]">·</span>
-                          <span className="font-normal text-[#747b73]">{draft.product_name}</span>
                         </div>
 
                         <div className="relative mt-5 bg-[#f1eee7]/65 px-5 py-5 pr-14 text-center font-sans text-sm leading-7 text-[#303732] whitespace-pre-wrap">

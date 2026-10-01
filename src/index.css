@@ -238,7 +238,7 @@
 .company-marquee__track {
   display: flex;
   width: max-content;
-  animation: company-marquee 42s linear infinite;
+  animation: company-marquee 24s linear infinite;
   will-change: transform;
 }
 .company-marquee__group {

@@ -49,7 +49,7 @@ function Metric({
   icon: typeof WalletCards;
 }) {
   return (
-    <div className="border border-[#e2ded5] bg-[#fffdf9] p-4">
+    <div className="rounded-2xl border border-[#e2ded5] bg-[#fffdf9] p-4">
       <div className="flex items-center justify-between">
         <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#8f8a80]">
           {label}
@@ -67,8 +67,8 @@ function Metric({
 function ProductFrame() {
   return (
     <div className="relative mx-auto max-w-[1160px]">
-      <div className="overflow-hidden border border-[#d9d5cc] bg-[#f1eee7] shadow-[0_28px_80px_rgba(32,37,34,0.14)]">
-        <div className="flex h-11 items-center justify-between border-b border-[#ded9d0] bg-[#fffdf9] px-4">
+      <div className="overflow-hidden rounded-2xl border border-[#d9d5cc] bg-[#f1eee7] shadow-[0_28px_80px_rgba(32,37,34,0.14)]">
+        <div className="flex h-11 items-center justify-between rounded-t-2xl border-b border-[#ded9d0] bg-[#fffdf9] px-4">
           <div className="flex items-center gap-1.5">
             <span className="h-2 w-2 rounded-full bg-[#d9d5cc]" />
             <span className="h-2 w-2 rounded-full bg-[#d9d5cc]" />
@@ -77,12 +77,12 @@ function ProductFrame() {
           <div className="font-mono text-[9px] text-[#8f8a80]">
             app.vendora.co / overview
           </div>
-          <div className="h-5 w-14 border border-[#e2ded5] bg-[#f6f3ed]" />
+          <div className="h-5 w-14 rounded-full border border-[#e2ded5] bg-[#f6f3ed]" />
         </div>
         <div className="grid min-h-[420px] md:grid-cols-[180px_1fr]">
           <aside className="hidden border-r border-[#ded9d0] bg-[#202522] p-4 text-[#f6f3ed] md:block">
             <div className="mb-8 flex items-center gap-2">
-              <span className="grid h-6 w-6 place-items-center bg-[#e36c3f] text-white">
+              <span className="grid h-6 w-6 place-items-center rounded-md bg-[#e36c3f] text-white">
                 <Circle className="h-2.5 w-2.5 fill-current" />
               </span>
               <span className="text-[11px] font-bold">Vendora</span>
@@ -92,7 +92,7 @@ function ProductFrame() {
                 (item, i) => (
                   <div
                     key={item}
-                    className={`flex items-center gap-2 px-2 py-2 text-[10px] ${i === 0 ? "bg-white/10 text-white" : "text-white/50"}`}
+                    className={`flex items-center gap-2 rounded-lg px-2 py-2 text-[10px] ${i === 0 ? "bg-white/10 text-white" : "text-white/50"}`}
                   >
                     <span
                       className={`h-1.5 w-1.5 rounded-full ${i === 0 ? "bg-[#e36c3f]" : "bg-white/30"}`}
@@ -123,7 +123,7 @@ function ProductFrame() {
                   Good morning, Amina.
                 </div>
               </div>
-              <div className="hidden border border-[#ded9d0] bg-[#fffdf9] px-3 py-2 font-mono text-[9px] text-[#8f8a80] sm:block">
+              <div className="hidden rounded-full border border-[#ded9d0] bg-[#fffdf9] px-3 py-2 font-mono text-[9px] text-[#8f8a80] sm:block">
                 Last 30 days
               </div>
             </div>
@@ -154,7 +154,7 @@ function ProductFrame() {
               />
             </div>
             <div className="mt-3 grid gap-3 lg:grid-cols-[1.5fr_1fr]">
-              <div className="border border-[#ded9d0] bg-[#fffdf9] p-4">
+              <div className="rounded-2xl border border-[#ded9d0] bg-[#fffdf9] p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#8f8a80]">
@@ -175,7 +175,7 @@ function ProductFrame() {
                   ].map((height, i) => (
                     <div
                       key={i}
-                      className={`flex-1 ${i === 11 ? "bg-[#e36c3f]" : "bg-[#9ab5ab]"}`}
+                      className={`flex-1 rounded-t-full ${i === 11 ? "bg-[#e36c3f]" : "bg-[#9ab5ab]"}`}
                       style={{ height: `${height}%` }}
                     />
                   ))}
@@ -185,7 +185,7 @@ function ProductFrame() {
                   <span>14 OCT</span>
                 </div>
               </div>
-              <div className="border border-[#ded9d0] bg-[#fffdf9] p-4">
+              <div className="rounded-2xl border border-[#ded9d0] bg-[#fffdf9] p-4">
                 <div className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#8f8a80]">
                   Activity
                 </div>
@@ -442,7 +442,7 @@ function WhatsAppFlow() {
           Live sequence · {active + 1}/{states.length}
         </span>
       </div>
-      <div className="relative mx-auto max-w-[370px] overflow-hidden border-[10px] border-[#202522] bg-[#202522] shadow-[0_24px_60px_rgba(32,37,34,0.22)]">
+      <div className="relative mx-auto max-w-[370px] overflow-hidden rounded-[30px] border-[10px] border-[#202522] bg-[#202522] shadow-[0_24px_60px_rgba(32,37,34,0.22)]">
         <div className="absolute inset-x-3 top-3 z-20 flex gap-1">
           {states.map((_, index) => (
             <span
@@ -579,7 +579,7 @@ function ChannelShowcase() {
           {channels.map((channel, channelIndex) => (
             <article
               key={channel.name}
-              className={`${channel.tone} overflow-hidden p-5 sm:p-7 ${channelIndex === 1 ? "text-[#202522]" : "text-white"}`}
+              className={`${channel.tone} overflow-hidden rounded-2xl p-5 sm:p-7 ${channelIndex === 1 ? "text-[#202522]" : "text-white"}`}
             >
               <div className="grid gap-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-center">
                 <div>
@@ -605,7 +605,7 @@ function ChannelShowcase() {
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-[1fr_0.3fr] gap-3">
-                  <div className="overflow-hidden border border-white/20 bg-[#f6f3ed] p-2 sm:p-3">
+                  <div className="overflow-hidden rounded-xl border border-white/20 bg-[#f6f3ed] p-2 sm:p-3">
                     <img
                       src={channel.assets[0]}
                       alt={channel.alt[0]}
@@ -621,7 +621,7 @@ function ChannelShowcase() {
                     {channel.assets.slice(1).map((asset, index) => (
                       <div
                         key={asset}
-                        className="overflow-hidden border border-white/20 bg-[#29322d] p-1"
+                        className="overflow-hidden rounded-xl border border-white/20 bg-[#29322d] p-1"
                       >
                         <img
                           src={asset}
@@ -966,7 +966,7 @@ function OnboardingModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="onboarding-title"
-        className="max-h-[92vh] w-full overflow-y-auto border border-[#d8d3c8] bg-[#fffdf9] shadow-[0_30px_100px_rgba(32,37,34,0.28)] sm:max-w-[560px]"
+          className="max-h-[92vh] w-full overflow-y-auto rounded-t-3xl border border-[#d8d3c8] bg-[#fffdf9] shadow-[0_30px_100px_rgba(32,37,34,0.28)] sm:max-w-[560px] sm:rounded-3xl"
       >
         <div className="flex items-center justify-between border-b border-[#e2ded5] px-5 py-4 sm:px-7">
           <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#2c6457]">
@@ -976,7 +976,7 @@ function OnboardingModal({
             type="button"
             onClick={onClose}
             aria-label="Close onboarding"
-            className="grid h-8 w-8 place-items-center text-2xl text-[#8f8a80] transition hover:bg-[#f1eee7] hover:text-[#202522]"
+                className="grid h-8 w-8 place-items-center rounded-full text-2xl text-[#8f8a80] transition hover:bg-[#f1eee7] hover:text-[#202522]"
           >
             <X className="h-4 w-4" />
           </button>
@@ -1013,7 +1013,7 @@ function OnboardingModal({
                     key={item}
                     type="button"
                     onClick={() => setGoal(item)}
-                    className={`flex items-center justify-between border p-4 text-left text-sm font-semibold transition ${goal === item ? "border-[#2c6457] bg-[#d9e7de] text-[#202522]" : "border-[#d8d3c8] hover:border-[#8bad9d]"}`}
+                    className={`flex items-center justify-between rounded-xl border p-4 text-left text-sm font-semibold transition ${goal === item ? "border-[#2c6457] bg-[#d9e7de] text-[#202522]" : "border-[#d8d3c8] hover:border-[#8bad9d]"}`}
                   >
                     <span>{item}</span>
                     <span
@@ -1025,7 +1025,7 @@ function OnboardingModal({
               <button
                 type="button"
                 onClick={() => setStep(2)}
-                className="mt-7 inline-flex h-12 w-full items-center justify-center gap-2 bg-[#202522] text-sm font-semibold text-white transition hover:bg-[#2c6457]"
+                className="mt-7 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#202522] text-sm font-semibold text-white transition hover:bg-[#2c6457]"
               >
                 Continue <ArrowRight className="h-4 w-4" />
               </button>
@@ -1050,7 +1050,7 @@ function OnboardingModal({
                       key={item}
                       type="button"
                       onClick={() => toggleChannel(item)}
-                      className={`border p-4 text-left text-sm font-semibold transition ${channels.includes(item) ? "border-[#2c6457] bg-[#d9e7de]" : "border-[#d8d3c8] hover:border-[#8bad9d]"}`}
+                      className={`rounded-xl border p-4 text-left text-sm font-semibold transition ${channels.includes(item) ? "border-[#2c6457] bg-[#d9e7de]" : "border-[#d8d3c8] hover:border-[#8bad9d]"}`}
                     >
                       <span className="flex items-center justify-between gap-2">
                         <span>{item}</span>
@@ -1066,7 +1066,7 @@ function OnboardingModal({
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="h-12 flex-1 border border-[#d8d3c8] text-sm font-semibold text-[#5f625d]"
+                  className="h-12 flex-1 rounded-full border border-[#d8d3c8] text-sm font-semibold text-[#5f625d]"
                 >
                   Back
                 </button>
@@ -1074,7 +1074,7 @@ function OnboardingModal({
                   type="button"
                   disabled={!channels.length}
                   onClick={() => setStep(3)}
-                  className="h-12 flex-[2] bg-[#202522] text-sm font-semibold text-white transition hover:bg-[#2c6457] disabled:cursor-not-allowed disabled:opacity-40"
+                  className="h-12 flex-[2] rounded-full bg-[#202522] text-sm font-semibold text-white transition hover:bg-[#2c6457] disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Review setup <ArrowRight className="ml-1 inline h-4 w-4" />
                 </button>
@@ -1110,22 +1110,22 @@ function OnboardingModal({
                 </div>
               </div>
               <div className="mt-7 grid grid-cols-3 gap-2 text-center font-mono text-[9px] uppercase tracking-[0.12em] text-[#6e716b]">
-                <div className="bg-[#f1eee7] px-2 py-3">No card</div>
-                <div className="bg-[#f1eee7] px-2 py-3">Guided setup</div>
-                <div className="bg-[#f1eee7] px-2 py-3">Add CRM later</div>
+                <div className="rounded-xl bg-[#f1eee7] px-2 py-3">No card</div>
+                <div className="rounded-xl bg-[#f1eee7] px-2 py-3">Guided setup</div>
+                <div className="rounded-xl bg-[#f1eee7] px-2 py-3">Add CRM later</div>
               </div>
               <div className="mt-7 flex gap-2">
                 <button
                   type="button"
                   onClick={() => setStep(2)}
-                  className="h-12 flex-1 border border-[#d8d3c8] text-sm font-semibold text-[#5f625d]"
+                  className="h-12 flex-1 rounded-full border border-[#d8d3c8] text-sm font-semibold text-[#5f625d]"
                 >
                   Back
                 </button>
                 <Link
                   to={destination}
                   onClick={onClose}
-                  className="inline-flex h-12 flex-[2] items-center justify-center gap-2 bg-[#e36c3f] text-sm font-semibold text-white transition hover:bg-[#c95735]"
+                  className="inline-flex h-12 flex-[2] items-center justify-center gap-2 rounded-full bg-[#e36c3f] text-sm font-semibold text-white transition hover:bg-[#c95735]"
                 >
                   Start free <ArrowRight className="h-4 w-4" />
                 </Link>
@@ -1302,7 +1302,7 @@ function ProcessSection() {
       status: "Incoming intent",
       tone: "bg-[#d9e7de]",
       visual: (
-        <div className="mx-auto max-w-[360px] border border-[#b9cabe] bg-[#fffdf9] p-4 shadow-[0_16px_40px_rgba(44,100,87,0.12)]">
+        <div className="mx-auto max-w-[360px] rounded-2xl border border-[#b9cabe] bg-[#fffdf9] p-4 shadow-[0_16px_40px_rgba(44,100,87,0.12)]">
           <div className="flex items-center gap-3 border-b border-[#d8e3da] pb-3">
             <span className="grid h-8 w-8 place-items-center rounded-full bg-[#2c6457] text-white">
               <MessageCircle className="h-4 w-4" />
@@ -1333,7 +1333,7 @@ function ProcessSection() {
       status: "Guardrails active",
       tone: "bg-[#e6d4aa]",
       visual: (
-        <div className="mx-auto max-w-[390px] border border-[#c9b57e] bg-[#fffdf9] p-5 shadow-[0_16px_40px_rgba(139,107,54,0.12)]">
+        <div className="mx-auto max-w-[390px] rounded-2xl border border-[#c9b57e] bg-[#fffdf9] p-5 shadow-[0_16px_40px_rgba(139,107,54,0.12)]">
           <div className="flex items-center justify-between">
             <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#8b6b36]">
               Sales AI / verification
@@ -1376,7 +1376,7 @@ function ProcessSection() {
       status: "Outcome recorded",
       tone: "bg-[#202522]",
       visual: (
-        <div className="mx-auto max-w-[390px] border border-white/15 bg-[#151a17] p-5 text-[#f6f3ed] shadow-[0_16px_40px_rgba(32,37,34,0.2)]">
+        <div className="mx-auto max-w-[390px] rounded-2xl border border-white/15 bg-[#151a17] p-5 text-[#f6f3ed] shadow-[0_16px_40px_rgba(32,37,34,0.2)]">
           <div className="flex items-center justify-between">
             <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#e36c3f]">
               Order closed / #VD-1048
@@ -1456,7 +1456,7 @@ function ProcessSection() {
                 type="button"
                 aria-pressed={active === index}
                 onClick={() => setActive(index)}
-                className={`w-full border p-5 text-left transition ${active === index ? "border-[#2c6457] bg-[#d9e7de]" : "border-[#d8d3c8] bg-[#fffdf9] hover:border-[#8bad9d]"}`}
+                className={`w-full rounded-2xl border p-5 text-left transition ${active === index ? "border-[#2c6457] bg-[#d9e7de]" : "border-[#d8d3c8] bg-[#fffdf9] hover:border-[#8bad9d]"}`}
               >
                 <div className="flex items-start gap-4">
                   <span
@@ -1480,7 +1480,7 @@ function ProcessSection() {
             ))}
           </div>
           <div
-            className={`min-h-[430px] ${current.tone} flex flex-col justify-between p-5 sm:p-8`}
+            className={`min-h-[430px] rounded-2xl ${current.tone} flex flex-col justify-between p-5 sm:p-8`}
           >
             <div
               className={`flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.16em] ${active === 2 ? "text-white/45" : "text-[#8f8a80]"}`}
@@ -1577,7 +1577,7 @@ export default function Index() {
                   and stay inside clear permissions.
                 </p>
                 <div className="mt-10 space-y-3">
-                  <div className="border border-white/15 bg-[#29322d] p-4">
+                  <div className="rounded-xl border border-white/15 bg-[#29322d] p-4">
                     <div className="flex items-center justify-between gap-4">
                       <div>
                         <div className="font-semibold">Marketing AI</div>
@@ -1590,7 +1590,7 @@ export default function Index() {
                       </span>
                     </div>
                   </div>
-                  <div className="border border-white/15 bg-[#29322d] p-4">
+                  <div className="rounded-xl border border-white/15 bg-[#29322d] p-4">
                     <div className="flex items-center justify-between gap-4">
                       <div>
                         <div className="font-semibold">Sales AI</div>
@@ -1603,7 +1603,7 @@ export default function Index() {
                       </span>
                     </div>
                   </div>
-                  <div className="border border-white/15 bg-[#29322d] p-4">
+                  <div className="rounded-xl border border-white/15 bg-[#29322d] p-4">
                     <div className="flex items-center justify-between gap-4">
                       <div>
                         <div className="font-semibold">Analytics AI</div>
@@ -1619,7 +1619,7 @@ export default function Index() {
                 </div>
               </div>
               <div>
-                <div className="border border-white/20 bg-[#151a17] p-2 shadow-[0_24px_70px_rgba(0,0,0,0.3)] sm:p-3">
+                <div className="overflow-hidden rounded-2xl border border-white/20 bg-[#151a17] p-2 shadow-[0_24px_70px_rgba(0,0,0,0.3)] sm:p-3">
                   <video
                     className="aspect-video w-full object-cover"
                     src="/media/agent-architecture.mp4"
@@ -1723,7 +1723,7 @@ export default function Index() {
               </Link>
             </div>
             <div className="mt-14 grid gap-5 lg:grid-cols-2">
-              <div className="overflow-hidden border border-white/15 bg-[#f6f3ed] p-2 sm:p-3">
+              <div className="overflow-hidden rounded-2xl border border-white/15 bg-[#f6f3ed] p-2 sm:p-3">
                 <img
                   src="/media/optimized/operations-audit.webp"
                   alt="Vendora operations view with orders, activity, audit and channel status"
@@ -1732,10 +1732,9 @@ export default function Index() {
                 />
                 <div className="flex flex-wrap items-center justify-between gap-3 px-2 pt-3 font-mono text-[9px] uppercase tracking-[0.14em] text-[#8f8a80]">
                   <span>Live operations</span>
-                  <span className="text-[#2c6457]">4 channels connected</span>
                 </div>
               </div>
-              <div className="overflow-hidden border border-white/15 bg-[#f6f3ed] p-2 sm:p-3">
+              <div className="overflow-hidden rounded-2xl border border-white/15 bg-[#f6f3ed] p-2 sm:p-3">
                 <img
                   src="/media/optimized/storefront-commerce.webp"
                   alt="Vendora connected storefront product detail with live inventory"
@@ -1775,7 +1774,7 @@ export default function Index() {
               </p>
               <Link
                 to={startPath}
-                className="mt-9 inline-flex items-center gap-2 bg-[#202522] px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-[#2c6457]"
+                className="mt-9 inline-flex items-center gap-2 rounded-full bg-[#202522] px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-[#2c6457]"
               >
                 Build your operation <ArrowRight className="h-4 w-4" />
               </Link>

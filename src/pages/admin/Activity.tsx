@@ -119,7 +119,7 @@ export default function Activity() {
     <AdminLayout title="Atividade">
       <div className="space-y-8">
         <PageHeader
-          eyebrow="Operação / Atividade"
+          eyebrow="Operação"
           title="Atividade"
           description="Uma linha do tempo dos agentes, notificações e ações registadas na operação."
           className="[&_h1]:font-serif [&_h1]:font-medium"

@@ -3,7 +3,6 @@ import {
   ArrowRight,
   Check,
   HelpCircle,
-  ShieldCheck,
   Sparkles,
   Zap,
 } from "lucide-react";
@@ -106,7 +105,7 @@ export default function Pricing() {
                 Transparent pricing
               </div>
 
-              <h1 className="text-balance text-[clamp(2.7rem,9vw,4.8rem)] font-semibold leading-[0.94] tracking-[-0.075em] text-white sm:text-6xl lg:text-7xl">
+              <h1 className="text-balance text-[clamp(2.35rem,9vw,4.8rem)] font-semibold leading-[0.94] tracking-[-0.075em] text-white sm:text-6xl lg:text-7xl">
                 A calmer way to <br className="hidden sm:inline" />
                 <span className="text-[#f3b08e]">keep selling.</span>
               </h1>
@@ -119,13 +118,13 @@ export default function Pricing() {
               <div
                 role="group"
                 aria-label="Billing frequency"
-                className="mx-auto mt-9 grid w-full max-w-[440px] grid-cols-2 gap-1 rounded-[4px] border border-white/15 bg-white/[0.06] p-1.5 text-xs font-semibold sm:inline-flex sm:w-auto sm:max-w-none sm:rounded-full sm:bg-black/30"
+                className="mx-auto mt-9 grid w-full max-w-[440px] grid-cols-2 gap-1 rounded-2xl border border-white/15 bg-white/[0.06] p-1.5 text-xs font-semibold sm:inline-flex sm:w-auto sm:max-w-none sm:rounded-full sm:bg-black/30"
               >
                 <button
                   type="button"
                   aria-pressed={!annual}
                   onClick={() => setAnnual(false)}
-                  className={`min-h-11 rounded-[3px] px-2.5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] sm:rounded-full sm:px-5 ${
+                  className={`min-h-11 rounded-xl px-2.5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] sm:rounded-full sm:px-5 ${
                     !annual
                       ? "bg-white text-[#202522] shadow-sm"
                       : "text-white/70 hover:text-white"
@@ -137,7 +136,7 @@ export default function Pricing() {
                   type="button"
                   aria-pressed={annual}
                   onClick={() => setAnnual(true)}
-                  className={`inline-flex min-h-11 items-center justify-center gap-1.5 whitespace-nowrap rounded-[3px] px-2 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] sm:gap-2 sm:rounded-full sm:px-5 ${
+                  className={`inline-flex min-h-11 items-center justify-center gap-1.5 whitespace-nowrap rounded-xl px-2 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] sm:gap-2 sm:rounded-full sm:px-5 ${
                     annual
                       ? "bg-white text-[#202522] shadow-sm"
                       : "text-white/70 hover:text-white"
@@ -150,7 +149,7 @@ export default function Pricing() {
                 </button>
               </div>
 
-              <div className="mx-auto mt-5 flex max-w-md items-center justify-center gap-2 border border-[#e6d4aa]/25 bg-white/[0.04] px-4 py-3 text-xs leading-5 text-[#f3b08e]">
+              <div className="mx-auto mt-5 flex max-w-md items-center justify-center gap-2 rounded-2xl border border-[#e6d4aa]/25 bg-white/[0.04] px-4 py-3 text-xs leading-5 text-[#f3b08e]">
                 <Sparkles className="h-4 w-4 shrink-0 text-[#e36c3f]" />
                 <span>
                   <strong>Launch offer:</strong> 30% off your first 3 months
@@ -169,14 +168,14 @@ export default function Pricing() {
                 return (
                   <article
                     key={plan.name}
-                    className={`relative flex h-full flex-col justify-between rounded-[4px] border p-6 shadow-[0_6px_24px_rgba(32,37,34,0.035)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_16px_38px_rgba(32,37,34,0.09)] sm:p-7 ${
+                    className={`relative flex h-full flex-col justify-between rounded-2xl border p-5 shadow-[0_6px_24px_rgba(32,37,34,0.035)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_16px_38px_rgba(32,37,34,0.09)] sm:p-7 ${
                       plan.featured
                         ? "border-[#b9cabe] bg-[#d9e7de]"
                         : "border-[#e2ded5] bg-[#fffdf9]"
                     }`}
                   >
                     {plan.featured && (
-                      <div className="absolute right-0 top-0 rounded-bl-[4px] bg-[#e36c3f] px-3.5 py-1.5 font-mono text-[9px] font-bold uppercase tracking-[0.14em] text-white">
+                      <div className="absolute right-0 top-0 rounded-bl-2xl bg-[#e36c3f] px-3.5 py-1.5 font-mono text-[9px] font-bold uppercase tracking-[0.14em] text-white">
                         Most popular
                       </div>
                     )}
@@ -194,7 +193,7 @@ export default function Pricing() {
 
                       <div
                         aria-live="polite"
-                        className="mt-6 flex items-end gap-2 rounded-[4px] bg-white/55 px-4 py-4"
+                        className="mt-6 flex items-end gap-2 rounded-xl bg-white/55 px-4 py-4"
                       >
                         <span className="font-serif text-5xl font-medium tracking-[-0.08em]">
                           ${price}
@@ -220,7 +219,7 @@ export default function Pricing() {
                     <div className="mt-8">
                       <Link
                         to={`/signup?plan=${plan.name.toLowerCase()}&billing=${annual ? "annual" : "monthly"}`}
-                        className={`inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-[4px] px-4 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2 ${
+                        className={`inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full px-4 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2 ${
                           plan.featured
                             ? "bg-[#202522] text-white hover:bg-[#2c6457]"
                             : "border border-[#d2cdbf] bg-transparent text-[#202522] hover:border-[#2c6457] hover:bg-[#2c6457] hover:text-white"
@@ -235,16 +234,9 @@ export default function Pricing() {
               })}
             </div>
 
-            <div className="mt-9 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-xs font-medium text-[#737a72]">
-              <span className="flex items-center gap-1.5">
-                <ShieldCheck className="h-4 w-4 text-[#2c6457]" /> No credit
-                card
-              </span>
-              <span className="flex items-center gap-1.5">
+            <div className="mt-8 flex items-center justify-center text-xs font-medium text-[#737a72]">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-[#ded9d0] bg-[#fffdf9] px-4 py-2">
                 <Zap className="h-4 w-4 text-[#2c6457]" /> Ready in minutes
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Check className="h-4 w-4 text-[#2c6457]" /> Cancel anytime
               </span>
             </div>
           </div>
@@ -265,7 +257,7 @@ export default function Pricing() {
               {FAQ_PRICING.map((item) => (
                 <article
                   key={item.q}
-                  className="rounded-[4px] border border-[#e2ded5] bg-[#fffdf9] p-5 sm:p-6"
+                  className="rounded-2xl border border-[#e2ded5] bg-[#fffdf9] p-5 sm:p-6"
                 >
                   <h3 className="text-base font-semibold text-[#202522]">
                     {item.q}

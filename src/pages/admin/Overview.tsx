@@ -702,9 +702,6 @@ export default function Overview() {
           <div className="rounded-[5px] border border-[#e4e0d7] bg-[#fffdf9] p-4 shadow-[0_2px_10px_rgba(32,37,34,0.025)] sm:p-5">
             <div className="mb-3 flex items-end justify-between gap-3 border-b border-[#ece8df] pb-3">
               <div>
-                <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#7f897e]">
-                  Vendas / Origem
-                </p>
                 <h2 className="mt-1 font-serif text-base font-semibold tracking-[-0.03em] text-[#202522] sm:text-lg">
                   Vendas por origem
                 </h2>

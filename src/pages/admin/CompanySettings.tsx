@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   AlertTriangle,
@@ -711,18 +711,7 @@ export default function CompanySettings() {
       await saveBusiness();
       return;
     }
-
-    toast.success("Esta seção está preparada para a próxima camada de configuração.");
   };
-
-  const currentNavigation = useMemo(() => {
-    for (const group of NAVIGATION) {
-      const item = group.items.find((entry) => entry.id === section);
-      if (item) return item;
-    }
-
-    return null;
-  }, [section]);
 
   const selectSection = (next: Section) => {
     setSection(next);
@@ -1246,7 +1235,6 @@ export default function CompanySettings() {
   const renderChannels = () => (
     <>
       <SectionHeading
-        eyebrow="Canais"
         title="Canais"
         description="Veja as conexões atualmente representadas no perfil do negócio."
       />
@@ -1647,42 +1635,6 @@ export default function CompanySettings() {
     </>
   );
 
-  const renderPlaceholder = () => {
-    const title = currentNavigation?.label || "Configuração";
-
-    return (
-      <>
-        <SectionHeading
-          eyebrow="Sistema"
-          title={title}
-          description={
-            currentNavigation?.description ||
-            "Configuração desta área da plataforma."
-          }
-        />
-
-        <div className="rounded-[7px] border border-[#ded9d0] bg-[#f1eee7] p-6">
-          <div className="flex gap-4">
-            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-[#fffdf9] ring-1 ring-neutral-200">
-              <Settings2 className="h-5 w-5 text-[#747b73]" />
-            </div>
-
-            <div>
-              <p className="text-sm font-semibold text-[#202522]">
-                Área preparada para expansão
-              </p>
-              <p className="mt-1 max-w-xl text-sm leading-6 text-[#747b73]">
-                Esta seção já faz parte da arquitetura de Settings, mas ainda
-                não existe persistência suficiente no banco para oferecer
-                controles reais aqui.
-              </p>
-            </div>
-          </div>
-        </div>
-      </>
-    );
-  };
-
   const renderSection = () => {
     switch (section) {
       case "company":
@@ -1710,7 +1662,7 @@ export default function CompanySettings() {
         return renderAudit();
 
       default:
-        return renderPlaceholder();
+        return renderCompany();
     }
   };
 
@@ -1739,9 +1691,6 @@ export default function CompanySettings() {
           <aside className="hidden lg:block">
             <div className="sticky top-24">
               <div className="mb-5">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#747b73]">
-                  Settings
-                </p>
                 <p className="mt-1 text-sm text-[#747b73]">
                   Configuração da empresa
                 </p>
@@ -1759,20 +1708,7 @@ export default function CompanySettings() {
                         const Icon = item.icon;
                         const active = section === item.id;
 
-                        if (!item.available) {
-                          return (
-                            <div
-                              key={item.id}
-                              className="flex cursor-not-allowed items-center gap-3 rounded-lg px-3 py-2.5 opacity-40"
-                              title="Disponível numa próxima versão"
-                            >
-                              <Icon className="h-4 w-4 shrink-0" />
-                              <span className="min-w-0 truncate text-sm">
-                                {item.label}
-                              </span>
-                            </div>
-                          );
-                        }
+                        if (!item.available) return null;
 
                         return (
                           <button

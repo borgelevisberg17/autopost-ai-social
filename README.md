@@ -32,7 +32,7 @@ npm run build
 
 ## Geração de conteúdo com IA
 
-A Edge Function `marketing-agent` usa o serviço Lovable AI já integrado ao projeto. Mantenha `LOVABLE_API_KEY` configurada nos segredos do projeto para gerar rascunhos; a função valida autenticação, permissões e dados do produto antes de chamar o serviço.
+As Edge Functions `marketing-agent` e `analytics-agent` precisam do segredo do provedor de IA configurado no projeto Supabase para gerar conteúdo e análises. As funções validam autenticação, permissões e dados do produto antes de processar os pedidos.
 
 ## Deploy
 
