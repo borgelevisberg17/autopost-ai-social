@@ -80,7 +80,7 @@ function statusLabel(value: string) {
   };
 
   const normalized = value.toLowerCase();
-  return labels[normalized] ?? value.replaceAll("_", " ");
+  return labels[normalized] ?? value.replace(/_/g, " ");
 }
 
 function SourceIcon({ source }: { source: ActivityEntry["source"] }) {
