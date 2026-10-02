@@ -1599,6 +1599,7 @@ function MobileProduct({
       {menuOpen && (
         <ProductMenu
           product={product}
+          storeSlug={storeSlug}
           mobile
           onEdit={onEdit}
           onToggle={onToggle}

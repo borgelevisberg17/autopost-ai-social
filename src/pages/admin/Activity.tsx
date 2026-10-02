@@ -49,7 +49,7 @@ export default function Activity() {
     // Keep the three source queries and their existing per-source limits intact.
     const [runs, actions, notices] = await Promise.all([
       supabase.from("agent_runs").select("id,agent_name,status,summary,started_at").eq("company_id", company.id).order("started_at", { ascending: false }).limit(30),
-      supabase.from("agent_actions").select("id,action_type,status,created_at").eq("company_id", company.id).order("created_at", { ascending: false }).limit(30),
+      supabase.from("agent_actions").select("id,action_type:action,status,created_at").eq("company_id", company.id).order("created_at", { ascending: false }).limit(30),
       supabase.from("notifications").select("id,title,message,read,created_at").eq("company_id", company.id).order("created_at", { ascending: false }).limit(30),
     ]);
 

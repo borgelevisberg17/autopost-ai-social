@@ -80,7 +80,7 @@ function statusLabel(value: string) {
   };
 
   const normalized = value.toLowerCase();
-  return labels[normalized] ?? value.replaceAll("_", " ");
+  return labels[normalized] ?? value.replace(/_/g, " ");
 }
 
 function SourceIcon({ source }: { source: ActivityEntry["source"] }) {
@@ -121,7 +121,7 @@ export function OverviewActivity() {
           .limit(5),
         supabase
           .from("agent_actions")
-          .select("id,action_type,status,created_at")
+          .select("id,action_type:action,status,created_at")
           .eq("company_id", companyId)
           .order("created_at", { ascending: false })
           .limit(5),
