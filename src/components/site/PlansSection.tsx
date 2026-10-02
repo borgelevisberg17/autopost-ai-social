@@ -3,9 +3,9 @@ import { ArrowRight, Check, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const plans = [
-  { name: "Starter", description: "The daily operation clear before adding more complexity.", monthly: 29, features: ["1 brand space", "Website + 2 social channels", "Shared catalogue", "Sales AI guardrails"] },
+  { name: "Starter", description: "The daily operation clear before adding more complexity.", monthly: 29, featured: false, features: ["1 brand space", "Website + 2 social channels", "Shared catalogue", "Sales AI guardrails"] },
   { name: "Growth", description: "Every channel, campaign and conversation moving together.", monthly: 79, featured: true, features: ["3 brand spaces", "All 4 channels", "Marketing, Sales and Analytics AI", "CRM events and approvals"] },
-  { name: "Scale", description: "More control for teams with volume, people and operating spaces.", monthly: 199, features: ["Unlimited spaces", "Advanced permissions", "Custom CRM workflows", "Dedicated success planning"] },
+  { name: "Scale", description: "More control for teams with volume, people and operating spaces.", monthly: 199, featured: false, features: ["Unlimited spaces", "Advanced permissions", "Custom CRM workflows", "Dedicated success planning"] },
 ] as const;
 
 export function PlansSection() {
