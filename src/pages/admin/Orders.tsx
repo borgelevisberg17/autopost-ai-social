@@ -1537,3 +1537,18 @@ function OrdersSkeleton() {
     </div>
   );
 }
+
+function DataError({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <div role="alert" className="rounded border border-border bg-card p-6 text-center">
+      <p className="text-sm text-muted-foreground">{message}</p>
+      <button
+        type="button"
+        onClick={onRetry}
+        className="mt-3 inline-flex min-h-11 items-center justify-center rounded border border-border px-4 text-sm font-medium hover:bg-muted"
+      >
+        Tentar novamente
+      </button>
+    </div>
+  );
+}
