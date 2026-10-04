@@ -8,6 +8,7 @@ import {
 } from "react-router-dom";
 import {
   Activity,
+  MessageCircle,
   Bell,
   BarChart3,
   Bot,
@@ -81,6 +82,11 @@ const navSections = [
         to: "/admin/pagamentos",
         icon: CreditCard,
         label: "Pagamentos",
+      },
+      {
+        to: "/admin/conversas",
+        icon: MessageCircle,
+        label: "Conversas",
       },
     ],
   },

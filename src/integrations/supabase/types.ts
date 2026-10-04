@@ -474,6 +474,63 @@ export type Database = {
           },
         ]
       }
+      conversations: {
+        Row: {
+          channel: string
+          company_id: string
+          created_at: string
+          customer_id: string | null
+          customer_name: string | null
+          customer_phone: string
+          id: string
+          last_inbound_at: string | null
+          last_message_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          channel?: string
+          company_id: string
+          created_at?: string
+          customer_id?: string | null
+          customer_name?: string | null
+          customer_phone: string
+          id?: string
+          last_inbound_at?: string | null
+          last_message_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          channel?: string
+          company_id?: string
+          created_at?: string
+          customer_id?: string | null
+          customer_name?: string | null
+          customer_phone?: string
+          id?: string
+          last_inbound_at?: string | null
+          last_message_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customers: {
         Row: {
           channel: string | null
@@ -568,6 +625,60 @@ export type Database = {
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          body: string
+          company_id: string
+          conversation_id: string
+          created_at: string
+          direction: string
+          error: string | null
+          external_id: string | null
+          id: string
+          sender: string
+          status: string
+        }
+        Insert: {
+          body: string
+          company_id: string
+          conversation_id: string
+          created_at?: string
+          direction: string
+          error?: string | null
+          external_id?: string | null
+          id?: string
+          sender: string
+          status?: string
+        }
+        Update: {
+          body?: string
+          company_id?: string
+          conversation_id?: string
+          created_at?: string
+          direction?: string
+          error?: string | null
+          external_id?: string | null
+          id?: string
+          sender?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
             referencedColumns: ["id"]
           },
         ]
@@ -888,6 +999,53 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "social_connections_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      whatsapp_accounts: {
+        Row: {
+          auto_reply: boolean
+          company_id: string
+          created_at: string
+          display_phone: string | null
+          id: string
+          last_event_at: string | null
+          phone_number_id: string
+          status: string
+          updated_at: string
+          waba_id: string | null
+        }
+        Insert: {
+          auto_reply?: boolean
+          company_id: string
+          created_at?: string
+          display_phone?: string | null
+          id?: string
+          last_event_at?: string | null
+          phone_number_id: string
+          status?: string
+          updated_at?: string
+          waba_id?: string | null
+        }
+        Update: {
+          auto_reply?: boolean
+          company_id?: string
+          created_at?: string
+          display_phone?: string | null
+          id?: string
+          last_event_at?: string | null
+          phone_number_id?: string
+          status?: string
+          updated_at?: string
+          waba_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_accounts_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
