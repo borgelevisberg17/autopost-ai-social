@@ -374,6 +374,7 @@ export default function Agents() {
       }
     >
       <div className="space-y-10">
+        {company && <SalesAgentTester companyId={company.id} />}
         {/* PAGE INTRO */}
         <section>
           <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
