@@ -355,6 +355,9 @@ export type Database = {
           description: string | null
           id: string
           name: string
+          payment_express_number: string | null
+          payment_iban: string | null
+          payment_iban_holder: string | null
           slug: string
           updated_at: string
           whatsapp: string | null
@@ -366,6 +369,9 @@ export type Database = {
           description?: string | null
           id?: string
           name: string
+          payment_express_number?: string | null
+          payment_iban?: string | null
+          payment_iban_holder?: string | null
           slug: string
           updated_at?: string
           whatsapp?: string | null
@@ -377,6 +383,9 @@ export type Database = {
           description?: string | null
           id?: string
           name?: string
+          payment_express_number?: string | null
+          payment_iban?: string | null
+          payment_iban_holder?: string | null
           slug?: string
           updated_at?: string
           whatsapp?: string | null
@@ -831,7 +840,12 @@ export type Database = {
           fulfillment_status: string
           id: string
           notes: string | null
+          paid_at: string | null
+          payment_method: string | null
+          payment_proof_path: string | null
+          payment_reference: string | null
           payment_status: string
+          payment_submitted_at: string | null
           status: string
           total: number
           updated_at: string
@@ -846,7 +860,12 @@ export type Database = {
           fulfillment_status?: string
           id?: string
           notes?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          payment_proof_path?: string | null
+          payment_reference?: string | null
           payment_status?: string
+          payment_submitted_at?: string | null
           status?: string
           total?: number
           updated_at?: string
@@ -861,7 +880,12 @@ export type Database = {
           fulfillment_status?: string
           id?: string
           notes?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          payment_proof_path?: string | null
+          payment_reference?: string | null
           payment_status?: string
+          payment_submitted_at?: string | null
           status?: string
           total?: number
           updated_at?: string
@@ -1063,6 +1087,11 @@ export type Database = {
         Returns: {
           created_at: string
           customer_name: string
+          items: Json
+          paid_at: string
+          payment_method: string
+          payment_status: string
+          payment_submitted_at: string
           status: string
           total: number
         }[]
@@ -1085,6 +1114,10 @@ export type Database = {
           _notes: string
         }
         Returns: string
+      }
+      set_payment_status: {
+        Args: { _order: string; _status: string }
+        Returns: undefined
       }
     }
     Enums: {
