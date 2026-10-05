@@ -14,6 +14,8 @@ import {
 
 import { supabase } from "@/integrations/supabase/client";
 import { ORDER_STATUS, formatMoney } from "@/lib/format";
+import { rememberOrder } from "@/lib/myOrders";
+import { PaymentPanel } from "@/components/store/PaymentPanel";
 
 type Order = {
   id?: string;
@@ -21,6 +23,9 @@ type Order = {
   total: number;
   created_at: string;
   customer_name: string;
+  payment_status?: string;
+  payment_method?: string | null;
+  payment_submitted_at?: string | null;
 };
 
 type OrderItem = {
@@ -32,6 +37,9 @@ type OrderItem = {
 type Company = {
   name: string;
   currency: string;
+  payment_iban?: string | null;
+  payment_iban_holder?: string | null;
+  payment_express_number?: string | null;
 };
 
 const STATUS_FLOW = [
@@ -111,53 +119,41 @@ export default function OrderStatus() {
 
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [reload, setReload] = useState(0);
 
   useEffect(() => {
     let active = true;
 
     async function load() {
-      setLoading(true);
+      if (reload === 0) setLoading(true);
 
-      const [
-        { data: orderData },
-        { data: companyData },
-        { data: itemsData },
-      ] = await Promise.all([
-        supabase.rpc("get_order_status", {
-          _order: id,
-        }),
-
+      const [{ data: orderData }, { data: companyData }] = await Promise.all([
+        supabase.rpc("get_order_status", { _order: id }),
         supabase
           .from("companies")
-          .select("name,currency")
+          .select("name,currency,payment_iban,payment_iban_holder,payment_express_number")
           .eq("slug", slug)
           .maybeSingle(),
-
-        supabase
-          .from("order_items")
-          .select("product_name,quantity,unit_price")
-          .eq("order_id", id)
-          .order("created_at", { ascending: true }),
       ]);
 
       if (!active) return;
 
-      setOrder(orderData?.[0] ?? null);
-      setItems((itemsData as OrderItem[]) ?? []);
-
-      if (companyData) {
-        setCompany(companyData as Company);
-      }
-
+      const row = (orderData as unknown as (Order & { items: OrderItem[] })[] | null)?.[0] ?? null;
+      setOrder(row);
+      setItems(row?.items ?? []);
+      if (companyData) setCompany(companyData as Company);
+      if (row) rememberOrder(slug, id);
       setLoading(false);
     }
 
     load();
+    const t = window.setInterval(load, 30000);
 
     return () => {
       active = false;
+      window.clearInterval(t);
     };
-  }, [id, slug]);
+  }, [id, slug, reload]);
 
   const currentIndex = useMemo(
     () => (order ? getStatusIndex(order.status) : -1),
@@ -343,6 +339,22 @@ export default function OrderStatus() {
                 . {getStatusMessage(order.status)}
               </p>
             </section>
+
+            {!isCancelled && (
+              <PaymentPanel
+                orderId={id}
+                total={Number(order.total)}
+                currency={currency}
+                paymentStatus={order.payment_status ?? "pending"}
+                submittedAt={order.payment_submitted_at ?? null}
+                info={{
+                  payment_iban: company?.payment_iban ?? null,
+                  payment_iban_holder: company?.payment_iban_holder ?? null,
+                  payment_express_number: company?.payment_express_number ?? null,
+                }}
+                onSubmitted={() => setReload((n) => n + 1)}
+              />
+            )}
 
             {/* STATUS */}
 
