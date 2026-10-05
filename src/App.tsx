@@ -35,6 +35,7 @@ const Audit = lazy(() => import("./pages/admin/Audit"));
 const Content = lazy(() => import("./pages/admin/Content"));
 const Automations = lazy(() => import("./pages/admin/Automations"));
 const Payments = lazy(() => import("./pages/admin/Payments"));
+const Conversations = lazy(() => import("./pages/admin/Conversations"));
 const Store = lazy(() => import("./pages/store/Store"));
 const OrderStatus = lazy(() => import("./pages/store/OrderStatus"));
 const NotFound = lazy(() => import("./pages/NotFound"));
