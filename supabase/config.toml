@@ -17,3 +17,9 @@ verify_jwt = false
 
 [functions.payment-proof]
 verify_jwt = false
+
+[functions.create-card-payment]
+verify_jwt = false
+
+[functions.capture-card-payment]
+verify_jwt = false
