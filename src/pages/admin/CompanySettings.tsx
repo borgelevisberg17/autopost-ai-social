@@ -1,3 +1,4 @@
+import { PaymentSettings } from "@/components/admin/PaymentSettings";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -792,6 +793,8 @@ export default function CompanySettings() {
                 placeholder="+244 9xx xxx xxx"
               />
             </Field>
+
+            {company && <PaymentSettings companyId={company.id} />}
 
             <Field label="Endereço público da loja">
               <div className="flex h-11 items-center justify-between gap-3 rounded-lg border border-[#ded9d0] bg-[#f1eee7] px-3.5">
