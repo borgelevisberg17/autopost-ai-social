@@ -26,6 +26,8 @@ import {
 } from "@/components/ui/sheet";
 import { formatMoney } from "@/lib/format";
 import { toast } from "sonner";
+import { rememberOrder } from "@/lib/myOrders";
+import { MyOrders } from "@/components/store/MyOrders";
 
 type Company = {
   id: string;
@@ -405,7 +407,9 @@ export default function Store() {
       String(data),
     );
 
-    setCartStep("success");
+    rememberOrder(slug, String(data));
+    closeCart();
+    navigate(`/loja/${slug}/pedido/${String(data)}`);
 
     await loadStore();
   };
@@ -748,7 +752,8 @@ export default function Store() {
 
       {/* PRODUCTS */}
 
-      <section
+      <MyOrders slug={slug} />
+<section
         id="produtos"
         className="mx-auto max-w-[1400px] px-5 py-16 sm:px-6 lg:px-8 lg:py-20"
       >
