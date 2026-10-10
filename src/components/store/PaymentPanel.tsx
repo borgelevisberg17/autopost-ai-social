@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FunctionsHttpError } from "@supabase/supabase-js";
-import { CheckCircle2, Clock3, Copy, Loader2, Upload } from "lucide-react";
+import { CheckCircle2, Clock3, Copy, CreditCard, Loader2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { formatMoney } from "@/lib/format";
@@ -36,6 +36,52 @@ function CopyRow({ label, value }: { label: string; value: string }) {
   );
 }
 
+async function errMsg(error: unknown, fallback: string) {
+  if (error instanceof FunctionsHttpError) { const b = await error.context.json().catch(() => null); if (b?.error) return b.error as string; }
+  return fallback;
+}
+
+function CardPay({ orderId, onPaid }: { orderId: string; onPaid: () => void }) {
+  const [busy, setBusy] = useState<string | null>(null);
+  const done = useRef(false);
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    const provider = q.get("payment");
+    const token = provider === "stripe" ? q.get("session_id") : provider === "paypal" ? q.get("token") : null;
+    if (!provider || !token || done.current) return;
+    done.current = true;
+    setBusy(provider);
+    void supabase.functions.invoke("capture-card-payment", { body: { order_id: orderId, provider, token } }).then(async ({ error }) => {
+      setBusy(null);
+      window.history.replaceState(null, "", window.location.pathname);
+      if (error) return toast.error(await errMsg(error, "Não foi possível confirmar o pagamento."));
+      toast.success("Pagamento confirmado");
+      onPaid();
+    });
+  }, [orderId, onPaid]);
+
+  const start = async (provider: "stripe" | "paypal") => {
+    setBusy(provider);
+    const return_url = window.location.origin + window.location.pathname;
+    const { data, error } = await supabase.functions.invoke("create-card-payment", { body: { order_id: orderId, provider, return_url } });
+    if (error || !data?.url) { setBusy(null); return toast.error(await errMsg(error, "Não foi possível iniciar o pagamento.")); }
+    window.location.href = data.url;
+  };
+
+  return (
+    <div className="mt-4 grid gap-2 sm:grid-cols-2">
+      <button type="button" disabled={!!busy} onClick={() => start("stripe")}
+        className="flex items-center justify-center gap-2 rounded border border-border bg-background px-4 py-3 text-sm font-semibold hover:bg-muted disabled:opacity-60">
+        {busy === "stripe" ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />} Pagar com cartão
+      </button>
+      <button type="button" disabled={!!busy} onClick={() => start("paypal")}
+        className="flex items-center justify-center gap-2 rounded border border-border bg-background px-4 py-3 text-sm font-semibold hover:bg-muted disabled:opacity-60">
+        {busy === "paypal" ? <Loader2 className="h-4 w-4 animate-spin" /> : null} PayPal
+      </button>
+    </div>
+  );
+}
+
 export function PaymentPanel({ orderId, total, currency, paymentStatus, submittedAt, info, onSubmitted }: Props) {
   const methods = [
     info.payment_iban && { id: "iban", label: "Transferência IBAN" },
@@ -58,7 +104,9 @@ export function PaymentPanel({ orderId, total, currency, paymentStatus, submitte
   if (methods.length === 0) {
     return (
       <section className="mt-10 rounded border border-border bg-card p-5 text-sm text-muted-foreground">
-        A loja vai contactá-lo para combinar o pagamento.
+        <h2 className="font-serif text-2xl text-foreground">Pagamento</h2>
+        <p className="mt-2">Pague {formatMoney(total, currency)} online.</p>
+        <CardPay orderId={orderId} onPaid={onSubmitted} />
       </section>
     );
   }
@@ -95,6 +143,10 @@ export function PaymentPanel({ orderId, total, currency, paymentStatus, submitte
       ) : (
         <p className="mt-2 text-sm text-muted-foreground">Pague {formatMoney(total, currency)} e envie o comprovativo aqui.</p>
       )}
+
+      <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Pagar online</p>
+      <CardPay orderId={orderId} onPaid={onSubmitted} />
+      <p className="mt-5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Ou por transferência</p>
 
       <div className="mt-4 flex flex-wrap gap-2">
         {methods.map((m) => (

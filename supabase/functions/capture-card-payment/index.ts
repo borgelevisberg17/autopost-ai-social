@@ -14,7 +14,7 @@ Deno.serve(async (req) => {
     if (typeof token !== "string" || token.length < 6 || token.length > 200) return json({ error: "Sessão inválida" }, 400);
 
     const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-    const { data: o } = await admin.from("orders").select("id,company_id,total,customer_name,payment_status").eq("id", order_id).maybeSingle();
+    const { data: o } = await admin.from("orders").select("id,company_id,total,customer_name,payment_status,status").eq("id", order_id).maybeSingle();
     if (!o) return json({ error: "Pedido não encontrado" }, 404);
     if (o.payment_status === "paid") return json({ ok: true, already: true });
 
@@ -54,7 +54,8 @@ Deno.serve(async (req) => {
 
     await admin.from("orders").update({
       payment_status: "paid", payment_method: provider,
-      payment_reference: token, payment_submitted_at: new Date().toISOString(),
+      payment_reference: token, payment_submitted_at: new Date().toISOString(), paid_at: new Date().toISOString(),
+      ...(o.status === "pending" ? { status: "confirmed" } : {}),
     }).eq("id", order_id).neq("payment_status", "paid");
     await admin.from("order_events").insert({
       company_id: o.company_id, order_id, type: "payment", actor_type: "system",
