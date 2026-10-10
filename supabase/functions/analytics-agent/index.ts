@@ -25,13 +25,18 @@ Deno.serve(async (req) => {
     if (!isMember) return json({ error: "Sem permissão" }, 403);
 
     const since = new Date(Date.now() - days * 864e5).toISOString();
-    const [{ data: company }, { data: products }, { data: orders }, { data: posts }] = await Promise.all([
+    const yearAgo = new Date(); yearAgo.setUTCMonth(yearAgo.getUTCMonth() - 11, 1); yearAgo.setUTCHours(0, 0, 0, 0);
+    const [{ data: company }, { data: products }, { data: orders }, { data: posts }, { data: variants }, { data: sub }, { data: yearOrders }] = await Promise.all([
       db.from("companies").select("name,currency,description").eq("id", companyId).single(),
       db.from("products").select("id,name,category,price,promo_price,stock,active").eq("company_id", companyId),
       db.from("orders").select("id,status,total,created_at,order_items(product_id,product_name,quantity,unit_price)")
         .eq("company_id", companyId).gte("created_at", since).limit(2000),
       db.from("agent_actions").select("platform,status,product_id,created_at")
         .eq("company_id", companyId).eq("action", "CREATE_POST").gte("created_at", since).limit(2000),
+      db.from("product_variants").select("id,product_id,name,stock,active").eq("company_id", companyId),
+      db.from("company_subscriptions").select("plan,status").eq("company_id", companyId).maybeSingle(),
+      db.from("orders").select("total,status,created_at").eq("company_id", companyId)
+        .gte("created_at", yearAgo.toISOString()).neq("status", "cancelled").limit(10000),
     ]);
 
     // Aggregate real numbers server-side — the AI only interprets them.
@@ -52,6 +57,30 @@ Deno.serve(async (req) => {
         byCategory.set(cat, (byCategory.get(cat) ?? 0) + i.quantity * Number(i.unit_price));
       }
     }
+    // Variant sales
+    const byVariant = new Map<string, { produto: string; variante: string; unidades: number }>();
+    for (const o of valid) for (const i of o.order_items ?? []) {
+      if (!i.variant_id) continue;
+      const cur = byVariant.get(i.variant_id) ?? { produto: i.product_name, variante: i.variant_name ?? "?", unidades: 0 };
+      cur.unidades += i.quantity; byVariant.set(i.variant_id, cur);
+    }
+    const variantesVendidas = [...byVariant.values()].sort((a, b) => b.unidades - a.unidades).slice(0, 15);
+    const variantesSemStock = (variants ?? []).filter((v) => v.active && v.stock === 0)
+      .map((v) => ({ produto: prodMap.get(v.product_id)?.name, variante: v.name })).slice(0, 15);
+    const variantesParadas = (variants ?? []).filter((v) => v.active && v.stock > 0 && !byVariant.has(v.id))
+      .map((v) => ({ produto: prodMap.get(v.product_id)?.name, variante: v.name, stock: v.stock })).slice(0, 15);
+    // Monthly growth (last 12 months)
+    const months: { mes: string; receita: number; pedidos: number }[] = [];
+    for (let k = 0; k < 12; k++) {
+      const d = new Date(yearAgo); d.setUTCMonth(yearAgo.getUTCMonth() + k);
+      months.push({ mes: d.toISOString().slice(0, 7), receita: 0, pedidos: 0 });
+    }
+    for (const o of yearOrders ?? []) {
+      const m = months.find((x) => x.mes === String(o.created_at).slice(0, 7));
+      if (m) { m.receita += Number(o.total); m.pedidos++; }
+    }
+    const [prev, last] = [months[10], months[11]];
+    const crescimentoMes = prev.receita > 0 ? Math.round(((last.receita - prev.receita) / prev.receita) * 100) : null;
     const top = [...byProduct.values()].sort((a, b) => b.receita - a.receita).slice(0, 10);
     const postsByProduct = new Map<string, number>();
     const postsByPlatform: Record<string, number> = {};
@@ -75,6 +104,10 @@ Deno.serve(async (req) => {
       pedidos_por_hora_utc: byHour, produtos_sem_vendas: parados,
       promovidos_sem_vendas: promovidosSemVenda, baixo_stock: baixoStock,
       posts_gerados_por_rede: postsByPlatform,
+      variantes_mais_vendidas: variantesVendidas, variantes_sem_stock: variantesSemStock,
+      variantes_sem_vendas: variantesParadas,
+      receita_mensal_12m: months, crescimento_mes_atual_vs_anterior_pct: crescimentoMes,
+      plano_subscricao: sub?.plan ?? "free", estado_subscricao: sub?.status ?? "active",
     };
 
     const { data: run } = await db.from("agent_runs").insert({
@@ -101,7 +134,7 @@ Deno.serve(async (req) => {
         model: "openai/gpt-6-astra",
         store: false,
         reasoning: { effort: "low" },
-        instructions: `És o agente de análise da loja "${company?.name}". Usa APENAS as métricas fornecidas; nunca inventes números, produtos ou tendências que não estejam nos dados. Se os dados forem poucos, diz isso. Escreve em português, direto e acionável. Responde só com JSON: {"resumo":"2-3 frases","destaques":["..."],"sugestoes":[{"titulo":"...","detalhe":"...","prioridade":"alta|media|baixa","area":"marketing|stock|vendas"}]} com no máximo 5 sugestões. Valores monetários na moeda indicada.`,
+        instructions: `És o agente de análise da loja "${company?.name}". Usa APENAS as métricas fornecidas; nunca inventes números, produtos ou tendências que não estejam nos dados. Se os dados forem poucos, diz isso. Escreve em português, direto e acionável. Responde só com JSON: {"resumo":"2-3 frases","destaques":["..."],"sugestoes":[{"titulo":"...","detalhe":"...","prioridade":"alta|media|baixa","area":"marketing|stock|vendas"}]}. Comenta o crescimento mensal e as variantes (tamanhos/cores) quando houver dados. com no máximo 5 sugestões. Valores monetários na moeda indicada.`,
         input: JSON.stringify(metrics),
       }),
     });
