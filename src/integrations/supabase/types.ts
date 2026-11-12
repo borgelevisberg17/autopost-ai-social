@@ -1268,6 +1268,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_company_monthly_sales: {
+        Args: { _company: string }
+        Returns: {
+          month_start: string
+          orders_count: number
+          revenue: number
+        }[]
+      }
       get_order_status: {
         Args: { _order: string }
         Returns: {
@@ -1280,6 +1288,16 @@ export type Database = {
           payment_submitted_at: string
           status: string
           total: number
+        }[]
+      }
+      get_platform_subscription_metrics: {
+        Args: never
+        Returns: {
+          active_subscriptions: number
+          month_start: string
+          paid_subscriptions: number
+          subscriptions_added: number
+          total_companies: number
         }[]
       }
       has_platform_admin: { Args: { _user: string }; Returns: boolean }

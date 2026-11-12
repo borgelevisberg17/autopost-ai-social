@@ -29,6 +29,20 @@
       "when": 1794474790250,
       "tag": "0003_platform_roles_and_subscription_history",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794486099065,
+      "tag": "0004_platform_subscription_metrics",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794486232955,
+      "tag": "0005_company_monthly_sales_metrics",
+      "breakpoints": true
     }
   ]
 }
