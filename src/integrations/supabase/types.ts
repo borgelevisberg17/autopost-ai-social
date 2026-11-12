@@ -424,6 +424,47 @@ export type Database = {
           },
         ]
       }
+      company_subscription_events: {
+        Row: {
+          company_id: string
+          current_period_end: string | null
+          event_type: string
+          id: string
+          plan: string
+          provider: string | null
+          recorded_at: string
+          status: string
+        }
+        Insert: {
+          company_id: string
+          current_period_end?: string | null
+          event_type: string
+          id?: string
+          plan: string
+          provider?: string | null
+          recorded_at?: string
+          status: string
+        }
+        Update: {
+          company_id?: string
+          current_period_end?: string | null
+          event_type?: string
+          id?: string
+          plan?: string
+          provider?: string | null
+          recorded_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_subscription_events_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       company_subscriptions: {
         Row: {
           company_id: string
@@ -1154,6 +1195,27 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       whatsapp_accounts: {
         Row: {
           auto_reply: boolean
@@ -1220,6 +1282,7 @@ export type Database = {
           total: number
         }[]
       }
+      has_platform_admin: { Args: { _user: string }; Returns: boolean }
       is_company_admin: {
         Args: { _company: string; _user: string }
         Returns: boolean
@@ -1245,6 +1308,7 @@ export type Database = {
       }
     }
     Enums: {
+      app_role: "platform_admin"
       company_role: "owner" | "admin" | "staff"
     }
     CompositeTypes: {
@@ -1373,6 +1437,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["platform_admin"],
       company_role: ["owner", "admin", "staff"],
     },
   },
