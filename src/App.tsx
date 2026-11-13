@@ -36,6 +36,7 @@ const Content = lazy(() => import("./pages/admin/Content"));
 const Automations = lazy(() => import("./pages/admin/Automations"));
 const Payments = lazy(() => import("./pages/admin/Payments"));
 const Conversations = lazy(() => import("./pages/admin/Conversations"));
+const Platform = lazy(() => import("./pages/admin/Platform"));
 const Store = lazy(() => import("./pages/store/Store"));
 const OrderStatus = lazy(() => import("./pages/store/OrderStatus"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -198,6 +199,7 @@ const App = () => (
                 <Route path="/admin/automacoes" element={<P><Automations /></P>} />
                 <Route path="/admin/pagamentos" element={<P><Payments /></P>} />
                 <Route path="/admin/conversas" element={<P><Conversations /></P>} />
+                <Route path="/plataforma" element={<P><Platform /></P>} />
 
                 <Route path="*" element={<NotFound />} />
               </Routes>

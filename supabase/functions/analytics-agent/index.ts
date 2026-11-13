@@ -23,6 +23,8 @@ Deno.serve(async (req) => {
     if (!companyId) return json({ error: "Empresa em falta" }, 400);
     const { data: isMember } = await db.rpc("is_company_member", { _company: companyId, _user: user.id });
     if (!isMember) return json({ error: "Sem permissão" }, 403);
+    const { error: quotaError } = await db.rpc("consume_company_ai", { _company: companyId, _feature: "analytics" });
+    if (quotaError) return json({ error: quotaError.message }, 403);
 
     const since = new Date(Date.now() - days * 864e5).toISOString();
     const yearAgo = new Date(); yearAgo.setUTCMonth(yearAgo.getUTCMonth() - 11, 1); yearAgo.setUTCHours(0, 0, 0, 0);

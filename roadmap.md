@@ -1,5 +1,9 @@
 # Roadmap
 
+- [ ] Consolidar catálogo de planos, limites no servidor e utilização por empresa
+- [ ] Administração da plataforma: empresas, preços, cupões e concessões temporárias auditadas
+- [ ] Republicar análise e validar gráficos e restrições de subscrição
+
 - [x] Empresas (multiempresa, moeda própria)
 - [x] Produtos e stock
 - [x] Loja pública + carrinho + pedidos

@@ -43,6 +43,13 @@
       "when": 1794486232955,
       "tag": "0005_company_monthly_sales_metrics",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794541153203,
+      "tag": "0006_platform_billing_controls",
+      "breakpoints": true
     }
   ]
 }

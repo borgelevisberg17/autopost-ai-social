@@ -36,6 +36,8 @@ Deno.serve(async (req) => {
       _user: user.id,
     });
     if (permissionError || !isAdmin) return json({ error: "Só administradores da loja podem ligar o número." }, 403);
+    const { data: entitlement, error: accessError } = await userDb.rpc("company_entitlement", { _company: companyId });
+    if (accessError || !entitlement?.features?.includes("whatsapp")) return json({ error: "O plano não permite WhatsApp" }, 403);
 
     const response = await fetch(
       `https://graph.facebook.com/v25.0/${encodeURIComponent(phoneNumberId)}?fields=display_phone_number,verified_name,quality_rating`,

@@ -358,6 +358,7 @@ export type Database = {
           payment_express_number: string | null
           payment_iban: string | null
           payment_iban_holder: string | null
+          platform_status: string
           slug: string
           updated_at: string
           whatsapp: string | null
@@ -372,6 +373,7 @@ export type Database = {
           payment_express_number?: string | null
           payment_iban?: string | null
           payment_iban_holder?: string | null
+          platform_status?: string
           slug: string
           updated_at?: string
           whatsapp?: string | null
@@ -386,11 +388,38 @@ export type Database = {
           payment_express_number?: string | null
           payment_iban?: string | null
           payment_iban_holder?: string | null
+          platform_status?: string
           slug?: string
           updated_at?: string
           whatsapp?: string | null
         }
         Relationships: []
+      }
+      company_ai_usage: {
+        Row: {
+          company_id: string
+          month_start: string
+          used: number
+        }
+        Insert: {
+          company_id: string
+          month_start: string
+          used?: number
+        }
+        Update: {
+          company_id?: string
+          month_start?: string
+          used?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_ai_usage_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       company_members: {
         Row: {
@@ -468,8 +497,11 @@ export type Database = {
       company_subscriptions: {
         Row: {
           company_id: string
+          coupon_id: string | null
           created_at: string
           current_period_end: string | null
+          grant_expires_at: string | null
+          granted_plan: string | null
           id: string
           plan: string
           provider: string | null
@@ -479,8 +511,11 @@ export type Database = {
         }
         Insert: {
           company_id: string
+          coupon_id?: string | null
           created_at?: string
           current_period_end?: string | null
+          grant_expires_at?: string | null
+          granted_plan?: string | null
           id?: string
           plan?: string
           provider?: string | null
@@ -490,8 +525,11 @@ export type Database = {
         }
         Update: {
           company_id?: string
+          coupon_id?: string | null
           created_at?: string
           current_period_end?: string | null
+          grant_expires_at?: string | null
+          granted_plan?: string | null
           id?: string
           plan?: string
           provider?: string | null
@@ -505,6 +543,20 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: true
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_subscriptions_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "platform_coupons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_subscriptions_granted_plan_fkey"
+            columns: ["granted_plan"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
             referencedColumns: ["id"]
           },
         ]
@@ -621,6 +673,45 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coupon_redemptions: {
+        Row: {
+          company_id: string
+          coupon_id: string
+          id: string
+          redeemed_at: string
+          redeemed_by: string
+        }
+        Insert: {
+          company_id: string
+          coupon_id: string
+          id?: string
+          redeemed_at?: string
+          redeemed_by: string
+        }
+        Update: {
+          company_id?: string
+          coupon_id?: string
+          id?: string
+          redeemed_at?: string
+          redeemed_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coupon_redemptions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coupon_redemptions_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "platform_coupons"
             referencedColumns: ["id"]
           },
         ]
@@ -1008,6 +1099,85 @@ export type Database = {
           },
         ]
       }
+      platform_audit: {
+        Row: {
+          action: string
+          actor_id: string
+          company_id: string | null
+          created_at: string
+          details: Json
+          id: string
+        }
+        Insert: {
+          action: string
+          actor_id: string
+          company_id?: string | null
+          created_at?: string
+          details?: Json
+          id?: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string
+          company_id?: string | null
+          created_at?: string
+          details?: Json
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "platform_audit_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      platform_coupons: {
+        Row: {
+          code: string
+          created_at: string
+          enabled: boolean
+          expires_at: string
+          id: string
+          max_uses: number
+          percent_off: number
+          plan_id: string
+          uses: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          enabled?: boolean
+          expires_at: string
+          id?: string
+          max_uses: number
+          percent_off: number
+          plan_id: string
+          uses?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          enabled?: boolean
+          expires_at?: string
+          id?: string
+          max_uses?: number
+          percent_off?: number
+          plan_id?: string
+          uses?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "platform_coupons_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_variants: {
         Row: {
           active: boolean
@@ -1195,6 +1365,42 @@ export type Database = {
           },
         ]
       }
+      subscription_plans: {
+        Row: {
+          currency: string
+          enabled: boolean
+          features: string[]
+          id: string
+          monthly_ai_limit: number
+          monthly_price: number | null
+          name: string
+          product_limit: number
+          updated_at: string
+        }
+        Insert: {
+          currency?: string
+          enabled?: boolean
+          features?: string[]
+          id: string
+          monthly_ai_limit?: number
+          monthly_price?: number | null
+          name: string
+          product_limit?: number
+          updated_at?: string
+        }
+        Update: {
+          currency?: string
+          enabled?: boolean
+          features?: string[]
+          id?: string
+          monthly_ai_limit?: number
+          monthly_price?: number | null
+          name?: string
+          product_limit?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -1268,6 +1474,11 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      company_entitlement: { Args: { _company: string }; Returns: Json }
+      consume_company_ai: {
+        Args: { _company: string; _feature: string }
+        Returns: Json
+      }
       get_company_monthly_sales: {
         Args: { _company: string }
         Returns: {
@@ -1319,6 +1530,15 @@ export type Database = {
           _notes: string
         }
         Returns: string
+      }
+      platform_manage: {
+        Args: { _action: string; _data: Json }
+        Returns: undefined
+      }
+      platform_overview: { Args: never; Returns: Json }
+      redeem_company_coupon: {
+        Args: { _code: string; _company: string }
+        Returns: Json
       }
       set_payment_status: {
         Args: { _order: string; _status: string }

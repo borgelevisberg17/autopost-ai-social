@@ -41,6 +41,12 @@ async function handleMessage(db: any, account: any, contactName: string | undefi
   if (dup) return;
 
   if (!account.auto_reply || convo.status !== "open" || msg.type !== "text" || !text.trim()) return;
+  const { error: quotaError } = await db.rpc("consume_company_ai", { _company: account.company_id, _feature: "sales" });
+  const { data: entitlement } = await db.rpc("company_entitlement", { _company: account.company_id });
+  if (quotaError || !entitlement?.features?.includes("whatsapp")) {
+    await db.from("conversations").update({ status: "handoff" }).eq("id", convo.id);
+    return;
+  }
 
   const { data: past } = await db.from("messages").select("direction,body")
     .eq("conversation_id", convo.id).order("created_at", { ascending: false }).limit(11);

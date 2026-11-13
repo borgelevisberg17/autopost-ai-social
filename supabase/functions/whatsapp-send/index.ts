@@ -25,6 +25,8 @@ Deno.serve(async (req) => {
     // RLS: only members can read the conversation.
     const { data: convo } = await userDb.from("conversations").select("id,company_id,customer_phone,last_inbound_at").eq("id", conversationId).maybeSingle();
     if (!convo) return json({ error: "Conversa não encontrada" }, 404);
+    const { data: entitlement, error: accessError } = await userDb.rpc("company_entitlement", { _company: convo.company_id });
+    if (accessError || !entitlement?.features?.includes("whatsapp")) return json({ error: "O plano não permite WhatsApp" }, 403);
     if (!convo.last_inbound_at || Date.now() - new Date(convo.last_inbound_at).getTime() > 24 * 3600e3) {
       return json({ error: "Passaram mais de 24h desde a última mensagem do cliente. A Meta só permite responder com um modelo aprovado." }, 409);
     }

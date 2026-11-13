@@ -23,6 +23,8 @@ Deno.serve(async (req) => {
     if (!companyId || !message) return json({ error: "Mensagem em falta" }, 400);
     const { data: isMember } = await db.rpc("is_company_member", { _company: companyId, _user: user.id });
     if (!isMember) return json({ error: "Sem permissão" }, 403);
+    const { error: quotaError } = await db.rpc("consume_company_ai", { _company: companyId, _feature: "sales" });
+    if (quotaError) return json({ error: quotaError.message }, 403);
 
     const r = await salesReply(db, companyId, message, history);
     await db.from("agent_runs").insert({

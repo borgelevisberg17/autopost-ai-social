@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { formatMoney } from "@/lib/format";
+import { SubscriptionPanel } from "./SubscriptionPanel";
 
 type MonthlySale = { month_start: string; revenue: number; orders_count: number };
 type PlatformMonth = {
@@ -89,7 +90,7 @@ export function SalesSubscriptionTrends({ companyId, currency }: { companyId: st
     revenue: Number(item.revenue),
     orders_count: Number(item.orders_count),
   })), [sales]);
-  const recentSales = salesChart.slice(-2);
+  const recentSales = salesChart.slice(-3, -1);
   const salesGrowth = recentSales.length === 2
     ? percentChange(recentSales[1].revenue, recentSales[0].revenue)
     : null;
@@ -110,6 +111,7 @@ export function SalesSubscriptionTrends({ companyId, currency }: { companyId: st
 
   return (
     <section className="space-y-6" aria-label="Crescimento de vendas e subscrições">
+      <SubscriptionPanel companyId={companyId} />
       <div className="border-y border-border py-5">
         <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
           <div>
@@ -118,7 +120,7 @@ export function SalesSubscriptionTrends({ companyId, currency }: { companyId: st
           </div>
           <div className="flex items-center gap-2 text-sm">
             <TrendingUp className="h-4 w-4 text-primary" />
-            <Change value={salesGrowth} label="vs. mês anterior" />
+            <Change value={salesGrowth} label="entre meses completos" />
           </div>
         </div>
         {error ? (

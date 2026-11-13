@@ -28,6 +28,8 @@ Deno.serve(async (req) => {
     if (!product) return json({ error: "Produto não encontrado" }, 404);
     const { data: isMember } = await userClient.rpc("is_company_member", { _company: product.company_id, _user: user.id });
     if (!isMember) return json({ error: "Sem permissão" }, 403);
+    const { error: quotaError } = await userClient.rpc("consume_company_ai", { _company: product.company_id, _feature: "marketing" });
+    if (quotaError) return json({ error: quotaError.message }, 403);
 
     const admin = createClient(url, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
     const log = (rows: Record<string, unknown>[]) => admin.from("agent_actions").insert(rows.map((r) => ({

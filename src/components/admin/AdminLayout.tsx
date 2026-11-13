@@ -38,6 +38,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useCompany } from "@/hooks/useCompany";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 type Notification = {
   id: string;
@@ -209,7 +210,12 @@ export function AdminLayout({
     reload,
     select,
   } = useCompany();
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
+  const [platformAdmin, setPlatformAdmin] = useState(false);
+  useEffect(() => {
+    setPlatformAdmin(false);
+    if (user) void supabase.rpc("has_platform_admin", { _user: user.id }).then(({ data }) => setPlatformAdmin(data === true));
+  }, [user]);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -603,6 +609,7 @@ export function AdminLayout({
               </div>
 
               {actions}
+              {platformAdmin && <Button asChild variant="outline" size="sm"><Link to="/plataforma">Plataforma</Link></Button>}
             </div>
           </div>
         </header>
