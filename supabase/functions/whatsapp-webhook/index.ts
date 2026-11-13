@@ -26,6 +26,8 @@ async function handleMessage(db: any, account: any, contactName: string | undefi
     `[${msg.type}]`;
   const from = String(msg.from ?? "").replace(/\D/g, "");
   if (!from) return;
+  // Group context must never enter a private customer's conversation/order lookup.
+  if (msg.group_id || msg.context?.group_id) return;
   const now = new Date().toISOString();
 
   const { data: convo } = await db.from("conversations").upsert({

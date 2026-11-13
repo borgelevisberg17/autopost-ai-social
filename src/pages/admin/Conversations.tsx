@@ -37,24 +37,15 @@ function AccountSetup({ companyId, account, onSaved }: { companyId: string; acco
     if (!/^\d{5,30}$/.test(pnid.trim())) return toast.error("O ID do número deve ter só algarismos.");
     setSaving(true);
     const { data: verified, error: verifyError } = await supabase.functions.invoke("whatsapp-verify-number", {
-      body: { company_id: companyId, phone_number_id: pnid.trim() },
+      body: { company_id: companyId, phone_number_id: pnid.trim(), waba_id: waba.trim() },
     });
     if (verifyError) {
       setSaving(false);
       return toast.error(await fnError(verifyError, "Não foi possível validar o número na Meta."));
     }
-    const row = {
-      company_id: companyId,
-      phone_number_id: pnid.trim(),
-      waba_id: waba.trim() || null,
-      display_phone: phone.trim() || verified?.display_phone || null,
-    };
-    const { error } = account
-      ? await db.from("whatsapp_accounts").update(row).eq("id", account.id)
-      : await db.from("whatsapp_accounts").insert(row);
     setSaving(false);
-    if (error) return toast.error(error.code === "23505" ? "Este número já está ligado a outra empresa." : "Só administradores podem ligar o número.");
-    toast.success("Número validado e guardado");
+    setPhone(verified?.display_phone ?? phone);
+    toast.success("Número validado e conta Business subscrita");
     onSaved();
   };
 

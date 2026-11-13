@@ -1,5 +1,12 @@
 # Roadmap
 
+- [x] Centralizar preços e diagnóstico Meta nas Definições da plataforma
+- [x] Preservar segredos Meta existentes ao guardar apenas o ID da aplicação
+- [x] Validar pertença do número à conta Business e guardar encaminhamento antes de subscrever eventos
+- [ ] Validar aplicação e subscrever número Business para mensagens individuais reais — depende de IDs Meta
+- [ ] Grupos WhatsApp — depende de conta oficial elegível e implementação específica de grupos
+- [ ] Publicação de produtos Facebook/Instagram — depende de páginas, contas e permissões autorizadas
+
 - [x] Formulário Stripe por empresa, criptografado, sem fallback para conta da plataforma
 - [ ] Autorizar contas próprias PayPal — falta integração de autorização individual das contas Business
 - [ ] Cobrança de subscrições — preços Básico/Pro ainda por definir e conta de pagamentos por autorizar

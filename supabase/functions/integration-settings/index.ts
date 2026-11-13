@@ -3,7 +3,7 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { z } from "npm:zod@3";
 import { encryptCredentials, metaCredentials, readCredentials, serviceDb } from "../_shared/credentials.ts";
 const json = (data: unknown, status = 200) => new Response(JSON.stringify(data), { status, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-const schema = z.object({ action: z.enum(["status", "save", "activate_meta"]), company_id: z.string().uuid().optional(), provider: z.enum(["stripe", "meta"]).optional(), credentials: z.record(z.string().max(8000)).optional() });
+const schema = z.object({ action: z.enum(["status", "save", "activate_meta", "check_meta"]), company_id: z.string().uuid().optional(), provider: z.enum(["stripe", "meta"]).optional(), credentials: z.record(z.string().max(8000)).optional() });
 Deno.serve(async req => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "Método não permitido" }, 405);
@@ -24,7 +24,22 @@ Deno.serve(async req => {
       const { data, error } = await serviceDb().from("integration_credentials").select("provider,updated_at").eq("scope_key", scope);
       if (error) return json({ error: "Não foi possível verificar ligações" }, 500);
       const meta = company ? null : await metaCredentials();
-      return json({ stripe: data?.some(r => r.provider === "stripe") ?? false, paypal: false, meta: !!meta?.access_token && !!meta?.app_secret && !!meta?.verify_token, meta_app: !!meta?.app_id, updated_at: data?.map(r => ({ provider: r.provider, updated_at: r.updated_at })) ?? [] });
+      const { data: numbers } = company ? { data: null } : await serviceDb().from("whatsapp_accounts").select("company_id,display_phone,status,last_event_at");
+      return json({ stripe: data?.some(r => r.provider === "stripe") ?? false, paypal: false, meta: !!meta?.access_token && !!meta?.app_secret && !!meta?.verify_token, meta_app: !!meta?.app_id, numbers: numbers ?? [], updated_at: data?.map(r => ({ provider: r.provider, updated_at: r.updated_at })) ?? [] });
+    }
+    if (body.action === "check_meta") {
+      if (company) return json({ error: "Reservado à plataforma" }, 403);
+      const meta = await metaCredentials();
+      if (!meta.app_id) return json({ error: "Falta o ID da aplicação Meta. Guarde apenas esse campo; os segredos existentes serão mantidos." }, 400);
+      if (!meta.app_secret || !meta.access_token) return json({ error: "Credenciais Meta incompletas" }, 400);
+      const response = await fetch(`https://graph.facebook.com/v25.0/${encodeURIComponent(meta.app_id)}/subscriptions`, { headers: { Authorization: `Bearer ${meta.app_id}|${meta.app_secret}` } });
+      if (!response.ok) return json({ error: "A Meta não permitiu verificar a aplicação. Confirme o ID e o segredo da aplicação.", status: response.status }, 502);
+      const result = await response.json();
+      const expected = `${new URL(url).origin}/functions/v1/whatsapp-webhook`;
+      const subscription = result.data?.find((s: { object: string; callback_url: string }) => s.object === "whatsapp_business_account" && s.callback_url === expected);
+      const subscribed = !!subscription?.fields?.some((field: string | { name: string }) => (typeof field === "string" ? field : field.name) === "messages");
+      const { count } = await serviceDb().from("whatsapp_accounts").select("id", { count: "exact", head: true });
+      return json({ ok: true, subscribed, number_count: count ?? 0, message: subscribed ? "Aplicação verificada; receção de mensagens subscrita." : "Aplicação verificada; falta ativar a receção de mensagens." });
     }
     if (body.action === "activate_meta") {
       if (company) return json({ error: "Reservado à plataforma" }, 403);
@@ -40,7 +55,9 @@ Deno.serve(async req => {
       if (result.success !== true) return json({ error: "A Meta não confirmou a subscrição" }, 502);
       return json({ ok: true, message: "Callback subscrito. Ligue o número Business de cada loja em Conversas." });
     }
-    const values = body.credentials ?? {};
+    const submitted = body.credentials ?? {};
+    const previous = body.provider === "meta" ? await metaCredentials() : await readCredentials(scope, "stripe") ?? {};
+    const values = { ...previous, ...Object.fromEntries(Object.entries(submitted).filter(([, value]) => value.trim() !== "")) };
     if (body.provider === "stripe") {
       if (!/^sk_(test|live)_\S+$/.test(values.secret_key ?? "")) return json({ error: "Chave Stripe inválida" }, 400);
       const check = await fetch("https://api.stripe.com/v1/account", { headers: { Authorization: `Bearer ${values.secret_key}` } });

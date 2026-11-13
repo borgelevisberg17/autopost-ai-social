@@ -77,5 +77,18 @@ class SubscriptionRules(unittest.TestCase):
         result = self.rpc('consume_company_ai', {'_company':free['id'],'_feature':'whatsapp'})
         self.assertGreaterEqual(result.status_code,400)
 
+    def test_meta_diagnostic_does_not_expose_credentials(self):
+        result = requests.post(self.url + '/functions/v1/integration-settings', headers=self.headers,
+                               json={'action':'status'}, timeout=30)
+        self.assertEqual(result.status_code,200)
+        self.assertNotIn('credentials',result.json())
+        self.assertNotIn('access_token',result.json())
+        self.assertNotIn('app_secret',result.json())
+
+    def test_company_cannot_save_shared_meta_credentials(self):
+        result = requests.post(self.url + '/functions/v1/integration-settings', headers=self.headers,
+                               json={'action':'save','company_id':self.company,'provider':'meta','credentials':{}}, timeout=30)
+        self.assertEqual(result.status_code,403)
+
 if __name__ == '__main__':
     unittest.main()

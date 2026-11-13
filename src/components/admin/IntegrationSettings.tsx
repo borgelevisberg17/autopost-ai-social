@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
 export function IntegrationSettings({ companyId }: { companyId?: string }) {
-  const [status, setStatus] = useState<{ stripe: boolean; meta: boolean; meta_app: boolean } | null>(null);
+  const [status, setStatus] = useState<{ stripe: boolean; meta: boolean; meta_app: boolean; numbers: { company_id: string; display_phone: string | null; status: string; last_event_at: string | null }[] } | null>(null);
+  const [diagnostic, setDiagnostic] = useState("");
   const [stripe, setStripe] = useState("");
   const [meta, setMeta] = useState({ app_id: "", access_token: "", app_secret: "", verify_token: "" });
   const [busy, setBusy] = useState(false);
@@ -35,8 +36,14 @@ export function IntegrationSettings({ companyId }: { companyId?: string }) {
   }
   async function activate() {
     setBusy(true);
-    try { const result = await invoke({ action: "activate_meta" }); toast.success(result.message); }
+    try { const result = await invoke({ action: "activate_meta" }); setDiagnostic(result.message); toast.success(result.message); }
     catch (e) { toast.error(e instanceof Error ? e.message : "Não foi possível ativar"); }
+    finally { setBusy(false); }
+  }
+  async function checkMeta() {
+    setBusy(true);
+    try { const result = await invoke({ action: "check_meta" }); setDiagnostic(`${result.message} Números ligados: ${result.number_count}.`); }
+    catch (e) { setDiagnostic(e instanceof Error ? e.message : "Verificação indisponível"); }
     finally { setBusy(false); }
   }
   return <section aria-label={companyId ? "Ligações de pagamento da loja" : "Ligações da plataforma"} className="col-span-full space-y-6 py-5 border-y border-border">
@@ -51,8 +58,11 @@ export function IntegrationSettings({ companyId }: { companyId?: string }) {
       <h3 className="font-semibold">Meta · {status?.meta ? "Credenciais guardadas" : "Estado não verificado"}</h3>
       <div className="grid gap-3 sm:grid-cols-2">{([
         ["app_id", "ID da aplicação", "text"], ["access_token", "Token permanente", "password"], ["app_secret", "Segredo da aplicação", "password"], ["verify_token", "Código de verificação do webhook", "password"],
-      ] as const).map(([key, label, type]) => <label className="text-sm" key={key}>{label}<Input aria-label={label} required autoComplete="off" type={type} value={meta[key]} onChange={e => setMeta({ ...meta, [key]: e.target.value })} /></label>)}</div>
-      <div className="flex flex-wrap gap-2"><Button disabled={busy}>Guardar Meta</Button><Button variant="outline" disabled={busy || !status?.meta_app} type="button" onClick={() => void activate()}>Ativar webhook da Meta</Button></div>
+      ] as const).map(([key, label, type]) => <label className="text-sm" key={key}>{label}<Input aria-label={label} autoComplete="off" type={type} value={meta[key]} placeholder={key === "app_id" ? "ID da aplicação Vendora" : "Manter credencial guardada"} onChange={e => setMeta({ ...meta, [key]: e.target.value })} /></label>)}</div>
+      <div className="flex flex-wrap gap-2"><Button disabled={busy}>Guardar Meta</Button><Button variant="outline" disabled={busy} type="button" onClick={() => void checkMeta()}>Verificar ligação Meta</Button><Button variant="outline" disabled={busy || !status?.meta_app} type="button" onClick={() => void activate()}>Ativar webhook da Meta</Button></div>
+      {diagnostic && <p role="status" className="text-sm border-l-2 border-primary pl-3">{diagnostic}</p>}
+      <dl className="grid gap-3 sm:grid-cols-2 text-sm border-t border-border pt-4"><div><dt className="font-semibold">Mensagens individuais</dt><dd className="text-muted-foreground">{status?.numbers.length ? `${status.numbers.length} número(s) ligado(s)` : "Falta ligar um número Business à loja"}</dd></div><div><dt className="font-semibold">Grupos</dt><dd className="text-muted-foreground">Elegibilidade não verificada · Conta oficial Meta necessária</dd></div><div><dt className="font-semibold">Facebook e Instagram</dt><dd className="text-muted-foreground">Publicação pendente de contas e permissões autorizadas</dd></div><div><dt className="font-semibold">Resposta da IA</dt><dd className="text-muted-foreground">Teste real pendente de mensagem recebida</dd></div></dl>
+      {status?.numbers.map(number => <p key={number.company_id} className="text-sm">{number.display_phone ?? "Número Business"} · {number.status} · Último evento: {number.last_event_at ? new Date(number.last_event_at).toLocaleString("pt-PT") : "Ainda não recebido"}</p>)}
     </form>}
   </section>;
 }
