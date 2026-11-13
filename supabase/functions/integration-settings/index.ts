@@ -23,8 +23,11 @@ Deno.serve(async req => {
     if (body.action === "status") {
       const { data, error } = await serviceDb().from("integration_credentials").select("provider,updated_at").eq("scope_key", scope);
       if (error) return json({ error: "Não foi possível verificar ligações" }, 500);
-      const meta = company ? null : await metaCredentials();
-      const { data: numbers } = company ? { data: null } : await serviceDb().from("whatsapp_accounts").select("company_id,display_phone,status,last_event_at");
+      const meta = await metaCredentials();
+      let numberQuery = serviceDb().from("whatsapp_accounts").select("company_id,display_phone,status,last_event_at");
+      if (company) numberQuery = numberQuery.eq("company_id", company);
+      const { data: numbers, error: numbersError } = await numberQuery;
+      if (numbersError) return json({ error: "Não foi possível consultar o número WhatsApp da loja" }, 500);
       return json({ stripe: data?.some(r => r.provider === "stripe") ?? false, paypal: false, meta: !!meta?.access_token && !!meta?.app_secret && !!meta?.verify_token, meta_app: !!meta?.app_id, numbers: numbers ?? [], updated_at: data?.map(r => ({ provider: r.provider, updated_at: r.updated_at })) ?? [] });
     }
     if (body.action === "check_meta") {
