@@ -26,11 +26,13 @@ Deno.serve(async (req) => {
 
     const body = await req.json().catch(() => null);
     const companyId = typeof body?.company_id === "string" ? body.company_id : "";
+    const phoneNumber = typeof body?.phone_number === "string" ? body.phone_number.trim() : "";
     const phoneNumberId = typeof body?.phone_number_id === "string" ? body.phone_number_id.trim() : "";
     const wabaId = typeof body?.waba_id === "string" ? body.waba_id.trim() : "";
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(companyId)) {
       return json({ error: "Empresa inválida." }, 400);
     }
+    if (!/^\+?[\d\s().-]{7,25}$/.test(phoneNumber)) return json({ error: "Introduza um número de telefone válido." }, 400);
     if (!/^\d{5,30}$/.test(phoneNumberId)) return json({ error: "ID do número inválido." }, 400);
     if (!/^\d{5,30}$/.test(wabaId)) return json({ error: "ID da conta Business obrigatório." }, 400);
 
@@ -51,6 +53,10 @@ Deno.serve(async (req) => {
       const metaMessage = typeof result?.error?.message === "string" ? result.error.message : "A Meta recusou este número.";
       return json({ error: `Não foi possível validar o número na Meta: ${metaMessage.slice(0, 240)}` }, 502);
     }
+
+    const submittedDigits = phoneNumber.replace(/\D/g, "");
+    const verifiedDigits = String(result.display_phone_number ?? "").replace(/\D/g, "");
+    if (!verifiedDigits || submittedDigits !== verifiedDigits) return json({ error: "O número informado não corresponde ao número verificado pela Meta. Confirme o número e o Phone Number ID." }, 400);
 
     const ownership = await fetch(`https://graph.facebook.com/v25.0/${encodeURIComponent(wabaId)}/phone_numbers?fields=id&limit=100`, { headers: { Authorization: `Bearer ${token}` } });
     const owned = await ownership.json().catch(() => null);
