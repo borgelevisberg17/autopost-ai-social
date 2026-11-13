@@ -20,7 +20,7 @@ Never commit these values to the repository, frontend variables, or workflow YAM
 After the secrets are configured:
 
 1. A commit pushed to `main` that changes `supabase/migrations/**` or `supabase/config.toml` starts the **Supabase database migrations** workflow.
-2. The runner links the project, previews pending migrations with `supabase db push --dry-run`, and then applies them with `supabase db push --yes`.
+2. The runner uses Supabase CLI v2.84.2, targets the project reference in the workflow, previews pending migrations with `supabase db push --remote --dry-run`, and then applies them with `supabase db push --remote --yes`.
 3. GitHub Actions reports success or the exact failing step in the workflow run.
 
 A manual run is also available under **Actions → Supabase database migrations → Run workflow**.
@@ -29,7 +29,7 @@ The workflow is serialized so two production migration jobs cannot run concurren
 
 ## Important: first deployment / migration history
 
-This repository already contains historical migrations. Before enabling the first production run, check **Supabase → SQL Editor** or run `supabase migration list --linked` from a trusted local environment after linking the project.
+This repository already contains historical migrations. Before enabling the first production run, check **Supabase → SQL Editor** or run `supabase migration list --linked` from a trusted local environment after authenticating and targeting the project.
 
 The remote `supabase_migrations.schema_migrations` history must accurately represent migrations already applied to this database. If the database was originally created by Lovable or manual SQL, do not blindly mark every local migration as applied and do not reset the production database. Reconcile the remote migration history against the actual schema and migration contents first. If history is out of sync, the workflow should fail rather than guessing.
 
