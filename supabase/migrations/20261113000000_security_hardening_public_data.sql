@@ -26,6 +26,7 @@ BEGIN
   WHERE table_schema = 'public'
     AND table_name = 'companies'
     AND column_name = ANY (ARRAY[
+      'id',
       'name',
       'slug',
       'currency',
