@@ -15,6 +15,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { PlanRoute } from "@/components/admin/PlanRoute";
 
 const Index = lazy(() => import("./pages/Index"));
+const LegalPage = lazy(() => import("./pages/LegalPage"));
 const Login = lazy(() => import("./pages/Login"));
 const Signup = lazy(() => import("./pages/Signup"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
@@ -92,6 +93,9 @@ const App = () => (
               <Routes>
                 {/* Public */}
                 <Route path="/" element={<Index />} />
+                <Route path="/policy" element={<LegalPage />} />
+                <Route path="/terms" element={<LegalPage />} />
+                <Route path="/data-deletion" element={<LegalPage />} />
                 <Route path="/pricing" element={<Navigate to="/#plans" replace />} />
 
                 {/* Authentication */}

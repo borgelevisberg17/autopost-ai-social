@@ -166,8 +166,14 @@ export default function Signup() {
         </button>
 
         <p className="pt-1 text-center text-[11px] leading-5 text-[#8f8a80]">
-          Ao criar conta, concorda com os Termos de Serviço e a Política de
-          Privacidade.
+          Ao criar conta, concorda com os{" "}
+          <Link to="/terms" className="font-semibold text-[#2c6457] underline underline-offset-2">
+            Termos de Serviço
+          </Link>{" "}
+          e a{" "}
+          <Link to="/policy" className="font-semibold text-[#2c6457] underline underline-offset-2">
+            Política de Privacidade
+          </Link>.
         </p>
       </form>
     </AuthShell>
