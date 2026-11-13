@@ -78,7 +78,7 @@ export async function salesReply(db: DB, companyId: string, message: string, his
 export async function sendWhatsApp(phoneNumberId: string, to: string, body: string) {
   const token = Deno.env.get("WHATSAPP_ACCESS_TOKEN");
   if (!token) return { ok: false, error: "WhatsApp não configurado" };
-  const r = await fetch(`https://graph.facebook.com/v21.0/${encodeURIComponent(phoneNumberId)}/messages`, {
+  const r = await fetch(`https://graph.facebook.com/v25.0/${encodeURIComponent(phoneNumberId)}/messages`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
     body: JSON.stringify({ messaging_product: "whatsapp", to, type: "text", text: { body: body.slice(0, 4000) } }),

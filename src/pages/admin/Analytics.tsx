@@ -20,6 +20,7 @@ import {
 
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { AnalyticsAgentPanel } from "@/components/admin/AnalyticsAgentPanel";
+import { SalesSubscriptionTrends } from "@/components/admin/SalesSubscriptionTrends";
 import { useCompany } from "@/hooks/useCompany";
 import { supabase } from "@/integrations/supabase/client";
 import { formatMoney } from "@/lib/format";
@@ -201,6 +202,7 @@ export default function Analytics() {
   return (
     <AdminLayout title="Analytics">
       <div className="space-y-10">
+        <SalesSubscriptionTrends companyId={company.id} currency={company.currency} />
         {company && (
           <AnalyticsAgentPanel
             companyId={company.id}

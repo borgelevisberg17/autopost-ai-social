@@ -26,10 +26,10 @@ Deno.serve(async (req) => {
 
     const since = new Date(Date.now() - days * 864e5).toISOString();
     const yearAgo = new Date(); yearAgo.setUTCMonth(yearAgo.getUTCMonth() - 11, 1); yearAgo.setUTCHours(0, 0, 0, 0);
-    const [{ data: company }, { data: products }, { data: orders }, { data: posts }, { data: variants }, { data: sub }, { data: yearOrders }] = await Promise.all([
+    const [companyResult, productsResult, ordersResult, postsResult, variantsResult, subResult, yearOrdersResult, subscriptionEventsResult] = await Promise.all([
       db.from("companies").select("name,currency,description").eq("id", companyId).single(),
       db.from("products").select("id,name,category,price,promo_price,stock,active").eq("company_id", companyId),
-      db.from("orders").select("id,status,total,created_at,order_items(product_id,product_name,quantity,unit_price)")
+      db.from("orders").select("id,status,total,created_at,order_items(product_id,product_name,quantity,unit_price,variant_id,variant_name)")
         .eq("company_id", companyId).gte("created_at", since).limit(2000),
       db.from("agent_actions").select("platform,status,product_id,created_at")
         .eq("company_id", companyId).eq("action", "CREATE_POST").gte("created_at", since).limit(2000),
@@ -37,7 +37,23 @@ Deno.serve(async (req) => {
       db.from("company_subscriptions").select("plan,status").eq("company_id", companyId).maybeSingle(),
       db.from("orders").select("total,status,created_at").eq("company_id", companyId)
         .gte("created_at", yearAgo.toISOString()).neq("status", "cancelled").limit(10000),
+      db.from("company_subscription_events").select("company_id,plan,status,event_type,recorded_at")
+        .eq("company_id", companyId).gte("recorded_at", yearAgo.toISOString()).order("recorded_at", { ascending: true }).limit(20000),
     ]);
+    const failedQuery = [companyResult, productsResult, ordersResult, postsResult, variantsResult, subResult, yearOrdersResult, subscriptionEventsResult]
+      .find((result) => result.error);
+    if (failedQuery?.error) {
+      console.error("Analytics data query failed", failedQuery.error.message);
+      return json({ error: "Não foi possível carregar todos os dados reais para análise." }, 500);
+    }
+    const company = companyResult.data;
+    const products = productsResult.data ?? [];
+    const orders = ordersResult.data ?? [];
+    const posts = postsResult.data ?? [];
+    const variants = variantsResult.data ?? [];
+    const sub = subResult.data;
+    const yearOrders = yearOrdersResult.data ?? [];
+    const subscriptionEvents = subscriptionEventsResult.data ?? [];
 
     // Aggregate real numbers server-side — the AI only interprets them.
     const valid = (orders ?? []).filter((o) => o.status !== "cancelled");
@@ -79,13 +95,14 @@ Deno.serve(async (req) => {
       const m = months.find((x) => x.mes === String(o.created_at).slice(0, 7));
       if (m) { m.receita += Number(o.total); m.pedidos++; }
     }
-    const [prev, last] = [months[10], months[11]];
+    // Compare the last two completed months; the current month is partial.
+    const [prev, last] = [months[9], months[10]];
     const crescimentoMes = prev.receita > 0 ? Math.round(((last.receita - prev.receita) / prev.receita) * 100) : null;
     const top = [...byProduct.values()].sort((a, b) => b.receita - a.receita).slice(0, 10);
     const postsByProduct = new Map<string, number>();
     const postsByPlatform: Record<string, number> = {};
-    for (const p of posts ?? []) {
-      if (p.status !== "DRAFT") continue;
+    for (const p of posts) {
+      if (p.status !== "DRAFT" && p.status !== "PUBLISHED") continue;
       postsByPlatform[p.platform ?? "?"] = (postsByPlatform[p.platform ?? "?"] ?? 0) + 1;
       if (p.product_id) postsByProduct.set(p.product_id, (postsByProduct.get(p.product_id) ?? 0) + 1);
     }
@@ -96,6 +113,12 @@ Deno.serve(async (req) => {
       .map((p) => ({ nome: p.name, posts: postsByProduct.get(p.id) })).slice(0, 10);
     const baixoStock = (products ?? []).filter((p) => p.active && p.stock > 0 && p.stock <= 5)
       .map((p) => ({ nome: p.name, stock: p.stock }));
+    const subscriptionTimeline = subscriptionEvents.map((event) => ({
+      plano: event.plan,
+      estado: event.status,
+      tipo: event.event_type,
+      data: event.recorded_at,
+    }));
     const metrics = {
       periodo_dias: days, moeda: company?.currency,
       pedidos: valid.length, cancelados: (orders ?? []).length - valid.length,
@@ -106,8 +129,9 @@ Deno.serve(async (req) => {
       posts_gerados_por_rede: postsByPlatform,
       variantes_mais_vendidas: variantesVendidas, variantes_sem_stock: variantesSemStock,
       variantes_sem_vendas: variantesParadas,
-      receita_mensal_12m: months, crescimento_mes_atual_vs_anterior_pct: crescimentoMes,
+      receita_mensal_12m: months, crescimento_ultimo_mes_fechado_vs_anterior_pct: crescimentoMes,
       plano_subscricao: sub?.plan ?? "free", estado_subscricao: sub?.status ?? "active",
+      historico_subscricao: subscriptionTimeline,
     };
 
     const { data: run } = await db.from("agent_runs").insert({
@@ -134,7 +158,7 @@ Deno.serve(async (req) => {
         model: "openai/gpt-6-astra",
         store: false,
         reasoning: { effort: "low" },
-        instructions: `És o agente de análise da loja "${company?.name}". Usa APENAS as métricas fornecidas; nunca inventes números, produtos ou tendências que não estejam nos dados. Se os dados forem poucos, diz isso. Escreve em português, direto e acionável. Responde só com JSON: {"resumo":"2-3 frases","destaques":["..."],"sugestoes":[{"titulo":"...","detalhe":"...","prioridade":"alta|media|baixa","area":"marketing|stock|vendas"}]}. Comenta o crescimento mensal e as variantes (tamanhos/cores) quando houver dados. com no máximo 5 sugestões. Valores monetários na moeda indicada.`,
+        instructions: `És o agente de análise da loja "${company?.name}". Usa APENAS as métricas fornecidas; nunca inventes números, produtos ou tendências que não estejam nos dados. Se os dados forem poucos, diz isso. Escreve em português, direto e acionável. Responde só com JSON: {"resumo":"2-3 frases","destaques":["..."],"sugestoes":[{"titulo":"...","detalhe":"...","prioridade":"alta|media|baixa","area":"marketing|stock|vendas"}]}. Comenta as vendas dos últimos meses completos, as variantes (tamanhos/cores) e o plano/histórico de subscrição quando houver dados. Não compare o mês atual incompleto como se fosse um mês fechado. No máximo 5 sugestões. Valores monetários na moeda indicada.`,
         input: JSON.stringify(metrics),
       }),
     });

@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 type Account = { id: string; phone_number_id: string; waba_id: string | null; display_phone: string | null; status: string; auto_reply: boolean; last_event_at: string | null };
 type Convo = { id: string; customer_phone: string; customer_name: string | null; status: string; last_message_at: string; last_inbound_at: string | null };
@@ -35,13 +36,25 @@ function AccountSetup({ companyId, account, onSaved }: { companyId: string; acco
   const save = async () => {
     if (!/^\d{5,30}$/.test(pnid.trim())) return toast.error("O ID do número deve ter só algarismos.");
     setSaving(true);
-    const row = { company_id: companyId, phone_number_id: pnid.trim(), waba_id: waba.trim() || null, display_phone: phone.trim() || null };
+    const { data: verified, error: verifyError } = await supabase.functions.invoke("whatsapp-verify-number", {
+      body: { company_id: companyId, phone_number_id: pnid.trim() },
+    });
+    if (verifyError) {
+      setSaving(false);
+      return toast.error(await fnError(verifyError, "Não foi possível validar o número na Meta."));
+    }
+    const row = {
+      company_id: companyId,
+      phone_number_id: pnid.trim(),
+      waba_id: waba.trim() || null,
+      display_phone: phone.trim() || verified?.display_phone || null,
+    };
     const { error } = account
       ? await db.from("whatsapp_accounts").update(row).eq("id", account.id)
       : await db.from("whatsapp_accounts").insert(row);
     setSaving(false);
     if (error) return toast.error(error.code === "23505" ? "Este número já está ligado a outra empresa." : "Só administradores podem ligar o número.");
-    toast.success("Número guardado");
+    toast.success("Número validado e guardado");
     onSaved();
   };
 
@@ -144,6 +157,13 @@ export default function Conversations() {
           <h1 className="font-serif text-3xl font-medium">Conversas WhatsApp</h1>
           <p className="mt-1 text-sm text-muted-foreground">Mensagens recebidas pela Vendora e respostas do agente de atendimento.</p>
         </div>
+        <Alert>
+          <MessageCircle className="h-4 w-4" />
+          <AlertTitle>Aplicação Meta partilhada pela Vendora</AlertTitle>
+          <AlertDescription>
+            A Vendora usa uma única aplicação Meta. As credenciais ficam protegidas no servidor; cada empresa liga o seu número separadamente e as conversas continuam isoladas por loja. Na Meta, configure este endereço como callback e subscreva o campo “messages”.
+          </AlertDescription>
+        </Alert>
         {company && !loading && <AccountSetup key={account?.id ?? "new"} companyId={company.id} account={account} onSaved={load} />}
 
         <div className="grid gap-4 md:grid-cols-[280px_1fr]">

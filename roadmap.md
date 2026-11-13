@@ -9,7 +9,8 @@
 - [x] Agente de vendas para teste interno (publicado)
 - [ ] Publicação real na Meta (Facebook/Instagram/WhatsApp) — precisa de credenciais Meta
 - [ ] Ligar o agente de vendas ao WhatsApp Business — fica para a próxima fase
-- [ ] Configuração partilhada da Meta para todas as empresas e ligação de conversas WhatsApp
-- [ ] Mostrar crescimento mensal real de vendas e subscrições, plano e estado da loja
+- [x] Credenciais Meta partilhadas e validação de número dentro de cada loja
+- [ ] Ativar callback da Meta e registar os números Business de cada loja
+- [x] Mostrar crescimento mensal real de vendas e subscrições, plano e estado da loja
 - [ ] Permissões por agente, 2FA, artigos/blog
 - [ ] Pagamentos online
