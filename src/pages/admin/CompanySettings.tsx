@@ -1,4 +1,5 @@
 import { PaymentSettings } from "@/components/admin/PaymentSettings";
+import { IntegrationSettings } from "@/components/admin/IntegrationSettings";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -1325,6 +1326,8 @@ export default function CompanySettings() {
           />
         </Field>
       </div>
+
+      {company?.id && <div className="mt-8"><IntegrationSettings companyId={company.id} /></div>}
 
       <SaveBar saving={saving} dirty={dirty} onSave={save} />
     </>
