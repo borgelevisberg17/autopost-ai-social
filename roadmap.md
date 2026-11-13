@@ -1,5 +1,10 @@
 # Roadmap
 
+- [ ] Configurar pagamentos próprios por empresa e cobrança separada da plataforma
+- [ ] Confirmar administração com a conta existente e acesso dentro da aplicação
+- [ ] Aplicar limites Free/Básico/Pro à navegação e aos acessos diretos
+- [ ] Verificar configuração Meta e ativação dos números Business
+
 - [x] Consolidar catálogo de planos, limites no servidor e utilização por empresa
 - [x] Administração da plataforma: empresas, preços, cupões e concessões temporárias auditadas
 - [x] Republicar análise e validar gráficos e restrições de subscrição
