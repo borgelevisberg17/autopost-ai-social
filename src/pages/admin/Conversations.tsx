@@ -35,9 +35,10 @@ function AccountSetup({ companyId, account, onSaved }: { companyId: string; acco
 
   const save = async () => {
     if (!/^\d{5,30}$/.test(pnid.trim())) return toast.error("O ID do número deve ter só algarismos.");
+    if (!/^\+?[\d\s().-]{7,25}$/.test(phone.trim())) return toast.error("Introduza o número visível associado ao Phone Number ID.");
     setSaving(true);
     const { data: verified, error: verifyError } = await supabase.functions.invoke("whatsapp-verify-number", {
-      body: { company_id: companyId, phone_number_id: pnid.trim(), waba_id: waba.trim() },
+      body: { company_id: companyId, phone_number: phone.trim(), phone_number_id: pnid.trim(), waba_id: waba.trim() },
     });
     if (verifyError) {
       setSaving(false);
