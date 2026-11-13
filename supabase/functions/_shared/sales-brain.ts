@@ -1,6 +1,7 @@
 // deno-lint-ignore-file no-explicit-any
 // Shared WhatsApp sales agent: answers only from real catalogue/order data.
 type DB = any;
+import { metaCredentials } from "./credentials.ts";
 
 export type Turn = { role: "client" | "agent"; text: string };
 
@@ -76,7 +77,7 @@ export async function salesReply(db: DB, companyId: string, message: string, his
 }
 
 export async function sendWhatsApp(phoneNumberId: string, to: string, body: string) {
-  const token = Deno.env.get("WHATSAPP_ACCESS_TOKEN");
+  const token = (await metaCredentials()).access_token;
   if (!token) return { ok: false, error: "WhatsApp não configurado" };
   const r = await fetch(`https://graph.facebook.com/v25.0/${encodeURIComponent(phoneNumberId)}/messages`, {
     method: "POST",

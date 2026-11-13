@@ -1,0 +1,4 @@
+CREATE TABLE public.integration_credentials (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), company_id uuid REFERENCES public.companies(id), scope_key text NOT NULL, provider text NOT NULL CHECK(provider IN ('stripe','meta')), ciphertext text NOT NULL, updated_at timestamptz NOT NULL DEFAULT now(), UNIQUE(scope_key,provider), CHECK (scope_key = COALESCE(company_id::text,'platform')));
+GRANT ALL ON public.integration_credentials TO service_role;
+ALTER TABLE public.integration_credentials ENABLE ROW LEVEL SECURITY;
+COMMENT ON TABLE public.integration_credentials IS 'Server-only encrypted credentials; never return ciphertext or decrypted values to clients.';

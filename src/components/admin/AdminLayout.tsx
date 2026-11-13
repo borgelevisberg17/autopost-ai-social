@@ -39,6 +39,8 @@ import { useCompany } from "@/hooks/useCompany";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useEntitlement } from "@/hooks/useEntitlement";
+import { routeAllowed } from "@/lib/planAccess";
 
 type Notification = {
   id: string;
@@ -211,6 +213,8 @@ export function AdminLayout({
     select,
   } = useCompany();
   const { signOut, user } = useAuth();
+  const { data: entitlement } = useEntitlement();
+  const allowedSections = navSections.map(section => ({ ...section, items: section.items.filter(item => routeAllowed(item.to, entitlement ?? null)) })).filter(section => section.items.length > 0);
   const [platformAdmin, setPlatformAdmin] = useState(false);
   useEffect(() => {
     setPlatformAdmin(false);
@@ -394,7 +398,7 @@ export function AdminLayout({
         {/* NAV */}
         <nav className="flex-1 overflow-y-auto px-4 py-5">
           <div className="space-y-5">
-            {navSections.map((section) => (
+            {allowedSections.map((section) => (
               <section key={section.label}>
                 <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#858c83]">
                   {section.label}
@@ -749,7 +753,7 @@ export function AdminLayout({
               </button>
             </div>
             <div className="max-h-[calc(82dvh-90px)] space-y-5 overflow-y-auto px-5 pb-3">
-              {navSections.map((section) => {
+              {allowedSections.map((section) => {
                 const items = section.items.filter(
                   (item) => !mobilePrimaryRoutes.has(item.to),
                 );

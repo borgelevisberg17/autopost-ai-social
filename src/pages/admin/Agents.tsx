@@ -28,6 +28,7 @@ import {
 
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { useCompany } from "@/hooks/useCompany";
+import { useEntitlement } from "@/hooks/useEntitlement";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -165,6 +166,7 @@ const statusIcon = (status: string) => {
 
 export default function Agents() {
   const { company } = useCompany();
+  const { data: entitlement } = useEntitlement();
 
   const [products, setProducts] = useState<Product[]>([]);
   const [log, setLog] = useState<Action[]>([]);
@@ -375,7 +377,7 @@ export default function Agents() {
       }
     >
       <div className="space-y-10">
-        {company && <SalesAgentTester companyId={company.id} />}
+        {company && entitlement?.features.includes("sales") && <SalesAgentTester companyId={company.id} />}
         {/* PAGE INTRO */}
         <section>
           <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">

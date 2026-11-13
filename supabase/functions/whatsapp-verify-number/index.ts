@@ -1,5 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { metaCredentials } from "../_shared/credentials.ts";
 
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
   status,
@@ -13,7 +14,7 @@ Deno.serve(async (req) => {
   try {
     const url = Deno.env.get("SUPABASE_URL");
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
-    const token = Deno.env.get("WHATSAPP_ACCESS_TOKEN");
+    const token = (await metaCredentials()).access_token;
     if (!url || !anonKey) return json({ error: "Serviço indisponível" }, 500);
     if (!token) return json({ error: "Token da Meta ainda não configurado" }, 503);
 

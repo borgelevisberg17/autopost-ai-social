@@ -769,6 +769,41 @@ export type Database = {
           },
         ]
       }
+      integration_credentials: {
+        Row: {
+          ciphertext: string
+          company_id: string | null
+          id: string
+          provider: string
+          scope_key: string
+          updated_at: string
+        }
+        Insert: {
+          ciphertext: string
+          company_id?: string | null
+          id?: string
+          provider: string
+          scope_key: string
+          updated_at?: string
+        }
+        Update: {
+          ciphertext?: string
+          company_id?: string | null
+          id?: string
+          provider?: string
+          scope_key?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "integration_credentials_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       inventory_movements: {
         Row: {
           company_id: string

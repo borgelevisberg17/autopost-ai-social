@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { IntegrationSettings } from "@/components/admin/IntegrationSettings";
 
 export function PaymentSettings({ companyId }: { companyId: string }) {
   const [f, setF] = useState({ payment_iban: "", payment_iban_holder: "", payment_express_number: "" });
@@ -41,6 +42,7 @@ export function PaymentSettings({ companyId }: { companyId: string }) {
         <Input placeholder="Número Multicaixa Express" value={f.payment_express_number} onChange={(e) => setF({ ...f, payment_express_number: e.target.value })} />
       </div>
       <Button className="mt-3" onClick={save} disabled={saving}>{saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Guardar pagamentos</Button>
+      <IntegrationSettings companyId={companyId} />
     </div>
   );
 }

@@ -1,11 +1,12 @@
 // Public receiver for Meta WhatsApp Cloud API webhooks.
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { salesReply, sendWhatsApp } from "../_shared/sales-brain.ts";
+import { metaCredentials, serviceDb } from "../_shared/credentials.ts";
 
 const enc = new TextEncoder();
 
 async function validSignature(raw: string, header: string | null) {
-  const secret = Deno.env.get("WHATSAPP_APP_SECRET");
+  const secret = (await metaCredentials()).app_secret;
   if (!secret || !header?.startsWith("sha256=")) return false;
   const key = await crypto.subtle.importKey("raw", enc.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
   const sig = new Uint8Array(await crypto.subtle.sign("HMAC", key, enc.encode(raw)));
@@ -79,9 +80,10 @@ async function handleMessage(db: any, account: any, contactName: string | undefi
 Deno.serve(async (req) => {
   const url = new URL(req.url);
   if (req.method === "GET") {
+    const verifyToken = (await metaCredentials()).verify_token;
     const ok = url.searchParams.get("hub.mode") === "subscribe" &&
-      !!Deno.env.get("WHATSAPP_VERIFY_TOKEN") &&
-      url.searchParams.get("hub.verify_token") === Deno.env.get("WHATSAPP_VERIFY_TOKEN");
+      !!verifyToken &&
+      url.searchParams.get("hub.verify_token") === verifyToken;
     return ok ? new Response(url.searchParams.get("hub.challenge") ?? "", { status: 200 }) : new Response("Forbidden", { status: 403 });
   }
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
@@ -91,7 +93,7 @@ Deno.serve(async (req) => {
   let payload;
   try { payload = JSON.parse(raw); } catch { return new Response("Bad JSON", { status: 400 }); }
 
-  const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+  const db = serviceDb();
   const work = (async () => {
     for (const entry of payload.entry ?? []) {
       for (const change of entry.changes ?? []) {

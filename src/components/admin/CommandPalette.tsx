@@ -16,6 +16,8 @@ import {
 
 import { useCompany } from "@/hooks/useCompany";
 import { supabase } from "@/integrations/supabase/client";
+import { useEntitlement } from "@/hooks/useEntitlement";
+import { routeAllowed } from "@/lib/planAccess";
 
 type SearchResult = {
   id: string;
@@ -33,6 +35,7 @@ export function CommandPalette({
   onClose: () => void;
 }) {
   const { company } = useCompany();
+  const { data: entitlement } = useEntitlement();
   const navigate = useNavigate();
 
   const [query, setQuery] = useState("");
@@ -115,7 +118,7 @@ export function CommandPalette({
         subtitle: "Navegação",
         url: "/admin/config",
       },
-    ];
+    ].filter(n => routeAllowed(n.url, entitlement ?? null)) as SearchResult[];
 
     if (!query.trim()) {
       setResults(navShortcuts);
@@ -200,7 +203,7 @@ export function CommandPalette({
     }
 
     performSearch();
-  }, [query, open, company]);
+  }, [query, open, company, entitlement]);
 
   if (!open) return null;
 

@@ -12,6 +12,7 @@ import {
 import { AuthProvider } from "@/hooks/useAuth";
 import { CompanyProvider } from "@/hooks/useCompany";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { PlanRoute } from "@/components/admin/PlanRoute";
 
 const Index = lazy(() => import("./pages/Index"));
 const Login = lazy(() => import("./pages/Login"));
@@ -156,7 +157,7 @@ const App = () => (
                   path="/admin/agentes"
                   element={
                     <P>
-                      <Agents />
+                      <PlanRoute><Agents /></PlanRoute>
                     </P>
                   }
                 />
@@ -164,7 +165,7 @@ const App = () => (
                   path="/admin/aprovacoes"
                   element={
                     <P>
-                      <Approvals />
+                      <PlanRoute><Approvals /></PlanRoute>
                     </P>
                   }
                 />
@@ -172,7 +173,7 @@ const App = () => (
                   path="/admin/analytics"
                   element={
                     <P>
-                      <Analytics />
+                      <PlanRoute><Analytics /></PlanRoute>
                     </P>
                   }
                 />
@@ -195,10 +196,10 @@ const App = () => (
                 <Route path="/admin/equipa" element={<P><Team /></P>} />
                 <Route path="/admin/atividade" element={<P><Activity /></P>} />
                 <Route path="/admin/auditoria" element={<P><Audit /></P>} />
-                <Route path="/admin/conteudo" element={<P><Content /></P>} />
-                <Route path="/admin/automacoes" element={<P><Automations /></P>} />
+                <Route path="/admin/conteudo" element={<P><PlanRoute><Content /></PlanRoute></P>} />
+                <Route path="/admin/automacoes" element={<P><PlanRoute><Automations /></PlanRoute></P>} />
                 <Route path="/admin/pagamentos" element={<P><Payments /></P>} />
-                <Route path="/admin/conversas" element={<P><Conversations /></P>} />
+                <Route path="/admin/conversas" element={<P><PlanRoute><Conversations /></PlanRoute></P>} />
                 <Route path="/plataforma" element={<P><Platform /></P>} />
 
                 <Route path="*" element={<NotFound />} />

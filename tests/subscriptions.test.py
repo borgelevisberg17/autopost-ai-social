@@ -55,5 +55,27 @@ class SubscriptionRules(unittest.TestCase):
         result = self.rpc('platform_manage', {'_action': 'coupon', '_data': {'code': 'INVALID-DISCOUNT', 'plan_id': 'basic', 'percent_off': 101, 'max_uses': 1, 'expires_at': '2099-01-01T00:00:00Z'}})
         self.assertGreaterEqual(result.status_code, 400)
 
+    def test_plan_limits_are_distinct(self):
+        response = requests.get(self.url + '/rest/v1/subscription_plans?select=id,product_limit,monthly_ai_limit,features', headers=self.headers, timeout=30)
+        self.assertEqual(response.status_code, 200)
+        plans = {p['id']: p for p in response.json()}
+        for plan, products, ai in [('free',25,10),('basic',500,200),('pro',5000,2000)]:
+            with self.subTest(plan=plan):
+                self.assertEqual(plans[plan]['product_limit'],products)
+                self.assertEqual(plans[plan]['monthly_ai_limit'],ai)
+        self.assertEqual(plans['free']['features'],['marketing'])
+        self.assertEqual(plans['basic']['features'],['marketing','analytics'])
+        self.assertEqual(plans['pro']['features'],['marketing','analytics','sales','whatsapp'])
+
+    def test_credentials_are_not_readable_by_authenticated_user(self):
+        response = requests.get(self.url + '/rest/v1/integration_credentials?select=id', headers=self.headers, timeout=30)
+        self.assertGreaterEqual(response.status_code,400)
+
+    def test_free_whatsapp_operation_is_blocked(self):
+        overview = self.rpc('platform_overview', {}).json()
+        free = next(c for c in overview['companies'] if c['entitlement']['plan']=='free')
+        result = self.rpc('consume_company_ai', {'_company':free['id'],'_feature':'whatsapp'})
+        self.assertGreaterEqual(result.status_code,400)
+
 if __name__ == '__main__':
     unittest.main()

@@ -2,6 +2,8 @@
 
 - Subscription entitlements are resolved server-side, with expiring grants falling back to the base plan; AI quota reservations and product limits use company-level locks to prevent concurrent bypasses.
 - Platform administration uses authenticated security-definer RPCs with platform-admin checks and immutable audit entries; removing a company is reversible archival to preserve orders and financial history.
+- Integration credentials are encrypted with AES-GCM, bound to company/provider scope, and accessible only to server functions; storefront checkout never falls back to platform merchant credentials.
+- Plan-dependent routes and navigation use the same feature map; server entitlements remain authoritative for operations and quota.
 
 - Multi-tenant: every business table has `company_id`; access via `is_company_member`/`is_company_admin` security-definer functions — keeps tenants isolated without recursive RLS.
 - Orders are only created through the `place_order` RPC — it checks and decrements stock atomically so all channels share one stock.

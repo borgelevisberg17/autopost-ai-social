@@ -1,9 +1,12 @@
 # Roadmap
 
-- [ ] Configurar pagamentos próprios por empresa e cobrança separada da plataforma
-- [ ] Confirmar administração com a conta existente e acesso dentro da aplicação
-- [ ] Aplicar limites Free/Básico/Pro à navegação e aos acessos diretos
-- [ ] Verificar configuração Meta e ativação dos números Business
+- [x] Formulário Stripe por empresa, criptografado, sem fallback para conta da plataforma
+- [ ] Autorizar contas próprias PayPal — falta integração de autorização individual das contas Business
+- [ ] Cobrança de subscrições — preços Básico/Pro ainda por definir e conta de pagamentos por autorizar
+- [x] Confirmar administração com a conta existente e acesso dentro da aplicação
+- [x] Aplicar limites Free/Básico/Pro à navegação e aos acessos diretos
+- [x] Formulário Meta no painel e ação de subscrição do webhook
+- [ ] Ativar Meta — falta ID da aplicação e registo de pelo menos um número Business
 
 - [x] Consolidar catálogo de planos, limites no servidor e utilização por empresa
 - [x] Administração da plataforma: empresas, preços, cupões e concessões temporárias auditadas

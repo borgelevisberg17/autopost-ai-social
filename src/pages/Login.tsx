@@ -3,6 +3,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { AuthShell } from "@/components/auth/AuthShell";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -20,7 +21,7 @@ export default function Login() {
 
   useEffect(() => {
     if (user) {
-      navigate(from, { replace: true });
+      void supabase.rpc("has_platform_admin", { _user: user.id }).then(({ data }) => navigate(from === "/dashboard" && data === true ? "/plataforma" : from, { replace: true }));
     }
   }, [user, navigate, from]);
 
@@ -33,7 +34,9 @@ export default function Login() {
     const { error } = await signIn(email.trim(), password);
 
     if (!error) {
-      navigate(from, { replace: true });
+      const { data: { user: signedIn } } = await supabase.auth.getUser();
+      const { data: admin } = signedIn ? await supabase.rpc("has_platform_admin", { _user: signedIn.id }) : { data: false };
+      navigate(from === "/dashboard" && admin === true ? "/plataforma" : from, { replace: true });
     }
 
     setIsLoading(false);
