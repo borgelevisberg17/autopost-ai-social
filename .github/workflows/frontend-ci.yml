@@ -31,5 +31,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm ci
+      # Lovable may update package.json before its lockfile is synced.
+      # Install from the manifest so CI can still validate the production build.
+      - run: npm install --no-audit --no-fund
       - run: npm run build
