@@ -42,6 +42,7 @@ export function IntegrationSettings({ companyId }: { companyId?: string }) {
       const { data, error } = await supabase.functions.invoke("whatsapp-verify-number", {
         body: {
           company_id: companyId,
+          phone_number: whatsapp.phone_number.trim(),
           phone_number_id: whatsapp.phone_number_id.trim(),
           waba_id: whatsapp.waba_id.trim(),
         },
