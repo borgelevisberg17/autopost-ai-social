@@ -146,7 +146,7 @@ Deno.serve(async (req) => {
         metadata: { days, metrics, ...extra },
       }).eq("id", run.id);
 
-    if (valid.length === 0 && (posts ?? []).length === 0) {
+    if (valid.length === 0 && yearOrders.length === 0 && (posts ?? []).length === 0) {
       await finish("success", "Sem vendas nem posts no período — nada para analisar.");
       return json({ metrics, insights: null, empty: true });
     }

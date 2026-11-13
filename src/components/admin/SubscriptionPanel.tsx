@@ -9,7 +9,12 @@ export function SubscriptionPanel({ companyId }: { companyId: string }) {
   const [value, setValue] = useState<Entitlement | null>(null);
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
-  useEffect(() => { setValue(null); void supabase.rpc("company_entitlement", { _company: companyId }).then(({ data, error }) => { if (error) toast.error(error.message); else setValue(data as unknown as Entitlement); }); }, [companyId]);
+  useEffect(() => {
+    setValue(null);
+    const load = () => { void supabase.rpc("company_entitlement", { _company: companyId }).then(({ data, error }) => { if (error) toast.error(error.message); else setValue(data as unknown as Entitlement); }); };
+    load(); window.addEventListener("subscription-usage-changed", load);
+    return () => window.removeEventListener("subscription-usage-changed", load);
+  }, [companyId]);
   async function redeem() {
     setBusy(true);
     const { data, error } = await supabase.rpc("redeem_company_coupon", { _company: companyId, _code: code });

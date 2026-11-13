@@ -44,7 +44,8 @@ export default function Platform() {
   async function load() {
     const [o, p, m] = await Promise.all([supabase.rpc("platform_overview"), supabase.from("subscription_plans").select("*"), supabase.rpc("get_platform_subscription_metrics")]);
     if (o.error) { setError("Acesso reservado à administração da plataforma."); return; }
-    setError(""); setData(o.data as unknown as Overview); setPlans(p.data ?? []); setMetrics(m.data ?? []);
+    const overview = o.data as unknown as Overview;
+    setError(""); setData(overview); setSelected(current => current ? overview.companies.find(c => c.id === current.id) ?? null : null); setPlans(p.data ?? []); setMetrics(m.data ?? []);
   }
   useEffect(() => { void load(); }, []);
   async function save(action: string, values: Record<string, unknown>) {

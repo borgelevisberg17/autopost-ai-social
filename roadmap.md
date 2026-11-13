@@ -1,8 +1,9 @@
 # Roadmap
 
-- [ ] Consolidar catálogo de planos, limites no servidor e utilização por empresa
-- [ ] Administração da plataforma: empresas, preços, cupões e concessões temporárias auditadas
-- [ ] Republicar análise e validar gráficos e restrições de subscrição
+- [x] Consolidar catálogo de planos, limites no servidor e utilização por empresa
+- [x] Administração da plataforma: empresas, preços, cupões e concessões temporárias auditadas
+- [x] Republicar análise e validar gráficos e restrições de subscrição
+- [ ] Cobrança recorrente dos planos e aplicação financeira dos cupões — depende de configuração Stripe/PayPal da plataforma
 
 - [x] Empresas (multiempresa, moeda própria)
 - [x] Produtos e stock

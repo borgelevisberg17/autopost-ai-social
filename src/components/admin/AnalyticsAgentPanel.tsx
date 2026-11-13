@@ -20,6 +20,7 @@ export function AnalyticsAgentPanel({ companyId, days }: { companyId: string; da
       body: { company_id: companyId, days },
     });
     setLoading(false);
+    window.dispatchEvent(new Event("subscription-usage-changed"));
     if (error) {
       let msg = "Não foi possível analisar agora.";
       if (error instanceof FunctionsHttpError) {
