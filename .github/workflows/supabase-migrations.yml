@@ -37,15 +37,15 @@ jobs:
           test -n "$SUPABASE_DB_PASSWORD" || { echo "::error::Missing SUPABASE_DB_PASSWORD repository secret"; exit 1; }
 
       - name: Install Supabase CLI
-        uses: supabase/setup-cli@v1
+        uses: supabase/setup-cli@v3
         with:
-          version: 2.76.4
+          version: 2.84.2
 
       - name: Link production project
         run: supabase link --project-ref "$SUPABASE_PROJECT_ID" --password "$SUPABASE_DB_PASSWORD"
 
       - name: Preview pending migrations
-        run: supabase db push --linked --dry-run
+        run: supabase db push --remote --dry-run
 
       - name: Apply pending migrations
-        run: supabase db push --linked --yes
+        run: supabase db push --remote --yes
