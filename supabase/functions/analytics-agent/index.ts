@@ -31,14 +31,14 @@ Deno.serve(async (req) => {
     const [companyResult, productsResult, ordersResult, postsResult, variantsResult, subResult, yearOrdersResult, subscriptionEventsResult] = await Promise.all([
       db.from("companies").select("name,currency,description").eq("id", companyId).single(),
       db.from("products").select("id,name,category,price,promo_price,stock,active").eq("company_id", companyId),
-      db.from("orders").select("id,status,total,created_at,order_items(product_id,product_name,quantity,unit_price,variant_id,variant_name)")
+      db.from("orders").select("id,status,payment_status,total,created_at,order_items(product_id,product_name,quantity,unit_price,variant_id,variant_name)")
         .eq("company_id", companyId).gte("created_at", since).limit(2000),
       db.from("agent_actions").select("platform,status,product_id,created_at")
         .eq("company_id", companyId).eq("action", "CREATE_POST").gte("created_at", since).limit(2000),
       db.from("product_variants").select("id,product_id,name,stock,active").eq("company_id", companyId),
       db.from("company_subscriptions").select("plan,status").eq("company_id", companyId).maybeSingle(),
-      db.from("orders").select("total,status,created_at").eq("company_id", companyId)
-        .gte("created_at", yearAgo.toISOString()).neq("status", "cancelled").limit(10000),
+      db.from("orders").select("total,status,payment_status,created_at").eq("company_id", companyId)
+        .gte("created_at", yearAgo.toISOString()).neq("status", "cancelled").eq("payment_status", "paid").limit(10000),
       db.from("company_subscription_events").select("company_id,plan,status,event_type,recorded_at")
         .eq("company_id", companyId).gte("recorded_at", yearAgo.toISOString()).order("recorded_at", { ascending: true }).limit(20000),
     ]);
@@ -59,12 +59,13 @@ Deno.serve(async (req) => {
 
     // Aggregate real numbers server-side — the AI only interprets them.
     const valid = (orders ?? []).filter((o) => o.status !== "cancelled");
-    const revenue = valid.reduce((s, o) => s + Number(o.total), 0);
+    const paidOrders = valid.filter((o) => o.payment_status === "paid");
+    const revenue = paidOrders.reduce((s, o) => s + Number(o.total), 0);
     const byProduct = new Map<string, { nome: string; unidades: number; receita: number }>();
     const byHour = new Array(24).fill(0);
     const byCategory = new Map<string, number>();
     const prodMap = new Map((products ?? []).map((p) => [p.id, p]));
-    for (const o of valid) {
+    for (const o of paidOrders) {
       byHour[new Date(o.created_at).getUTCHours()]++;
       for (const i of o.order_items ?? []) {
         const k = i.product_id ?? i.product_name;
@@ -77,7 +78,7 @@ Deno.serve(async (req) => {
     }
     // Variant sales
     const byVariant = new Map<string, { produto: string; variante: string; unidades: number }>();
-    for (const o of valid) for (const i of o.order_items ?? []) {
+    for (const o of paidOrders) for (const i of o.order_items ?? []) {
       if (!i.variant_id) continue;
       const cur = byVariant.get(i.variant_id) ?? { produto: i.product_name, variante: i.variant_name ?? "?", unidades: 0 };
       cur.unidades += i.quantity; byVariant.set(i.variant_id, cur);
@@ -123,8 +124,8 @@ Deno.serve(async (req) => {
     }));
     const metrics = {
       periodo_dias: days, moeda: company?.currency,
-      pedidos: valid.length, cancelados: (orders ?? []).length - valid.length,
-      receita: revenue, ticket_medio: valid.length ? revenue / valid.length : 0,
+      pedidos: valid.length, pedidos_pagos: paidOrders.length, cancelados: (orders ?? []).length - valid.length,
+      receita: revenue, ticket_medio: paidOrders.length ? revenue / paidOrders.length : 0,
       mais_vendidos: top, receita_por_categoria: Object.fromEntries(byCategory),
       pedidos_por_hora_utc: byHour, produtos_sem_vendas: parados,
       promovidos_sem_vendas: promovidosSemVenda, baixo_stock: baixoStock,
