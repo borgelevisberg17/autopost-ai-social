@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/sheet";
 import { formatMoney } from "@/lib/format";
 import { toast } from "sonner";
-import { rememberOrder } from "@/lib/myOrders";
+import { rememberOrder, saveOrderItems } from "@/lib/myOrders";
 import { MyOrders } from "@/components/store/MyOrders";
 import { StoreFooter } from "@/components/store/StoreFooter";
 import { StoreFAQ } from "@/components/store/StoreFAQ";
@@ -492,6 +492,17 @@ export default function Store() {
     );
 
     rememberOrder(slug, String(data));
+    saveOrderItems(
+      String(data),
+      cartItems.map((item) => ({
+        product_name: item.product.name,
+        quantity: item.quantity,
+        unit_price: item.product.price,
+        image: item.product.images?.[0],
+        size: item.size,
+        color: item.color,
+      })),
+    );
     closeCart();
     navigate(`/loja/${slug}/pedido/${String(data)}`);
 

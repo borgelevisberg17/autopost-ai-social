@@ -29,7 +29,7 @@ interface StoreFooterProps {
  * Multicaixa Express official vector logo component.
  * Inlined to guarantee 100% reliable rendering without mask or image sandbox issues.
  */
-function MulticaixaExpressLogo({ className }: { className?: string }) {
+export function MulticaixaExpressLogo({ className }: { className?: string }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
