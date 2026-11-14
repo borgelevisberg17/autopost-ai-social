@@ -32,12 +32,15 @@ interface StoreFooterProps {
  * Multicaixa Express official vector logo component.
  * Inlined to guarantee 100% reliable rendering without mask or image sandbox issues.
  */
-function MulticaixaExpressLogo({ className = "h-4.5 w-auto" }: { className?: string }) {
+function MulticaixaExpressLogo({ className }: { className?: string }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 280 42"
-      className={className}
+      width="100"
+      height="18"
+      style={{ height: "18px", width: "auto" }}
+      className={className || "h-[18px] w-auto max-w-[100px] shrink-0"}
       fill="none"
     >
       {/* MULTICAIXA WORDMARK */}
@@ -415,7 +418,7 @@ export function StoreFooter({
       </div>
 
       {/* 4. PAYMENT BADGES & BOTTOM COPYRIGHT BAR */}
-      <div className="bg-black/30 py-6 sm:py-8">
+      <div className="bg-black/30 pt-6 sm:pt-8 pb-28 sm:pb-8">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             {/* Payment methods: Label on top row, logos on row below (no hover effect) */}
@@ -427,19 +430,22 @@ export function StoreFooter({
                 {/* Multicaixa Express (Official vector logo) */}
                 <div
                   title="Multicaixa Express"
-                  className="h-8 px-2.5 py-1 bg-white rounded-md flex items-center justify-center shadow-xs select-none"
+                  className="h-8 min-w-[95px] px-2.5 py-1 bg-white rounded-md flex items-center justify-center shadow-xs shrink-0 select-none"
                 >
-                  <MulticaixaExpressLogo className="h-4.5 w-auto max-w-[110px]" />
+                  <MulticaixaExpressLogo className="h-[18px] w-auto max-w-[100px] shrink-0" />
                 </div>
 
                 {/* Transferência Bancária (IBAN) - Robust React DOM Emblem */}
                 <div
                   title="Transferência Bancária (IBAN)"
-                  className="h-8 px-2.5 py-1 bg-white rounded-md flex items-center gap-1.5 shadow-xs select-none"
+                  className="h-8 px-2.5 py-1 bg-white rounded-md flex items-center gap-1.5 shadow-xs shrink-0 select-none"
                 >
                   <svg
                     viewBox="0 0 28 28"
-                    className="h-4.5 w-4.5 text-[#002133] shrink-0"
+                    width="18"
+                    height="18"
+                    style={{ width: "18px", height: "18px" }}
+                    className="w-[18px] h-[18px] text-[#002133] shrink-0"
                     fill="currentColor"
                   >
                     <polygon points="14,2 1,9 27,9" />
@@ -464,36 +470,45 @@ export function StoreFooter({
                 {/* Visa */}
                 <div
                   title="Cartão Visa"
-                  className="h-8 px-2.5 py-1 bg-white rounded-md flex items-center justify-center shadow-xs select-none"
+                  className="h-8 px-2.5 py-1 bg-white rounded-md flex items-center justify-center shadow-xs shrink-0 select-none"
                 >
                   <img
                     src="/media/payments/visa.svg"
                     alt="Visa"
-                    className="h-3.5 sm:h-4 w-auto max-w-[45px] object-contain"
+                    width="38"
+                    height="13"
+                    style={{ height: "13px", width: "auto" }}
+                    className="h-[13px] w-auto max-w-[42px] object-contain shrink-0"
                   />
                 </div>
 
                 {/* Mastercard */}
                 <div
                   title="Cartão Mastercard"
-                  className="h-8 px-2.5 py-1 bg-white rounded-md flex items-center justify-center shadow-xs select-none"
+                  className="h-8 px-2.5 py-1 bg-white rounded-md flex items-center justify-center shadow-xs shrink-0 select-none"
                 >
                   <img
                     src="/media/payments/mastercard.svg"
                     alt="Mastercard"
-                    className="h-5 sm:h-5.5 w-auto max-w-[36px] object-contain"
+                    width="28"
+                    height="18"
+                    style={{ height: "18px", width: "auto" }}
+                    className="h-[18px] w-auto max-w-[34px] object-contain shrink-0"
                   />
                 </div>
 
                 {/* PayPal */}
                 <div
                   title="PayPal"
-                  className="h-8 px-2.5 py-1 bg-white rounded-md flex items-center justify-center shadow-xs select-none"
+                  className="h-8 px-2.5 py-1 bg-white rounded-md flex items-center justify-center shadow-xs shrink-0 select-none"
                 >
                   <img
                     src="/media/payments/paypal.svg"
                     alt="PayPal"
-                    className="h-4 sm:h-4.5 w-auto max-w-[65px] object-contain"
+                    width="56"
+                    height="15"
+                    style={{ height: "15px", width: "auto" }}
+                    className="h-[15px] w-auto max-w-[62px] object-contain shrink-0"
                   />
                 </div>
               </div>
