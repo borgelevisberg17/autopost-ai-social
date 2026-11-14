@@ -560,19 +560,19 @@ export default function Conversations() {
   const isDark = theme === "dark";
 
   return (
-    <AdminLayout title="Conversas WhatsApp">
-      {/* UNIFIED WHATSAPP WEB APPLICATION FRAME */}
+    <AdminLayout title="Conversas WhatsApp" fullBleed>
+      {/* FULL-BLEED INTEGRATED WHATSAPP SUITE */}
       <div
-        className={`w-full h-[calc(100vh-130px)] min-h-[640px] max-h-[920px] rounded-2xl border shadow-xl flex flex-col overflow-hidden transition-colors ${
+        className={`w-full h-full flex flex-col overflow-hidden transition-colors ${
           isDark
-            ? "bg-[#111b21] border-[#222d34] text-[#e9edef]"
-            : "bg-white border-[#d1d7db] text-[#111b21]"
+            ? "bg-[#111b21] text-[#e9edef]"
+            : "bg-white text-slate-900"
         }`}
       >
-        {/* 1. TOP COMMAND BAR (Integrated directly into the frame) */}
+        {/* 1. TOP COMMAND TOOLBAR (Integrated directly into the workspace) */}
         <header
-          className={`flex items-center justify-between px-4 py-2.5 border-b shrink-0 select-none ${
-            isDark ? "bg-[#202c33] border-[#2a3942]" : "bg-[#f0f2f5] border-[#e9edef]"
+          className={`flex items-center justify-between px-4 py-2 border-b shrink-0 select-none ${
+            isDark ? "bg-[#202c33] border-[#2a3942]" : "bg-white border-slate-200/80"
           }`}
         >
           {/* Left: WhatsApp Business Status */}

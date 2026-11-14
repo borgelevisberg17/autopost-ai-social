@@ -217,22 +217,22 @@ export function CommandPalette({
         role="dialog"
         aria-modal="true"
         aria-label="Pesquisa global"
-        className="w-full max-w-2xl overflow-hidden rounded-[5px] border border-[#e4e0d7] bg-[#fffdf9] shadow-[0_24px_80px_rgba(32,37,34,0.2)]"
+        className="w-full max-w-2xl overflow-hidden rounded-xl border border-slate-200/90 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.18)]"
       >
-        <div className="flex items-center border-b border-[#e9e5dc] px-4">
-          <Search className="h-4 w-4 shrink-0 text-[#687168]" />
+        <div className="flex items-center border-b border-slate-100 px-4">
+          <Search className="h-4 w-4 shrink-0 text-slate-400" />
           <input
             autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Pesquisar em Vendora (produtos, pedidos, clientes, navegar...)"
-            className="h-14 w-full bg-transparent px-3 text-sm text-[#202522] outline-none placeholder:text-[#9a9e96]"
+            className="h-14 w-full bg-transparent px-3 text-sm text-slate-900 outline-none placeholder:text-slate-400"
           />
           <button
             type="button"
             onClick={onClose}
             aria-label="Fechar pesquisa"
-            className="grid h-8 w-8 place-items-center text-[#858c83] transition hover:bg-[#f1eee7] hover:text-[#202522]"
+            className="grid h-8 w-8 place-items-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
           >
             <X className="h-4 w-4" />
           </button>
@@ -293,11 +293,11 @@ export function CommandPalette({
           )}
         </div>
 
-        <div className="flex items-center justify-between border-t border-[#e9e5dc] bg-[#faf9f4] px-4 py-2.5 text-[10px] text-[#858c83]">
+        <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50/80 px-4 py-2.5 text-[11px] text-slate-500">
           <span>
             Dica: Use <strong>⌘ K</strong> para abrir/fechar
           </span>
-          <span>Vendora Commerce OS</span>
+          <span className="font-medium text-slate-600">Vendora Commerce OS</span>
         </div>
       </div>
     </div>

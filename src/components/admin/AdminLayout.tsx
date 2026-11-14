@@ -15,6 +15,8 @@ import {
   Box,
   Check,
   CheckSquare,
+  ChevronRight,
+  ChevronsUpDown,
   ExternalLink,
   LayoutDashboard,
   Loader2,
@@ -29,6 +31,7 @@ import {
   Settings,
   Share2,
   ShoppingBag,
+  Store,
   Users,
   X,
 } from "lucide-react";
@@ -41,6 +44,11 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useEntitlement } from "@/hooks/useEntitlement";
 import { routeAllowed } from "@/lib/planAccess";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 type Notification = {
   id: string;
@@ -54,12 +62,18 @@ type Notification = {
 
 const navSections = [
   {
-    label: "Loja",
+    label: "Comércio",
     items: [
       {
         to: "/dashboard",
         icon: LayoutDashboard,
         label: "Visão geral",
+      },
+      {
+        to: "/admin/pedidos",
+        icon: ShoppingBag,
+        label: "Pedidos",
+        badgeKey: "orders",
       },
       {
         to: "/admin/produtos",
@@ -72,11 +86,6 @@ const navSections = [
         label: "Inventário",
       },
       {
-        to: "/admin/pedidos",
-        icon: ShoppingBag,
-        label: "Pedidos",
-      },
-      {
         to: "/admin/clientes",
         icon: Users,
         label: "Clientes",
@@ -86,25 +95,31 @@ const navSections = [
         icon: CreditCard,
         label: "Pagamentos",
       },
+    ],
+  },
+  {
+    label: "Comunicação & Vendas",
+    items: [
       {
         to: "/admin/conversas",
         icon: MessageCircle,
-        label: "Conversas",
+        label: "Conversas WhatsApp",
+        isWhatsApp: true,
+      },
+      {
+        to: "/admin/canais",
+        icon: Share2,
+        label: "Canais de Venda",
       },
     ],
   },
   {
-    label: "Automação",
+    label: "Automação & IA",
     items: [
       {
         to: "/admin/agentes",
         icon: Bot,
-        label: "Agentes",
-      },
-      {
-        to: "/admin/aprovacoes",
-        icon: CheckSquare,
-        label: "Aprovações",
+        label: "Agentes IA",
       },
       {
         to: "/admin/conteudo",
@@ -117,6 +132,11 @@ const navSections = [
         label: "Automações",
       },
       {
+        to: "/admin/aprovacoes",
+        icon: CheckSquare,
+        label: "Aprovações",
+      },
+      {
         to: "/admin/atividade",
         icon: Activity,
         label: "Atividade",
@@ -124,28 +144,13 @@ const navSections = [
     ],
   },
   {
-    label: "Análise",
+    label: "Gestão & Definições",
     items: [
       {
         to: "/admin/analytics",
         icon: BarChart3,
         label: "Analytics",
       },
-    ],
-  },
-  {
-    label: "Canais",
-    items: [
-      {
-        to: "/admin/canais",
-        icon: Share2,
-        label: "Canais",
-      },
-    ],
-  },
-  {
-    label: "Definições",
-    items: [
       {
         to: "/admin/config",
         icon: Settings,
@@ -159,7 +164,7 @@ const navSections = [
       {
         to: "/admin/auditoria",
         icon: FileClock,
-        label: "Audit log",
+        label: "Auditoria",
       },
     ],
   },
@@ -172,24 +177,24 @@ const mobileNav = [
     label: "Início",
   },
   {
-    to: "/admin/produtos",
-    icon: Package,
-    label: "Produtos",
-  },
-  {
     to: "/admin/pedidos",
     icon: ShoppingBag,
     label: "Pedidos",
   },
   {
+    to: "/admin/conversas",
+    icon: MessageCircle,
+    label: "Conversas",
+  },
+  {
+    to: "/admin/produtos",
+    icon: Package,
+    label: "Produtos",
+  },
+  {
     to: "/admin/clientes",
     icon: Users,
     label: "Clientes",
-  },
-  {
-    to: "/admin/canais",
-    icon: Share2,
-    label: "Canais",
   },
 ];
 
@@ -199,10 +204,12 @@ export function AdminLayout({
   title,
   actions,
   children,
+  fullBleed,
 }: {
   title: string;
   actions?: ReactNode;
   children: ReactNode;
+  fullBleed?: boolean;
 }) {
   const {
     company,
@@ -214,12 +221,29 @@ export function AdminLayout({
   } = useCompany();
   const { signOut, user } = useAuth();
   const { data: entitlement } = useEntitlement();
-  const allowedSections = navSections.map(section => ({ ...section, items: section.items.filter(item => routeAllowed(item.to, entitlement ?? null)) })).filter(section => section.items.length > 0);
+  const allowedSections = navSections
+    .map((section) => ({
+      ...section,
+      items: section.items.filter((item) =>
+        routeAllowed(item.to, entitlement ?? null),
+      ),
+    }))
+    .filter((section) => section.items.length > 0);
+
   const [platformAdmin, setPlatformAdmin] = useState(false);
+  const [storeSwitcherOpen, setStoreSwitcherOpen] = useState(false);
+  const [pendingOrdersCount, setPendingOrdersCount] = useState<number>(0);
+  const [openConvoCount, setOpenConvoCount] = useState<number>(0);
+
   useEffect(() => {
     setPlatformAdmin(false);
-    if (user) void supabase.rpc("has_platform_admin", { _user: user.id }).then(({ data }) => setPlatformAdmin(data === true));
+    if (user) {
+      void supabase
+        .rpc("has_platform_admin", { _user: user.id })
+        .then(({ data }) => setPlatformAdmin(data === true));
+    }
   }, [user]);
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -229,6 +253,29 @@ export function AdminLayout({
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const moreTriggerRef = useRef<HTMLButtonElement>(null);
   const moreDialogRef = useRef<HTMLElement>(null);
+
+  // Quick stats query for sidebar indicators
+  useEffect(() => {
+    if (!company?.id) return;
+
+    void supabase
+      .from("orders")
+      .select("id", { count: "exact", head: true })
+      .eq("company_id", company.id)
+      .eq("status", "pending")
+      .then(({ count }) => {
+        if (typeof count === "number") setPendingOrdersCount(count);
+      });
+
+    void supabase
+      .from("conversations")
+      .select("id", { count: "exact", head: true })
+      .eq("company_id", company.id)
+      .neq("status", "closed")
+      .then(({ count }) => {
+        if (typeof count === "number") setOpenConvoCount(count);
+      });
+  }, [company?.id]);
 
   useEffect(() => {
     const handleShortcut = (event: KeyboardEvent) => {
@@ -307,23 +354,30 @@ export function AdminLayout({
 
   if (loading) {
     return (
-      <div className="grid min-h-screen place-items-center bg-[#fffdf9]">
-        <Loader2 className="h-5 w-5 animate-spin text-[#747b73]" />
+      <div className="grid min-h-screen place-items-center bg-[#f8fafc]">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
+          <p className="text-xs font-medium text-slate-500">A carregar Vendora...</p>
+        </div>
       </div>
     );
   }
 
   if (companyError) {
     return (
-      <main className="grid min-h-screen place-items-center bg-[#f6f3ed] px-5 text-[#202522]">
-        <div className="w-full max-w-sm border border-[#ded9d0] bg-[#fffdf9] p-6 text-center">
-          <p className="font-serif text-xl">
-            Não foi possível carregar a sua loja.
+      <main className="grid min-h-screen place-items-center bg-[#f8fafc] px-5 text-slate-900">
+        <div className="w-full max-w-sm rounded-xl border border-slate-200 bg-white p-6 text-center shadow-lg">
+          <Store className="mx-auto mb-3 h-10 w-10 text-slate-400" />
+          <h2 className="text-lg font-bold text-slate-900">
+            Não foi possível carregar a sua loja
+          </h2>
+          <p className="mt-1 text-xs text-slate-500">
+            Ocorreu um erro ao carregar as informações do seu negócio.
           </p>
           <button
             type="button"
             onClick={() => void reload()}
-            className="mt-5 h-10 bg-[#202522] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#2c6457]"
+            className="mt-5 h-10 w-full rounded-lg bg-slate-900 px-5 text-xs font-bold text-white transition hover:bg-slate-800"
           >
             Tentar novamente
           </button>
@@ -336,307 +390,424 @@ export function AdminLayout({
     return <Navigate to="/onboarding" replace />;
   }
 
+  const isFullBleed = fullBleed ?? title?.toLowerCase().includes("conversas");
+
   return (
-    <div className="min-h-screen bg-[#f6f3ed] text-[#202522]">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans antialiased selection:bg-emerald-500/20 selection:text-emerald-900">
       {/* COMMAND PALETTE */}
       <CommandPalette
         open={commandPaletteOpen}
         onClose={() => setCommandPaletteOpen(false)}
       />
 
-      {/* SIDEBAR */}
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-[252px] border-r border-[#eeeae2] bg-[#faf9f4] text-[#202522] lg:flex lg:flex-col">
-        {/* BRAND */}
-        <div className="px-6 pb-5 pt-6">
+      {/* MODERN EXECUTIVE SIDEBAR */}
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-[260px] border-r border-slate-200/80 bg-white text-slate-900 lg:flex lg:flex-col shadow-[1px_0_4px_rgba(0,0,0,0.02)]">
+        {/* BRAND LOCKUP */}
+        <div className="flex h-14 items-center justify-between px-5 border-b border-slate-100">
           <Link
             to="/dashboard"
-            className="inline-flex items-center gap-3 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-4"
+            className="inline-flex items-center gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
           >
             <img
               src="/vendora-mark.png"
-              alt=""
-              aria-hidden="true"
-              className="h-9 w-9"
+              alt="Vendora"
+              className="h-7 w-7 rounded-lg shadow-xs"
             />
-
-            <span className="font-serif text-[23px] font-medium tracking-[-0.045em] text-[#202522]">
-              Vendora
-            </span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[17px] font-bold tracking-tight text-slate-900">
+                Vendora
+              </span>
+              <span className="rounded bg-emerald-50 px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-emerald-700 border border-emerald-200/60">
+                OS
+              </span>
+            </div>
           </Link>
         </div>
 
-        {/* STORE SWITCHER */}
-        <div className="px-4">
-          <div className="border-b border-[#e5e1d8] pb-4">
-            <p className="mb-1.5 px-2 text-[10px] font-medium uppercase tracking-[0.16em] text-[#858c83]">
-              Sua loja
-            </p>
-
-            {companies.length > 1 ? (
-              <select
-                value={company.id}
-                onChange={(e) => select(e.target.value)}
-                aria-label="Selecionar loja"
-                className="h-10 w-full rounded-[4px] border border-[#e3dfd6] bg-[#fffdf9] px-3 text-xs font-medium text-[#202522] outline-none transition focus:border-[#2c6457] focus:ring-2 focus:ring-[#2c6457]/20"
-              >
-                {companies.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <div className="flex h-10 items-center rounded-[4px] border border-[#e3dfd6] bg-[#fffdf9] px-3">
-                <span className="truncate text-xs font-semibold">
-                  {company.name}
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* NAV */}
-        <nav className="flex-1 overflow-y-auto px-4 py-5">
-          <div className="space-y-5">
-            {allowedSections.map((section) => (
-              <section key={section.label}>
-                <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#858c83]">
-                  {section.label}
+        {/* WORKSPACE / STORE SELECTOR CHIP */}
+        <div className="px-3 py-3 border-b border-slate-100">
+          {companies.length > 1 ? (
+            <Popover open={storeSwitcherOpen} onOpenChange={setStoreSwitcherOpen}>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  className="group flex w-full items-center gap-2.5 rounded-xl border border-slate-200/80 bg-slate-50/70 p-2 text-left transition hover:border-slate-300 hover:bg-white hover:shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                >
+                  <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-slate-900 to-slate-700 text-xs font-bold text-white shadow-2xs">
+                    {company.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-xs font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">
+                      {company.name}
+                    </p>
+                    <p className="flex items-center gap-1 text-[10px] text-slate-500">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      Loja ativa
+                    </p>
+                  </div>
+                  <ChevronsUpDown className="h-3.5 w-3.5 shrink-0 text-slate-400 group-hover:text-slate-600" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[236px] p-1.5 shadow-xl rounded-xl border-slate-200" align="start">
+                <p className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  Suas lojas ({companies.length})
                 </p>
-
-                <div className="space-y-0.5">
-                  {section.items.map((item) => {
-                    const Icon = item.icon;
-
+                <div className="mt-1 space-y-0.5">
+                  {companies.map((c) => {
+                    const isCurrent = c.id === company.id;
                     return (
-                      <NavLink
-                        key={item.to}
-                        to={item.to}
-                        end
-                        className={({ isActive }) =>
-                          cn(
-                            "flex min-h-10 items-center gap-3 rounded-[6px] px-3 text-[13px] transition-colors",
-                            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2",
-                            isActive
-                              ? "bg-[#e7eadf] font-semibold text-[#202522]"
-                              : "font-medium text-[#666e66] hover:bg-[#f0efe9] hover:text-[#202522]",
-                          )
-                        }
+                      <button
+                        key={c.id}
+                        type="button"
+                        onClick={() => {
+                          select(c.id);
+                          setStoreSwitcherOpen(false);
+                        }}
+                        className={cn(
+                          "flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-xs font-medium transition",
+                          isCurrent
+                            ? "bg-slate-100 font-bold text-slate-900"
+                            : "text-slate-600 hover:bg-slate-50 hover:text-slate-900",
+                        )}
                       >
-                        <Icon className="h-4 w-4 shrink-0" strokeWidth={1.8} />
-
-                        <span>{item.label}</span>
-                      </NavLink>
+                        <div className="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-slate-200 text-[10px] font-bold text-slate-800">
+                          {c.name.charAt(0).toUpperCase()}
+                        </div>
+                        <span className="truncate flex-1 text-left">{c.name}</span>
+                        {isCurrent && <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" />}
+                      </button>
                     );
                   })}
                 </div>
-              </section>
-            ))}
-          </div>
+              </PopoverContent>
+            </Popover>
+          ) : (
+            <div className="flex w-full items-center gap-2.5 rounded-xl border border-slate-200/80 bg-slate-50/70 p-2 text-left">
+              <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-slate-900 to-slate-700 text-xs font-bold text-white shadow-2xs">
+                {company.name.charAt(0).toUpperCase()}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-xs font-bold text-slate-900">
+                  {company.name}
+                </p>
+                <p className="flex items-center gap-1 text-[10px] text-slate-500">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  Loja online
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* NAVIGATION LIST */}
+        <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-4">
+          {allowedSections.map((section) => (
+            <section key={section.label}>
+              <p className="mb-1.5 px-2.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                {section.label}
+              </p>
+
+              <div className="space-y-0.5">
+                {section.items.map((item) => {
+                  const Icon = item.icon;
+                  const isWhatsApp = "isWhatsApp" in item && item.isWhatsApp;
+                  const isOrders = item.to === "/admin/pedidos";
+
+                  return (
+                    <NavLink
+                      key={item.to}
+                      to={item.to}
+                      end
+                      className={({ isActive }) =>
+                        cn(
+                          "group flex h-9 items-center gap-2.5 rounded-lg px-2.5 text-[13px] font-medium transition-all",
+                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500",
+                          isActive
+                            ? "bg-slate-900 text-white font-semibold shadow-xs"
+                            : "text-slate-600 hover:bg-slate-100/70 hover:text-slate-900",
+                        )
+                      }
+                    >
+                      {({ isActive }) => (
+                        <>
+                          <Icon
+                            className={cn(
+                              "h-4 w-4 shrink-0 transition-colors",
+                              isActive
+                                ? "text-white"
+                                : isWhatsApp
+                                ? "text-emerald-600 group-hover:text-emerald-700"
+                                : "text-slate-400 group-hover:text-slate-600",
+                            )}
+                            strokeWidth={isActive ? 2 : 1.75}
+                          />
+
+                          <span className="truncate">{item.label}</span>
+
+                          {/* Dynamic Badge Indicators */}
+                          {isWhatsApp && (
+                            <span
+                              className={cn(
+                                "ml-auto inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-bold transition-colors",
+                                isActive
+                                  ? "bg-emerald-500 text-white"
+                                  : "bg-emerald-50 text-emerald-700 border border-emerald-200/60",
+                              )}
+                            >
+                              <span
+                                className={cn(
+                                  "h-1.5 w-1.5 rounded-full animate-pulse",
+                                  isActive ? "bg-white" : "bg-emerald-500",
+                                )}
+                              />
+                              {openConvoCount > 0 ? openConvoCount : "Live"}
+                            </span>
+                          )}
+
+                          {isOrders && pendingOrdersCount > 0 && (
+                            <span
+                              className={cn(
+                                "ml-auto rounded-full px-1.5 py-0.5 text-[10px] font-bold",
+                                isActive
+                                  ? "bg-amber-400 text-slate-900"
+                                  : "bg-amber-100 text-amber-800",
+                              )}
+                            >
+                              {pendingOrdersCount}
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </NavLink>
+                  );
+                })}
+              </div>
+            </section>
+          ))}
         </nav>
 
-        {/* BOTTOM */}
-        <div className="border-t border-[#e5e1d8] px-4 py-3">
+        {/* SIDEBAR FOOTER */}
+        <div className="border-t border-slate-100 p-3 space-y-1.5">
           <a
             href={`/loja/${company.slug}`}
             target="_blank"
             rel="noreferrer"
-            className="flex min-h-10 items-center gap-3 rounded-[4px] px-3 text-[13px] font-medium text-[#666e66] transition-colors hover:bg-[#f0efe9] hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
+            className="flex h-9 items-center justify-between rounded-lg px-2.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-900"
           >
-            <ExternalLink className="h-4 w-4" strokeWidth={1.8} />
-            <span>Ver loja pública</span>
+            <span className="flex items-center gap-2">
+              <Store className="h-4 w-4 text-slate-400" />
+              <span>Ver loja pública</span>
+            </span>
+            <ExternalLink className="h-3.5 w-3.5 text-slate-400" />
           </a>
 
-          <button
-            type="button"
-            onClick={signOut}
-            className="mt-0.5 flex min-h-10 w-full items-center gap-3 rounded-[4px] px-3 text-[13px] font-medium text-[#777e76] transition-colors hover:bg-[#f0efe9] hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
-          >
-            <LogOut className="h-4 w-4" strokeWidth={1.8} />
-            <span>Sair</span>
-          </button>
+          <div className="flex items-center justify-between rounded-lg bg-slate-50 p-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-slate-200 text-xs font-bold text-slate-700">
+                {user?.email?.charAt(0).toUpperCase() ?? "U"}
+              </div>
+              <div className="min-w-0">
+                <p className="truncate text-xs font-bold text-slate-900">
+                  {user?.email?.split("@")[0] ?? "Utilizador"}
+                </p>
+                <p className="truncate text-[10px] text-slate-400">
+                  {user?.email ?? ""}
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={signOut}
+              title="Terminar sessão"
+              className="grid h-7 w-7 place-items-center rounded-lg text-slate-400 hover:bg-slate-200/60 hover:text-red-600 transition"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </aside>
 
-      {/* MAIN */}
-      <main className="min-w-0 pb-[calc(76px+env(safe-area-inset-bottom))] lg:ml-[252px] lg:pb-0">
-        {/* HEADER */}
+      {/* MAIN VIEWPORT CONTAINER */}
+      <main
+        className={cn(
+          "min-w-0 lg:ml-[260px]",
+          isFullBleed
+            ? "flex h-screen flex-col overflow-hidden pb-[calc(68px+env(safe-area-inset-bottom))] lg:pb-0"
+            : "min-h-screen pb-[calc(76px+env(safe-area-inset-bottom))] lg:pb-0",
+        )}
+      >
+        {/* SLEEK COMMAND HEADER */}
         <header
           aria-label={`${title} — navegação do painel`}
-          className="sticky top-0 z-30 border-b border-[#eeeae2] bg-[#f8f7f1]/95 backdrop-blur-sm"
+          className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between border-b border-slate-200/80 bg-white/85 px-4 backdrop-blur-md sm:px-6 lg:px-8 select-none"
         >
-          <div className="mx-auto flex min-h-[68px] max-w-[1480px] items-center justify-between gap-3 px-4 sm:min-h-[76px] sm:px-7 lg:px-10">
-            <div className="flex min-w-0 items-center gap-3">
+          {/* LEFT: BREADCRUMBS & CONTEXT */}
+          <div className="flex items-center gap-3 min-w-0">
+            <Link to="/dashboard" className="lg:hidden shrink-0">
               <img
                 src="/vendora-mark.png"
                 alt=""
-                aria-hidden="true"
-                className="h-8 w-8 shrink-0 lg:hidden"
+                className="h-7 w-7 rounded-lg"
               />
-              <div className="min-w-0">
-                {title === "Configurações" ? (
-                  <h1 className="truncate font-serif text-[21px] font-medium tracking-[-0.03em] text-[#202522] sm:text-[25px]">
-                    {title}
-                  </h1>
-                ) : (
-                  <p className="hidden font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-[#858c83] lg:block">
-                    Espaço de trabalho
-                  </p>
-                )}
-                {companies.length > 1 ? (
-                  <select
-                    value={company.id}
-                    onChange={(e) => select(e.target.value)}
-                    aria-label="Selecionar loja"
-                    className="mt-0.5 block w-full max-w-[190px] truncate bg-transparent text-[10px] font-medium text-[#687168] outline-none focus-visible:ring-2 focus-visible:ring-[#2c6457] lg:hidden"
-                  >
-                    {companies.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <p className="truncate text-[10px] text-[#858c83] lg:hidden">
-                    {company.name}
-                  </p>
-                )}
-              </div>
-            </div>
+            </Link>
 
-            <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+            <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-slate-500">
+              <span className="hidden sm:inline font-medium text-slate-400">
+                Painel
+              </span>
+              <ChevronRight className="hidden sm:inline h-3.5 w-3.5 text-slate-300" />
+              <span className="font-bold text-slate-900 text-xs sm:text-sm truncate">
+                {title}
+              </span>
+            </nav>
+          </div>
+
+          {/* RIGHT: SEARCH, STATUS, NOTIFICATIONS, ACTIONS */}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            {/* SEARCH COMMAND PALETTE TRIGGER */}
+            <button
+              type="button"
+              onClick={() => setCommandPaletteOpen(true)}
+              aria-label="Pesquisar pedidos, produtos e clientes"
+              className="flex h-9 items-center gap-2 rounded-lg border border-slate-200/80 bg-slate-50/70 px-2.5 text-left text-xs text-slate-500 shadow-2xs transition hover:border-slate-300 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 sm:w-[220px] md:w-[280px]"
+            >
+              <Search className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+              <span className="hidden flex-1 truncate sm:block">
+                Pesquisar (⌘K)...
+              </span>
+              <kbd className="hidden rounded border border-slate-200 bg-white px-1.5 py-0.5 font-mono text-[9px] text-slate-400 sm:block">
+                ⌘K
+              </kbd>
+            </button>
+
+            {/* LIVE STORE STATUS PILL */}
+            <span className="hidden md:inline-flex items-center gap-1.5 rounded-full border border-emerald-200/70 bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-800">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Loja Online
+            </span>
+
+            {/* NOTIFICATIONS DROPDOWN */}
+            <div className="relative">
               <button
                 type="button"
-                onClick={() => setCommandPaletteOpen(true)}
-                aria-label="Pesquisar pedidos, produtos e clientes"
-                className="group flex h-10 w-10 items-center justify-center gap-2 rounded-[4px] border border-[#e3dfd6] bg-[#fffdf9] px-3 text-left text-xs text-[#737a72] transition hover:border-[#b9c6b7] hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] sm:w-[min(32vw,290px)] sm:justify-start lg:w-[min(28vw,340px)]"
+                onClick={() => setNotificationsOpen((v) => !v)}
+                className="relative grid h-9 w-9 place-items-center rounded-lg border border-slate-200/80 bg-white text-slate-600 shadow-2xs transition hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                aria-label="Notificações"
+                aria-expanded={notificationsOpen}
               >
-                <Search className="h-4 w-4 shrink-0 text-[#687168]" />
-                <span className="hidden min-w-0 flex-1 truncate sm:block">
-                  Pesquisar pedidos, produtos, clientes...
-                </span>
-                <kbd className="ml-auto hidden shrink-0 border border-[#e5e1d8] bg-[#f8f7f1] px-1.5 py-0.5 font-mono text-[10px] text-[#858c83] lg:block">
-                  ⌘ K
-                </kbd>
+                <Bell className="h-4 w-4" />
+                {unreadCount > 0 && (
+                  <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white shadow-xs">
+                    {unreadCount}
+                  </span>
+                )}
               </button>
 
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setNotificationsOpen((v) => !v)}
-                  className="relative grid h-10 w-10 place-items-center rounded-[4px] border border-[#e3dfd6] bg-[#fffdf9] text-[#525c54] transition hover:border-[#b9c6b7] hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
-                  aria-label="Notificações"
-                  aria-expanded={notificationsOpen}
-                >
-                  <Bell className="h-4 w-4" />
-                  {unreadCount > 0 && (
-                    <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-[#bd592f] px-1 text-[9px] font-bold text-white">
-                      {unreadCount}
-                    </span>
-                  )}
-                </button>
-
-                {notificationsOpen && (
-                  <div className="fixed left-3 right-3 top-[76px] z-50 overflow-hidden rounded-[4px] border border-[#ded9d0] bg-[#fffdf9] shadow-[0_16px_48px_rgba(32,37,34,0.16)] sm:absolute sm:left-auto sm:right-0 sm:top-12 sm:w-96">
-                    <div className="flex items-center justify-between border-b border-[#e9e5dc] px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-[#202522]">
-                          Notificações
+              {notificationsOpen && (
+                <div className="fixed left-3 right-3 top-16 z-50 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl sm:absolute sm:left-auto sm:right-0 sm:top-11 sm:w-96">
+                  <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3 bg-slate-50/50">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-slate-900">
+                        Notificações
+                      </span>
+                      {unreadCount > 0 && (
+                        <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">
+                          {unreadCount} novas
                         </span>
-                        {unreadCount > 0 && (
-                          <span className="bg-[#e9eee9] px-1.5 py-0.5 text-[10px] font-semibold text-[#2c6457]">
-                            {unreadCount} novas
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-3">
-                        {unreadCount > 0 && (
-                          <button
-                            type="button"
-                            onClick={markAllAsRead}
-                            className="text-[11px] font-medium text-[#687168] hover:text-[#202522]"
-                          >
-                            Marcar lidas
-                          </button>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => setNotificationsOpen(false)}
-                          aria-label="Fechar notificações"
-                          className="grid h-7 w-7 place-items-center text-[#858c83] hover:bg-[#f1eee7] hover:text-[#202522]"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </div>
-                    <div className="max-h-[min(65vh,420px)] divide-y divide-[#eeeae2] overflow-y-auto">
-                      {notifications.length === 0 ? (
-                        <div className="p-8 text-center text-xs text-[#858c83]">
-                          Sem notificações de momento.
-                        </div>
-                      ) : (
-                        notifications.map((n) => (
-                          <button
-                            key={n.id}
-                            type="button"
-                            onClick={() => markAsRead(n.id, n.link)}
-                            className={cn(
-                              "w-full cursor-pointer p-4 text-left transition hover:bg-[#f5f4ee]",
-                              !n.read && "bg-[#f1f3ed]",
-                            )}
-                          >
-                            <span className="flex items-start justify-between gap-3">
-                              <span className="text-xs font-semibold text-[#202522]">
-                                {n.title}
-                              </span>
-                              {!n.read && (
-                                <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#e36c3f]" />
-                              )}
-                            </span>
-                            <span className="mt-1 block line-clamp-2 text-xs leading-5 text-[#687168]">
-                              {n.message}
-                            </span>
-                            <span className="mt-2 block font-mono text-[10px] text-[#92978e]">
-                              {new Intl.DateTimeFormat("pt-PT", {
-                                day: "2-digit",
-                                month: "short",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              }).format(new Date(n.created_at))}
-                            </span>
-                          </button>
-                        ))
                       )}
                     </div>
+                    <div className="flex items-center gap-2">
+                      {unreadCount > 0 && (
+                        <button
+                          type="button"
+                          onClick={markAllAsRead}
+                          className="text-[11px] font-semibold text-slate-500 hover:text-slate-900"
+                        >
+                          Marcar lidas
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setNotificationsOpen(false)}
+                        aria-label="Fechar notificações"
+                        className="grid h-6 w-6 place-items-center rounded-md text-slate-400 hover:bg-slate-200/60 hover:text-slate-700"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
                   </div>
-                )}
-              </div>
-
-              {actions}
-              {platformAdmin && <Button asChild variant="outline" size="sm"><Link to="/plataforma">Plataforma</Link></Button>}
+                  <div className="max-h-[360px] divide-y divide-slate-100 overflow-y-auto">
+                    {notifications.length === 0 ? (
+                      <div className="p-8 text-center text-xs text-slate-400">
+                        Sem notificações de momento.
+                      </div>
+                    ) : (
+                      notifications.map((n) => (
+                        <button
+                          key={n.id}
+                          type="button"
+                          onClick={() => markAsRead(n.id, n.link)}
+                          className={cn(
+                            "w-full cursor-pointer p-3.5 text-left transition hover:bg-slate-50",
+                            !n.read && "bg-emerald-50/40",
+                          )}
+                        >
+                          <span className="flex items-start justify-between gap-2">
+                            <span className="text-xs font-bold text-slate-900">
+                              {n.title}
+                            </span>
+                            {!n.read && (
+                              <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" />
+                            )}
+                          </span>
+                          <span className="mt-0.5 block line-clamp-2 text-xs text-slate-600">
+                            {n.message}
+                          </span>
+                          <span className="mt-1.5 block text-[10px] font-medium text-slate-400">
+                            {new Intl.DateTimeFormat("pt-PT", {
+                              day: "2-digit",
+                              month: "short",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            }).format(new Date(n.created_at))}
+                          </span>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
+
+            {actions}
+
+            {platformAdmin && (
+              <Button asChild variant="outline" size="sm" className="h-9 rounded-lg border-slate-200 text-xs font-semibold">
+                <Link to="/plataforma">Plataforma</Link>
+              </Button>
+            )}
           </div>
         </header>
 
-        {/* PAGE */}
+        {/* WORKSPACE PAGE CONTAINER */}
         <div
           className={cn(
-            title?.includes("Conversas")
-              ? "mx-auto w-full max-w-[1600px] px-2 py-2 sm:px-4 sm:py-3 lg:px-6 lg:py-4"
-              : "admin-workspace mx-auto w-full max-w-[1480px] px-4 py-6 sm:px-7 sm:py-8 lg:px-10 lg:py-10",
-            title !== "Configurações" && "admin-workspace--quiet",
+            isFullBleed
+              ? "flex-1 w-full overflow-hidden p-0 m-0"
+              : "admin-workspace mx-auto w-full max-w-[1440px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-8",
           )}
         >
           {children}
         </div>
       </main>
 
-      {/* MOBILE HEADER / NAV */}
+      {/* MOBILE BOTTOM NAVIGATION */}
       <nav
         aria-label="Navegação principal no telemóvel"
-        className="fixed inset-x-0 bottom-0 z-50 border-t border-[#eeeae2] bg-[#fbfaf6]/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_26px_rgba(32,37,34,0.06)] backdrop-blur-sm lg:hidden"
+        className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_20px_rgba(0,0,0,0.06)] backdrop-blur-md lg:hidden"
       >
-        <div className="mx-auto grid h-[68px] max-w-lg grid-cols-6">
+        <div className="mx-auto grid h-14 max-w-lg grid-cols-6">
           {mobileNav.map((item) => {
             const Icon = item.icon;
 
@@ -647,9 +818,9 @@ export function AdminLayout({
                 end
                 className={({ isActive }) =>
                   cn(
-                    "flex min-w-0 flex-col items-center justify-center gap-1 px-1 text-[10px] font-medium transition-colors",
-                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-inset",
-                    isActive ? "text-[#2c6457]" : "text-[#858c83]",
+                    "flex min-w-0 flex-col items-center justify-center gap-0.5 px-1 text-[10px] font-medium transition-colors",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500",
+                    isActive ? "text-emerald-700 font-bold" : "text-slate-500",
                   )
                 }
               >
@@ -657,13 +828,13 @@ export function AdminLayout({
                   <>
                     <span
                       className={cn(
-                        "grid h-7 w-10 place-items-center rounded-[7px] transition-colors",
-                        isActive && "bg-[#e7eadf]",
+                        "grid h-6 w-10 place-items-center rounded-lg transition-colors",
+                        isActive && "bg-emerald-50",
                       )}
                     >
                       <Icon
-                        className="h-[18px] w-[18px]"
-                        strokeWidth={isActive ? 2 : 1.7}
+                        className="h-4 w-4"
+                        strokeWidth={isActive ? 2.2 : 1.75}
                       />
                     </span>
 
@@ -681,31 +852,32 @@ export function AdminLayout({
             aria-label="Mais áreas do painel"
             onClick={() => setMoreOpen((open) => !open)}
             className={cn(
-              "flex min-w-0 flex-col items-center justify-center gap-1 px-1 text-[10px] font-medium transition-colors",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-inset",
-              moreActive || moreOpen ? "text-[#2c6457]" : "text-[#858c83]",
+              "flex min-w-0 flex-col items-center justify-center gap-0.5 px-1 text-[10px] font-medium transition-colors",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500",
+              moreActive || moreOpen ? "text-emerald-700 font-bold" : "text-slate-500",
             )}
           >
             <span
               className={cn(
-                "grid h-7 w-10 place-items-center rounded-[7px] transition-colors",
-                (moreActive || moreOpen) && "bg-[#e7eadf]",
+                "grid h-6 w-10 place-items-center rounded-lg transition-colors",
+                (moreActive || moreOpen) && "bg-emerald-50",
               )}
             >
-              <MoreHorizontal className="h-[18px] w-[18px]" strokeWidth={1.8} />
+              <MoreHorizontal className="h-4 w-4" strokeWidth={1.8} />
             </span>
             <span>Mais</span>
           </button>
         </div>
       </nav>
 
+      {/* MOBILE MORE MODAL */}
       {moreOpen && (
         <div className="fixed inset-0 z-[60] lg:hidden">
           <button
             type="button"
             aria-label="Fechar menu de áreas"
             onClick={() => setMoreOpen(false)}
-            className="absolute inset-0 bg-[#202522]/25"
+            className="absolute inset-0 bg-slate-900/40 backdrop-blur-xs"
           />
           <section
             role="dialog"
@@ -731,30 +903,30 @@ export function AdminLayout({
                 first.focus();
               }
             }}
-            className="absolute inset-x-0 bottom-0 max-h-[82dvh] overflow-hidden rounded-t-[16px] border-t border-[#e7e3da] bg-[#fbfaf6] pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-[0_-16px_48px_rgba(32,37,34,0.14)]"
+            className="absolute inset-x-0 bottom-0 max-h-[82dvh] overflow-hidden rounded-t-2xl border-t border-slate-200 bg-white pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-2xl"
           >
-            <div className="flex items-center justify-between px-5 pb-3 pt-5">
+            <div className="flex items-center justify-between px-5 pb-3 pt-4 border-b border-slate-100">
               <div>
-                <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#747b73]">
-                  Vendora · painel
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  Vendora Commerce OS
                 </p>
                 <h2
                   id="mobile-more-title"
-                  className="mt-1 font-serif text-xl tracking-[-0.03em] text-[#202522]"
+                  className="text-base font-bold text-slate-900"
                 >
-                  Explorar áreas
+                  Todas as áreas
                 </h2>
               </div>
               <button
                 type="button"
                 onClick={() => setMoreOpen(false)}
                 aria-label="Fechar menu de áreas"
-                className="grid h-10 w-10 place-items-center rounded-full text-[#5f625d] hover:bg-[#efede6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+                className="grid h-8 w-8 place-items-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <div className="max-h-[calc(82dvh-90px)] space-y-5 overflow-y-auto px-5 pb-3">
+            <div className="max-h-[calc(82dvh-80px)] space-y-4 overflow-y-auto px-5 py-4">
               {allowedSections.map((section) => {
                 const items = section.items.filter(
                   (item) => !mobilePrimaryRoutes.has(item.to),
@@ -762,7 +934,7 @@ export function AdminLayout({
                 if (items.length === 0) return null;
                 return (
                   <section key={section.label}>
-                    <h3 className="mb-2 font-mono text-[9px] uppercase tracking-[0.14em] text-[#858c83]">
+                    <h3 className="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
                       {section.label}
                     </h3>
                     <div className="grid grid-cols-2 gap-2">
@@ -775,15 +947,15 @@ export function AdminLayout({
                             onClick={() => setMoreOpen(false)}
                             className={({ isActive }) =>
                               cn(
-                                "flex min-h-12 items-center gap-3 rounded-[7px] px-3 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]",
+                                "flex min-h-11 items-center gap-2.5 rounded-lg px-3 text-xs font-semibold transition",
                                 isActive
-                                  ? "bg-[#e7eadf] text-[#202522]"
-                                  : "bg-[#f1eee7] text-[#5f625d] hover:bg-[#ebe8df]",
+                                  ? "bg-slate-900 text-white"
+                                  : "bg-slate-50 text-slate-700 hover:bg-slate-100",
                               )
                             }
                           >
                             <Icon
-                              className="h-4 w-4 shrink-0 text-[#2c6457]"
+                              className="h-4 w-4 shrink-0 text-emerald-600"
                               strokeWidth={1.8}
                             />
                             <span className="min-w-0 truncate">
