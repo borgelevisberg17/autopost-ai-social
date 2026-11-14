@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
   ArrowRight,
@@ -623,10 +624,37 @@ export default function Store() {
             <span className="store-header__divider" aria-hidden="true" />
             <button type="button" onClick={openCart} aria-label={cartCount ? `Abrir carrinho com ${cartCount} itens` : "Abrir carrinho"} className="store-cart-icon">
               <ShoppingCart className="h-[19px] w-[19px]" />
-              {cartCount > 0 && <span className="store-cart-count">{cartCount}</span>}
+              {cartCount > 0 && (
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={cartCount}
+                    initial={{ scale: 0.6 }}
+                    animate={{ scale: 1 }}
+                    exit={{ scale: 0.6 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 20 }}
+                    className="store-cart-count"
+                  >
+                    {cartCount}
+                  </motion.span>
+                </AnimatePresence>
+              )}
             </button>
             <button type="button" onClick={openCart} className="store-cart-button">
-              Carrinho{cartCount > 0 && <span className="store-cart-button__count">{cartCount}</span>}
+              Carrinho
+              {cartCount > 0 && (
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={cartCount}
+                    initial={{ scale: 0.6 }}
+                    animate={{ scale: 1 }}
+                    exit={{ scale: 0.6 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 20 }}
+                    className="store-cart-button__count"
+                  >
+                    {cartCount}
+                  </motion.span>
+                </AnimatePresence>
+              )}
             </button>
           </div>
         </div>
@@ -696,9 +724,11 @@ export default function Store() {
           <section id="categorias" className="store-category-rail" aria-label="Explorar categorias">
             <div className="store-category-rail__track">
               {categoryItems.map((item) => (
-                <button
+                <motion.button
                   key={item.name}
                   type="button"
+                  whileTap={{ scale: 0.95 }}
+                  whileHover={{ y: -2 }}
                   aria-pressed={category === item.name}
                   onClick={() => { setCategory(item.name); scrollTo("produtos"); }}
                   className={`store-category-card${category === item.name ? " is-active" : ""}`}
@@ -708,7 +738,7 @@ export default function Store() {
                   </span>
                   <span className="store-category-card__text"><strong>{item.name}</strong></span>
                   <ArrowRight aria-hidden="true" className="store-category-card__arrow h-[18px] w-[18px]" />
-                </button>
+                </motion.button>
               ))}
             </div>
           </section>
@@ -755,36 +785,119 @@ export default function Store() {
             </div>
           ) : (
             <div className={`store-product-grid${displayedProducts.length === 1 ? " store-product-grid--single" : ""}`}>
-              {displayedProducts.map((product, index) => {
-                const price = priceOf(product);
-                const discount = product.promo_price != null && product.price > 0 ? Math.round(((product.price - product.promo_price) / product.price) * 100) : 0;
-                const isFavorite = favorites.includes(product.id);
-                return (
-                  <article key={product.id} className="store-product-card">
-                    <div className="store-product-card__media">
-                      <button type="button" onClick={() => navigate(`/loja/${slug}/produto/${product.id}`)} aria-label={`Ver detalhes de ${product.name}`} className="store-product-card__image-button">
-                        {product.images?.[0] ? <img src={product.images[0]} alt={product.name} loading="lazy" onError={(event) => { event.currentTarget.style.display = "none"; }} /> : <span className="store-product-card__placeholder"><ImageOff className="h-7 w-7" /></span>}
-                      </button>
-                      {discount > 0 ? <span className="store-product-card__badge">-{discount}%</span> : index === 0 ? <span className="store-product-card__badge store-product-card__badge--new">Novo</span> : null}
-                      <button type="button" onClick={() => toggleFavorite(product.id)} aria-label={isFavorite ? `Remover ${product.name} dos favoritos` : `Guardar ${product.name} nos favoritos`} aria-pressed={isFavorite} className={`store-product-card__favorite${isFavorite ? " is-active" : ""}`}>
-                        <Heart className="h-[18px] w-[18px]" fill={isFavorite ? "currentColor" : "none"} />
-                      </button>
-                      <button type="button" onClick={() => navigate(`/loja/${slug}/produto/${product.id}`)} className="store-product-card__quick-view">Ver produto <ArrowRight className="h-4 w-4" /></button>
-                    </div>
-                    <div className="store-product-card__details">
-                      {product.category && <p className="store-product-card__category">{product.category}</p>}
-                      <button type="button" onClick={() => navigate(`/loja/${slug}/produto/${product.id}`)} className="store-product-card__name">{product.name}</button>
-                      <div className="store-product-card__footer">
-                        <div className="store-product-card__price-block">
-                          <strong>{formatMoney(price, currency)}</strong>
-                          {product.promo_price != null && <del>{formatMoney(product.price, currency)}</del>}
-                        </div>
-                        <button type="button" aria-label={`Adicionar ${product.name} ao carrinho`} disabled={product.stock === 0} onClick={() => changeQuantity(product, 1)} className="store-product-card__add"><ShoppingCart className="h-4 w-4" />Adicionar</button>
+              <AnimatePresence mode="popLayout">
+                {displayedProducts.map((product, index) => {
+                  const price = priceOf(product);
+                  const discount = product.promo_price != null && product.price > 0 ? Math.round(((product.price - product.promo_price) / product.price) * 100) : 0;
+                  const isFavorite = favorites.includes(product.id);
+                  const isOutOfStock = product.stock <= 0;
+                  const isLowStock = product.stock > 0 && product.stock <= 3;
+
+                  return (
+                    <motion.article
+                      key={product.id}
+                      layout
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.96 }}
+                      transition={{ duration: 0.25 }}
+                      whileHover={{ y: -5 }}
+                      className="store-product-card group"
+                    >
+                      <div className="store-product-card__media">
+                        <button
+                          type="button"
+                          onClick={() => navigate(`/loja/${slug}/produto/${product.id}`)}
+                          aria-label={`Ver detalhes de ${product.name}`}
+                          className="store-product-card__image-button overflow-hidden"
+                        >
+                          {product.images?.[0] ? (
+                            <img
+                              src={product.images[0]}
+                              alt={product.name}
+                              loading="lazy"
+                              className="transition-transform duration-500 ease-out group-hover:scale-105"
+                              onError={(event) => { event.currentTarget.style.display = "none"; }}
+                            />
+                          ) : (
+                            <span className="store-product-card__placeholder">
+                              <ImageOff className="h-7 w-7" />
+                            </span>
+                          )}
+                        </button>
+
+                        {/* BADGES */}
+                        {isOutOfStock ? (
+                          <span className="store-product-card__badge bg-neutral-900/90 text-white">
+                            Esgotado
+                          </span>
+                        ) : discount > 0 ? (
+                          <span className="store-product-card__badge">-{discount}%</span>
+                        ) : isLowStock ? (
+                          <span className="store-product-card__badge bg-amber-600 text-white">
+                            Apenas {product.stock} rest.
+                          </span>
+                        ) : index === 0 ? (
+                          <span className="store-product-card__badge store-product-card__badge--new">
+                            Novo
+                          </span>
+                        ) : null}
+
+                        <motion.button
+                          type="button"
+                          whileTap={{ scale: 0.85 }}
+                          onClick={() => toggleFavorite(product.id)}
+                          aria-label={isFavorite ? `Remover ${product.name} dos favoritos` : `Guardar ${product.name} nos favoritos`}
+                          aria-pressed={isFavorite}
+                          className={`store-product-card__favorite${isFavorite ? " is-active" : ""}`}
+                        >
+                          <Heart className="h-[18px] w-[18px]" fill={isFavorite ? "currentColor" : "none"} />
+                        </motion.button>
+
+                        <button
+                          type="button"
+                          onClick={() => navigate(`/loja/${slug}/produto/${product.id}`)}
+                          className="store-product-card__quick-view"
+                        >
+                          Ver produto <ArrowRight className="h-4 w-4" />
+                        </button>
                       </div>
-                    </div>
-                  </article>
-                );
-              })}
+
+                      <div className="store-product-card__details">
+                        {product.category && <p className="store-product-card__category">{product.category}</p>}
+                        <button
+                          type="button"
+                          onClick={() => navigate(`/loja/${slug}/produto/${product.id}`)}
+                          className="store-product-card__name text-left"
+                        >
+                          {product.name}
+                        </button>
+
+                        <div className="store-product-card__footer">
+                          <div className="store-product-card__price-block">
+                            <strong className="tabular-nums">{formatMoney(price, currency)}</strong>
+                            {product.promo_price != null && (
+                              <del className="tabular-nums">{formatMoney(product.price, currency)}</del>
+                            )}
+                          </div>
+
+                          <motion.button
+                            type="button"
+                            whileTap={{ scale: 0.92 }}
+                            aria-label={`Adicionar ${product.name} ao carrinho`}
+                            disabled={isOutOfStock}
+                            onClick={() => changeQuantity(product, 1)}
+                            className="store-product-card__add disabled:opacity-40 disabled:cursor-not-allowed"
+                          >
+                            <ShoppingCart className="h-4 w-4" />
+                            {isOutOfStock ? "Esgotado" : "Adicionar"}
+                          </motion.button>
+                        </div>
+                      </div>
+                    </motion.article>
+                  );
+                })}
+              </AnimatePresence>
             </div>
           )}
         </section>
@@ -1083,86 +1196,99 @@ export default function Store() {
                   {/* PRODUCTS LIST & COUPON */}
                   <div className="px-5 py-4 sm:px-6 space-y-4">
                     <div className="divide-y divide-neutral-100">
-                      {cartItems.map(({ product, quantity }) => {
-                        const unitPrice = priceOf(product);
-                        const itemTotal = unitPrice * quantity;
-                        const variant = cartVariants[product.id] || { size: 42, color: "Branco" };
+                      <AnimatePresence initial={false}>
+                        {cartItems.map(({ product, quantity }) => {
+                          const unitPrice = priceOf(product);
+                          const itemTotal = unitPrice * quantity;
+                          const variant = cartVariants[product.id] || { size: 42, color: "Branco" };
 
-                        return (
-                          <div key={product.id} className="py-4 first:pt-1 last:pb-2">
-                            <div className="flex items-start gap-3.5">
-                              <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-neutral-100">
-                                {product.images?.[0] ? (
-                                  <img
-                                    src={product.images[0]}
-                                    alt={product.name}
-                                    className="h-full w-full object-cover"
-                                  />
-                                ) : (
-                                  <div className="grid h-full place-items-center">
-                                    <ImageOff className="h-5 w-5 text-neutral-400" />
-                                  </div>
-                                )}
-                              </div>
-
-                              <div className="min-w-0 flex-1">
-                                {/* Row 1: Product name & price */}
-                                <div className="flex items-start justify-between gap-2">
-                                  <p className="min-w-0 flex-1 truncate text-sm font-bold text-neutral-900">
-                                    {product.name}
-                                  </p>
-                                  <p className="shrink-0 text-sm font-bold tabular-nums text-neutral-900">
-                                    {formatMoney(itemTotal, currency)}
-                                  </p>
+                          return (
+                            <motion.div
+                              key={product.id}
+                              layout
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: "auto" }}
+                              exit={{ opacity: 0, height: 0, overflow: "hidden" }}
+                              transition={{ duration: 0.22 }}
+                              className="py-4 first:pt-1 last:pb-2"
+                            >
+                              <div className="flex items-start gap-3.5">
+                                <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-neutral-100">
+                                  {product.images?.[0] ? (
+                                    <img
+                                      src={product.images[0]}
+                                      alt={product.name}
+                                      className="h-full w-full object-cover"
+                                    />
+                                  ) : (
+                                    <div className="grid h-full place-items-center">
+                                      <ImageOff className="h-5 w-5 text-neutral-400" />
+                                    </div>
+                                  )}
                                 </div>
 
-                                {/* Row 2: Variants */}
-                                <p className="text-xs text-neutral-400 mt-0.5 font-medium">
-                                  Tamanho: {variant.size || 42} • Cor: {variant.color || "Branco"}
-                                </p>
-
-                                {/* Row 3: Compact quantity pill and trash */}
-                                <div className="mt-3 flex items-center justify-between">
-                                  <div className="inline-flex h-8 items-center rounded-lg bg-neutral-100 border border-neutral-200/60 p-0.5">
-                                    <button
-                                      type="button"
-                                      onClick={() => changeQuantity(product, -1)}
-                                      aria-label={`Diminuir quantidade de ${product.name}`}
-                                      className="grid h-7 w-7 place-items-center text-neutral-700 hover:bg-white rounded transition text-xs font-semibold"
-                                    >
-                                      <Minus className="h-3.5 w-3.5" />
-                                    </button>
-                                    <span className="w-8 text-center text-xs font-bold tabular-nums text-neutral-900">
-                                      {quantity}
-                                    </span>
-                                    <button
-                                      type="button"
-                                      onClick={() => changeQuantity(product, 1)}
-                                      aria-label={`Aumentar quantidade de ${product.name}`}
-                                      className="grid h-7 w-7 place-items-center text-neutral-700 hover:bg-white rounded transition text-xs font-semibold"
-                                    >
-                                      <Plus className="h-3.5 w-3.5" />
-                                    </button>
+                                <div className="min-w-0 flex-1">
+                                  {/* Row 1: Product name & price */}
+                                  <div className="flex items-start justify-between gap-2">
+                                    <p className="min-w-0 flex-1 truncate text-sm font-bold text-neutral-900">
+                                      {product.name}
+                                    </p>
+                                    <p className="shrink-0 text-sm font-bold tabular-nums text-neutral-900">
+                                      {formatMoney(itemTotal, currency)}
+                                    </p>
                                   </div>
 
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      const next = { ...cart };
-                                      delete next[product.id];
-                                      updateCart(next);
-                                    }}
-                                    aria-label={`Remover ${product.name}`}
-                                    className="p-1.5 text-neutral-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition"
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </button>
+                                  {/* Row 2: Variants */}
+                                  <p className="text-xs text-neutral-400 mt-0.5 font-medium">
+                                    Tamanho: {variant.size || 42} • Cor: {variant.color || "Branco"}
+                                  </p>
+
+                                  {/* Row 3: Compact quantity pill and trash */}
+                                  <div className="mt-3 flex items-center justify-between">
+                                    <div className="inline-flex h-8 items-center rounded-lg bg-neutral-100 border border-neutral-200/60 p-0.5">
+                                      <motion.button
+                                        type="button"
+                                        whileTap={{ scale: 0.85 }}
+                                        onClick={() => changeQuantity(product, -1)}
+                                        aria-label={`Diminuir quantidade de ${product.name}`}
+                                        className="grid h-7 w-7 place-items-center text-neutral-700 hover:bg-white rounded transition text-xs font-semibold"
+                                      >
+                                        <Minus className="h-3.5 w-3.5" />
+                                      </motion.button>
+                                      <span className="w-8 text-center text-xs font-bold tabular-nums text-neutral-900">
+                                        {quantity}
+                                      </span>
+                                      <motion.button
+                                        type="button"
+                                        whileTap={{ scale: 0.85 }}
+                                        onClick={() => changeQuantity(product, 1)}
+                                        aria-label={`Aumentar quantidade de ${product.name}`}
+                                        className="grid h-7 w-7 place-items-center text-neutral-700 hover:bg-white rounded transition text-xs font-semibold"
+                                      >
+                                        <Plus className="h-3.5 w-3.5" />
+                                      </motion.button>
+                                    </div>
+
+                                    <motion.button
+                                      type="button"
+                                      whileTap={{ scale: 0.85 }}
+                                      onClick={() => {
+                                        const next = { ...cart };
+                                        delete next[product.id];
+                                        updateCart(next);
+                                      }}
+                                      aria-label={`Remover ${product.name}`}
+                                      className="p-1.5 text-neutral-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </motion.button>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          </div>
-                        );
-                      })}
+                            </motion.div>
+                          );
+                        })}
+                      </AnimatePresence>
                     </div>
 
                     {/* Coupon / Discount Code */}
@@ -1205,22 +1331,25 @@ export default function Store() {
                     </div>
                     <p className="text-[11px] leading-relaxed text-neutral-400">O valor e os detalhes da entrega serão combinados diretamente com a loja.</p>
                     <div className="space-y-2.5 pt-1">
-                      <Button
+                      <motion.div whileTap={{ scale: 0.98 }}>
+                        <Button
+                          type="button"
+                          onClick={goToCheckout}
+                          className="h-12 w-full rounded-full bg-[#111216] hover:bg-black text-sm font-bold text-white shadow-md focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 flex items-center justify-center gap-2 transition"
+                        >
+                          <Lock className="h-4 w-4" />
+                          Finalizar Compra →
+                        </Button>
+                      </motion.div>
+                      <motion.button
                         type="button"
-                        onClick={goToCheckout}
-                        className="h-12 w-full rounded-full bg-[#111216] hover:bg-black text-sm font-bold text-white shadow-md focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 flex items-center justify-center gap-2 transition active:scale-[0.98]"
-                      >
-                        <Lock className="h-4 w-4" />
-                        Finalizar Compra →
-                      </Button>
-                      <button
-                        type="button"
+                        whileTap={{ scale: 0.98 }}
                         onClick={continueShopping}
                         className="h-12 w-full rounded-full border border-neutral-300 bg-white hover:bg-neutral-100 text-neutral-800 font-bold text-sm flex items-center justify-center gap-2 transition"
                       >
                         <ArrowLeft className="h-4 w-4" />
                         Continuar Comprando
-                      </button>
+                      </motion.button>
                     </div>
                   </div>
                 </div>
@@ -1393,37 +1522,26 @@ export default function Store() {
         </SheetContent>
       </Sheet>
 
-      {/* MOBILE CART */}
-
-      {cartCount > 0 &&
-        !cartOpen && (
-          <button
+      {/* MOBILE FLOATING CART */}
+      <AnimatePresence>
+        {cartCount > 0 && !cartOpen && (
+          <motion.button
             type="button"
-            onClick={
-              openCart
-            }
-            aria-label={`Abrir carrinho. Total ${formatMoney(
-              cartTotal,
-              currency,
-            )}`}
+            initial={{ y: 30, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 30, opacity: 0 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={openCart}
+            aria-label={`Abrir carrinho com ${cartCount} itens. Total ${formatMoney(cartTotal, currency)}`}
             className="fixed bottom-4 left-1/2 z-40 flex min-h-12 -translate-x-1/2 items-center gap-3 rounded-full bg-[#111216] px-5 py-3 text-sm font-bold text-white shadow-xl transition hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#111216] sm:bottom-5 md:hidden"
           >
             <ShoppingBag className="h-4 w-4" />
-
-            <span>
-              Ver carrinho
-            </span>
-
-            <span className="h-4 w-px bg-[#fffdf9]/40" />
-
-            <span>
-              {formatMoney(
-                cartTotal,
-                currency,
-              )}
-            </span>
-          </button>
+            <span>Ver carrinho</span>
+            <span className="h-4 w-px bg-white/40" />
+            <span className="tabular-nums">{formatMoney(cartTotal, currency)}</span>
+          </motion.button>
         )}
+      </AnimatePresence>
 
       {/* FOOTER */}
 

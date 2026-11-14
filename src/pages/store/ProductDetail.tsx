@@ -376,7 +376,7 @@ export default function ProductDetail() {
                   type="button"
                   onClick={() => setActiveImage(index)}
                   className={`w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-[#f1f2f5] border-2 transition shrink-0 ${
-                    activeImage === index ? "border-blue-600 shadow-sm" : "border-transparent opacity-75 hover:opacity-100"
+                    activeImage === index ? "border-[#101114] shadow-sm" : "border-transparent opacity-75 hover:opacity-100"
                   }`}
                 >
                   <img src={image} alt="" className="w-full h-full object-cover" />
@@ -412,7 +412,7 @@ export default function ProductDetail() {
               )}
 
               {/* Novo Badge */}
-              <span className="absolute top-4 left-4 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">
+              <span className="absolute top-4 left-4 bg-[#101114] text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">
                 Novo
               </span>
 
@@ -513,7 +513,7 @@ export default function ProductDetail() {
                   onClick={() => setSelectedColor("branco")}
                   className={`w-7 h-7 rounded-full bg-white border-2 transition ${
                     selectedColor === "branco"
-                      ? "border-blue-600 ring-2 ring-blue-600/30"
+                      ? "border-[#101114] ring-2 ring-[#101114]/20"
                       : "border-neutral-300"
                   }`}
                   aria-label="Branco"
@@ -523,7 +523,7 @@ export default function ProductDetail() {
                   onClick={() => setSelectedColor("preto")}
                   className={`w-7 h-7 rounded-full bg-black border-2 transition ${
                     selectedColor === "preto"
-                      ? "border-blue-600 ring-2 ring-blue-600/30"
+                      ? "border-[#101114] ring-2 ring-[#101114]/20"
                       : "border-transparent"
                   }`}
                   aria-label="Preto"
@@ -533,7 +533,7 @@ export default function ProductDetail() {
                   onClick={() => setSelectedColor("cinza")}
                   className={`w-7 h-7 rounded-full bg-neutral-400 border-2 transition ${
                     selectedColor === "cinza"
-                      ? "border-blue-600 ring-2 ring-blue-600/30"
+                      ? "border-[#101114] ring-2 ring-[#101114]/20"
                       : "border-transparent"
                   }`}
                   aria-label="Cinza"
@@ -552,7 +552,7 @@ export default function ProductDetail() {
                     onClick={() => setSelectedSize(size)}
                     className={`min-w-10 h-9 px-3 rounded-full text-xs font-bold transition ${
                       selectedSize === size
-                        ? "bg-blue-600 text-white"
+                        ? "bg-[#101114] text-white shadow-xs"
                         : "bg-[#f1f2f5] text-[#111216] hover:bg-[#e4e6eb]"
                     }`}
                   >
@@ -584,7 +584,7 @@ export default function ProductDetail() {
               <button
                 type="button"
                 onClick={() => saveCart(false)}
-                className="flex-1 h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm rounded-full flex items-center justify-center gap-2 shadow-sm transition"
+                className="flex-1 h-12 bg-[#101114] hover:bg-black text-white font-bold text-xs sm:text-sm rounded-full flex items-center justify-center gap-2 shadow-sm transition active:scale-[0.98]"
               >
                 <ShoppingCart className="h-4 w-4" />
                 Adicionar ao Carrinho
@@ -647,7 +647,7 @@ export default function ProductDetail() {
                 onClick={() => setTab("description")}
                 className={`pb-2.5 text-sm font-bold transition relative ${
                   tab === "description"
-                    ? "text-[#111216] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-blue-600"
+                    ? "text-[#111216] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#101114]"
                     : "text-[#73757b] hover:text-[#111216]"
                 }`}
               >
@@ -658,7 +658,7 @@ export default function ProductDetail() {
                 onClick={() => setTab("details")}
                 className={`pb-2.5 text-sm font-bold transition relative ${
                   tab === "details"
-                    ? "text-[#111216] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-blue-600"
+                    ? "text-[#111216] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#101114]"
                     : "text-[#73757b] hover:text-[#111216]"
                 }`}
               >
@@ -669,7 +669,7 @@ export default function ProductDetail() {
                 onClick={() => setTab("reviews")}
                 className={`pb-2.5 text-sm font-bold transition relative ${
                   tab === "reviews"
-                    ? "text-[#111216] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-blue-600"
+                    ? "text-[#111216] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#101114]"
                     : "text-[#73757b] hover:text-[#111216]"
                 }`}
               >
@@ -685,15 +685,15 @@ export default function ProductDetail() {
                 </p>
                 <div className="space-y-2.5 pt-2">
                   <div className="flex items-center gap-2.5 text-[#111216] font-medium text-xs sm:text-sm">
-                    <CheckCircle2 className="h-4 w-4 text-blue-600 shrink-0" />
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
                     <span>Material premium</span>
                   </div>
                   <div className="flex items-center gap-2.5 text-[#111216] font-medium text-xs sm:text-sm">
-                    <CheckCircle2 className="h-4 w-4 text-blue-600 shrink-0" />
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
                     <span>Sola de borracha resistente</span>
                   </div>
                   <div className="flex items-center gap-2.5 text-[#111216] font-medium text-xs sm:text-sm">
-                    <CheckCircle2 className="h-4 w-4 text-blue-600 shrink-0" />
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
                     <span>Design icónico</span>
                   </div>
                 </div>
