@@ -552,6 +552,13 @@ export default function Store() {
           <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Pesquisar produtos..." aria-label="Pesquisar produtos" />
           {search && <button type="button" aria-label="Limpar pesquisa" onClick={() => setSearch("")}><X className="h-4 w-4" /></button>}
         </label>
+        <nav aria-label="Navegação da loja" className="store-mobile-nav">
+          <button type="button" className="store-mobile-nav__active" onClick={() => scrollTo("inicio")}>Início</button>
+          <button type="button" onClick={() => scrollTo("produtos")}>Produtos</button>
+          {categoryItems.length > 0 && <button type="button" onClick={() => scrollTo("categorias")}>Categorias</button>}
+          <button type="button" onClick={() => scrollTo("sobre")}>Sobre</button>
+          <button type="button" onClick={() => scrollTo("contacto")}>Contacto</button>
+        </nav>
       </header>
 
       <main>
@@ -713,7 +720,7 @@ export default function Store() {
         >
           {productOpen && (
             <div>
-              <div className="relative aspect-[4/5] bg-[#ebe7df]">
+              <div className="relative aspect-[4/5] bg-[#f1f2f5]">
                 {productOpen
                   .images?.[0] ? (
                   <img
@@ -724,7 +731,7 @@ export default function Store() {
                     alt={
                       productOpen.name
                     }
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-contain p-6"
                   />
                 ) : (
                   <div className="grid h-full place-items-center">
@@ -740,7 +747,7 @@ export default function Store() {
                     )
                   }
                   aria-label="Fechar detalhes do produto"
-                  className="absolute right-4 top-4 grid h-11 w-11 place-items-center rounded-[7px] bg-[#fffdf9] text-[#202522] shadow-md transition hover:bg-[#ebe7df] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+                  className="absolute right-4 top-4 grid h-11 w-11 place-items-center rounded-full bg-white text-[#202522] shadow-md transition hover:bg-[#f1f2f5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4169f5]"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -829,7 +836,7 @@ export default function Store() {
                       null,
                     );
                   }}
-                  className="mt-6 h-12 w-full rounded-[7px] bg-black text-sm font-bold text-white hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
+                  className="mt-6 h-12 w-full rounded-full bg-[#155eef] text-sm font-bold text-white shadow-sm hover:bg-[#0e4fd1] focus-visible:ring-2 focus-visible:ring-[#4169f5] focus-visible:ring-offset-2"
                 >
                   {productOpen.stock >
                   0
@@ -955,7 +962,7 @@ export default function Store() {
                 onClick={
                   continueShopping
                 }
-                className="mt-7 h-11 rounded-full bg-black px-6 text-sm font-bold text-white hover:bg-neutral-800"
+                className="mt-7 h-11 rounded-full bg-[#155eef] px-6 text-sm font-bold text-white hover:bg-[#0e4fd1]"
               >
                 Ver produtos
               </Button>
@@ -1004,7 +1011,7 @@ export default function Store() {
                                         alt={
                                           product.name
                                         }
-                                        className="h-full w-full object-cover"
+                                        className="h-full w-full object-contain p-2"
                                       />
                                     ) : (
                                       <div className="grid h-full place-items-center">
@@ -1375,7 +1382,7 @@ export default function Store() {
                     disabled={
                       placing
                     }
-                    className="h-12 w-full rounded-full bg-black text-sm font-bold text-white hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
+                    className="h-12 w-full rounded-full bg-[#155eef] text-sm font-bold text-white hover:bg-[#0e4fd1] focus-visible:ring-2 focus-visible:ring-[#4169f5] focus-visible:ring-offset-2"
                   >
                     {placing ? (
                       <>
@@ -1405,7 +1412,7 @@ export default function Store() {
                         180,
                       );
                     }}
-                    className="h-12 w-full rounded-full bg-black text-sm font-bold text-white hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
+                    className="h-12 w-full rounded-full bg-[#155eef] text-sm font-bold text-white hover:bg-[#0e4fd1] focus-visible:ring-2 focus-visible:ring-[#4169f5] focus-visible:ring-offset-2"
                   >
                     Ver pedido
                     <ArrowRight className="ml-2 h-4 w-4" />
@@ -1440,7 +1447,7 @@ export default function Store() {
               cartTotal,
               currency,
             )}`}
-            className="fixed bottom-4 left-1/2 z-40 flex min-h-12 -translate-x-1/2 items-center gap-3 rounded-[7px] bg-black px-5 py-3 text-sm font-bold text-white shadow-2xl transition hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black sm:bottom-5 md:hidden"
+            className="fixed bottom-4 left-1/2 z-40 flex min-h-12 -translate-x-1/2 items-center gap-3 rounded-full bg-[#155eef] px-5 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-[#0e4fd1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#155eef] sm:bottom-5 md:hidden"
           >
             <ShoppingBag className="h-4 w-4" />
 
