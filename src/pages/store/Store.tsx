@@ -36,6 +36,7 @@ import { toast } from "sonner";
 import { rememberOrder } from "@/lib/myOrders";
 import { MyOrders } from "@/components/store/MyOrders";
 import { StoreFooter } from "@/components/store/StoreFooter";
+import { StoreFAQ } from "@/components/store/StoreFAQ";
 
 type Company = {
   id: string;
@@ -592,6 +593,7 @@ export default function Store() {
             <button type="button" onClick={() => scrollTo("produtos")}>Produtos</button>
             {categoryItems.length > 0 && <button type="button" onClick={() => scrollTo("categorias")}>Categorias</button>}
             <button type="button" onClick={() => scrollTo("sobre")}>Sobre</button>
+            <button type="button" onClick={() => scrollTo("faq")}>FAQ</button>
             <button type="button" onClick={() => scrollTo("contacto")}>Contacto</button>
           </nav>
 
@@ -627,6 +629,7 @@ export default function Store() {
           <button type="button" onClick={() => scrollTo("produtos")}>Produtos</button>
           {categoryItems.length > 0 && <button type="button" onClick={() => scrollTo("categorias")}>Categorias</button>}
           <button type="button" onClick={() => scrollTo("sobre")}>Sobre</button>
+          <button type="button" onClick={() => scrollTo("faq")}>FAQ</button>
           <button type="button" onClick={() => scrollTo("contacto")}>Contacto</button>
         </nav>
       </header>
@@ -803,6 +806,12 @@ export default function Store() {
             <div className="store-marketing-banner__gradient" />
           </div>
         </section>
+
+        {/* FAQs */}
+        <StoreFAQ
+          company={company}
+          onContactClick={() => scrollTo("contacto")}
+        />
       </main>
 
       {/* PRODUCT DETAIL */}
@@ -979,25 +988,22 @@ export default function Store() {
         <SheetContent
           side="right"
           style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
-          className="store-cart-sheet flex h-full max-h-screen w-full flex-col overflow-hidden border-l border-neutral-200 bg-white p-0 max-sm:inset-x-0 max-sm:top-auto max-sm:bottom-0 max-sm:h-[90dvh] max-sm:max-h-[90dvh] max-sm:w-full max-sm:rounded-t-[28px] max-sm:rounded-b-none max-sm:border-l-0 max-sm:border-t sm:max-w-[460px] sm:rounded-l-3xl shadow-2xl"
+          className="store-cart-sheet flex h-full max-h-screen w-full flex-col gap-0 overflow-hidden border-l border-neutral-200 bg-white p-0 max-sm:inset-x-0 max-sm:top-auto max-sm:bottom-0 max-sm:h-[90dvh] max-sm:max-h-[90dvh] max-sm:w-full max-sm:rounded-t-[28px] max-sm:rounded-b-none max-sm:border-l-0 max-sm:border-t sm:max-w-[460px] sm:rounded-l-3xl shadow-2xl"
         >
           {/* HEADER */}
 
-          <div className="shrink-0 border-b border-[#e3e5e8] bg-white px-6 py-5 sm:px-8 sm:py-7">
+          <div className="shrink-0 border-b border-neutral-100 bg-white px-5 py-4 sm:px-6 sm:py-5">
             <SheetHeader>
-              <div className="flex items-center gap-4 sm:gap-6">
+              <div className="flex items-center gap-3.5 sm:gap-4">
                 {cartStep !== "checkout" && (
-                  <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-[#f1f2f5] text-[#111216] sm:h-20 sm:w-20">
-                    {cartStep === "success" ? <Check className="h-8 w-8" /> : <ShoppingCart className="h-8 w-8 sm:h-9 sm:w-9" />}
+                  <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[#f1f2f5] text-[#111216]">
+                    {cartStep === "success" ? <Check className="h-6 w-6" /> : <ShoppingCart className="h-6 w-6 text-neutral-800" />}
                   </span>
                 )}
-                {cartStep ===
-                  "checkout" && (
+                {cartStep === "checkout" && (
                   <button
                     type="button"
-                    onClick={
-                      goBackToCart
-                    }
+                    onClick={goBackToCart}
                     aria-label="Voltar ao carrinho"
                     className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[#ded9d0] text-[#303732] transition hover:bg-[#ebe7df] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
                   >
@@ -1005,30 +1011,27 @@ export default function Store() {
                   </button>
                 )}
 
-                <div className="min-w-0">
+                <div className="min-w-0 pr-8">
                   <SheetTitle
                     ref={checkoutTitleRef}
                     tabIndex={-1}
-                    className="text-2xl font-bold tracking-tight text-[#111216] focus:outline-none sm:text-[30px]"
+                    className="text-xl sm:text-2xl font-bold tracking-tight text-[#111216] focus:outline-none"
                   >
-                    {cartStep ===
-                    "cart"
+                    {cartStep === "cart"
                       ? "Carrinho"
-                      : cartStep ===
-                          "checkout"
+                      : cartStep === "checkout"
                         ? "Finalizar pedido"
                         : "Pedido confirmado"}
                   </SheetTitle>
 
                   {cartStep === "cart" && (
-                    <p className="mt-1 text-sm font-medium text-[#73757b] sm:text-base">
+                    <p className="mt-0.5 text-xs sm:text-sm font-medium text-[#73757b]">
                       Seu carrinho de compras
                     </p>
                   )}
 
-                  {cartStep ===
-                    "checkout" && (
-                    <p className="mt-1 text-sm font-medium text-[#747b73]">
+                  {cartStep === "checkout" && (
+                    <p className="mt-0.5 text-xs sm:text-sm font-medium text-[#747b73]">
                       Dados para contacto
                     </p>
                   )}
@@ -1413,7 +1416,7 @@ export default function Store() {
                     <button
                       type="button"
                       onClick={continueShopping}
-                      className="h-12 w-full rounded-full border border-blue-600 bg-white hover:bg-blue-50 text-neutral-900 font-bold text-sm flex items-center justify-center gap-2 transition"
+                      className="h-12 w-full rounded-full border border-blue-600 bg-white hover:bg-blue-50 text-blue-600 font-bold text-sm flex items-center justify-center gap-2 transition"
                     >
                       <ArrowLeft className="h-4 w-4" />
                       Continuar Comprando

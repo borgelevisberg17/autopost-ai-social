@@ -3,6 +3,7 @@ import {
   ArrowRight,
   ArrowUp,
   Headphones,
+  HelpCircle,
   Mail,
   MessageCircle,
   PackageCheck,
@@ -112,62 +113,52 @@ export function StoreFooter({
 
   return (
     <footer id="contacto" className="bg-[#0b0c10] text-white mt-12 sm:mt-20">
-      {/* 1. TRUST PILLARS ROW - 2x2 on mobile, 4 cols on desktop */}
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-          <div className="p-3 sm:p-4 rounded-2xl bg-white/[0.03] flex flex-col sm:flex-row items-start gap-2.5 sm:gap-4">
-            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/[0.06] flex items-center justify-center shrink-0 text-white">
-              <Truck className="h-5 w-5 sm:h-6 sm:w-6" />
-            </div>
-            <div>
-              <h4 className="font-bold text-xs sm:text-sm text-white line-clamp-1">
-                Entrega em Angola
-              </h4>
-              <p className="text-[11px] sm:text-xs text-neutral-400 mt-0.5 leading-snug line-clamp-2">
-                Envios rápidos para Luanda e províncias.
+      {/* 1. EDITORIAL FISCAL & INSTITUTIONAL DISCLOSURE */}
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+        <div className="rounded-3xl bg-white/[0.02] border border-white/5 p-6 sm:p-8 lg:p-10">
+          <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6 lg:gap-12">
+            {/* Title & Institutional Badge */}
+            <div className="lg:w-1/3 space-y-2.5">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-[11px] font-bold uppercase tracking-wider">
+                <ShieldCheck className="h-3.5 w-3.5" />
+                Compromisso & Transparência Fiscal
+              </span>
+              <h3 className="text-lg sm:text-xl font-extrabold text-white tracking-tight">
+                Garantia Comercial, Segurança e Rigor Fiscal
+              </h3>
+              <p className="text-xs text-neutral-400 leading-relaxed">
+                Informações legais, tributárias e diretrizes de atendimento ao consumidor para compras efetuadas em território nacional.
               </p>
             </div>
-          </div>
 
-          <div className="p-3 sm:p-4 rounded-2xl bg-white/[0.03] flex flex-col sm:flex-row items-start gap-2.5 sm:gap-4">
-            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/[0.06] flex items-center justify-center shrink-0 text-white">
-              <ShieldCheck className="h-5 w-5 sm:h-6 sm:w-6" />
-            </div>
-            <div>
-              <h4 className="font-bold text-xs sm:text-sm text-white line-clamp-1">
-                Compra 100% Segura
-              </h4>
-              <p className="text-[11px] sm:text-xs text-neutral-400 mt-0.5 leading-snug line-clamp-2">
-                Confirmação e stock garantido ao fechar.
+            {/* Editorial Paragraph */}
+            <div className="lg:w-2/3 space-y-4 text-xs sm:text-sm text-neutral-300 leading-relaxed">
+              <p>
+                A <strong className="text-white font-bold">{company.name}</strong> opera em rigorosa conformidade com o regime comercial e tributário da República de Angola, assegurando faturação fiscal certificada perante a <strong className="text-white">AGT</strong> em todas as transações, com emissão de fatura/recibo e inclusão facultativa de NIF singular ou coletivo.
               </p>
-            </div>
-          </div>
+              <p className="text-neutral-400 text-xs sm:text-[13px]">
+                Todos os produtos apresentados no catálogo beneficiam de garantia de autenticidade e reserva imediata de stock no momento da finalização do pedido. As expedições para Luanda e restantes províncias são processadas via operadores logísticos certificados, cumprindo prazos rigorosos de entrega. O consumidor beneficia do direito legal de troca ou devolução no prazo de até 7 dias corridos após a receção, salvaguardando a integridade do artigo e da embalagem de origem. O apoio ao cliente e pós-venda é prestado de forma direta e dedicada através dos nossos canais oficiais de WhatsApp.
+              </p>
 
-          <div className="p-3 sm:p-4 rounded-2xl bg-white/[0.03] flex flex-col sm:flex-row items-start gap-2.5 sm:gap-4">
-            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/[0.06] flex items-center justify-center shrink-0 text-white">
-              <RefreshCcw className="h-5 w-5 sm:h-6 sm:w-6" />
-            </div>
-            <div>
-              <h4 className="font-bold text-xs sm:text-sm text-white line-clamp-1">
-                Trocas Facilitadas
-              </h4>
-              <p className="text-[11px] sm:text-xs text-neutral-400 mt-0.5 leading-snug line-clamp-2">
-                Até 7 dias com apoio direto e ágil.
-              </p>
-            </div>
-          </div>
-
-          <div className="p-3 sm:p-4 rounded-2xl bg-white/[0.03] flex flex-col sm:flex-row items-start gap-2.5 sm:gap-4">
-            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/[0.06] flex items-center justify-center shrink-0 text-white">
-              <Headphones className="h-5 w-5 sm:h-6 sm:w-6" />
-            </div>
-            <div>
-              <h4 className="font-bold text-xs sm:text-sm text-white line-clamp-1">
-                Apoio ao Cliente
-              </h4>
-              <p className="text-[11px] sm:text-xs text-neutral-400 mt-0.5 leading-snug line-clamp-2">
-                Atendimento dedicado via WhatsApp.
-              </p>
+              {/* Fiscal & Trust Micro-badges */}
+              <div className="pt-2 flex flex-wrap items-center gap-2 sm:gap-3 text-[11px] font-medium text-neutral-400">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/[0.04] text-neutral-300">
+                  <ShieldCheck className="h-3.5 w-3.5 text-blue-400" />
+                  Conformidade AGT
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/[0.04] text-neutral-300">
+                  <Truck className="h-3.5 w-3.5 text-blue-400" />
+                  Logística Nacional Assegurada
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/[0.04] text-neutral-300">
+                  <RefreshCcw className="h-3.5 w-3.5 text-blue-400" />
+                  Direito de Troca (7 Dias)
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/[0.04] text-neutral-300">
+                  <PackageCheck className="h-3.5 w-3.5 text-blue-400" />
+                  Stock em Tempo Real
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -339,6 +330,16 @@ export function StoreFooter({
               Ajuda & Suporte
             </h4>
             <ul className="space-y-2 text-xs sm:text-sm text-neutral-300">
+              <li>
+                <button
+                  type="button"
+                  onClick={() => onNavigateSection?.("faq")}
+                  className="hover:text-blue-400 text-blue-400 font-semibold transition flex items-center gap-1.5 text-left"
+                >
+                  <HelpCircle className="h-3 w-3 text-blue-400 shrink-0" />
+                  <span className="truncate">Perguntas Frequentes (FAQ)</span>
+                </button>
+              </li>
               <li>
                 <button
                   type="button"
