@@ -56,6 +56,15 @@ type Product = {
   images: string[];
 };
 
+
+const DEFAULT_CATEGORIES = [
+  { name: "Sneakers", image: "https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=300&q=80" },
+  { name: "Casual", image: "https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?auto=format&fit=crop&w=300&q=80" },
+  { name: "Sociais", image: "https://images.unsplash.com/photo-1614252235316-8c857d38b5f4?auto=format&fit=crop&w=300&q=80" },
+  { name: "Chinelos", image: "https://images.unsplash.com/photo-1603808033192-082d6919d3e1?auto=format&fit=crop&w=300&q=80" },
+  { name: "Acessórios", image: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?auto=format&fit=crop&w=300&q=80" },
+];
+
 type CartStep = "cart" | "checkout" | "success";
 
 export default function Store() {
@@ -345,12 +354,27 @@ export default function Store() {
   const featuredProducts =
     products.slice(0, 3);
 
-  const categoryItems = categories
-    .filter((item) => item !== "Todos")
-    .map((name) => {
-      const matchingProducts = products.filter((product) => product.category === name);
-      return { name, image: matchingProducts.find((product) => product.images?.[0])?.images[0] };
+  const categoryItems = useMemo(() => {
+    const rawCategories = categories.filter((c) => c !== "Todos");
+    const result: { name: string; image?: string }[] = [];
+
+    rawCategories.forEach((name) => {
+      const p = products.find((prod) => prod.category === name && prod.images?.[0]);
+      const def = DEFAULT_CATEGORIES.find((d) => d.name.toLowerCase() === name.toLowerCase());
+      result.push({
+        name,
+        image: p?.images?.[0] || def?.image,
+      });
     });
+
+    DEFAULT_CATEGORIES.forEach((def) => {
+      if (result.length < 5 && !result.some((r) => r.name.toLowerCase() === def.name.toLowerCase())) {
+        result.push({ name: def.name, image: def.image });
+      }
+    });
+
+    return result.slice(0, 5);
+  }, [categories, products]);
 
   const toggleFavorite = (productId: string) => {
     setFavorites((current) =>
@@ -750,11 +774,33 @@ export default function Store() {
           )}
         </section>
 
-        <section id="sobre" className="store-about">
-          <div className="store-about__mark">{company.name.charAt(0).toUpperCase()}</div>
-          <div><p>SELECIONADO PARA SI</p><h2>Boas escolhas.<br /><span>Uma experiência simples.</span></h2></div>
-          <p className="store-about__copy">{company.description || `Descubra tudo o que ${company.name} preparou para si.`}</p>
-          <button type="button" onClick={() => scrollTo("produtos")} aria-label="Explorar produtos" className="store-about__arrow"><ArrowRight className="h-5 w-5" /></button>
+        <section id="sobre" className="store-marketing-banner" aria-label="Destaque da coleção">
+          <div className="store-marketing-banner__content">
+            <h2 className="store-marketing-banner__title">
+              Estilo em<br />
+              cada passo.
+            </h2>
+            <p className="store-marketing-banner__subtitle">
+              Qualidade, conforto e muito mais.
+            </p>
+            <button
+              type="button"
+              onClick={() => scrollTo("produtos")}
+              className="store-marketing-banner__cta"
+            >
+              Explorar produtos <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
+          <div className="store-marketing-banner__visual">
+            <img
+              src={
+                heroImage ||
+                "https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=1200&q=80"
+              }
+              alt={company.name}
+            />
+            <div className="store-marketing-banner__gradient" />
+          </div>
         </section>
       </main>
 
