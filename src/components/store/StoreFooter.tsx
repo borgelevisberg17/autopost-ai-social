@@ -2,8 +2,7 @@ import { useState, type FormEvent } from "react";
 import {
   ArrowRight,
   ArrowUp,
-  CreditCard,
-  Headphones,
+Headphones,
   Mail,
   MessageCircle,
   PackageCheck,
@@ -61,13 +60,12 @@ export function StoreFooter({
   };
 
   return (
-    <footer id="contacto" className="bg-[#0b0c10] text-white border-t border-white/10 mt-20">
+    <footer id="contacto" className="bg-[#0b0c10] text-white mt-16 sm:mt-24">
       {/* 1. TRUST PILLARS ROW */}
-      <div className="border-b border-white/10">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 text-white">
+              <div className="w-12 h-12 rounded-2xl bg-white/[0.05] flex items-center justify-center shrink-0 text-white">
                 <Truck className="h-6 w-6" />
               </div>
               <div>
@@ -79,7 +77,7 @@ export function StoreFooter({
             </div>
 
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 text-white">
+              <div className="w-12 h-12 rounded-2xl bg-white/[0.05] flex items-center justify-center shrink-0 text-white">
                 <ShieldCheck className="h-6 w-6" />
               </div>
               <div>
@@ -91,7 +89,7 @@ export function StoreFooter({
             </div>
 
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 text-white">
+              <div className="w-12 h-12 rounded-2xl bg-white/[0.05] flex items-center justify-center shrink-0 text-white">
                 <RefreshCcw className="h-6 w-6" />
               </div>
               <div>
@@ -103,7 +101,7 @@ export function StoreFooter({
             </div>
 
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 text-white">
+              <div className="w-12 h-12 rounded-2xl bg-white/[0.05] flex items-center justify-center shrink-0 text-white">
                 <Headphones className="h-6 w-6" />
               </div>
               <div>
@@ -113,13 +111,12 @@ export function StoreFooter({
                 </p>
               </div>
             </div>
-          </div>
         </div>
       </div>
 
       {/* 2. NEWSLETTER VIP CLUB ROW */}
-      <div className="border-b border-white/10 bg-white/[0.02]">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+      <div className="bg-white/[0.02] py-10 sm:py-12">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="max-w-xl">
               <span className="text-[11px] font-bold uppercase tracking-widest text-blue-400">
@@ -359,22 +356,63 @@ export function StoreFooter({
       </div>
 
       {/* 4. PAYMENT BADGES & BOTTOM COPYRIGHT BAR */}
-      <div className="border-t border-white/10 bg-black/40">
+      <div className="bg-black/30 py-8">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-neutral-400">
-            {/* Payment methods */}
-            <div className="flex items-center flex-wrap gap-2.5">
-              <span className="text-[11px] font-semibold text-neutral-400">Formas de Pagamento:</span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/10 border border-white/10 text-white font-bold text-[11px]">
-                <CreditCard className="h-3 w-3" />
-                Multicaixa Express
+            {/* Payment methods with official logos */}
+            <div className="flex items-center flex-wrap gap-3">
+              <span className="text-xs font-medium text-neutral-400">
+                Formas de Pagamento:
               </span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/10 border border-white/10 text-white font-bold text-[11px]">
-                Transferência Bancária (IBAN)
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/10 border border-white/10 text-white font-bold text-[11px]">
-                Cartão
-              </span>
+              <div className="flex items-center flex-wrap gap-2">
+                {/* Multicaixa Express */}
+                <div
+                  title="Multicaixa Express"
+                  className="h-8 px-2.5 py-1 bg-white rounded-md flex items-center justify-center transition-transform hover:scale-105 shadow-xs"
+                >
+                  <img
+                    src="/media/payments/multicaixa-express.svg"
+                    alt="Multicaixa Express"
+                    className="h-4.5 w-auto max-w-[110px] object-contain"
+                  />
+                </div>
+
+                {/* Transferência Bancária (IBAN) */}
+                <div
+                  title="Transferência Bancária (IBAN)"
+                  className="h-8 px-2.5 py-1 bg-white rounded-md flex items-center justify-center transition-transform hover:scale-105 shadow-xs"
+                >
+                  <img
+                    src="/media/payments/iban.svg"
+                    alt="Transferência Bancária (IBAN)"
+                    className="h-4.5 w-auto max-w-[95px] object-contain"
+                  />
+                </div>
+
+                {/* Visa */}
+                <div
+                  title="Cartão Visa"
+                  className="h-8 px-2.5 py-1 bg-white rounded-md flex items-center justify-center transition-transform hover:scale-105 shadow-xs"
+                >
+                  <img
+                    src="/media/payments/visa.svg"
+                    alt="Visa"
+                    className="h-3.5 w-auto max-w-[45px] object-contain"
+                  />
+                </div>
+
+                {/* Mastercard */}
+                <div
+                  title="Cartão Mastercard"
+                  className="h-8 px-2.5 py-1 bg-white rounded-md flex items-center justify-center transition-transform hover:scale-105 shadow-xs"
+                >
+                  <img
+                    src="/media/payments/mastercard.svg"
+                    alt="Mastercard"
+                    className="h-5 w-auto max-w-[36px] object-contain"
+                  />
+                </div>
+              </div>
             </div>
 
             {/* Copyright and Back to Top */}
