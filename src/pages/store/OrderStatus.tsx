@@ -510,7 +510,9 @@ export default function OrderStatus() {
                               0,
                               Math.min(
                                 76,
-                                (currentIndex / (STATUS_STEPS.length - 1)) * 76,
+                                hasSubmittedProof && currentIndex === 0
+                                  ? 16
+                                  : (currentIndex / (STATUS_STEPS.length - 1)) * 76,
                               ),
                             )}%`,
                           }}
@@ -520,9 +522,9 @@ export default function OrderStatus() {
                         <div className="relative flex justify-between">
                           {STATUS_STEPS.map((step, idx) => {
                             const Icon = step.icon;
-                            const isDone = idx < currentIndex;
-                            const isCurrent = idx === currentIndex;
-                            const isPending = idx > currentIndex;
+                            const isDone = idx < currentIndex || (idx === 0 && hasSubmittedProof);
+                            const isCurrent = idx === currentIndex && (!hasSubmittedProof || currentIndex > 0);
+                            const isVerifying = idx === 1 && hasSubmittedProof && currentIndex === 0;
 
                             return (
                               <div
@@ -533,6 +535,8 @@ export default function OrderStatus() {
                                   className={`grid h-10 w-10 place-items-center rounded-2xl transition duration-300 ${
                                     isDone
                                       ? "bg-[#101114] text-white shadow-xs"
+                                      : isVerifying
+                                      ? "bg-amber-50 border-2 border-amber-500 text-amber-700 shadow-sm ring-4 ring-amber-100 animate-pulse"
                                       : isCurrent
                                       ? "bg-[#101114] text-white shadow-md ring-4 ring-neutral-200"
                                       : "bg-white text-neutral-300 border-2 border-neutral-200"
@@ -540,6 +544,8 @@ export default function OrderStatus() {
                                 >
                                   {isDone ? (
                                     <Check className="h-4 w-4 stroke-[3]" />
+                                  ) : isVerifying ? (
+                                    <Clock3 className="h-4 w-4" />
                                   ) : (
                                     <Icon className="h-4 w-4" />
                                   )}
@@ -547,17 +553,19 @@ export default function OrderStatus() {
 
                                 <p
                                   className={`mt-3 text-xs font-bold ${
-                                    isCurrent
+                                    isVerifying
+                                      ? "text-amber-800"
+                                      : isCurrent
                                       ? "text-[#101114]"
                                       : isDone
                                       ? "text-neutral-700"
                                       : "text-neutral-400"
                                   }`}
                                 >
-                                  {step.label}
+                                  {isVerifying ? "Em Conferência" : step.label}
                                 </p>
                                 <p className="mt-0.5 text-[11px] text-neutral-400 leading-tight">
-                                  {step.desc}
+                                  {isVerifying ? "Validação bancária" : step.desc}
                                 </p>
                               </div>
                             );
@@ -570,8 +578,9 @@ export default function OrderStatus() {
                     <div className="sm:hidden space-y-4 pt-1">
                       {STATUS_STEPS.map((step, idx) => {
                         const Icon = step.icon;
-                        const isDone = idx < currentIndex;
-                        const isCurrent = idx === currentIndex;
+                        const isDone = idx < currentIndex || (idx === 0 && hasSubmittedProof);
+                        const isCurrent = idx === currentIndex && (!hasSubmittedProof || currentIndex > 0);
+                        const isVerifying = idx === 1 && hasSubmittedProof && currentIndex === 0;
                         const isLast = idx === STATUS_STEPS.length - 1;
 
                         return (
@@ -579,7 +588,7 @@ export default function OrderStatus() {
                             {!isLast && (
                               <div
                                 className={`absolute left-4.5 top-9 bottom-0 w-0.5 -ml-px ${
-                                  idx < currentIndex
+                                  idx < currentIndex || (idx === 0 && hasSubmittedProof)
                                     ? "bg-[#101114]"
                                     : "bg-neutral-200"
                                 }`}
@@ -590,6 +599,8 @@ export default function OrderStatus() {
                               className={`relative z-10 grid h-9 w-9 shrink-0 place-items-center rounded-xl transition ${
                                 isDone
                                   ? "bg-[#101114] text-white shadow-2xs"
+                                  : isVerifying
+                                  ? "bg-amber-50 border-2 border-amber-500 text-amber-700 shadow-xs ring-4 ring-amber-100"
                                   : isCurrent
                                   ? "bg-[#101114] text-white shadow-xs ring-4 ring-neutral-200"
                                   : "bg-white text-neutral-300 border-2 border-neutral-200"
@@ -597,6 +608,8 @@ export default function OrderStatus() {
                             >
                               {isDone ? (
                                 <Check className="h-4 w-4 stroke-[3]" />
+                              ) : isVerifying ? (
+                                <Clock3 className="h-4 w-4" />
                               ) : (
                                 <Icon className="h-4 w-4" />
                               )}
@@ -606,23 +619,31 @@ export default function OrderStatus() {
                               <div className="flex items-center gap-2">
                                 <p
                                   className={`text-sm font-bold ${
-                                    isCurrent
+                                    isVerifying
+                                      ? "text-amber-800"
+                                      : isCurrent
                                       ? "text-[#101114]"
                                       : isDone
                                       ? "text-neutral-700"
                                       : "text-neutral-400"
                                   }`}
                                 >
-                                  {step.title}
+                                  {isVerifying ? "Em Conferência Financeira" : step.title}
                                 </p>
-                                {isCurrent && (
+                                {isVerifying ? (
+                                  <span className="inline-flex rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider animate-pulse">
+                                    A Validar
+                                  </span>
+                                ) : isCurrent ? (
                                   <span className="inline-flex rounded-full bg-[#101114] px-2 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider">
                                     Atual
                                   </span>
-                                )}
+                                ) : null}
                               </div>
                               <p className="mt-0.5 text-xs text-neutral-500">
-                                {step.desc}
+                                {isVerifying
+                                  ? "A equipa da loja está a conferir o comprovativo enviado"
+                                  : step.desc}
                               </p>
                             </div>
                           </div>
