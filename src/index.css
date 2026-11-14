@@ -926,6 +926,7 @@ html {
 .product-detail-not-found > button { display: inline-flex; min-height: 42px; align-items: center; gap: 8px; margin-top: 7px; padding: 0 16px; border: 1px solid #dedfe3; border-radius: 999px; color: #202127; font-size: 12px; font-weight: 700; }
 .product-detail-not-found > button svg { width: 16px; height: 16px; }
 .product-detail-mobile-search { display: none; }
+.product-gallery:not(.has-thumbs) { grid-template-columns: minmax(0, 1fr); }
 
 @media (max-width: 1399px) {
   .product-detail-main { width: calc(100% - 56px); }

@@ -60,6 +60,7 @@ export default function ProductDetail() {
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
+  const [imageFailed, setImageFailed] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [favorite, setFavorite] = useState(false);
   const [tab, setTab] = useState<"description" | "details">("description");
@@ -139,6 +140,9 @@ export default function ProductDetail() {
     () => (product?.images ?? []).filter((image) => /^https?:\/\//i.test(image)),
     [product?.images],
   );
+  useEffect(() => {
+    setImageFailed(false);
+  }, [activeImage, productId]);
   const cartCount = Object.values(cart).reduce((total, count) => total + Math.max(0, Number(count) || 0), 0);
   const productPrice = product ? Number(product.promo_price ?? product.price) : 0;
   const discount = product?.promo_price != null && product.price > 0
@@ -264,7 +268,7 @@ export default function ProductDetail() {
         </nav>
 
         <section className="product-detail-layout" aria-label={`Detalhes de ${product.name}`}>
-          <div className="product-gallery">
+          <div className={`product-gallery${images.length > 1 ? " has-thumbs" : ""}`}>
             {images.length > 1 && (
               <div className="product-gallery__thumbs" aria-label="Imagens do produto">
                 {images.map((image, index) => (
@@ -282,8 +286,8 @@ export default function ProductDetail() {
               </div>
             )}
             <div className="product-gallery__hero">
-              {currentImage ? (
-                <img key={currentImage} src={currentImage} alt={product.name} onError={(event) => { event.currentTarget.style.visibility = "hidden"; }} />
+              {currentImage && !imageFailed ? (
+                <img key={currentImage} src={currentImage} alt={product.name} onError={() => setImageFailed(true)} />
               ) : (
                 <div className="product-gallery__empty"><ImageOff aria-hidden="true" /><span>Imagem não disponível</span></div>
               )}
