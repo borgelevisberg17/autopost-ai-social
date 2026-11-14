@@ -2,14 +2,10 @@ import { useState, type FormEvent } from "react";
 import {
   ArrowRight,
   ArrowUp,
-  Headphones,
   HelpCircle,
   Mail,
   MessageCircle,
   PackageCheck,
-  RefreshCcw,
-  ShieldCheck,
-  Truck,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -113,54 +109,15 @@ export function StoreFooter({
 
   return (
     <footer id="contacto" className="bg-[#0b0c10] text-white mt-12 sm:mt-20">
-      {/* 1. EDITORIAL FISCAL & INSTITUTIONAL DISCLOSURE */}
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
-        <div className="rounded-3xl bg-white/[0.02] border border-white/5 p-6 sm:p-8 lg:p-10">
-          <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6 lg:gap-12">
-            {/* Title & Institutional Badge */}
-            <div className="lg:w-1/3 space-y-2.5">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-[11px] font-bold uppercase tracking-wider">
-                <ShieldCheck className="h-3.5 w-3.5" />
-                Compromisso & Transparência Fiscal
-              </span>
-              <h3 className="text-lg sm:text-xl font-extrabold text-white tracking-tight">
-                Garantia Comercial, Segurança e Rigor Fiscal
-              </h3>
-              <p className="text-xs text-neutral-400 leading-relaxed">
-                Informações legais, tributárias e diretrizes de atendimento ao consumidor para compras efetuadas em território nacional.
-              </p>
-            </div>
-
-            {/* Editorial Paragraph */}
-            <div className="lg:w-2/3 space-y-4 text-xs sm:text-sm text-neutral-300 leading-relaxed">
-              <p>
-                A <strong className="text-white font-bold">{company.name}</strong> opera em rigorosa conformidade com o regime comercial e tributário da República de Angola, assegurando faturação fiscal certificada perante a <strong className="text-white">AGT</strong> em todas as transações, com emissão de fatura/recibo e inclusão facultativa de NIF singular ou coletivo.
-              </p>
-              <p className="text-neutral-400 text-xs sm:text-[13px]">
-                Todos os produtos apresentados no catálogo beneficiam de garantia de autenticidade e reserva imediata de stock no momento da finalização do pedido. As expedições para Luanda e restantes províncias são processadas via operadores logísticos certificados, cumprindo prazos rigorosos de entrega. O consumidor beneficia do direito legal de troca ou devolução no prazo de até 7 dias corridos após a receção, salvaguardando a integridade do artigo e da embalagem de origem. O apoio ao cliente e pós-venda é prestado de forma direta e dedicada através dos nossos canais oficiais de WhatsApp.
-              </p>
-
-              {/* Fiscal & Trust Micro-badges */}
-              <div className="pt-2 flex flex-wrap items-center gap-2 sm:gap-3 text-[11px] font-medium text-neutral-400">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/[0.04] text-neutral-300">
-                  <ShieldCheck className="h-3.5 w-3.5 text-blue-400" />
-                  Conformidade AGT
-                </span>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/[0.04] text-neutral-300">
-                  <Truck className="h-3.5 w-3.5 text-blue-400" />
-                  Logística Nacional Assegurada
-                </span>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/[0.04] text-neutral-300">
-                  <RefreshCcw className="h-3.5 w-3.5 text-blue-400" />
-                  Direito de Troca (7 Dias)
-                </span>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/[0.04] text-neutral-300">
-                  <PackageCheck className="h-3.5 w-3.5 text-blue-400" />
-                  Stock em Tempo Real
-                </span>
-              </div>
-            </div>
-          </div>
+      {/* 1. NATURAL FISCAL & INSTITUTIONAL NOTICE (NO CARD, NO EYEBROW, NO TAGS) */}
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <div className="max-w-4xl space-y-3.5 text-xs sm:text-sm text-neutral-400 leading-relaxed">
+          <p>
+            A <strong className="text-white font-semibold">{company.name}</strong> opera em rigorosa conformidade com o regime comercial e tributário da República de Angola, assegurando faturação fiscal certificada perante a <strong className="text-white">AGT</strong> em todas as transações, com emissão de fatura/recibo e inclusão facultativa de NIF singular ou coletivo. Todos os produtos apresentados no catálogo beneficiam de garantia de autenticidade e reserva imediata de stock no momento da finalização do pedido.
+          </p>
+          <p>
+            As expedições para Luanda e restantes províncias são processadas via operadores logísticos certificados, cumprindo prazos rigorosos com acompanhamento em tempo real. Asseguramos o direito legal de troca ou devolução no prazo de até 7 dias corridos após a receção, salvaguardando a integridade do artigo e da embalagem original. O apoio ao cliente e pós-venda é prestado de forma direta e dedicada através dos nossos canais oficiais de WhatsApp.
+          </p>
         </div>
       </div>
 
