@@ -998,3 +998,59 @@ html {
   .product-related-card__image { aspect-ratio: 1 / .86; }
   .product-detail-footer { align-items: flex-start; flex-direction: column; padding: 14px 16px; }
 }
+
+
+/* Rating display */
+.product-rating { display: flex; align-items: center; gap: 6px; margin-top: 14px; }
+.product-rating__stars { display: flex; gap: 1px; color: #facc15; }
+.product-rating__stars svg { width: 16px; height: 16px; fill: currentColor; stroke: currentColor; }
+.product-rating__score { margin-left: 4px; font-size: 14px; font-weight: 700; color: #111216; }
+.product-rating__count { font-size: 13px; color: #73757b; }
+
+/* Variant selectors */
+.product-variant-section { margin-top: 20px; }
+.product-variant-section__label { margin: 0 0 10px; font-size: 14px; font-weight: 700; color: #111216; }
+.product-color-options { display: flex; align-items: center; gap: 14px; }
+.product-color-swatch { position: relative; width: 30px; height: 30px; flex: 0 0 auto; border: 2px solid #e0e1e5; border-radius: 50%; cursor: pointer; transition: transform 160ms ease, box-shadow 160ms ease; }
+.product-color-swatch:hover { transform: scale(1.08); }
+.product-color-swatch.is-active { border-color: var(--store-blue); box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--store-blue); }
+.product-size-options { display: flex; flex-wrap: wrap; gap: 10px; }
+.product-size-option { display: grid; min-width: 44px; height: 44px; place-items: center; padding: 0 12px; border: 1.5px solid #e0e1e5; border-radius: 10px; font-size: 14px; font-weight: 600; color: #111216; cursor: pointer; transition: border-color 160ms ease, background 160ms ease, color 160ms ease; }
+.product-size-option:hover { border-color: #a0a2a9; }
+.product-size-option.is-active { border-color: var(--store-blue); background: var(--store-blue); color: #fff; }
+
+/* Description features list */
+.product-description-features { display: grid; gap: 10px; margin-top: 16px; }
+.product-description-feature { display: flex; align-items: center; gap: 10px; font-size: 14px; color: #3a3d46; }
+.product-description-feature svg { width: 20px; height: 20px; flex: 0 0 auto; color: var(--store-blue); }
+
+/* Related product card favorite */
+.product-related-card { position: relative; }
+.product-related-card__favorite { position: absolute; top: 8px; right: 8px; z-index: 2; display: grid; width: 30px; height: 30px; place-items: center; border-radius: 50%; background: rgba(255,255,255,.92); color: #17181c; transition: transform 160ms ease, color 160ms ease; }
+.product-related-card__favorite:hover { transform: scale(1.08); background: #fff; }
+.product-related-card__favorite.is-active { color: #e43e55; }
+.product-related-card__favorite svg { width: 16px; height: 16px; }
+
+/* Cart discount field */
+.cart-discount-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding: 12px 14px; border: 1px solid #e3e5e8; border-radius: 14px; background: #f8f9fb; }
+.cart-discount-row__icon { flex: 0 0 auto; color: #92949b; }
+.cart-discount-row__icon svg { width: 20px; height: 20px; }
+.cart-discount-row input { flex: 1; min-width: 0; height: 36px; border: 0; outline: 0; background: transparent; font-size: 13px; color: #111216; }
+.cart-discount-row input::placeholder { color: #a0a2a9; }
+.cart-discount-row button { flex: 0 0 auto; min-height: 34px; padding: 0 16px; border: 1px solid #d9dbe0; border-radius: 999px; background: #fff; color: #17181c; font-size: 12px; font-weight: 700; transition: border-color 160ms ease, background 160ms ease, color 160ms ease; }
+.cart-discount-row button:hover { border-color: var(--store-blue); color: var(--store-blue); }
+
+/* Responsive for new elements */
+@media (max-width: 640px) {
+  .product-rating__stars svg { width: 14px; height: 14px; }
+  .product-rating__score { font-size: 13px; }
+  .product-rating__count { font-size: 11px; }
+  .product-variant-section { margin-top: 16px; }
+  .product-variant-section__label { font-size: 13px; }
+  .product-color-swatch { width: 26px; height: 26px; }
+  .product-size-options { gap: 8px; }
+  .product-size-option { min-width: 38px; height: 38px; font-size: 12px; }
+  .product-description-feature { font-size: 13px; }
+  .product-related-card__favorite { width: 26px; height: 26px; top: 6px; right: 6px; }
+  .product-related-card__favorite svg { width: 14px; height: 14px; }
+}
