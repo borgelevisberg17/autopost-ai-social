@@ -388,18 +388,20 @@ html {
   font-family: "DM Sans", system-ui, sans-serif;
 }
 .store-cart-sheet > button:last-child {
-  top: 28px !important;
-  right: 24px !important;
+  top: 18px !important;
+  right: 18px !important;
   display: grid;
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   place-items: center;
-  border-radius: 14px;
-  background: #f1f2f5;
+  border-radius: 9999px;
+  background: #f3f4f6;
+  color: #374151;
   opacity: 1;
+  transition: background 150ms ease;
 }
-.store-cart-sheet > button:last-child:hover { background: #e8eaf0; opacity: 1; }
-.store-cart-sheet > button:last-child svg { width: 22px; height: 22px; }
+.store-cart-sheet > button:last-child:hover { background: #e5e7eb; }
+.store-cart-sheet > button:last-child svg { width: 18px; height: 18px; }
 .store-header {
   position: sticky;
   top: 8px;

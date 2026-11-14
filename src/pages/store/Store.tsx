@@ -979,7 +979,7 @@ export default function Store() {
         <SheetContent
           side="right"
           style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
-          className="store-cart-sheet flex h-[100dvh] max-h-[100dvh] w-full flex-col overflow-hidden border-l border-[#e3e5e8] bg-white p-0 max-sm:inset-x-0 max-sm:top-auto max-sm:bottom-0 max-sm:h-[92dvh] max-sm:max-h-[92dvh] max-sm:w-full max-sm:rounded-t-[28px] max-sm:rounded-b-none max-sm:border-l-0 max-sm:border-t sm:max-w-xl sm:rounded-l-2xl"
+          className="store-cart-sheet flex h-full max-h-screen w-full flex-col overflow-hidden border-l border-neutral-200 bg-white p-0 max-sm:inset-x-0 max-sm:top-auto max-sm:bottom-0 max-sm:h-[90dvh] max-sm:max-h-[90dvh] max-sm:w-full max-sm:rounded-t-[28px] max-sm:rounded-b-none max-sm:border-l-0 max-sm:border-t sm:max-w-[460px] sm:rounded-l-3xl shadow-2xl"
         >
           {/* HEADER */}
 
@@ -1069,123 +1069,115 @@ export default function Store() {
           ) : (
             <>
               {/* SINGLE SCROLL AREA */}
+              {cartStep !== "success" && (
+                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-4 space-y-4">
+                  {cartStep === "cart" && (
+                    <>
+                      <div className="divide-y divide-neutral-100">
+                        {cartItems.map(({ product, quantity }) => {
+                          const unitPrice = priceOf(product);
+                          const itemTotal = unitPrice * quantity;
+                          const variant = cartVariants[product.id] || { size: 42, color: "Branco" };
 
-              {cartStep !==
-                "success" && (
-                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-                  {cartStep ===
-                    "cart" && (
-                    <div className="px-6 sm:px-8">
-                      <div className="divide-y divide-neutral-200">
-                        {cartItems.map(
-                          ({
-                            product,
-                            quantity,
-                          }) => {
-                            const unitPrice =
-                              priceOf(
-                                product,
-                              );
+                          return (
+                            <div key={product.id} className="py-4 first:pt-0 last:pb-0">
+                              <div className="flex items-start gap-3.5">
+                                <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-neutral-100">
+                                  {product.images?.[0] ? (
+                                    <img
+                                      src={product.images[0]}
+                                      alt={product.name}
+                                      className="h-full w-full object-cover"
+                                    />
+                                  ) : (
+                                    <div className="grid h-full place-items-center">
+                                      <ImageOff className="h-5 w-5 text-neutral-400" />
+                                    </div>
+                                  )}
+                                </div>
 
-                            const itemTotal =
-                              unitPrice *
-                              quantity;
-
-                            return (
-                              <div
-                                key={
-                                  product.id
-                                }
-                                className="py-6"
-                              >
-                                <div className="flex gap-4 sm:gap-6">
-                                  <div className="h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-[#f1f2f5] sm:h-36 sm:w-36">
-                                    {product
-                                      .images?.[0] ? (
-                                      <img
-                                        src={
-                                          product
-                                            .images[0]
-                                        }
-                                        alt={
-                                          product.name
-                                        }
-                                        className="h-full w-full object-cover"
-                                      />
-                                    ) : (
-                                      <div className="grid h-full place-items-center">
-                                        <ImageOff className="h-5 w-5 text-[#747b73]" />
-                                      </div>
-                                    )}
+                                <div className="min-w-0 flex-1">
+                                  {/* Row 1: Product name & price */}
+                                  <div className="flex items-start justify-between gap-2">
+                                    <p className="min-w-0 flex-1 truncate text-sm font-bold text-neutral-900">
+                                      {product.name}
+                                    </p>
+                                    <p className="shrink-0 text-sm font-bold tabular-nums text-neutral-900">
+                                      {formatMoney(itemTotal, currency)}
+                                    </p>
                                   </div>
 
-                                  <div className="min-w-0 flex-1">
-                                    <div className="flex min-w-0 items-start justify-between gap-3">
-                                      <p className="min-w-0 flex-1 line-clamp-2 text-base font-semibold leading-6 text-[#111216] sm:text-lg">
-                                        {product.name}
-                                      </p>
-                                      <p className="text-xs text-[#73757b] mt-0.5 font-medium">
-                                        Tamanho: {cartVariants[product.id]?.size || 42} • Cor: {cartVariants[product.id]?.color || "Branco"}
-                                      </p>
-                                      <p className="shrink-0 text-sm font-bold tabular-nums text-[#111216] sm:text-lg">
-                                        {formatMoney(itemTotal, currency)}
-                                      </p>
-                                    </div>
+                                  {/* Row 2: Variants */}
+                                  <p className="text-xs text-neutral-400 mt-0.5 font-medium">
+                                    Tamanho: {variant.size || 42} • Cor: {variant.color || "Branco"}
+                                  </p>
 
-                                    <div className="mt-7 flex items-center justify-between gap-3">
-                                      <div className="inline-flex h-12 items-center overflow-hidden rounded-full border border-[#e3e5e8]">
-                                        <button
-                                          type="button"
-                                          onClick={() => changeQuantity(product, -1)}
-                                          aria-label={`Diminuir quantidade de ${product.name}`}
-                                          className="grid h-12 w-12 place-items-center text-[#202226] transition hover:bg-[#f1f2f5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#4169f5]"
-                                        >
-                                          <Minus className="h-4 w-4" />
-                                        </button>
-                                        <span className="grid h-12 w-14 place-items-center bg-[#f1f2f5] text-base font-bold tabular-nums text-[#111216]">
-                                          {quantity}
-                                        </span>
-                                        <button
-                                          type="button"
-                                          onClick={() => changeQuantity(product, 1)}
-                                          aria-label={`Aumentar quantidade de ${product.name}`}
-                                          className="grid h-12 w-12 place-items-center text-[#202226] transition hover:bg-[#f1f2f5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#4169f5]"
-                                        >
-                                          <Plus className="h-4 w-4" />
-                                        </button>
-                                      </div>
-
+                                  {/* Row 3: Compact quantity pill and trash */}
+                                  <div className="mt-3 flex items-center justify-between">
+                                    <div className="inline-flex h-8 items-center rounded-lg bg-neutral-100 border border-neutral-200/60 p-0.5">
                                       <button
                                         type="button"
-                                        onClick={() => {
-                                          const next = { ...cart };
-                                          delete next[product.id];
-                                          updateCart(next);
-                                        }}
-                                        aria-label={`Remover ${product.name}`}
-                                        className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-[#f1f2f5] text-[#111216] transition hover:bg-[#e7e9ee] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4169f5]"
+                                        onClick={() => changeQuantity(product, -1)}
+                                        aria-label={`Diminuir quantidade de ${product.name}`}
+                                        className="grid h-7 w-7 place-items-center text-neutral-700 hover:bg-white rounded transition text-xs font-semibold"
                                       >
-                                        <Trash2 className="h-5 w-5" />
+                                        <Minus className="h-3.5 w-3.5" />
+                                      </button>
+                                      <span className="w-8 text-center text-xs font-bold tabular-nums text-neutral-900">
+                                        {quantity}
+                                      </span>
+                                      <button
+                                        type="button"
+                                        onClick={() => changeQuantity(product, 1)}
+                                        aria-label={`Aumentar quantidade de ${product.name}`}
+                                        className="grid h-7 w-7 place-items-center text-neutral-700 hover:bg-white rounded transition text-xs font-semibold"
+                                      >
+                                        <Plus className="h-3.5 w-3.5" />
                                       </button>
                                     </div>
+
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const next = { ...cart };
+                                        delete next[product.id];
+                                        updateCart(next);
+                                      }}
+                                      aria-label={`Remover ${product.name}`}
+                                      className="p-1.5 text-neutral-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </button>
                                   </div>
                                 </div>
                               </div>
-                            );
-                          },
-                        )}
+                            </div>
+                          );
+                        })}
                       </div>
+
                       {/* Coupon / Discount Code */}
-                      <div className="cart-discount-row mx-6 sm:mx-8 my-4">
-                        <span className="cart-discount-row__icon"><Tag className="h-4 w-4" /></span>
-                        <input type="text" placeholder="Código de desconto" />
-                        <button type="button" onClick={() => toast.info("Nenhum cupom ativo no momento.")}>Aplicar</button>
+                      <div className="pt-2">
+                        <div className="flex items-center gap-2 rounded-full bg-neutral-100/90 border border-neutral-200/60 p-1.5 pl-4 focus-within:border-blue-500 focus-within:bg-white transition">
+                          <Tag className="h-4 w-4 text-neutral-400 shrink-0" />
+                          <input
+                            type="text"
+                            placeholder="Código de desconto"
+                            className="flex-1 bg-transparent text-xs text-neutral-900 outline-none placeholder:text-neutral-400 min-w-0"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => toast.info("Nenhum cupom ativo no momento.")}
+                            className="h-8 px-4 rounded-full border border-blue-600 bg-white text-blue-600 font-bold text-xs hover:bg-blue-50 transition shrink-0"
+                          >
+                            Aplicar
+                          </button>
+                        </div>
                       </div>
-                    </div>
+                    </>
                   )}
 
-                  {cartStep ===
-                    "checkout" && (
+              {cartStep === "checkout" && (
                     <div className="px-5 py-6 sm:px-6">
                       <div className="mb-7">
                         <p className="text-2xl font-bold tracking-tight text-[#202522]">
@@ -1390,46 +1382,47 @@ export default function Store() {
               )}
 
               {/* FIXED FOOTER */}
-
-              {cartStep ===
-                "cart" && (
-                <div className="shrink-0 border-t border-[#e3e5e8] bg-white px-6 py-5 shadow-[0_-8px_24px_-24px_rgba(0,0,0,.4)] sm:px-8 sm:pb-24">
-                  <div className="space-y-3">
+              {cartStep === "cart" && (
+                <div className="shrink-0 border-t border-neutral-100 bg-white px-6 py-5 space-y-4">
+                  <div className="space-y-2.5">
                     <div className="flex items-center justify-between gap-4 text-sm">
-                      <span className="font-medium text-[#747b73]">Subtotal</span>
-                      <span className="font-semibold tabular-nums text-[#202522]">{formatMoney(cartTotal, currency)}</span>
+                      <span className="font-medium text-neutral-600">Subtotal</span>
+                      <span className="font-semibold tabular-nums text-neutral-900">{formatMoney(cartTotal, currency)}</span>
                     </div>
                     <div className="flex items-center justify-between gap-4 text-sm">
-                      <span className="inline-flex items-center gap-2 font-medium text-[#747b73]">Entrega <Info className="h-4 w-4 text-[#92949b]" /></span>
+                      <span className="inline-flex items-center gap-1.5 font-medium text-neutral-600">
+                        Entrega <Info className="h-3.5 w-3.5 text-neutral-400" />
+                      </span>
                       <span className="text-xs font-bold text-blue-600">Grátis</span>
                     </div>
-                    <div className="flex items-center justify-between gap-4 border-t border-[#ded9d0] pt-3">
-                      <span className="text-lg font-bold text-[#202522]">Total</span>
-                      <span className="text-2xl font-bold tracking-tight tabular-nums text-[#202522]">{formatMoney(cartTotal, currency)}</span>
+                    <div className="flex items-center justify-between gap-4 border-t border-neutral-100 pt-2.5">
+                      <span className="text-base font-bold text-neutral-900">Total</span>
+                      <span className="text-2xl font-extrabold tracking-tight tabular-nums text-neutral-900">{formatMoney(cartTotal, currency)}</span>
                     </div>
                   </div>
-                  <p className="mt-2 text-[11px] leading-5 text-[#747b73]">O valor e os detalhes da entrega serão combinados diretamente com a loja.</p>
-                  <Button
-                    type="button"
-                    onClick={goToCheckout}
-                    className="mt-4 h-14 w-full rounded-full bg-[#155eef] text-sm font-bold text-white shadow-md hover:bg-[#0e4fd1] focus-visible:ring-2 focus-visible:ring-[#4169f5] focus-visible:ring-offset-2 flex items-center justify-center gap-2"
-                  >
-                    <Lock className="h-4 w-4" />
-                    Finalizar Compra
-                    <ArrowRight className="ml-1 h-4 w-4" />
-                  </Button>
-                  <button
-                    type="button"
-                    onClick={continueShopping}
-                    className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-full border border-blue-600 bg-white text-sm font-bold text-[#111216] transition hover:bg-blue-50"
-                  >
-                    <ArrowLeft className="h-4 w-4" /> Continuar Comprando
-                  </button>
+                  <p className="text-[11px] leading-relaxed text-neutral-400">O valor e os detalhes da entrega serão combinados diretamente com a loja.</p>
+                  <div className="space-y-2.5 pt-1">
+                    <Button
+                      type="button"
+                      onClick={goToCheckout}
+                      className="h-12 w-full rounded-full bg-[#155eef] text-sm font-bold text-white shadow-md hover:bg-[#0e4fd1] focus-visible:ring-2 focus-visible:ring-[#4169f5] focus-visible:ring-offset-2 flex items-center justify-center gap-2 transition"
+                    >
+                      <Lock className="h-4 w-4" />
+                      Finalizar Compra →
+                    </Button>
+                    <button
+                      type="button"
+                      onClick={continueShopping}
+                      className="h-12 w-full rounded-full border border-blue-600 bg-white hover:bg-blue-50 text-neutral-900 font-bold text-sm flex items-center justify-center gap-2 transition"
+                    >
+                      <ArrowLeft className="h-4 w-4" />
+                      Continuar Comprando
+                    </button>
+                  </div>
                 </div>
               )}
 
-              {cartStep ===
-                "checkout" && (
+              {cartStep === "checkout" && (
                 <div className="shrink-0 border-t border-[#ded9d0] bg-[#fffdf9] px-5 py-5 sm:px-6">
                   <div className="mb-4 flex items-center justify-between gap-4">
                     <span className="text-sm font-medium text-[#747b73]">
