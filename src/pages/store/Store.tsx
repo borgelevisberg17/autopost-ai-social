@@ -13,6 +13,7 @@ import {
   Search,
   ShoppingBag,
   ShoppingCart,
+  Truck,
   X,
 } from "lucide-react";
 
@@ -870,13 +871,18 @@ export default function Store() {
         <SheetContent
           side="right"
           style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
-          className="flex h-[100dvh] max-h-[100dvh] w-full flex-col overflow-hidden border-l border-[#ded9d0] bg-[#fffdf9] p-0 max-sm:inset-x-0 max-sm:top-auto max-sm:bottom-0 max-sm:h-[92dvh] max-sm:max-h-[92dvh] max-sm:w-full max-sm:rounded-t-[28px] max-sm:rounded-b-none max-sm:border-l-0 max-sm:border-t sm:max-w-lg sm:rounded-l-2xl"
+          className="flex h-[100dvh] max-h-[100dvh] w-full flex-col overflow-hidden border-l border-[#ded9d0] bg-[#fffdf9] p-0 max-sm:inset-x-0 max-sm:top-auto max-sm:bottom-0 max-sm:h-[92dvh] max-sm:max-h-[92dvh] max-sm:w-full max-sm:rounded-t-[28px] max-sm:rounded-b-none max-sm:border-l-0 max-sm:border-t sm:max-w-xl sm:rounded-l-2xl"
         >
           {/* HEADER */}
 
           <div className="shrink-0 border-b border-[#ded9d0] bg-[#fffdf9] px-5 py-5 sm:px-6">
             <SheetHeader>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
+                {cartStep !== "checkout" && (
+                  <span className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-[#f1f2f5] text-[#111216]">
+                    {cartStep === "success" ? <Check className="h-8 w-8" /> : <ShoppingCart className="h-8 w-8" />}
+                  </span>
+                )}
                 {cartStep ===
                   "checkout" && (
                   <button
@@ -895,7 +901,7 @@ export default function Store() {
                   <SheetTitle
                     ref={checkoutTitleRef}
                     tabIndex={-1}
-                    className="text-xl font-bold tracking-tight text-[#202522] focus:outline-none"
+                    className="text-2xl font-bold tracking-tight text-[#202522] focus:outline-none"
                   >
                     {cartStep ===
                     "cart"
@@ -906,18 +912,13 @@ export default function Store() {
                         : "Pedido confirmado"}
                   </SheetTitle>
 
-                  {cartStep ===
-                    "cart" &&
-                    cartCount >
-                      0 && (
-                      <p className="mt-1 text-sm font-medium text-[#747b73]">
-                        {cartCount}{" "}
-                        {cartCount ===
-                        1
-                          ? "item"
-                          : "itens"}
-                      </p>
-                    )}
+                  {cartStep === "cart" && (
+                    <p className="mt-1 text-sm font-medium text-[#747b73]">
+                      {cartCount > 0
+                        ? `${cartCount} ${cartCount === 1 ? "item" : "itens"} na sua compra`
+                        : "Seu carrinho de compras"}
+                    </p>
+                  )}
 
                   {cartStep ===
                     "checkout" && (
@@ -992,7 +993,7 @@ export default function Store() {
                                 className="py-5"
                               >
                                 <div className="flex gap-4">
-                                  <div className="h-24 w-20 shrink-0 overflow-hidden rounded-lg bg-[#ebe7df] sm:h-28 sm:w-24">
+                                  <div className="h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-[#ebe7df] sm:h-32 sm:w-32">
                                     {product
                                       .images?.[0] ? (
                                       <img
@@ -1316,32 +1317,37 @@ export default function Store() {
 
               {cartStep ===
                 "cart" && (
-                <div className="shrink-0 border-t border-[#ded9d0] bg-[#fffdf9] px-5 py-5 sm:px-6">
-                  <div className="flex items-end justify-between gap-5">
-                    <div>
-                      <p className="text-xs font-medium text-[#747b73]">
-                        Total
-                      </p>
-
-                      <p className="mt-1 text-xl font-bold tracking-tight text-[#202522]">
-                        {formatMoney(
-                          cartTotal,
-                          currency,
-                        )}
-                      </p>
+                <div className="shrink-0 border-t border-[#ded9d0] bg-[#fffdf9] px-5 py-5 shadow-[0_-8px_24px_-24px_rgba(0,0,0,.4)] sm:px-6">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between gap-4 text-sm">
+                      <span className="font-medium text-[#747b73]">Subtotal</span>
+                      <span className="font-semibold tabular-nums text-[#202522]">{formatMoney(cartTotal, currency)}</span>
                     </div>
-
-                    <Button
-                      type="button"
-                      onClick={
-                        goToCheckout
-                      }
-                      className="h-12 rounded-full bg-black px-5 text-sm font-bold text-white hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
-                    >
-                      Finalizar pedido
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
+                    <div className="flex items-center justify-between gap-4 text-sm">
+                      <span className="inline-flex items-center gap-2 font-medium text-[#747b73]"><Truck className="h-4 w-4" />Entrega</span>
+                      <span className="text-xs font-medium text-[#747b73]">A combinar com a loja</span>
+                    </div>
+                    <div className="flex items-center justify-between gap-4 border-t border-[#ded9d0] pt-3">
+                      <span className="text-lg font-bold text-[#202522]">Total</span>
+                      <span className="text-2xl font-bold tracking-tight tabular-nums text-[#202522]">{formatMoney(cartTotal, currency)}</span>
+                    </div>
                   </div>
+                  <p className="mt-2 text-[11px] leading-5 text-[#747b73]">O valor e os detalhes da entrega serão combinados diretamente com a loja.</p>
+                  <Button
+                    type="button"
+                    onClick={goToCheckout}
+                    className="mt-4 h-14 w-full rounded-full bg-[#155eef] text-sm font-bold text-white shadow-md hover:bg-[#0e4fd1] focus-visible:ring-2 focus-visible:ring-[#4169f5] focus-visible:ring-offset-2"
+                  >
+                    Finalizar pedido
+                    <ArrowRight className="ml-auto h-5 w-5" />
+                  </Button>
+                  <button
+                    type="button"
+                    onClick={continueShopping}
+                    className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-full border border-[#4169f5] bg-white text-sm font-semibold text-[#202522] transition hover:bg-[#f4f7ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4169f5]"
+                  >
+                    <ArrowLeft className="h-4 w-4" /> Continuar a comprar
+                  </button>
                 </div>
               )}
 
