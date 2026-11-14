@@ -432,11 +432,11 @@ html {
   box-shadow: 0 5px 18px rgba(18, 20, 24, 0.06);
 }
 .store-header__bar {
-  display: grid;
-  min-height: 72px;
-  grid-template-columns: minmax(180px, 1fr) auto minmax(320px, 1fr);
+  display: flex;
   align-items: center;
-  gap: 24px;
+  justify-content: space-between;
+  min-height: 72px;
+  gap: 16px;
   padding: 0 18px 0 22px;
 }
 .store-brand {
@@ -474,12 +474,12 @@ html {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 9px;
+  gap: 6px;
   white-space: nowrap;
 }
 .store-nav button {
   min-height: 38px;
-  padding: 0 14px;
+  padding: 0 12px;
   border-radius: 999px;
   color: #222327;
   font-size: 13px;
@@ -526,7 +526,7 @@ html {
 .store-header__divider { width: 1px; height: 36px; background: #d7d7da; }
 .store-cart-icon {
   position: relative;
-  display: grid;
+  display: none;
   width: 42px;
   height: 42px;
   flex: 0 0 auto;
@@ -751,14 +751,14 @@ html {
 .store-footer__bottom span:last-child { font-size: 9px; font-weight: 700; letter-spacing: 0.16em; }
 
 @media (max-width: 1199px) {
-  .store-header__bar { grid-template-columns: minmax(155px, 1fr) auto minmax(250px, 1fr); gap: 10px; padding: 0 14px; }
-  .store-nav { gap: 2px; }
-  .store-nav button { padding: 0 10px; font-size: 12px; }
-  .store-search--desktop { width: 175px; }
+  .store-header__bar { gap: 12px; padding: 0 14px; }
+  .store-nav { gap: 3px; }
+  .store-nav button { padding: 0 9px; font-size: 12px; }
+  .store-search--desktop { width: 150px; }
   .store-product-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
 }
-@media (max-width: 920px) {
-  .store-header__bar { grid-template-columns: 1fr auto; min-height: 66px; }
+@media (max-width: 980px) {
+  .store-header__bar { min-height: 66px; }
   .store-nav { display: none; }
   .store-mobile-nav { display: flex; gap: 5px; overflow-x: auto; padding: 0 14px 10px; scrollbar-width: none; }
   .store-mobile-nav::-webkit-scrollbar { display: none; }
@@ -767,6 +767,7 @@ html {
   .store-mobile-nav .store-mobile-nav__active { background: #111216; color: #fff; }
   .store-header__actions { grid-column: 2; grid-row: 1; }
   .store-search--desktop, .store-header__divider, .store-cart-button { display: none; }
+  .store-cart-icon { display: grid; }
   .store-search--mobile { display: flex; width: calc(100% - 24px); margin: 0 14px 12px; padding: 0 12px; }
   .store-search--mobile input { height: 40px; }
   .store-hero { min-height: 450px; }
