@@ -6,6 +6,7 @@ import {
   Check,
   Heart,
   ImageOff,
+  Info,
   Loader2,
   Minus,
   Plus,
@@ -13,7 +14,7 @@ import {
   Search,
   ShoppingBag,
   ShoppingCart,
-  Truck,
+  Trash2,
   X,
 } from "lucide-react";
 
@@ -67,6 +68,7 @@ export default function Store() {
   const [storeLoaded, setStoreLoaded] = useState(false);
 
   const [category, setCategory] = useState("Todos");
+  const [showAllProducts, setShowAllProducts] = useState(false);
   const [search, setSearch] = useState(
     () => new URLSearchParams(window.location.search).get("q") || "",
   );
@@ -284,6 +286,16 @@ export default function Store() {
     search,
   ]);
 
+  const isUnfilteredProductView =
+    category === "Todos" && !search.trim();
+  const displayedProducts = useMemo(() => {
+    if (!isUnfilteredProductView || showAllProducts) {
+      return filteredProducts;
+    }
+
+    return filteredProducts.slice(0, 5);
+  }, [filteredProducts, isUnfilteredProductView, showAllProducts]);
+
   const cartItems = Object.entries(cart)
     .map(([id, quantity]) => ({
       product: products.find(
@@ -327,7 +339,7 @@ export default function Store() {
     .filter((item) => item !== "Todos")
     .map((name) => {
       const matchingProducts = products.filter((product) => product.category === name);
-      return { name, image: matchingProducts.find((product) => product.images?.[0])?.images[0], count: matchingProducts.length };
+      return { name, image: matchingProducts.find((product) => product.images?.[0])?.images[0] };
     });
 
   const toggleFavorite = (productId: string) => {
@@ -592,7 +604,7 @@ export default function Store() {
               <Button onClick={() => scrollTo("produtos")} className="store-hero__primary">
                 Explorar produtos <ArrowRight className="ml-2 h-[18px] w-[18px]" />
               </Button>
-              <button type="button" onClick={() => { setCategory("Todos"); scrollTo("produtos"); }} className="store-hero__secondary">
+              <button type="button" onClick={() => { setCategory("Todos"); setShowAllProducts(true); scrollTo("produtos"); }} className="store-hero__secondary">
                 <span className="store-hero__play" aria-hidden="true"><Play className="h-4 w-4" fill="currentColor" /></span>
                 Ver coleção
               </button>
@@ -622,7 +634,7 @@ export default function Store() {
                   <span className="store-category-card__image">
                     {item.image ? <img src={item.image} alt="" onError={(event) => { event.currentTarget.style.display = "none"; }} /> : <ShoppingBag aria-hidden="true" className="h-7 w-7" />}
                   </span>
-                  <span className="store-category-card__text"><strong>{item.name}</strong><small>{item.count} {item.count === 1 ? "produto" : "produtos"}</small></span>
+                  <span className="store-category-card__text"><strong>{item.name}</strong></span>
                   <ArrowRight aria-hidden="true" className="store-category-card__arrow h-[18px] w-[18px]" />
                 </button>
               ))}
@@ -635,15 +647,29 @@ export default function Store() {
         <section id="produtos" className="store-products">
           <div className="store-products__heading">
             <div>
-              <p className="store-products__eyebrow">A ESCOLHA DA LOJA</p>
-              <h2><span aria-hidden="true" />{category === "Todos" ? "Produtos em destaque" : category}</h2>
-              <p className="store-products__count">{filteredProducts.length} {filteredProducts.length === 1 ? "produto disponível" : "produtos disponíveis"}</p>
+              <h2><span aria-hidden="true" />{search.trim() ? "Resultados da pesquisa" : category !== "Todos" ? category : showAllProducts ? "Todos os produtos" : "Produtos em Destaque"}</h2>
+              {(search.trim() || category !== "Todos") && <p className="store-products__count">{filteredProducts.length} {filteredProducts.length === 1 ? "produto disponível" : "produtos disponíveis"}</p>}
             </div>
             <div className="store-products__heading-actions">
               {category !== "Todos" && <button type="button" onClick={() => setCategory("Todos")} className="store-filter-reset">Todas as categorias</button>}
-              <button type="button" onClick={() => { setCategory("Todos"); setSearch(""); }} className="store-view-all">
-                Ver todos os produtos <ArrowRight className="h-4 w-4" />
-              </button>
+              {((isUnfilteredProductView && filteredProducts.length > 5) || !isUnfilteredProductView) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (isUnfilteredProductView && showAllProducts) {
+                      setShowAllProducts(false);
+                      return;
+                    }
+                    setCategory("Todos");
+                    setSearch("");
+                    setShowAllProducts(true);
+                  }}
+                  className="store-view-all"
+                >
+                  {isUnfilteredProductView && showAllProducts ? "Ver destaques" : "Ver todos os produtos"}
+                  {isUnfilteredProductView && showAllProducts ? <ArrowLeft className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}
+                </button>
+              )}
             </div>
           </div>
 
@@ -656,8 +682,8 @@ export default function Store() {
               {(search || category !== "Todos") && <button type="button" onClick={() => { setSearch(""); setCategory("Todos"); }} className="store-empty__reset">Limpar filtros <ArrowRight className="h-4 w-4" /></button>}
             </div>
           ) : (
-            <div className={`store-product-grid${filteredProducts.length === 1 ? " store-product-grid--single" : ""}`}>
-              {filteredProducts.map((product, index) => {
+            <div className={`store-product-grid${displayedProducts.length === 1 ? " store-product-grid--single" : ""}`}>
+              {displayedProducts.map((product, index) => {
                 const price = priceOf(product);
                 const discount = product.promo_price != null && product.price > 0 ? Math.round(((product.price - product.promo_price) / product.price) * 100) : 0;
                 const isFavorite = favorites.includes(product.id);
@@ -873,16 +899,16 @@ export default function Store() {
         <SheetContent
           side="right"
           style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
-          className="flex h-[100dvh] max-h-[100dvh] w-full flex-col overflow-hidden border-l border-[#ded9d0] bg-[#fffdf9] p-0 max-sm:inset-x-0 max-sm:top-auto max-sm:bottom-0 max-sm:h-[92dvh] max-sm:max-h-[92dvh] max-sm:w-full max-sm:rounded-t-[28px] max-sm:rounded-b-none max-sm:border-l-0 max-sm:border-t sm:max-w-xl sm:rounded-l-2xl"
+          className="store-cart-sheet flex h-[100dvh] max-h-[100dvh] w-full flex-col overflow-hidden border-l border-[#e3e5e8] bg-white p-0 max-sm:inset-x-0 max-sm:top-auto max-sm:bottom-0 max-sm:h-[92dvh] max-sm:max-h-[92dvh] max-sm:w-full max-sm:rounded-t-[28px] max-sm:rounded-b-none max-sm:border-l-0 max-sm:border-t sm:max-w-xl sm:rounded-l-2xl"
         >
           {/* HEADER */}
 
-          <div className="shrink-0 border-b border-[#ded9d0] bg-[#fffdf9] px-5 py-5 sm:px-6">
+          <div className="shrink-0 border-b border-[#e3e5e8] bg-white px-6 py-5 sm:px-8 sm:py-7">
             <SheetHeader>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 sm:gap-6">
                 {cartStep !== "checkout" && (
-                  <span className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-[#f1f2f5] text-[#111216]">
-                    {cartStep === "success" ? <Check className="h-8 w-8" /> : <ShoppingCart className="h-8 w-8" />}
+                  <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-[#f1f2f5] text-[#111216] sm:h-20 sm:w-20">
+                    {cartStep === "success" ? <Check className="h-8 w-8" /> : <ShoppingCart className="h-8 w-8 sm:h-9 sm:w-9" />}
                   </span>
                 )}
                 {cartStep ===
@@ -903,7 +929,7 @@ export default function Store() {
                   <SheetTitle
                     ref={checkoutTitleRef}
                     tabIndex={-1}
-                    className="text-2xl font-bold tracking-tight text-[#202522] focus:outline-none"
+                    className="text-2xl font-bold tracking-tight text-[#111216] focus:outline-none sm:text-[30px]"
                   >
                     {cartStep ===
                     "cart"
@@ -915,10 +941,8 @@ export default function Store() {
                   </SheetTitle>
 
                   {cartStep === "cart" && (
-                    <p className="mt-1 text-sm font-medium text-[#747b73]">
-                      {cartCount > 0
-                        ? `${cartCount} ${cartCount === 1 ? "item" : "itens"} na sua compra`
-                        : "Seu carrinho de compras"}
+                    <p className="mt-1 text-sm font-medium text-[#73757b] sm:text-base">
+                      Seu carrinho de compras
                     </p>
                   )}
 
@@ -940,7 +964,7 @@ export default function Store() {
           cartStep ===
             "cart" ? (
             <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-8 text-center">
-              <div className="grid h-16 w-16 place-items-center rounded-2xl bg-[#ebe7df]">
+              <div className="grid h-16 w-16 place-items-center rounded-2xl bg-[#f1f2f5]">
                 <ShoppingCart className="h-6 w-6 text-[#5f625d]" />
               </div>
 
@@ -971,7 +995,7 @@ export default function Store() {
                 <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
                   {cartStep ===
                     "cart" && (
-                    <div className="px-5 sm:px-6">
+                    <div className="px-6 sm:px-8">
                       <div className="divide-y divide-neutral-200">
                         {cartItems.map(
                           ({
@@ -992,10 +1016,10 @@ export default function Store() {
                                 key={
                                   product.id
                                 }
-                                className="py-5"
+                                className="py-6"
                               >
-                                <div className="flex gap-4">
-                                  <div className="h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-[#ebe7df] sm:h-32 sm:w-32">
+                                <div className="flex gap-4 sm:gap-6">
+                                  <div className="h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-[#f1f2f5] sm:h-36 sm:w-36">
                                     {product
                                       .images?.[0] ? (
                                       <img
@@ -1006,7 +1030,7 @@ export default function Store() {
                                         alt={
                                           product.name
                                         }
-                                        className="h-full w-full object-contain p-2"
+                                        className="h-full w-full object-cover"
                                       />
                                     ) : (
                                       <div className="grid h-full place-items-center">
@@ -1016,89 +1040,50 @@ export default function Store() {
                                   </div>
 
                                   <div className="min-w-0 flex-1">
-                                    <div className="flex items-start justify-between gap-3">
-                                      <div className="min-w-0">
-                                        {product.category && (
-                                          <p className="mb-1 text-[9px] font-bold uppercase tracking-[0.16em] text-[#747b73]">
-                                            {
-                                              product.category
-                                            }
-                                          </p>
-                                        )}
+                                    <div className="flex min-w-0 items-start justify-between gap-3">
+                                      <p className="min-w-0 flex-1 line-clamp-2 text-base font-semibold leading-6 text-[#111216] sm:text-lg">
+                                        {product.name}
+                                      </p>
+                                      <p className="shrink-0 text-sm font-bold tabular-nums text-[#111216] sm:text-lg">
+                                        {formatMoney(itemTotal, currency)}
+                                      </p>
+                                    </div>
 
-                                        <p className="line-clamp-2 text-sm font-semibold leading-5 text-[#202522]">
-                                          {
-                                            product.name
-                                          }
-                                        </p>
+                                    <div className="mt-7 flex items-center justify-between gap-3">
+                                      <div className="inline-flex h-12 items-center overflow-hidden rounded-full border border-[#e3e5e8]">
+                                        <button
+                                          type="button"
+                                          onClick={() => changeQuantity(product, -1)}
+                                          aria-label={`Diminuir quantidade de ${product.name}`}
+                                          className="grid h-12 w-12 place-items-center text-[#202226] transition hover:bg-[#f1f2f5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#4169f5]"
+                                        >
+                                          <Minus className="h-4 w-4" />
+                                        </button>
+                                        <span className="grid h-12 w-14 place-items-center bg-[#f1f2f5] text-base font-bold tabular-nums text-[#111216]">
+                                          {quantity}
+                                        </span>
+                                        <button
+                                          type="button"
+                                          onClick={() => changeQuantity(product, 1)}
+                                          aria-label={`Aumentar quantidade de ${product.name}`}
+                                          className="grid h-12 w-12 place-items-center text-[#202226] transition hover:bg-[#f1f2f5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#4169f5]"
+                                        >
+                                          <Plus className="h-4 w-4" />
+                                        </button>
                                       </div>
 
                                       <button
                                         type="button"
                                         onClick={() => {
-                                          const next =
-                                            {
-                                              ...cart,
-                                            };
-
-                                          delete next[
-                                            product.id
-                                          ];
-
-                                          updateCart(
-                                            next,
-                                          );
+                                          const next = { ...cart };
+                                          delete next[product.id];
+                                          updateCart(next);
                                         }}
                                         aria-label={`Remover ${product.name}`}
-                                        className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-[#747b73] transition hover:bg-[#ebe7df] hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+                                        className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-[#f1f2f5] text-[#111216] transition hover:bg-[#e7e9ee] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4169f5]"
                                       >
-                                        <X className="h-4 w-4" />
+                                        <Trash2 className="h-5 w-5" />
                                       </button>
-                                    </div>
-
-                                    <p className="mt-2 text-sm font-bold text-[#202522]">
-                                      {formatMoney(
-                                        itemTotal,
-                                        currency,
-                                      )}
-                                    </p>
-
-                                    <div className="mt-4">
-                                      <div className="inline-flex h-9 items-center rounded-full border border-[#c9c3b8]">
-                                        <button
-                                          type="button"
-                                          onClick={() =>
-                                            changeQuantity(
-                                              product,
-                                              -1,
-                                            )
-                                          }
-                                          aria-label={`Diminuir quantidade de ${product.name}`}
-                                          className="grid h-9 w-9 place-items-center rounded-full text-[#303732] transition hover:bg-[#ebe7df] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
-                                        >
-                                          <Minus className="h-3.5 w-3.5" />
-                                        </button>
-
-                                        <span className="w-7 text-center text-sm font-bold text-[#202522]">
-                                          {
-                                            quantity
-                                          }
-                                        </span>
-
-                                        <button
-                                          type="button"
-                                          onClick={() =>
-                                            changeQuantity(
-                                              product,
-                                              1,
-                                            )
-                                          }
-                                          aria-label={`Aumentar quantidade de ${product.name}`}
-                                          className="grid h-9 w-9 place-items-center rounded-full text-[#303732] transition hover:bg-[#ebe7df] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
-                                        >
-                                          <Plus className="h-3.5 w-3.5" />
-                                        </button>
-                                      </div>
                                     </div>
                                   </div>
                                 </div>
@@ -1319,14 +1304,14 @@ export default function Store() {
 
               {cartStep ===
                 "cart" && (
-                <div className="shrink-0 border-t border-[#ded9d0] bg-[#fffdf9] px-5 py-5 shadow-[0_-8px_24px_-24px_rgba(0,0,0,.4)] sm:px-6">
+                <div className="shrink-0 border-t border-[#e3e5e8] bg-white px-6 py-5 shadow-[0_-8px_24px_-24px_rgba(0,0,0,.4)] sm:px-8 sm:pb-24">
                   <div className="space-y-3">
                     <div className="flex items-center justify-between gap-4 text-sm">
                       <span className="font-medium text-[#747b73]">Subtotal</span>
                       <span className="font-semibold tabular-nums text-[#202522]">{formatMoney(cartTotal, currency)}</span>
                     </div>
                     <div className="flex items-center justify-between gap-4 text-sm">
-                      <span className="inline-flex items-center gap-2 font-medium text-[#747b73]"><Truck className="h-4 w-4" />Entrega</span>
+                      <span className="inline-flex items-center gap-2 font-medium text-[#747b73]">Entrega <Info className="h-4 w-4 text-[#92949b]" /></span>
                       <span className="text-xs font-medium text-[#747b73]">A combinar com a loja</span>
                     </div>
                     <div className="flex items-center justify-between gap-4 border-t border-[#ded9d0] pt-3">
@@ -1338,7 +1323,7 @@ export default function Store() {
                   <Button
                     type="button"
                     onClick={goToCheckout}
-                    className="mt-4 h-14 w-full rounded-full bg-[#155eef] text-sm font-bold text-white shadow-md hover:bg-[#0e4fd1] focus-visible:ring-2 focus-visible:ring-[#4169f5] focus-visible:ring-offset-2"
+                    className="mt-4 h-14 w-full rounded-full bg-[#155eef] text-sm font-bold text-white shadow-md hover:bg-[#0e4fd1] focus-visible:ring-2 focus-visible:ring-[#4169f5] focus-visible:ring-offset-2 sm:h-[76px] sm:text-base"
                   >
                     Finalizar pedido
                     <ArrowRight className="ml-auto h-5 w-5" />
@@ -1346,7 +1331,7 @@ export default function Store() {
                   <button
                     type="button"
                     onClick={continueShopping}
-                    className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-full border border-[#4169f5] bg-white text-sm font-semibold text-[#202522] transition hover:bg-[#f4f7ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4169f5]"
+                    className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-full border border-[#4169f5] bg-white text-sm font-semibold text-[#202522] transition hover:bg-[#f4f7ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4169f5] sm:h-[68px]"
                   >
                     <ArrowLeft className="h-4 w-4" /> Continuar a comprar
                   </button>
