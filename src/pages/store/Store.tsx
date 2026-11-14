@@ -35,6 +35,7 @@ import { formatMoney } from "@/lib/format";
 import { toast } from "sonner";
 import { rememberOrder } from "@/lib/myOrders";
 import { MyOrders } from "@/components/store/MyOrders";
+import { StoreFooter } from "@/components/store/StoreFooter";
 
 type Company = {
   id: string;
@@ -1537,25 +1538,15 @@ export default function Store() {
 
       {/* FOOTER */}
 
-      <footer id="contacto" className="store-footer">
-        <div className="store-footer__main">
-          <div className="store-footer__brand">
-            <span className="store-brand__mark">{company.name.charAt(0).toUpperCase()}</span>
-            <div><strong>{company.name}</strong><p>{company.description || "Compre com confiança. Escolha com estilo."}</p></div>
-          </div>
-          <div className="store-footer__links">
-            <span>EXPLORE</span>
-            <button type="button" onClick={() => scrollTo("produtos")}>Produtos</button>
-            {categoryItems.length > 0 && <button type="button" onClick={() => scrollTo("categorias")}>Categorias</button>}
-          </div>
-          <div className="store-footer__links">
-            <span>CONTACTO</span>
-            {company.whatsapp ? <a href={`https://wa.me/${company.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noreferrer">Fale connosco <ArrowRight className="h-3.5 w-3.5" /></a> : <p>Estamos disponíveis para ajudar.</p>}
-            <button type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>Voltar ao topo ↑</button>
-          </div>
-        </div>
-        <div className="store-footer__bottom"><span>© {new Date().getFullYear()} {company.name}</span><span>LOJA ONLINE · VENDORA</span></div>
-      </footer>
+      <StoreFooter
+        company={company}
+        categories={categoryItems}
+        onCategoryClick={(catName) => {
+          setCategory(catName);
+          scrollTo("produtos");
+        }}
+        onNavigateSection={(sectionId) => scrollTo(sectionId)}
+      />
     </div>
   );
 }

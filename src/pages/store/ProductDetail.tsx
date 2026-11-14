@@ -24,6 +24,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { formatMoney } from "@/lib/format";
 import { toast } from "sonner";
+import { StoreFooter } from "@/components/store/StoreFooter";
 
 type StoreCompany = {
   id: string;
@@ -801,13 +802,10 @@ export default function ProductDetail() {
       </main>
 
       {/* 5. FOOTER */}
-      <footer className="product-detail-footer mt-16">
-        <button type="button" onClick={() => goToStore()}>
-          <span className="store-brand__mark">{company.name.charAt(0).toUpperCase()}</span>
-          <span>{company.name}</span>
-        </button>
-        <span>Produto e disponibilidade sujeitos à confirmação no pedido.</span>
-      </footer>
+      <StoreFooter
+        company={company}
+        onNavigateSection={(sectionId) => goToStore(sectionId)}
+      />
     </div>
   );
 }
