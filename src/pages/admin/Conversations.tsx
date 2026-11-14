@@ -13,6 +13,7 @@ import {
   Loader2,
   MessageCircle,
   MessageSquarePlus,
+  Moon,
   Package,
   Phone,
   RefreshCw,
@@ -22,8 +23,8 @@ import {
   ShieldCheck,
   Smile,
   Sparkles,
+  Sun,
   User,
-  UserCheck,
   UserRound,
   X,
   Zap,
@@ -51,6 +52,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { formatMoney } from "@/lib/format";
 
 type Account = {
@@ -95,7 +101,7 @@ type OrderPreview = {
 const db = supabase as any;
 const WEBHOOK_URL = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/whatsapp-webhook`;
 
-const QUICK_EMOJIS = ["👍", "🙏", "😊", "❤️", "👟", "📦", "🔥", "🤝", "✨", "👋"];
+const QUICK_EMOJIS = ["👍", "🙏", "😊", "❤️", "👟", "📦", "🔥", "🤝", "✨", "👋", "✅", "🙌"];
 
 const QUICK_REPLIES = [
   "Olá! Bem-vindo à nossa loja. Como podemos ajudar hoje? 😊",
@@ -113,15 +119,15 @@ async function fnError(error: unknown, fallback: string) {
   return fallback;
 }
 
-function getAvatarGradient(key: string): { bg: string; text: string } {
+function getAvatarColor(key: string): { bg: string; text: string } {
   const palettes = [
-    { bg: "bg-emerald-500", text: "text-white" },
-    { bg: "bg-teal-500", text: "text-white" },
-    { bg: "bg-sky-500", text: "text-white" },
-    { bg: "bg-indigo-500", text: "text-white" },
-    { bg: "bg-violet-500", text: "text-white" },
-    { bg: "bg-amber-600", text: "text-white" },
-    { bg: "bg-rose-500", text: "text-white" },
+    { bg: "bg-[#00a884]", text: "text-white" },
+    { bg: "bg-[#25D366]", text: "text-[#111b21]" },
+    { bg: "bg-[#0284c7]", text: "text-white" },
+    { bg: "bg-[#6366f1]", text: "text-white" },
+    { bg: "bg-[#8b5cf6]", text: "text-white" },
+    { bg: "bg-[#d97706]", text: "text-white" },
+    { bg: "bg-[#e11d48]", text: "text-white" },
   ];
   let hash = 0;
   for (let i = 0; i < key.length; i++) hash = (hash << 5) - hash + key.charCodeAt(i);
@@ -181,6 +187,17 @@ export default function Conversations() {
   const accountQuery = useWhatsAppAccount(company?.id);
   const account = accountQuery.data ?? null;
 
+  // WhatsApp Web Theme Mode: Dark by default (matching WhatsApp Web desktop reference) with 1-click Light mode toggle
+  const [theme, setTheme] = useState<"dark" | "light">(() => {
+    return (localStorage.getItem("whatsapp_theme") as "dark" | "light") || "dark";
+  });
+
+  const toggleTheme = () => {
+    const next = theme === "dark" ? "light" : "dark";
+    setTheme(next);
+    localStorage.setItem("whatsapp_theme", next);
+  };
+
   // Conversations & Messages state
   const [convos, setConvos] = useState<Convo[]>([]);
   const [latestMsgs, setLatestMsgs] = useState<Record<string, Msg>>({});
@@ -213,7 +230,7 @@ export default function Conversations() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Keep form in sync when account loads
+  // Sync setup form
   useEffect(() => {
     if (account) {
       setPnid(account.phone_number_id ?? "");
@@ -222,7 +239,7 @@ export default function Conversations() {
     }
   }, [account]);
 
-  // Load conversations and their latest messages
+  // Load conversations and latest messages
   const load = useCallback(async () => {
     if (!company) return;
     try {
@@ -233,15 +250,15 @@ export default function Conversations() {
         .order("last_message_at", { ascending: false })
         .limit(100);
 
-      const conversationsList = (cs ?? []) as Convo[];
-      setConvos(conversationsList);
+      const list = (cs ?? []) as Convo[];
+      setConvos(list);
 
-      if (conversationsList.length > 0) {
-        const convoIds = conversationsList.map((c) => c.id);
+      if (list.length > 0) {
+        const ids = list.map((c) => c.id);
         const { data: recentMsgs } = await db
           .from("messages")
           .select("*")
-          .in("conversation_id", convoIds)
+          .in("conversation_id", ids)
           .order("created_at", { ascending: false })
           .limit(300);
 
@@ -261,7 +278,7 @@ export default function Conversations() {
     }
   }, [company]);
 
-  // Load messages for the active conversation
+  // Load messages for active conversation
   const loadMsgs = useCallback(async (id: string) => {
     const { data } = await db
       .from("messages")
@@ -272,29 +289,26 @@ export default function Conversations() {
     setMsgs((data ?? []) as Msg[]);
   }, []);
 
-  // Initial load
   useEffect(() => {
     void load();
   }, [load]);
 
-  // Load messages whenever active conversation changes
   useEffect(() => {
     if (active) {
       void loadMsgs(active);
     }
   }, [active, loadMsgs]);
 
-  // Auto scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [msgs]);
 
-  // Real-time subscription & periodic poll backup
+  // Realtime subscription & polling backup
   useEffect(() => {
     if (!company) return;
 
     const channel = supabase
-      .channel(`admin-conversations-${company.id}`)
+      .channel(`admin-conversations-realtime-${company.id}`)
       .on(
         "postgres_changes",
         {
@@ -322,21 +336,20 @@ export default function Conversations() {
       )
       .subscribe();
 
-    const t = setInterval(() => {
+    const interval = setInterval(() => {
       void load();
       if (active) void loadMsgs(active);
     }, 12000);
 
     return () => {
       void supabase.removeChannel(channel);
-      clearInterval(t);
+      clearInterval(interval);
     };
   }, [company, active, load, loadMsgs]);
 
-  // Active conversation object
   const convo = useMemo(() => convos.find((c) => c.id === active) ?? null, [convos, active]);
 
-  // Load orders for active customer
+  // Load customer orders
   useEffect(() => {
     if (!convo?.customer_phone || !company) {
       setCustomerOrders([]);
@@ -357,17 +370,15 @@ export default function Conversations() {
       .catch(() => setLoadingOrders(false));
   }, [convo?.customer_phone, company]);
 
-  // Check 24-hour Meta service window
   const is24hWindowExpired = useMemo(() => {
     if (!convo?.last_inbound_at) return false;
     const diff = Date.now() - new Date(convo.last_inbound_at).getTime();
     return diff > 24 * 3600 * 1000;
   }, [convo?.last_inbound_at]);
 
-  // Filter conversations
+  // Filter list
   const filteredConvos = useMemo(() => {
     return convos.filter((c) => {
-      // Search
       const searchTerms = search.toLowerCase().trim();
       const matchesSearch =
         !searchTerms ||
@@ -377,7 +388,6 @@ export default function Conversations() {
 
       if (!matchesSearch) return false;
 
-      // Status filter
       if (filter === "unread") {
         const lastMsg = latestMsgs[c.id];
         return lastMsg && lastMsg.direction === "in";
@@ -401,7 +411,7 @@ export default function Conversations() {
           ? "Conversa devolvida ao Agente IA"
           : status === "handoff"
           ? "Atendimento assumido pela equipa"
-          : "Conversa marcada como fechada",
+          : "Conversa encerrada",
       );
       void load();
     }
@@ -413,7 +423,6 @@ export default function Conversations() {
     setText("");
     setSending(true);
 
-    // Optimistic message append
     const tempId = `temp-${Date.now()}`;
     const optimisticMsg: Msg = {
       id: tempId,
@@ -443,7 +452,6 @@ export default function Conversations() {
     void load();
   };
 
-  // Toggle master auto reply
   const toggleAutoReply = async (enabled: boolean) => {
     if (!account) return;
     const { error } = await db
@@ -452,7 +460,7 @@ export default function Conversations() {
       .eq("id", account.id);
 
     if (error) {
-      toast.error("Não foi possível alterar a resposta automática.");
+      toast.error("Não foi possível alterar o agente automático.");
     } else {
       toast.success(
         enabled
@@ -463,7 +471,6 @@ export default function Conversations() {
     }
   };
 
-  // Save Meta setup
   const saveAccountSetup = async () => {
     if (!company) return;
     if (!/^\d{5,30}$/.test(pnid.trim())) {
@@ -502,7 +509,6 @@ export default function Conversations() {
     void load();
   };
 
-  // Create or open new chat
   const handleStartNewChat = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!company) return;
@@ -511,18 +517,16 @@ export default function Conversations() {
       return toast.error("Introduza um número de WhatsApp válido.");
     }
 
-    // Check if exists
     const existing = convos.find((c) => c.customer_phone.replace(/\D/g, "") === cleanNumber);
     if (existing) {
       setActive(existing.id);
       setNewChatOpen(false);
       setNewPhone("");
       setNewName("");
-      toast.info("Conversa já existente selecionada.");
+      toast.info("Conversa existente selecionada.");
       return;
     }
 
-    // Insert new conversation
     const { data: newConvo, error } = await db
       .from("conversations")
       .insert({
@@ -553,155 +557,227 @@ export default function Conversations() {
   );
   const isConnected = connectionState === "connected";
 
+  const isDark = theme === "dark";
+
   return (
     <AdminLayout title="Conversas WhatsApp">
-      <div className="space-y-4">
-        {/* TOP STATUS RIBBON */}
-        <header className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-neutral-200/80 bg-white p-3.5 sm:px-5 shadow-xs">
+      {/* UNIFIED WHATSAPP WEB APPLICATION FRAME */}
+      <div
+        className={`w-full h-[calc(100vh-130px)] min-h-[640px] max-h-[920px] rounded-2xl border shadow-xl flex flex-col overflow-hidden transition-colors ${
+          isDark
+            ? "bg-[#111b21] border-[#222d34] text-[#e9edef]"
+            : "bg-white border-[#d1d7db] text-[#111b21]"
+        }`}
+      >
+        {/* 1. TOP COMMAND BAR (Integrated directly into the frame) */}
+        <header
+          className={`flex items-center justify-between px-4 py-2.5 border-b shrink-0 select-none ${
+            isDark ? "bg-[#202c33] border-[#2a3942]" : "bg-[#f0f2f5] border-[#e9edef]"
+          }`}
+        >
+          {/* Left: WhatsApp Business Status */}
           <div className="flex items-center gap-3 min-w-0">
-            <div className="relative grid h-10 w-10 place-items-center rounded-xl bg-[#25D366]/10 text-[#075E54]">
-              <MessageCircle className="h-5 w-5 fill-[#25D366] text-[#25D366]" />
-              <span
-                className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white ${
-                  isConnected ? "bg-emerald-500 animate-pulse" : "bg-amber-500"
-                }`}
-              />
+            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#25D366] text-white shadow-xs">
+              <MessageCircle className="h-5 w-5 fill-white" />
             </div>
+
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <h1 className="text-sm sm:text-base font-bold text-neutral-900 truncate">
+                <span className="font-bold text-xs sm:text-sm tracking-tight truncate">
                   WhatsApp Business
-                </h1>
+                </span>
                 <span
-                  className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase ${
+                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider ${
                     isConnected
-                      ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                      : "bg-amber-50 text-amber-700 border border-amber-200"
+                      ? "bg-[#00a884]/20 text-[#25D366]"
+                      : "bg-amber-500/20 text-amber-400"
                   }`}
                 >
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full ${
+                      isConnected ? "bg-[#25D366] animate-pulse" : "bg-amber-400"
+                    }`}
+                  />
                   {whatsappConnectionLabel(connectionState)}
                 </span>
               </div>
-              <p className="text-xs text-neutral-500 truncate">
-                {account?.display_phone
-                  ? `Linha oficial: ${account.display_phone}`
-                  : "Nenhum número validado na Meta"}
+              <p
+                className={`text-[11px] truncate font-mono ${
+                  isDark ? "text-[#8696a0]" : "text-[#667781]"
+                }`}
+              >
+                {account?.display_phone || "Sem número configurado"}
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5 sm:gap-4">
-            {/* Auto Reply Switch */}
+          {/* Right: Master Controls */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Master AI Agent Switch */}
             {account && (
-              <div className="flex items-center gap-2 pl-2 border-l border-neutral-200 sm:border-l-0">
+              <div
+                className={`flex items-center gap-2 px-2.5 py-1 rounded-full border ${
+                  isDark
+                    ? "bg-[#111b21] border-[#2a3942] text-[#e9edef]"
+                    : "bg-white border-[#d1d7db] text-[#111b21]"
+                }`}
+              >
                 <Switch
                   checked={account.auto_reply}
                   onCheckedChange={toggleAutoReply}
-                  id="auto-reply-switch"
+                  id="master-ai-toggle"
+                  className="data-[state=checked]:bg-[#00a884]"
                 />
                 <label
-                  htmlFor="auto-reply-switch"
-                  className="hidden md:inline text-xs font-semibold text-neutral-700 cursor-pointer select-none"
+                  htmlFor="master-ai-toggle"
+                  className="hidden md:inline text-[11px] font-bold cursor-pointer select-none"
                 >
-                  Agente IA automático
+                  {account.auto_reply ? "IA Ativa" : "IA Pausada"}
                 </label>
               </div>
             )}
 
-            {/* Refresh Button */}
-            <Button
-              variant="outline"
-              size="sm"
+            {/* Dark / Light Theme Toggle */}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              title={isDark ? "Mudar para modo claro" : "Mudar para modo escuro"}
+              className={`grid h-8 w-8 place-items-center rounded-full transition cursor-pointer ${
+                isDark
+                  ? "bg-[#111b21] hover:bg-[#2a3942] text-[#e9edef]"
+                  : "bg-white hover:bg-[#e9edef] text-[#54656f]"
+              }`}
+            >
+              {isDark ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4" />}
+            </button>
+
+            {/* Refresh */}
+            <button
+              type="button"
               onClick={() => {
                 setRefreshing(true);
                 void load();
                 if (active) void loadMsgs(active);
               }}
               disabled={refreshing}
-              className="h-9 px-3 rounded-full border-neutral-200 text-xs font-semibold"
+              title="Atualizar mensagens"
+              className={`grid h-8 w-8 place-items-center rounded-full transition cursor-pointer ${
+                isDark
+                  ? "bg-[#111b21] hover:bg-[#2a3942] text-[#e9edef]"
+                  : "bg-white hover:bg-[#e9edef] text-[#54656f]"
+              }`}
             >
-              <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${refreshing ? "animate-spin text-emerald-600" : ""}`} />
-              <span className="hidden sm:inline">Atualizar</span>
-            </Button>
+              <RefreshCw
+                className={`h-4 w-4 ${refreshing ? "animate-spin text-[#00a884]" : ""}`}
+              />
+            </button>
 
-            {/* Meta Configuration Trigger */}
+            {/* Meta Cloud API Drawer Trigger */}
             <Button
               variant="outline"
               size="sm"
               onClick={() => setSetupOpen(true)}
-              className="h-9 px-3.5 rounded-full border-neutral-200 bg-[#fbfaf6] hover:bg-neutral-100 text-neutral-800 text-xs font-semibold"
+              className={`h-8 px-3 rounded-full text-xs font-bold transition border ${
+                isDark
+                  ? "bg-[#111b21] border-[#2a3942] hover:bg-[#2a3942] text-[#e9edef]"
+                  : "bg-white border-[#d1d7db] hover:bg-[#e9edef] text-[#111b21]"
+              }`}
             >
-              <Settings className="h-3.5 w-3.5 mr-1.5 text-neutral-500" />
-              <span>Conexão Meta</span>
+              <Settings className="h-3.5 w-3.5 mr-1.5 opacity-70" />
+              <span className="hidden sm:inline">Meta API</span>
             </Button>
           </div>
         </header>
 
-        {/* MAIN WHATSAPP APP CANVAS */}
-        <div className="relative flex h-[calc(100vh-175px)] min-h-[580px] max-h-[860px] overflow-hidden rounded-2xl border border-neutral-200/90 bg-white shadow-sm">
-          {/* LEFT COLUMN: CHAT LIST SIDEBAR */}
+        {/* 2. MAIN 2-COLUMN WHATSAPP BODY */}
+        <div className="flex-1 flex overflow-hidden min-h-0">
+          {/* LEFT COLUMN: CONVERSATION LIST (SIDEBAR) */}
           <aside
-            className={`flex flex-col w-full md:w-[360px] lg:w-[400px] border-r border-[#e9edef] bg-white shrink-0 ${
-              active ? "hidden md:flex" : "flex"
-            }`}
+            className={`w-full md:w-[360px] lg:w-[390px] flex flex-col border-r shrink-0 min-h-0 ${
+              isDark ? "bg-[#111b21] border-[#222d34]" : "bg-white border-[#e9edef]"
+            } ${active ? "hidden md:flex" : "flex"}`}
           >
-            {/* Sidebar Top Profile & Header */}
-            <div className="flex items-center justify-between border-b border-[#e9edef] bg-[#f0f2f5] px-4 py-3">
-              <div className="flex items-center gap-3">
-                <div className="grid h-9 w-9 place-items-center rounded-full bg-[#101114] text-white font-bold text-xs shadow-xs">
-                  {company?.name?.charAt(0).toUpperCase() || "V"}
-                </div>
-                <div>
-                  <h2 className="text-sm font-bold text-[#111b21]">Conversas</h2>
-                  <p className="text-[11px] text-[#667781]">
-                    {convos.length} {convos.length === 1 ? "contacto" : "contactos"}
-                  </p>
-                </div>
+            {/* Sidebar Top: New Chat Trigger */}
+            <div
+              className={`flex items-center justify-between px-4 py-2.5 border-b ${
+                isDark ? "bg-[#111b21] border-[#222d34]" : "bg-white border-[#e9edef]"
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-sm tracking-tight">Conversas</span>
+                <span
+                  className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
+                    isDark ? "bg-[#202c33] text-[#8696a0]" : "bg-[#f0f2f5] text-[#667781]"
+                  }`}
+                >
+                  {convos.length}
+                </span>
               </div>
 
-              <div className="flex items-center gap-1">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setNewChatOpen(true)}
-                  title="Iniciar nova conversa"
-                  className="h-9 w-9 rounded-full text-[#54656f] hover:bg-[#e9edef] hover:text-[#111b21]"
-                >
-                  <MessageSquarePlus className="h-5 w-5" />
-                </Button>
-              </div>
+              <button
+                type="button"
+                onClick={() => setNewChatOpen(true)}
+                title="Iniciar nova conversa no WhatsApp"
+                className={`grid h-8 w-8 place-items-center rounded-full transition cursor-pointer ${
+                  isDark
+                    ? "bg-[#202c33] hover:bg-[#2a3942] text-[#00a884]"
+                    : "bg-[#f0f2f5] hover:bg-[#e9edef] text-[#008069]"
+                }`}
+              >
+                <MessageSquarePlus className="h-4 w-4" />
+              </button>
             </div>
 
             {/* Search Bar */}
-            <div className="p-2.5 border-b border-[#e9edef] bg-white">
+            <div
+              className={`p-2.5 border-b ${
+                isDark ? "bg-[#111b21] border-[#222d34]" : "bg-white border-[#e9edef]"
+              }`}
+            >
               <div className="relative flex items-center">
-                <Search className="absolute left-3.5 h-4 w-4 text-[#54656f]" />
+                <Search
+                  className={`absolute left-3.5 h-3.5 w-3.5 ${
+                    isDark ? "text-[#8696a0]" : "text-[#54656f]"
+                  }`}
+                />
                 <input
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Procurar ou criar conversa..."
-                  className="h-9 w-full rounded-lg bg-[#f0f2f5] pl-10 pr-8 text-xs font-normal text-[#111b21] placeholder:text-[#54656f] focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#00a884] transition"
+                  placeholder="Procurar conversa..."
+                  className={`h-8.5 w-full rounded-lg pl-9 pr-7 text-xs transition focus:outline-none ${
+                    isDark
+                      ? "bg-[#202c33] text-[#e9edef] placeholder:text-[#8696a0] focus:ring-1 focus:ring-[#00a884]"
+                      : "bg-[#f0f2f5] text-[#111b21] placeholder:text-[#54656f] focus:ring-1 focus:ring-[#008069]"
+                  }`}
                 />
                 {search && (
                   <button
                     type="button"
                     onClick={() => setSearch("")}
-                    className="absolute right-2.5 text-[#54656f] hover:text-[#111b21]"
+                    className="absolute right-2.5 opacity-60 hover:opacity-100"
                   >
-                    <X className="h-3.5 w-3.5" />
+                    <X className="h-3 w-3" />
                   </button>
                 )}
               </div>
             </div>
 
-            {/* Filter Pills (WhatsApp Web style) */}
-            <div className="flex items-center gap-1.5 overflow-x-auto px-3 py-2 border-b border-[#e9edef] bg-white scrollbar-none text-[11px]">
+            {/* Filter Pills (No ugly scrollbars, wraps gracefully) */}
+            <div
+              className={`flex flex-wrap items-center gap-1.5 px-3 py-2 border-b text-[11px] ${
+                isDark ? "bg-[#111b21] border-[#222d34]" : "bg-white border-[#e9edef]"
+              }`}
+            >
               <button
                 type="button"
                 onClick={() => setFilter("all")}
-                className={`px-3 py-1 rounded-full font-semibold transition cursor-pointer whitespace-nowrap ${
+                className={`px-2.5 py-1 rounded-full font-bold transition cursor-pointer ${
                   filter === "all"
-                    ? "bg-[#e7fce3] text-[#008069]"
+                    ? isDark
+                      ? "bg-[#00a884] text-[#111b21]"
+                      : "bg-[#008069] text-white"
+                    : isDark
+                    ? "bg-[#202c33] text-[#8696a0] hover:bg-[#2a3942]"
                     : "bg-[#f0f2f5] text-[#54656f] hover:bg-[#e9edef]"
                 }`}
               >
@@ -710,15 +786,19 @@ export default function Conversations() {
               <button
                 type="button"
                 onClick={() => setFilter("unread")}
-                className={`px-3 py-1 rounded-full font-semibold transition cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                className={`px-2.5 py-1 rounded-full font-bold transition cursor-pointer flex items-center gap-1 ${
                   filter === "unread"
-                    ? "bg-[#e7fce3] text-[#008069]"
+                    ? isDark
+                      ? "bg-[#00a884] text-[#111b21]"
+                      : "bg-[#008069] text-white"
+                    : isDark
+                    ? "bg-[#202c33] text-[#8696a0] hover:bg-[#2a3942]"
                     : "bg-[#f0f2f5] text-[#54656f] hover:bg-[#e9edef]"
                 }`}
               >
                 <span>Não lidas</span>
                 {convos.filter((c) => latestMsgs[c.id]?.direction === "in").length > 0 && (
-                  <span className="grid h-4 w-4 place-items-center rounded-full bg-[#25D366] text-white font-bold text-[9px]">
+                  <span className="grid h-3.5 min-w-3.5 px-1 place-items-center rounded-full bg-[#25D366] text-[#111b21] font-black text-[9px]">
                     {convos.filter((c) => latestMsgs[c.id]?.direction === "in").length}
                   </span>
                 )}
@@ -726,31 +806,43 @@ export default function Conversations() {
               <button
                 type="button"
                 onClick={() => setFilter("agent")}
-                className={`px-3 py-1 rounded-full font-semibold transition cursor-pointer whitespace-nowrap ${
+                className={`px-2.5 py-1 rounded-full font-bold transition cursor-pointer ${
                   filter === "agent"
-                    ? "bg-[#e7fce3] text-[#008069]"
+                    ? isDark
+                      ? "bg-[#00a884] text-[#111b21]"
+                      : "bg-[#008069] text-white"
+                    : isDark
+                    ? "bg-[#202c33] text-[#8696a0] hover:bg-[#2a3942]"
                     : "bg-[#f0f2f5] text-[#54656f] hover:bg-[#e9edef]"
                 }`}
               >
-                🤖 Agente IA
+                🤖 IA
               </button>
               <button
                 type="button"
                 onClick={() => setFilter("staff")}
-                className={`px-3 py-1 rounded-full font-semibold transition cursor-pointer whitespace-nowrap ${
+                className={`px-2.5 py-1 rounded-full font-bold transition cursor-pointer ${
                   filter === "staff"
-                    ? "bg-[#e7fce3] text-[#008069]"
+                    ? isDark
+                      ? "bg-[#00a884] text-[#111b21]"
+                      : "bg-[#008069] text-white"
+                    : isDark
+                    ? "bg-[#202c33] text-[#8696a0] hover:bg-[#2a3942]"
                     : "bg-[#f0f2f5] text-[#54656f] hover:bg-[#e9edef]"
                 }`}
               >
-                👤 Com a Equipa
+                👤 Equipa
               </button>
               <button
                 type="button"
                 onClick={() => setFilter("closed")}
-                className={`px-3 py-1 rounded-full font-semibold transition cursor-pointer whitespace-nowrap ${
+                className={`px-2.5 py-1 rounded-full font-bold transition cursor-pointer ${
                   filter === "closed"
-                    ? "bg-[#e7fce3] text-[#008069]"
+                    ? isDark
+                      ? "bg-[#00a884] text-[#111b21]"
+                      : "bg-[#008069] text-white"
+                    : isDark
+                    ? "bg-[#202c33] text-[#8696a0] hover:bg-[#2a3942]"
                     : "bg-[#f0f2f5] text-[#54656f] hover:bg-[#e9edef]"
                 }`}
               >
@@ -759,23 +851,28 @@ export default function Conversations() {
             </div>
 
             {/* Scrollable Conversation List */}
-            <div className="flex-1 overflow-y-auto divide-y divide-[#f0f2f5] whatsapp-chat-scroll">
+            <div
+              className={`flex-1 overflow-y-auto divide-y min-h-0 ${
+                isDark
+                  ? "whatsapp-dark-scroll divide-[#222d34]"
+                  : "whatsapp-chat-scroll divide-[#f0f2f5]"
+              }`}
+            >
               {loading ? (
-                <div className="p-8 text-center text-xs text-[#667781] space-y-2">
+                <div className="p-8 text-center text-xs opacity-60 space-y-2">
                   <Loader2 className="mx-auto h-5 w-5 animate-spin text-[#00a884]" />
                   <p>A carregar conversas...</p>
                 </div>
               ) : filteredConvos.length === 0 ? (
-                <div className="p-8 text-center text-xs text-[#667781] space-y-3">
-                  <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-[#f0f2f5] text-[#54656f]">
+                <div className="p-8 text-center text-xs opacity-60 space-y-3">
+                  <div
+                    className={`mx-auto grid h-12 w-12 place-items-center rounded-full ${
+                      isDark ? "bg-[#202c33]" : "bg-[#f0f2f5]"
+                    }`}
+                  >
                     <MessageCircle className="h-6 w-6" />
                   </div>
-                  <p className="font-semibold text-neutral-800">Nenhuma conversa encontrada</p>
-                  <p className="text-[11px] leading-relaxed max-w-[240px] mx-auto">
-                    {search
-                      ? "Nenhum contacto coincide com a pesquisa."
-                      : "As mensagens recebidas no WhatsApp aparecerão aqui automaticamente."}
-                  </p>
+                  <p className="font-bold">Nenhuma conversa encontrada</p>
                   <Button
                     variant="outline"
                     size="sm"
@@ -791,37 +888,41 @@ export default function Conversations() {
                   const isSelected = active === c.id;
                   const last = latestMsgs[c.id];
                   const hasInboundPending = last && last.direction === "in";
-                  const avatarColor = getAvatarGradient(c.customer_phone || c.id);
+                  const avatarColor = getAvatarColor(c.customer_phone || c.id);
                   const displayName = c.customer_name || `+${c.customer_phone}`;
 
                   return (
-                    <motion.button
+                    <button
                       key={c.id}
                       type="button"
-                      whileHover={{ backgroundColor: isSelected ? "#f0f2f5" : "#f8f9fb" }}
-                      whileTap={{ scale: 0.99 }}
                       onClick={() => setActive(c.id)}
-                      className={`flex w-full items-center gap-3 px-3.5 py-3 text-left transition-colors cursor-pointer ${
-                        isSelected ? "bg-[#f0f2f5]" : "bg-white"
+                      className={`flex w-full items-center gap-3 px-3.5 py-3 text-left transition-colors cursor-pointer select-none ${
+                        isSelected
+                          ? isDark
+                            ? "bg-[#2a3942]"
+                            : "bg-[#f0f2f5]"
+                          : isDark
+                          ? "hover:bg-[#202c33]"
+                          : "hover:bg-[#f5f6f6]"
                       }`}
                     >
                       {/* Avatar */}
                       <div
-                        className={`relative grid h-12 w-12 shrink-0 place-items-center rounded-full text-sm font-bold shadow-2xs ${avatarColor.bg} ${avatarColor.text}`}
+                        className={`relative grid h-11 w-11 shrink-0 place-items-center rounded-full text-sm font-bold shadow-xs ${avatarColor.bg} ${avatarColor.text}`}
                       >
                         {displayName.charAt(0).toUpperCase()}
                         {c.status === "open" && (
                           <span
                             title="Agente IA ativo"
-                            className="absolute -bottom-0.5 -right-0.5 grid h-4 w-4 place-items-center rounded-full bg-[#101114] text-[9px] text-white border border-white"
+                            className="absolute -bottom-0.5 -right-0.5 grid h-3.5 w-3.5 place-items-center rounded-full bg-[#111b21] text-[8px] text-[#25D366] border border-[#222d34]"
                           >
                             🤖
                           </span>
                         )}
                         {c.status === "handoff" && (
                           <span
-                            title="Com a equipa humana"
-                            className="absolute -bottom-0.5 -right-0.5 grid h-4 w-4 place-items-center rounded-full bg-blue-600 text-[9px] text-white border border-white"
+                            title="Com a equipa"
+                            className="absolute -bottom-0.5 -right-0.5 grid h-3.5 w-3.5 place-items-center rounded-full bg-blue-600 text-[8px] text-white border border-[#222d34]"
                           >
                             👤
                           </span>
@@ -831,16 +932,28 @@ export default function Conversations() {
                       {/* Content */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-1">
-                          <p className="truncate text-[13px] font-bold text-[#111b21]">
+                          <p className="truncate text-xs sm:text-[13px] font-bold">
                             {displayName}
                           </p>
-                          <span className="shrink-0 text-[10px] text-[#667781] font-medium">
+                          <span
+                            className={`shrink-0 text-[10px] font-medium ${
+                              hasInboundPending
+                                ? "text-[#25D366] font-bold"
+                                : isDark
+                                ? "text-[#8696a0]"
+                                : "text-[#667781]"
+                            }`}
+                          >
                             {formatChatTime(c.last_message_at)}
                           </span>
                         </div>
 
                         <div className="mt-0.5 flex items-center justify-between gap-2">
-                          <p className="truncate text-xs text-[#667781] flex items-center gap-1">
+                          <p
+                            className={`truncate text-xs flex items-center gap-1 ${
+                              isDark ? "text-[#8696a0]" : "text-[#667781]"
+                            }`}
+                          >
                             {last?.direction === "out" && (
                               <CheckCheck className="h-3.5 w-3.5 shrink-0 text-[#53bdeb]" />
                             )}
@@ -850,55 +963,75 @@ export default function Conversations() {
                           </p>
 
                           {hasInboundPending && (
-                            <span className="grid h-4 min-w-4 px-1 place-items-center rounded-full bg-[#25D366] text-[10px] font-bold text-white leading-none shrink-0 shadow-2xs">
+                            <span className="grid h-4 min-w-4 px-1 place-items-center rounded-full bg-[#25D366] text-[10px] font-black text-[#111b21] leading-none shrink-0 shadow-2xs">
                               1
                             </span>
                           )}
                         </div>
                       </div>
-                    </motion.button>
+                    </button>
                   );
                 })
               )}
             </div>
           </aside>
 
-          {/* RIGHT COLUMN: ACTIVE CHAT VIEWPORT */}
+          {/* RIGHT COLUMN: CHAT VIEWPORT */}
           <main
-            className={`flex-1 flex flex-col bg-[#efeae2] relative min-w-0 ${
+            className={`flex-1 flex flex-col relative min-w-0 min-h-0 ${
               !active ? "hidden md:flex" : "flex"
             }`}
           >
             {!convo ? (
-              /* EMPTY LANDING STATE (AUTHENTIC WHATSAPP WEB) */
-              <div className="flex flex-1 flex-col items-center justify-center p-8 text-center bg-[#f0f2f5] border-l border-[#e9edef]">
+              /* EMPTY LANDING SCREEN (AUTHENTIC WHATSAPP WEB) */
+              <div
+                className={`flex flex-1 flex-col items-center justify-center p-8 text-center border-l select-none ${
+                  isDark
+                    ? "bg-[#222e35] border-[#222d34]"
+                    : "bg-[#f0f2f5] border-[#e9edef]"
+                }`}
+              >
                 <div className="max-w-md space-y-4">
-                  <div className="mx-auto grid h-24 w-24 place-items-center rounded-full bg-[#25D366]/10 text-[#00a884] shadow-xs">
-                    <MessageCircle className="h-12 w-12 stroke-[1.5]" />
+                  <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-[#25D366]/15 text-[#25D366] shadow-sm">
+                    <MessageCircle className="h-10 w-10 fill-current stroke-none" />
                   </div>
-                  <h2 className="text-2xl font-bold tracking-tight text-[#111b21]">
-                    WhatsApp Business para a sua Loja
+                  <h2 className="text-xl sm:text-2xl font-bold tracking-tight">
+                    WhatsApp Web da Loja
                   </h2>
-                  <p className="text-xs sm:text-sm text-[#667781] leading-relaxed">
-                    Envie e receba mensagens dos seus clientes em tempo real. O agente de inteligência
-                    artificial responde automaticamente e a sua equipa pode assumir a qualquer instante.
+                  <p
+                    className={`text-xs leading-relaxed max-w-sm mx-auto ${
+                      isDark ? "text-[#8696a0]" : "text-[#667781]"
+                    }`}
+                  >
+                    Selecione uma conversa à esquerda para responder aos seus clientes ou acompanhar
+                    o atendimento automático do Agente de IA em tempo real.
                   </p>
-                  <div className="pt-4 flex items-center justify-center gap-2 text-xs text-[#8696a0]">
+                  <div
+                    className={`pt-6 flex items-center justify-center gap-1.5 text-[11px] ${
+                      isDark ? "text-[#8696a0]" : "text-[#8696a0]"
+                    }`}
+                  >
                     <ShieldCheck className="h-4 w-4 text-[#00a884]" />
-                    <span>Linha protegida pela Meta Cloud API com isolamento por empresa.</span>
+                    <span>Mensagens protegidas com encriptação oficial da Meta Cloud API.</span>
                   </div>
                 </div>
               </div>
             ) : (
-              /* ACTIVE CHAT VIEWPORT */
-              <div className="flex flex-1 flex-col h-full overflow-hidden">
+              /* ACTIVE CHAT SCREEN */
+              <div className="flex flex-1 flex-col h-full overflow-hidden min-h-0">
                 {/* 1. CHAT HEADER */}
-                <header className="flex items-center justify-between border-b border-[#e9edef] bg-[#f0f2f5] px-4 py-2.5 z-10 shadow-2xs">
+                <header
+                  className={`flex items-center justify-between px-4 py-2.5 border-b shrink-0 z-10 shadow-xs ${
+                    isDark
+                      ? "bg-[#202c33] border-[#2a3942] text-[#e9edef]"
+                      : "bg-[#f0f2f5] border-[#e9edef] text-[#111b21]"
+                  }`}
+                >
                   <div className="flex items-center gap-3 min-w-0">
                     <button
                       type="button"
                       onClick={() => setActive(null)}
-                      className="md:hidden grid h-8 w-8 place-items-center rounded-full text-[#54656f] hover:bg-[#e9edef]"
+                      className="md:hidden grid h-8 w-8 place-items-center rounded-full hover:bg-black/10"
                       aria-label="Voltar para a lista"
                     >
                       <ArrowLeft className="h-5 w-5" />
@@ -909,31 +1042,33 @@ export default function Conversations() {
                       className="flex items-center gap-3 cursor-pointer group min-w-0"
                     >
                       <div
-                        className={`grid h-10 w-10 shrink-0 place-items-center rounded-full text-sm font-bold shadow-2xs ${getAvatarGradient(
-                          convo.customer_phone,
-                        ).bg} text-white`}
+                        className={`grid h-10 w-10 shrink-0 place-items-center rounded-full text-sm font-bold shadow-xs ${
+                          getAvatarColor(convo.customer_phone).bg
+                        } ${getAvatarColor(convo.customer_phone).text}`}
                       >
                         {(convo.customer_name || convo.customer_phone).charAt(0).toUpperCase()}
                       </div>
                       <div className="min-w-0">
-                        <div className="flex items-center gap-1.5">
-                          <p className="truncate text-sm font-bold text-[#111b21] group-hover:underline">
-                            {convo.customer_name || `+${convo.customer_phone}`}
-                          </p>
-                        </div>
-                        <p className="text-[11px] text-[#667781] truncate">
+                        <p className="truncate text-xs sm:text-sm font-bold group-hover:underline">
+                          {convo.customer_name || `+${convo.customer_phone}`}
+                        </p>
+                        <p
+                          className={`text-[11px] truncate font-medium ${
+                            isDark ? "text-[#8696a0]" : "text-[#667781]"
+                          }`}
+                        >
                           {convo.status === "open" ? (
-                            <span className="text-emerald-700 font-semibold flex items-center gap-1">
-                              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                            <span className="text-[#25D366] flex items-center gap-1 font-bold">
+                              <span className="h-1.5 w-1.5 rounded-full bg-[#25D366] animate-pulse" />
                               Agente IA a responder
                             </span>
                           ) : convo.status === "handoff" ? (
-                            <span className="text-blue-700 font-semibold flex items-center gap-1">
-                              <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+                            <span className="text-sky-400 flex items-center gap-1 font-bold">
+                              <span className="h-1.5 w-1.5 rounded-full bg-sky-400" />
                               Atendimento com a equipa
                             </span>
                           ) : (
-                            <span className="text-neutral-500">Conversa fechada</span>
+                            <span>Conversa fechada</span>
                           )}
                         </p>
                       </div>
@@ -942,16 +1077,16 @@ export default function Conversations() {
 
                   {/* Header Actions */}
                   <div className="flex items-center gap-2">
-                    {/* Takeover or Handback button */}
+                    {/* Handoff / Return to AI */}
                     {convo.status === "open" ? (
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => setStatus("handoff")}
-                        className="h-8 px-2.5 sm:px-3 text-xs font-bold rounded-full border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 shadow-2xs"
+                        className="h-8 px-2.5 sm:px-3 text-xs font-bold rounded-full border-sky-400/40 bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 shadow-2xs"
                       >
-                        <UserRound className="h-3.5 w-3.5 mr-1 sm:mr-1.5" />
-                        <span className="hidden sm:inline">Assumir Atendimento</span>
+                        <UserRound className="h-3.5 w-3.5 mr-1" />
+                        <span className="hidden sm:inline">Assumir</span>
                         <span className="sm:hidden">Assumir</span>
                       </Button>
                     ) : (
@@ -959,9 +1094,9 @@ export default function Conversations() {
                         variant="outline"
                         size="sm"
                         onClick={() => setStatus("open")}
-                        className="h-8 px-2.5 sm:px-3 text-xs font-bold rounded-full border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 shadow-2xs"
+                        className="h-8 px-2.5 sm:px-3 text-xs font-bold rounded-full border-emerald-400/40 bg-emerald-500/10 hover:bg-emerald-500/20 text-[#25D366] shadow-2xs"
                       >
-                        <Bot className="h-3.5 w-3.5 mr-1 sm:mr-1.5 text-emerald-600" />
+                        <Bot className="h-3.5 w-3.5 mr-1" />
                         <span className="hidden sm:inline">Devolver à IA</span>
                         <span className="sm:hidden">IA</span>
                       </Button>
@@ -969,60 +1104,60 @@ export default function Conversations() {
 
                     {/* Close / Reopen */}
                     {convo.status !== "closed" ? (
-                      <Button
-                        variant="ghost"
-                        size="sm"
+                      <button
+                        type="button"
                         onClick={() => setStatus("closed")}
                         title="Fechar conversa"
-                        className="h-8 px-2.5 rounded-full text-xs font-semibold text-neutral-600 hover:text-neutral-900"
+                        className="h-8 px-2.5 rounded-full text-xs font-bold opacity-70 hover:opacity-100 transition cursor-pointer"
                       >
                         Fechar
-                      </Button>
+                      </button>
                     ) : (
-                      <Button
-                        variant="outline"
-                        size="sm"
+                      <button
+                        type="button"
                         onClick={() => setStatus("open")}
-                        className="h-8 px-2.5 rounded-full text-xs font-semibold text-neutral-700"
+                        className="h-8 px-2.5 rounded-full text-xs font-bold text-[#00a884] hover:underline"
                       >
                         Reabrir
-                      </Button>
+                      </button>
                     )}
 
                     {/* Customer Info Toggle */}
-                    <Button
-                      variant="ghost"
-                      size="icon"
+                    <button
+                      type="button"
                       onClick={() => setInfoOpen((v) => !v)}
                       title="Ver dados do cliente"
-                      className={`h-8 w-8 rounded-full ${infoOpen ? "bg-[#e9edef] text-[#111b21]" : "text-[#54656f]"}`}
+                      className={`grid h-8 w-8 place-items-center rounded-full transition cursor-pointer ${
+                        infoOpen ? "bg-white/10" : "hover:bg-white/10 opacity-80"
+                      }`}
                     >
                       <Info className="h-4 w-4" />
-                    </Button>
+                    </button>
                   </div>
                 </header>
 
-                {/* 2. CHAT STREAM (WHATSAPP BACKGROUND) */}
-                <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3.5 whatsapp-chat-bg whatsapp-chat-scroll">
-                  {/* Security message pill */}
-                  <div className="flex justify-center">
-                    <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#ffeecd] px-3 py-1 text-[11px] text-[#54656f] shadow-2xs max-w-md text-center">
-                      <ShieldCheck className="h-3.5 w-3.5 text-amber-700 shrink-0" />
-                      As mensagens são processadas com criptografia de ponta a ponta na Meta.
-                    </span>
-                  </div>
-
-                  {/* 24-hour Meta Policy Warning */}
+                {/* 2. CHAT STREAM AREA (With Authentic WhatsApp Background) */}
+                <div
+                  className={`flex-1 overflow-y-auto p-4 sm:p-5 space-y-3 min-h-0 ${
+                    isDark
+                      ? "whatsapp-chat-dark-bg whatsapp-dark-scroll"
+                      : "whatsapp-chat-bg whatsapp-chat-scroll"
+                  }`}
+                >
+                  {/* Meta 24-hour expiration notice */}
                   {is24hWindowExpired && (
                     <div className="flex justify-center">
-                      <span className="inline-flex items-center gap-1.5 rounded-lg bg-amber-50 border border-amber-200 px-3 py-1.5 text-[11px] font-medium text-amber-800 shadow-2xs max-w-lg text-center">
-                        <Clock className="h-3.5 w-3.5 text-amber-600 shrink-0" />
-                        Passaram 24h desde a última mensagem do cliente. A Meta exige nova mensagem do cliente para envio livre.
-                      </span>
+                      <div className="rounded-lg bg-amber-500/10 border border-amber-500/30 px-3 py-1.5 text-[11px] text-amber-400 shadow-xs max-w-md text-center flex items-center gap-2">
+                        <Clock className="h-3.5 w-3.5 shrink-0" />
+                        <span>
+                          Janela de 24h da Meta expirada. Aguarde nova mensagem do cliente para
+                          envio livre.
+                        </span>
+                      </div>
                     </div>
                   )}
 
-                  {/* Messages list with date grouping */}
+                  {/* Messages list */}
                   {msgs.map((m, idx) => {
                     const showDateBadge =
                       idx === 0 || !isSameDay(msgs[idx - 1].created_at, m.created_at);
@@ -1032,10 +1167,16 @@ export default function Conversations() {
                     const isStaff = m.sender === "staff";
 
                     return (
-                      <div key={m.id} className="space-y-3">
+                      <div key={m.id} className="space-y-2">
                         {showDateBadge && (
                           <div className="flex justify-center my-3">
-                            <span className="rounded-md bg-white/90 backdrop-blur-xs px-2.5 py-1 text-[11px] font-bold text-[#54656f] shadow-2xs">
+                            <span
+                              className={`rounded-lg px-2.5 py-1 text-[11px] font-bold shadow-xs select-none ${
+                                isDark
+                                  ? "bg-[#182229] text-[#8696a0]"
+                                  : "bg-white text-[#667781]"
+                              }`}
+                            >
                               {formatChatDateBadge(m.created_at)}
                             </span>
                           </div>
@@ -1043,22 +1184,26 @@ export default function Conversations() {
 
                         <div className={`flex ${isInbound ? "justify-start" : "justify-end"}`}>
                           <div
-                            className={`relative max-w-[85%] sm:max-w-[70%] rounded-2xl px-3.5 py-2 text-[13px] leading-relaxed shadow-[0_1px_0.5px_rgba(11,20,26,0.13)] ${
+                            className={`relative max-w-[75%] sm:max-w-[65%] rounded-2xl px-3.5 py-2 text-[13px] leading-relaxed shadow-sm ${
                               isInbound
-                                ? "bg-white text-[#111b21] rounded-tl-xs"
+                                ? isDark
+                                  ? "bg-[#202c33] text-[#e9edef] rounded-tl-xs"
+                                  : "bg-white text-[#111b21] rounded-tl-xs"
+                                : isDark
+                                ? "bg-[#005c4b] text-[#e9edef] rounded-tr-xs"
                                 : "bg-[#d9fdd3] text-[#111b21] rounded-tr-xs"
                             }`}
                           >
                             {/* Sender Tag on Outbound */}
                             {!isInbound && (
-                              <div className="flex items-center gap-1 mb-0.5">
+                              <div className="flex items-center gap-1 mb-1">
                                 {isAgent ? (
-                                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 uppercase tracking-wider">
+                                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#25D366] uppercase tracking-wider">
                                     <Sparkles className="h-2.5 w-2.5" />
-                                    Agente Vendora
+                                    Agente IA
                                   </span>
                                 ) : isStaff ? (
-                                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-neutral-600 uppercase tracking-wider">
+                                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-sky-400 uppercase tracking-wider">
                                     <User className="h-2.5 w-2.5" />
                                     Equipa
                                   </span>
@@ -1069,15 +1214,19 @@ export default function Conversations() {
                             {/* Message Body */}
                             <p className="whitespace-pre-wrap break-words">{m.body}</p>
 
-                            {/* Timestamp & Status Checkmark */}
-                            <div className="mt-1 flex items-center justify-end gap-1 text-[10px] text-[#667781]">
+                            {/* Timestamp & Status Icon */}
+                            <div
+                              className={`mt-1 flex items-center justify-end gap-1 text-[10px] ${
+                                isDark ? "text-[#8696a0]" : "text-[#667781]"
+                              }`}
+                            >
                               <span>{formatChatTime(m.created_at)}</span>
                               {!isInbound && (
                                 <>
                                   {m.status === "sending" ? (
-                                    <Clock className="h-3 w-3 text-neutral-400" />
+                                    <Clock className="h-3 w-3 opacity-60" />
                                   ) : m.status === "failed" ? (
-                                    <span className="text-red-500 font-bold" title={m.error || "Falhou"}>
+                                    <span className="text-red-400 font-bold" title={m.error || "Falhou"}>
                                       ✕
                                     </span>
                                   ) : (
@@ -1094,79 +1243,145 @@ export default function Conversations() {
                   <div ref={messagesEndRef} />
                 </div>
 
-                {/* 3. QUICK CHIPS STRIP */}
-                <div className="border-t border-[#e9edef] bg-[#f0f2f5] px-3 py-1.5 flex items-center gap-1.5 overflow-x-auto scrollbar-none text-xs">
-                  <span className="text-[11px] font-bold text-[#54656f] uppercase tracking-wider shrink-0 mr-1">
-                    Rápido:
-                  </span>
-                  {QUICK_EMOJIS.map((emoji) => (
-                    <button
-                      key={emoji}
-                      type="button"
-                      onClick={() => setText((prev) => prev + emoji)}
-                      className="px-2 py-0.5 rounded-full hover:bg-white text-sm transition cursor-pointer"
-                    >
-                      {emoji}
-                    </button>
-                  ))}
-                  <div className="h-4 w-px bg-neutral-300 shrink-0 mx-1" />
-                  {QUICK_REPLIES.slice(0, 2).map((reply, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      onClick={() => setText(reply)}
-                      className="truncate max-w-[200px] px-2.5 py-0.5 rounded-full bg-white text-[11px] font-medium text-[#54656f] hover:text-[#111b21] hover:border-black border border-neutral-200 transition shrink-0"
-                    >
-                      {reply}
-                    </button>
-                  ))}
-                </div>
-
-                {/* 4. CHAT INPUT FOOTER */}
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    void send();
-                  }}
-                  className="flex items-center gap-2 border-t border-[#e9edef] bg-[#f0f2f5] p-3"
+                {/* 3. INPUT FOOTER (Clean WhatsApp Web footer without native scrollbars) */}
+                <footer
+                  className={`border-t px-3 py-2.5 shrink-0 select-none ${
+                    isDark
+                      ? "bg-[#202c33] border-[#2a3942]"
+                      : "bg-[#f0f2f5] border-[#e9edef]"
+                  }`}
                 >
-                  <div className="relative flex-1">
-                    <textarea
-                      ref={textareaRef}
-                      value={text}
-                      rows={1}
-                      onChange={(e) => setText(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && !e.shiftKey) {
-                          e.preventDefault();
-                          void send();
-                        }
-                      }}
-                      placeholder="Escrever mensagem como equipa (Enter para enviar)..."
-                      maxLength={4000}
-                      className="w-full resize-none rounded-xl bg-white px-4 py-2.5 text-xs text-[#111b21] placeholder:text-[#54656f] focus:outline-none focus:ring-1 focus:ring-[#00a884] shadow-xs max-h-32 transition"
-                    />
-                  </div>
-
-                  <motion.button
-                    type="submit"
-                    whileTap={{ scale: 0.92 }}
-                    whileHover={{ scale: 1.05 }}
-                    disabled={sending || !text.trim()}
-                    aria-label="Enviar mensagem"
-                    className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#00a884] text-white hover:bg-[#008f6f] disabled:opacity-40 disabled:cursor-not-allowed shadow-xs transition cursor-pointer"
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      void send();
+                    }}
+                    className="flex items-center gap-2"
                   >
-                    {sending ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Send className="h-4 w-4 fill-white translate-x-0.5" />
-                    )}
-                  </motion.button>
-                </form>
+                    {/* Quick Emojis Popover */}
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button
+                          type="button"
+                          title="Inserir emoji"
+                          className={`grid h-9 w-9 shrink-0 place-items-center rounded-full transition cursor-pointer ${
+                            isDark
+                              ? "hover:bg-[#2a3942] text-[#8696a0]"
+                              : "hover:bg-[#e9edef] text-[#54656f]"
+                          }`}
+                        >
+                          <Smile className="h-5 w-5" />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        side="top"
+                        align="start"
+                        className={`w-64 p-2.5 rounded-2xl shadow-xl border ${
+                          isDark
+                            ? "bg-[#202c33] border-[#2a3942] text-white"
+                            : "bg-white border-[#d1d7db] text-black"
+                        }`}
+                      >
+                        <p className="text-[11px] font-bold opacity-60 mb-1.5 px-1">
+                          Emojis rápidos
+                        </p>
+                        <div className="grid grid-cols-6 gap-1.5 text-lg">
+                          {QUICK_EMOJIS.map((emoji) => (
+                            <button
+                              key={emoji}
+                              type="button"
+                              onClick={() => setText((prev) => prev + emoji)}
+                              className="h-8 w-8 grid place-items-center rounded-lg hover:bg-white/10 transition cursor-pointer"
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+
+                    {/* Quick Canned Replies Popover */}
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button
+                          type="button"
+                          title="Respostas prontas"
+                          className={`grid h-9 w-9 shrink-0 place-items-center rounded-full transition cursor-pointer ${
+                            isDark
+                              ? "hover:bg-[#2a3942] text-[#8696a0]"
+                              : "hover:bg-[#e9edef] text-[#54656f]"
+                          }`}
+                        >
+                          <Zap className="h-5 w-5" />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        side="top"
+                        align="start"
+                        className={`w-80 p-3 rounded-2xl shadow-xl border space-y-1.5 ${
+                          isDark
+                            ? "bg-[#202c33] border-[#2a3942] text-white"
+                            : "bg-white border-[#d1d7db] text-black"
+                        }`}
+                      >
+                        <p className="text-[11px] font-bold opacity-60 px-1">
+                          Modelos de Resposta Rápida
+                        </p>
+                        {QUICK_REPLIES.map((reply, i) => (
+                          <button
+                            key={i}
+                            type="button"
+                            onClick={() => setText(reply)}
+                            className="w-full text-left text-xs p-2 rounded-xl hover:bg-white/10 transition leading-relaxed block"
+                          >
+                            {reply}
+                          </button>
+                        ))}
+                      </PopoverContent>
+                    </Popover>
+
+                    {/* Message Text Input */}
+                    <div className="flex-1 min-w-0">
+                      <textarea
+                        ref={textareaRef}
+                        value={text}
+                        rows={1}
+                        onChange={(e) => setText(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && !e.shiftKey) {
+                            e.preventDefault();
+                            void send();
+                          }
+                        }}
+                        placeholder="Escrever mensagem..."
+                        maxLength={4000}
+                        className={`w-full resize-none rounded-xl px-4 py-2 text-xs leading-normal transition focus:outline-none ${
+                          isDark
+                            ? "bg-[#2a3942] text-[#e9edef] placeholder:text-[#8696a0]"
+                            : "bg-white text-[#111b21] placeholder:text-[#54656f]"
+                        }`}
+                      />
+                    </div>
+
+                    {/* Send Button */}
+                    <button
+                      type="submit"
+                      disabled={sending || !text.trim()}
+                      aria-label="Enviar mensagem"
+                      className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#00a884] text-white hover:bg-[#02906f] disabled:opacity-40 disabled:cursor-not-allowed shadow-xs transition cursor-pointer"
+                    >
+                      {sending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Send className="h-4 w-4 fill-white translate-x-0.5" />
+                      )}
+                    </button>
+                  </form>
+                </footer>
               </div>
             )}
 
-            {/* CUSTOMER DETAILS SIDE PANEL (SLIDE-OVER) */}
+            {/* CUSTOMER DETAILS SLIDE-OVER */}
             <AnimatePresence>
               {infoOpen && convo && (
                 <motion.div
@@ -1174,43 +1389,47 @@ export default function Conversations() {
                   animate={{ x: 0 }}
                   exit={{ x: "100%" }}
                   transition={{ type: "spring", damping: 25, stiffness: 280 }}
-                  className="absolute inset-y-0 right-0 z-20 w-80 sm:w-96 border-l border-[#e9edef] bg-white shadow-xl flex flex-col"
+                  className={`absolute inset-y-0 right-0 z-20 w-80 sm:w-96 border-l shadow-2xl flex flex-col ${
+                    isDark
+                      ? "bg-[#111b21] border-[#222d34] text-[#e9edef]"
+                      : "bg-white border-[#e9edef] text-[#111b21]"
+                  }`}
                 >
-                  {/* Panel Header */}
-                  <div className="flex items-center justify-between border-b border-[#e9edef] bg-[#f0f2f5] px-4 py-3">
-                    <h3 className="text-sm font-bold text-[#111b21]">Dados do Cliente</h3>
-                    <Button
-                      variant="ghost"
-                      size="icon"
+                  <div
+                    className={`flex items-center justify-between px-4 py-3 border-b ${
+                      isDark ? "bg-[#202c33] border-[#2a3942]" : "bg-[#f0f2f5] border-[#e9edef]"
+                    }`}
+                  >
+                    <h3 className="text-sm font-bold">Dados do Cliente</h3>
+                    <button
+                      type="button"
                       onClick={() => setInfoOpen(false)}
-                      className="h-8 w-8 rounded-full text-[#54656f]"
+                      className="p-1 rounded-full hover:bg-white/10"
                     >
                       <X className="h-4 w-4" />
-                    </Button>
+                    </button>
                   </div>
 
-                  {/* Panel Content */}
                   <div className="flex-1 overflow-y-auto p-5 space-y-6">
-                    {/* Contact Profile Card */}
                     <div className="text-center space-y-2">
                       <div
-                        className={`mx-auto grid h-16 w-16 place-items-center rounded-full text-xl font-bold text-white shadow-md ${getAvatarGradient(
-                          convo.customer_phone,
-                        ).bg}`}
+                        className={`mx-auto grid h-16 w-16 place-items-center rounded-full text-xl font-bold shadow-md ${
+                          getAvatarColor(convo.customer_phone).bg
+                        } ${getAvatarColor(convo.customer_phone).text}`}
                       >
                         {(convo.customer_name || convo.customer_phone).charAt(0).toUpperCase()}
                       </div>
-                      <h4 className="text-base font-bold text-[#111b21]">
+                      <h4 className="text-base font-bold">
                         {convo.customer_name || `+${convo.customer_phone}`}
                       </h4>
-                      <p className="text-xs text-[#667781]">+{convo.customer_phone}</p>
+                      <p className="text-xs opacity-70">+{convo.customer_phone}</p>
 
                       <div className="pt-2">
                         <a
                           href={`https://wa.me/${convo.customer_phone.replace(/\D/g, "")}`}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex items-center gap-1.5 rounded-full bg-[#25D366]/10 px-3.5 py-1 text-xs font-bold text-[#075E54] hover:bg-[#25D366]/20 transition"
+                          className="inline-flex items-center gap-1.5 rounded-full bg-[#25D366]/20 px-3.5 py-1 text-xs font-bold text-[#25D366] hover:bg-[#25D366]/30 transition"
                         >
                           <ExternalLink className="h-3.5 w-3.5" />
                           <span>Abrir no WhatsApp Oficial</span>
@@ -1218,11 +1437,16 @@ export default function Conversations() {
                       </div>
                     </div>
 
-                    {/* Status & Timing */}
-                    <div className="rounded-xl border border-neutral-200/80 bg-[#fbfaf6] p-3.5 space-y-2 text-xs">
-                      <div className="flex justify-between py-1 border-b border-neutral-200/60">
-                        <span className="text-neutral-500">Estado</span>
-                        <span className="font-bold text-neutral-900">
+                    <div
+                      className={`rounded-xl border p-3.5 space-y-2 text-xs ${
+                        isDark
+                          ? "bg-[#202c33] border-[#2a3942]"
+                          : "bg-neutral-50 border-neutral-200"
+                      }`}
+                    >
+                      <div className="flex justify-between py-1 border-b border-white/10">
+                        <span className="opacity-70">Estado</span>
+                        <span className="font-bold">
                           {convo.status === "open"
                             ? "🤖 Agente IA"
                             : convo.status === "handoff"
@@ -1230,15 +1454,15 @@ export default function Conversations() {
                             : "Fechada"}
                         </span>
                       </div>
-                      <div className="flex justify-between py-1 border-b border-neutral-200/60">
-                        <span className="text-neutral-500">Início</span>
-                        <span className="font-semibold text-neutral-800">
+                      <div className="flex justify-between py-1 border-b border-white/10">
+                        <span className="opacity-70">Início</span>
+                        <span className="font-semibold">
                           {new Date(convo.created_at).toLocaleDateString("pt-PT")}
                         </span>
                       </div>
                       <div className="flex justify-between py-1">
-                        <span className="text-neutral-500">Última interação</span>
-                        <span className="font-semibold text-neutral-800">
+                        <span className="opacity-70">Última mensagem</span>
+                        <span className="font-semibold">
                           {new Date(convo.last_message_at).toLocaleTimeString("pt-PT", {
                             hour: "2-digit",
                             minute: "2-digit",
@@ -1247,42 +1471,43 @@ export default function Conversations() {
                       </div>
                     </div>
 
-                    {/* Customer Orders in Vendora */}
                     <div className="space-y-3">
-                      <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-500 flex items-center gap-1.5">
-                        <Package className="h-3.5 w-3.5 text-neutral-700" />
+                      <h4 className="text-xs font-bold uppercase tracking-wider opacity-60 flex items-center gap-1.5">
+                        <Package className="h-3.5 w-3.5" />
                         <span>Pedidos na Loja</span>
                       </h4>
 
                       {loadingOrders ? (
-                        <div className="p-4 text-center text-xs text-neutral-400">
-                          <Loader2 className="mx-auto h-4 w-4 animate-spin text-neutral-500 mb-1" />
-                          A pesquisar histórico...
+                        <div className="p-4 text-center text-xs opacity-60">
+                          <Loader2 className="mx-auto h-4 w-4 animate-spin mb-1" />
+                          A pesquisar pedidos...
                         </div>
                       ) : customerOrders.length === 0 ? (
-                        <p className="rounded-xl border border-dashed border-neutral-200 p-4 text-center text-xs text-neutral-500">
-                          Nenhum pedido finalizado encontrado com este contacto telefónico.
+                        <p className="rounded-xl border border-dashed border-white/20 p-4 text-center text-xs opacity-60">
+                          Nenhum pedido registado com este telefone.
                         </p>
                       ) : (
                         <div className="space-y-2">
                           {customerOrders.map((o) => (
                             <div
                               key={o.id}
-                              className="flex items-center justify-between rounded-xl border border-neutral-200 bg-white p-3 text-xs shadow-2xs"
+                              className={`flex items-center justify-between rounded-xl border p-3 text-xs shadow-xs ${
+                                isDark
+                                  ? "bg-[#202c33] border-[#2a3942]"
+                                  : "bg-white border-neutral-200"
+                              }`}
                             >
                               <div>
-                                <p className="font-bold text-neutral-900">
-                                  #{o.id.slice(0, 8).toUpperCase()}
-                                </p>
-                                <p className="text-[11px] text-neutral-400">
+                                <p className="font-bold">#{o.id.slice(0, 8).toUpperCase()}</p>
+                                <p className="text-[11px] opacity-60">
                                   {new Date(o.created_at).toLocaleDateString("pt-PT")}
                                 </p>
                               </div>
                               <div className="text-right">
-                                <p className="font-extrabold text-neutral-900">
+                                <p className="font-extrabold">
                                   {formatMoney(o.total, company?.currency)}
                                 </p>
-                                <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-neutral-100 text-neutral-700 uppercase">
+                                <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-white/10 uppercase">
                                   {o.status}
                                 </span>
                               </div>
@@ -1308,13 +1533,12 @@ export default function Conversations() {
               <span>Conexão WhatsApp Business</span>
             </SheetTitle>
             <SheetDescription>
-              A Vendora usa a Meta Cloud API oficial. Cada loja liga o seu número próprio com total
-              isolamento de conversas e dados.
+              A Vendora utiliza a Meta Cloud API oficial. Cada empresa liga o seu número próprio com
+              isolamento seguro de dados.
             </SheetDescription>
           </SheetHeader>
 
           <div className="mt-6 space-y-6">
-            {/* Status card */}
             <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4 space-y-1">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-neutral-600">Estado da Conexão</span>
@@ -1331,7 +1555,6 @@ export default function Conversations() {
               </p>
             </div>
 
-            {/* Form */}
             <div className="space-y-4">
               <div>
                 <label className="text-xs font-bold text-neutral-700 block mb-1.5">
@@ -1344,7 +1567,7 @@ export default function Conversations() {
                   className="font-mono text-xs"
                 />
                 <p className="text-[11px] text-neutral-400 mt-1">
-                  Encontrado no painel do Meta Developers em WhatsApp &gt; API Setup.
+                  Obtido no portal Meta for Developers em WhatsApp &gt; API Setup.
                 </p>
               </div>
 
@@ -1382,14 +1605,13 @@ export default function Conversations() {
               </Button>
             </div>
 
-            {/* Webhook Configuration Guide */}
             <div className="rounded-xl border border-neutral-200 bg-white p-4 space-y-3">
               <h4 className="text-xs font-bold text-neutral-800 flex items-center gap-1.5">
                 <Zap className="h-4 w-4 text-emerald-600" />
                 Configurar Webhook na Meta
               </h4>
               <p className="text-xs text-neutral-500 leading-relaxed">
-                No portal Meta for Developers, configure este endereço exato como URL de callback e
+                No painel Meta for Developers, configure este endereço exato como URL de callback e
                 subscreva o campo <strong className="text-black">messages</strong>.
               </p>
 
@@ -1401,7 +1623,7 @@ export default function Conversations() {
                     void navigator.clipboard.writeText(WEBHOOK_URL);
                     toast.success("Endereço do webhook copiado!");
                   }}
-                  className="text-neutral-500 hover:text-black p-1"
+                  className="text-neutral-500 hover:text-black p-1 cursor-pointer"
                 >
                   <Copy className="h-4 w-4" />
                 </button>

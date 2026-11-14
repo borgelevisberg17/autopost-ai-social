@@ -621,7 +621,9 @@ export function AdminLayout({
         {/* PAGE */}
         <div
           className={cn(
-            "admin-workspace mx-auto w-full max-w-[1480px] px-4 py-6 sm:px-7 sm:py-8 lg:px-10 lg:py-10",
+            title?.includes("Conversas")
+              ? "mx-auto w-full max-w-[1600px] px-2 py-2 sm:px-4 sm:py-3 lg:px-6 lg:py-4"
+              : "admin-workspace mx-auto w-full max-w-[1480px] px-4 py-6 sm:px-7 sm:py-8 lg:px-10 lg:py-10",
             title !== "Configurações" && "admin-workspace--quiet",
           )}
         >
