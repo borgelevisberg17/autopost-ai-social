@@ -106,22 +106,22 @@ function channelLabel(channel: string) {
 function statusTone(status: string) {
   switch (status) {
     case "pending":
-      return "bg-[#f5f5f2] text-[#5f625d]";
+      return "bg-amber-50 text-amber-800 border border-amber-200/70 font-semibold rounded-md";
 
     case "confirmed":
-      return "bg-[#ebe7df] text-[#5f625d]";
+      return "bg-sky-50 text-sky-700 border border-sky-200/70 font-semibold rounded-md";
 
     case "shipped":
-      return "bg-[#202522] text-white";
+      return "bg-indigo-50 text-indigo-700 border border-indigo-200/70 font-semibold rounded-md";
 
     case "completed":
-      return "bg-black text-white";
+      return "bg-emerald-50 text-emerald-700 border border-emerald-200/70 font-semibold rounded-md";
 
     case "cancelled":
-      return "bg-[#ebe7df] text-[#a7aaa2]";
+      return "bg-rose-50 text-rose-700 border border-rose-200/70 font-semibold rounded-md";
 
     default:
-      return "bg-[#ebe7df] text-[#747b73]";
+      return "bg-slate-100 text-slate-700 border border-slate-200 font-semibold rounded-md";
   }
 }
 
@@ -566,18 +566,18 @@ export default function Orders() {
     <AdminLayout title="Pedidos">
       <div className="space-y-7">
         {/* HEADER */}
-        <section className="flex flex-col gap-5 pb-2 lg:flex-row lg:items-end lg:justify-between">
+        <section className="flex flex-col gap-4 pb-1 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#a7aaa2]">
-              Operação
-            </p>
+            <span className="mb-2 inline-flex items-center gap-1.5 rounded-md border border-emerald-200/80 bg-emerald-50 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-emerald-800">
+              Operação de Vendas
+            </span>
 
-            <h1 className="font-serif text-[clamp(2rem,4vw,2.8rem)] font-medium leading-[1.04] tracking-[-0.045em] text-[#202522]">
+            <h1 className="font-sans text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
               Pedidos
             </h1>
 
-            <p className="mt-2 text-sm leading-6 text-[#747b73]">
-              Gerencie pedidos, clientes, pagamentos e o envio das vendas.
+            <p className="mt-1 text-xs sm:text-sm text-slate-500">
+              Gerencie pedidos, clientes, pagamentos e o envio das vendas em tempo real.
             </p>
           </div>
 
@@ -585,16 +585,16 @@ export default function Orders() {
             <button
               type="button"
               onClick={exportOrders}
-              className="inline-flex min-h-10 items-center gap-2 border border-[#ded9d0] bg-[#fffdf9] px-4 text-sm font-medium transition hover:border-neutral-400 hover:bg-[#f1eee7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+              className="inline-flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3.5 text-xs font-semibold text-slate-700 shadow-2xs transition hover:bg-slate-50 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
             >
-              <Download className="h-4 w-4" />
-              Exportar
+              <Download className="h-3.5 w-3.5" />
+              Exportar CSV
             </button>
           </div>
         </section>
 
-        {/* SUMMARY */}
-        <section className="grid border-y border-[#ded9d0] sm:grid-cols-2 lg:grid-cols-6">
+        {/* SUMMARY TABS */}
+        <section className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
           <SummaryItem
             label="Todos"
             value={stats.total}
@@ -606,6 +606,7 @@ export default function Orders() {
             label="Pendentes"
             value={stats.pending}
             active={filter === "pending"}
+            tone="amber"
             onClick={() => setFilter("pending")}
           />
 
@@ -613,6 +614,7 @@ export default function Orders() {
             label="Confirmados"
             value={stats.confirmed}
             active={filter === "confirmed"}
+            tone="sky"
             onClick={() => setFilter("confirmed")}
           />
 
@@ -620,6 +622,7 @@ export default function Orders() {
             label="Enviados"
             value={stats.shipped}
             active={filter === "shipped"}
+            tone="indigo"
             onClick={() => setFilter("shipped")}
           />
 
@@ -627,6 +630,7 @@ export default function Orders() {
             label="Concluídos"
             value={stats.completed}
             active={filter === "completed"}
+            tone="emerald"
             onClick={() => setFilter("completed")}
           />
 
@@ -634,6 +638,7 @@ export default function Orders() {
             label="Cancelados"
             value={stats.cancelled}
             active={filter === "cancelled"}
+            tone="rose"
             onClick={() => setFilter("cancelled")}
           />
         </section>
@@ -803,18 +808,18 @@ export default function Orders() {
           />
         ) : (
           <>
-            {/* DESKTOP */}
-            <div className="hidden overflow-hidden border-y border-[#ded9d0] lg:block">
+            {/* DESKTOP TABLE */}
+            <div className="hidden overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-xs lg:block">
               <table className="w-full border-collapse text-left">
                 <thead>
-                  <tr className="border-b border-[#ded9d0] bg-[#f1eee7]/50">
+                  <tr className="border-b border-slate-100 bg-slate-50/70">
                     <th className="w-10 px-4 py-3">
                       <input
                         type="checkbox"
                         checked={allVisibleSelected}
                         onChange={toggleAllVisible}
                         aria-label="Selecionar todos os pedidos"
-                        className="h-4 w-4 accent-black"
+                        className="h-4 w-4 accent-slate-900 rounded"
                       />
                     </th>
 
@@ -826,7 +831,7 @@ export default function Orders() {
                     <TableHead>Data</TableHead>
                     <TableHead>Estado</TableHead>
 
-                    <th className="px-4 py-3 text-right text-[10px] font-semibold uppercase tracking-[0.14em] text-[#a7aaa2]">
+                    <th className="px-4 py-3 text-right text-[10px] font-bold uppercase tracking-wider text-slate-400">
                       Total
                     </th>
 
@@ -834,7 +839,7 @@ export default function Orders() {
                   </tr>
                 </thead>
 
-                <tbody>
+                <tbody className="divide-y divide-slate-100">
                   {filteredOrders.map((order) => {
                     const selected = selectedIds.includes(
                       order.id,
@@ -844,8 +849,8 @@ export default function Orders() {
                       <tr
                         key={order.id}
                         className={cn(
-                          "group cursor-pointer border-b border-[#ebe7df] transition-colors last:border-b-0 hover:bg-[#f1eee7]",
-                          selected && "bg-[#f1eee7]",
+                          "group cursor-pointer transition-colors hover:bg-slate-50/80",
+                          selected && "bg-slate-50",
                         )}
                         onClick={() => openOrder(order)}
                       >
@@ -1040,7 +1045,7 @@ function TableHead({
   children: React.ReactNode;
 }) {
   return (
-    <th className="px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#a7aaa2]">
+    <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
       {children}
     </th>
   );
@@ -1050,11 +1055,13 @@ function SummaryItem({
   label,
   value,
   active,
+  tone,
   onClick,
 }: {
   label: string;
   value: number;
   active: boolean;
+  tone?: "amber" | "sky" | "indigo" | "emerald" | "rose";
   onClick: () => void;
 }) {
   return (
@@ -1062,18 +1069,37 @@ function SummaryItem({
       type="button"
       onClick={onClick}
       className={cn(
-        "border-b border-[#ded9d0] px-4 py-4 text-left transition-colors last:border-b-0 sm:px-5 lg:border-b-0 lg:border-r lg:px-5 lg:last:border-r-0",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-inset",
+        "rounded-xl p-3 sm:p-4 text-left transition-all border shadow-2xs",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500",
         active
-          ? "bg-[#f1eee7]"
-          : "hover:bg-[#f1eee7]",
+          ? "border-slate-900 bg-slate-900 text-white shadow-xs"
+          : "border-slate-200/80 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50/70",
       )}
     >
-      <p className="text-xs text-[#a7aaa2]">
-        {label}
-      </p>
+      <div className="flex items-center justify-between">
+        <p
+          className={cn(
+            "text-xs font-semibold uppercase tracking-wider",
+            active ? "text-slate-300" : "text-slate-400",
+          )}
+        >
+          {label}
+        </p>
+        {tone && value > 0 && !active && (
+          <span
+            className={cn(
+              "h-2 w-2 rounded-full",
+              tone === "amber" && "bg-amber-500",
+              tone === "sky" && "bg-sky-500",
+              tone === "indigo" && "bg-indigo-500",
+              tone === "emerald" && "bg-emerald-500",
+              tone === "rose" && "bg-rose-500",
+            )}
+          />
+        )}
+      </div>
 
-      <p className="mt-1 text-lg font-semibold tracking-tight">
+      <p className="mt-1 text-xl sm:text-2xl font-bold tracking-tight">
         {value}
       </p>
     </button>
@@ -1101,12 +1127,12 @@ function FilterSelect({
           onChange(event.target.value)
         }
         aria-label={ariaLabel}
-        className="h-11 w-full appearance-none rounded-sm border border-[#ded9d0] bg-[#fffdf9] px-3 pr-9 text-sm font-medium outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
+        className="h-10 w-full appearance-none rounded-lg border border-slate-200/80 bg-white px-3 pr-9 text-xs font-semibold text-slate-700 shadow-2xs outline-none transition focus:border-slate-400 focus:ring-1 focus:ring-slate-400"
       >
         {children}
       </select>
 
-      <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#a7aaa2]" />
+      <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
     </div>
   );
 }
@@ -1177,26 +1203,26 @@ function OrderDrawer({
         className="absolute inset-0 cursor-default bg-black/20"
       />
 
-      <aside className="absolute inset-y-0 right-0 flex w-full max-w-xl flex-col border-l border-[#ded9d0] bg-[#fffdf9] shadow-2xl">
+      <aside className="absolute inset-y-0 right-0 flex w-full max-w-xl flex-col border-l border-slate-200 bg-white shadow-2xl">
         {/* HEADER */}
-        <header className="flex min-h-[68px] items-center justify-between border-b border-[#ded9d0] px-5 sm:px-7">
+        <header className="flex min-h-[64px] items-center justify-between border-b border-slate-100 px-5 sm:px-7 bg-white">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <p className="font-mono text-sm font-semibold">
+              <p className="font-mono text-sm font-bold text-slate-900">
                 {formatOrderId(order.id)}
               </p>
 
               <button
                 type="button"
                 onClick={() => onCopy(order.id)}
-                className="grid h-7 w-7 place-items-center rounded-sm text-[#a7aaa2] transition-colors hover:bg-[#ebe7df] hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+                className="grid h-7 w-7 place-items-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
                 aria-label="Copiar ID do pedido"
               >
                 <Copy className="h-3.5 w-3.5" />
               </button>
             </div>
 
-            <p className="mt-0.5 text-xs text-[#a7aaa2]">
+            <p className="mt-0.5 text-xs text-slate-400">
               {formatDate(order.created_at)}
             </p>
           </div>
@@ -1204,10 +1230,10 @@ function OrderDrawer({
           <button
             type="button"
             onClick={onClose}
-            className="grid h-9 w-9 place-items-center rounded-sm text-[#747b73] transition-colors hover:bg-[#ebe7df] hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+            className="grid h-8 w-8 place-items-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
             aria-label="Fechar"
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </button>
         </header>
 

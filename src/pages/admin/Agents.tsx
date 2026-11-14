@@ -369,37 +369,36 @@ export default function Agents() {
         <button
           type="button"
           onClick={() => setShowRunPanel(true)}
-          className="inline-flex h-9 items-center gap-2 rounded-sm bg-[#202522] px-3.5 text-sm font-medium text-white transition-colors hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
+          className="inline-flex h-9 items-center gap-2 rounded-lg bg-slate-900 px-3.5 text-xs font-bold text-white shadow-xs transition hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
         >
-          <Play className="h-3.5 w-3.5" />
+          <Sparkles className="h-3.5 w-3.5" />
           Executar agente
         </button>
       }
     >
-      <div className="space-y-10">
+      <div className="space-y-8">
         {company && entitlement?.features.includes("sales") && <SalesAgentTester companyId={company.id} />}
         {/* PAGE INTRO */}
         <section>
-          <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
+          <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
-              <p className="mb-2 text-[10px] font-medium uppercase tracking-[0.18em] text-[#a7aaa2]">
-                Automação
-              </p>
+              <span className="mb-2 inline-flex items-center gap-1.5 rounded-md border border-emerald-200/80 bg-emerald-50 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-emerald-800">
+                Inteligência Artificial & Automação
+              </span>
 
-              <h1 className="font-serif text-[clamp(2rem,4vw,2.8rem)] font-medium leading-[1.04] tracking-[-0.045em] text-[#202522]">
-                Agentes
+              <h1 className="font-sans text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
+                Agentes IA
               </h1>
 
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-[#747b73]">
-                Execute o Marketing Agent manualmente sobre o catálogo e
-                reveja os rascunhos por canal. Não há execução contínua.
+              <p className="mt-1 max-w-2xl text-xs sm:text-sm text-slate-500">
+                Execute o Marketing Agent sobre o catálogo e acompanhe os agentes de atendimento da sua loja.
               </p>
             </div>
 
             <button
               type="button"
               onClick={loadData}
-              className="inline-flex h-9 w-fit items-center gap-2 rounded-sm border border-[#ded9d0] bg-[#fffdf9] px-3 text-sm font-medium text-[#5f625d] transition-colors hover:border-[#c9c3b8] hover:bg-[#f1eee7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
+              className="inline-flex h-9 w-fit items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 shadow-2xs transition hover:bg-slate-50 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
             >
               <RefreshCw className="h-3.5 w-3.5" />
               Atualizar
@@ -410,12 +409,12 @@ export default function Agents() {
         {/* WORKFORCE */}
         <section>
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#a7aaa2]">
-              Workforce
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+              Workforce Ativa
             </h3>
 
             {hasActionsData && attentionCount > 0 && (
-              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-amber-700">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 border border-amber-200/60 px-2 py-0.5 text-xs font-bold text-amber-700">
                 <AlertTriangle className="h-3.5 w-3.5" />
                 {attentionCount}{" "}
                 {attentionCount === 1
@@ -425,28 +424,28 @@ export default function Agents() {
             )}
           </div>
 
-          <div className="grid border-y border-[#ded9d0] sm:grid-cols-3">
-            <div className="border-b border-[#ded9d0] px-0 py-5 sm:border-b-0 sm:border-r sm:px-5">
-                <p className="text-xs text-[#a7aaa2]">Disponíveis</p>
-              <p className="mt-1 text-2xl font-semibold tracking-[-0.04em]">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-xs">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Disponíveis</p>
+              <p className="mt-1 text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
                 1
               </p>
             </div>
 
-            <div className="border-b border-[#ded9d0] px-0 py-5 sm:border-b-0 sm:border-r sm:px-5">
-              <div className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-[7px] bg-[#202522]" />
-                  <p className="text-xs text-[#a7aaa2]">Automação contínua</p>
+            <div className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-xs">
+              <div className="flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Atendimento WhatsApp</p>
               </div>
 
-              <p className="mt-1 text-2xl font-semibold tracking-[-0.04em]">
-                Não
+              <p className="mt-1 text-2xl sm:text-3xl font-bold tracking-tight text-emerald-600">
+                Ativo
               </p>
             </div>
 
-            <div className="px-0 py-5 sm:px-5">
-              <p className="text-xs text-[#a7aaa2]">
-                Atenção
+            <div className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-xs">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                Ações com Atenção
               </p>
 
               <p className="mt-1 text-2xl font-semibold tracking-[-0.04em]">

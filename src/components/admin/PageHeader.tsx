@@ -19,27 +19,27 @@ export function PageHeader({
   return (
     <header
       className={cn(
-        "flex flex-col gap-4 pb-1 sm:flex-row sm:items-end sm:justify-between sm:gap-6",
+        "flex flex-col gap-4 pb-2 sm:flex-row sm:items-end sm:justify-between sm:gap-6",
         className,
       )}
     >
       <div className="min-w-0">
         {eyebrow && (
-          <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.16em] text-[#2c6457]">
+          <span className="mb-2 inline-flex items-center gap-1.5 rounded-md border border-emerald-200/80 bg-emerald-50 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-emerald-800">
             {eyebrow}
-          </p>
+          </span>
         )}
-        <h1 className="font-serif text-[clamp(2rem,4vw,2.8rem)] font-medium leading-[1.04] tracking-[-0.045em] text-[#202522]">
+        <h1 className="font-sans text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
           {title}
         </h1>
         {description && (
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-[#747b73]">
+          <p className="mt-1.5 max-w-2xl text-xs sm:text-sm leading-relaxed text-slate-500">
             {description}
           </p>
         )}
       </div>
       {actions && (
-        <div className="flex shrink-0 items-center gap-2 [&>button]:min-h-10">
+        <div className="flex shrink-0 items-center gap-2 [&>button]:min-h-9">
           {actions}
         </div>
       )}

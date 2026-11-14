@@ -209,16 +209,18 @@ export default function Analytics() {
             days={period === "7d" ? 7 : period === "90d" ? 90 : 30}
           />
         )}
-        <section className="flex flex-col justify-between gap-5 pb-2 sm:flex-row sm:items-end">
+        <section className="flex flex-col justify-between gap-4 pb-1 sm:flex-row sm:items-end">
           <div>
-            <p className="mb-2 text-xs font-medium uppercase tracking-[0.16em] text-[#a7aaa2]">Desempenho Comercial</p>
-            <h1 className="font-serif text-[clamp(2rem,4vw,2.8rem)] font-medium leading-[1.04] tracking-[-0.045em] text-[#202522]">Analytics &amp; Vendas</h1>
-            <p className="mt-2 max-w-xl text-sm leading-6 text-[#747b73]">
-              Análise detalhada de vendas, receita, canais de aquisição e perfil dos compradores.
+            <span className="mb-2 inline-flex items-center gap-1.5 rounded-md border border-emerald-200/80 bg-emerald-50 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-emerald-800">
+              Métricas &amp; Desempenho
+            </span>
+            <h1 className="font-sans text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">Analytics &amp; Vendas</h1>
+            <p className="mt-1 max-w-xl text-xs sm:text-sm text-slate-500">
+              Análise detalhada de vendas, receita, canais de aquisição e evolução da sua loja.
             </p>
           </div>
 
-          <div className="flex w-fit border border-[#ded9d0] bg-[#fffdf9]" aria-label="Período de análise">
+          <div className="flex w-fit rounded-lg border border-slate-200/80 bg-slate-100 p-0.5 shadow-2xs" aria-label="Período de análise">
             {(
               [
                 ["7d", "7 dias"],
@@ -232,8 +234,9 @@ export default function Analytics() {
                 onClick={() => setPeriod(value)}
                 aria-pressed={period === value}
                 className={cn(
-                  "min-h-11 px-3.5 text-xs font-medium transition",
-                  period === value ? "bg-[#202522] text-white" : "text-[#747b73] hover:bg-[#f1eee7] hover:text-[#202522]",
+                  "min-h-8 rounded-md px-3 text-xs font-semibold transition-all",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500",
+                  period === value ? "bg-white text-slate-900 shadow-xs" : "text-slate-600 hover:text-slate-900",
                 )}
               >
                 {label}
@@ -243,42 +246,48 @@ export default function Analytics() {
         </section>
 
         {error && (
-          <div className="flex flex-col gap-3 border border-[#e3b9ad] bg-[#fff8f5] px-5 py-4 sm:flex-row sm:items-center sm:justify-between" role="alert">
+          <div className="flex flex-col gap-3 rounded-xl border border-rose-200 bg-rose-50/50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between" role="alert">
             <div>
-              <p className="text-sm font-semibold text-[#202522]">Não foi possível atualizar os dados</p>
-              <p className="mt-1 text-xs text-[#747b73]">{error}</p>
+              <p className="text-sm font-bold text-rose-800">Não foi possível atualizar os dados</p>
+              <p className="mt-1 text-xs text-slate-600">{error}</p>
             </div>
             <button
               type="button"
               onClick={loadData}
-              className="inline-flex min-h-11 shrink-0 items-center justify-center border border-[#ded9d0] bg-[#fffdf9] px-4 text-xs font-semibold text-[#202522] hover:bg-[#f1eee7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+              className="inline-flex h-9 shrink-0 items-center justify-center rounded-lg bg-slate-900 px-4 text-xs font-bold text-white shadow-xs hover:bg-slate-800 transition"
             >
               Tentar novamente
             </button>
           </div>
         )}
 
-        <section className="grid gap-px border-y border-[#ded9d0] bg-[#ded9d0] sm:grid-cols-3">
-          <div className="min-w-0 bg-[#fffdf9] p-5 sm:p-6">
-            <div className="flex items-start justify-between gap-4 text-[#a7aaa2]">
-              <span className="text-xs font-semibold uppercase leading-5 tracking-wider">Receita total</span>
-              <Wallet className="h-4 w-4 shrink-0" />
+        <section className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="min-w-0 rounded-xl border border-slate-200/80 bg-white p-5 shadow-xs">
+            <div className="flex items-start justify-between gap-4 text-slate-400">
+              <span className="text-xs font-semibold uppercase tracking-wider">Receita total</span>
+              <div className="grid h-8 w-8 place-items-center rounded-lg bg-slate-50 border border-slate-100 text-slate-600">
+                <Wallet className="h-4 w-4 shrink-0" strokeWidth={1.8} />
+              </div>
             </div>
-            {loading ? <LoadingBlock className="mt-3 h-8 w-32" /> : <p className="mt-2 text-2xl font-semibold text-[#202522]">{error ? "—" : formatCurrency(stats.totalRevenue)}</p>}
+            {loading ? <LoadingBlock className="mt-3 h-8 w-32 rounded-md" /> : <p className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">{error ? "—" : formatCurrency(stats.totalRevenue)}</p>}
           </div>
-          <div className="min-w-0 bg-[#fffdf9] p-5 sm:p-6">
-            <div className="flex items-start justify-between gap-4 text-[#a7aaa2]">
-              <span className="text-xs font-semibold uppercase leading-5 tracking-wider">Total de pedidos</span>
-              <ShoppingBag className="h-4 w-4 shrink-0" />
+          <div className="min-w-0 rounded-xl border border-slate-200/80 bg-white p-5 shadow-xs">
+            <div className="flex items-start justify-between gap-4 text-slate-400">
+              <span className="text-xs font-semibold uppercase tracking-wider">Total de pedidos</span>
+              <div className="grid h-8 w-8 place-items-center rounded-lg bg-slate-50 border border-slate-100 text-slate-600">
+                <ShoppingBag className="h-4 w-4 shrink-0" strokeWidth={1.8} />
+              </div>
             </div>
-            {loading ? <LoadingBlock className="mt-3 h-8 w-20" /> : <p className="mt-2 text-2xl font-semibold text-[#202522]">{error ? "—" : stats.totalOrders}</p>}
+            {loading ? <LoadingBlock className="mt-3 h-8 w-20 rounded-md" /> : <p className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">{error ? "—" : stats.totalOrders}</p>}
           </div>
-          <div className="min-w-0 bg-[#fffdf9] p-5 sm:p-6">
-            <div className="flex items-start justify-between gap-4 text-[#a7aaa2]">
-              <span className="text-xs font-semibold uppercase leading-5 tracking-wider">Ticket médio</span>
-              <TrendingUp className="h-4 w-4 shrink-0" />
+          <div className="min-w-0 rounded-xl border border-slate-200/80 bg-white p-5 shadow-xs">
+            <div className="flex items-start justify-between gap-4 text-slate-400">
+              <span className="text-xs font-semibold uppercase tracking-wider">Ticket médio</span>
+              <div className="grid h-8 w-8 place-items-center rounded-lg bg-slate-50 border border-slate-100 text-slate-600">
+                <TrendingUp className="h-4 w-4 shrink-0" strokeWidth={1.8} />
+              </div>
             </div>
-            {loading ? <LoadingBlock className="mt-3 h-8 w-28" /> : <p className="mt-2 text-2xl font-semibold text-[#202522]">{error ? "—" : formatCurrency(stats.avgOrder)}</p>}
+            {loading ? <LoadingBlock className="mt-3 h-8 w-28 rounded-md" /> : <p className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">{error ? "—" : formatCurrency(stats.avgOrder)}</p>}
           </div>
         </section>
 

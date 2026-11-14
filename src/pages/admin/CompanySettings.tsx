@@ -273,14 +273,15 @@ function SectionHeading({
   return (
     <div className="mb-8">
       {eyebrow && (
-        <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#747b73]">
-          {eyebrow}
-        </p>
+        <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200/80 bg-emerald-50 px-2.5 py-0.5 text-[11px] font-semibold tracking-wide text-emerald-800 mb-2">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+          {eyebrow.toUpperCase()}
+        </div>
       )}
-      <h2 className="text-[25px] font-semibold tracking-[-0.025em] text-[#202522]">
+      <h2 className="font-sans text-2xl font-bold tracking-tight text-slate-900">
         {title}
       </h2>
-      <p className="mt-1.5 max-w-2xl text-sm leading-6 text-[#747b73]">
+      <p className="mt-1 max-w-2xl text-xs sm:text-sm text-slate-500 leading-relaxed">
         {description}
       </p>
     </div>
@@ -297,10 +298,10 @@ function Field({
   children: React.ReactNode;
 }) {
   return (
-    <div className="space-y-2">
+    <div className="space-y-1.5">
       <div>
-        <label className="text-sm font-medium text-[#202522]">{label}</label>
-        {hint && <p className="mt-0.5 text-xs text-[#747b73]">{hint}</p>}
+        <label className="text-xs font-bold text-slate-800">{label}</label>
+        {hint && <p className="mt-0.5 text-xs text-slate-400">{hint}</p>}
       </div>
       {children}
     </div>
@@ -327,7 +328,7 @@ function Input({
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
       maxLength={maxLength}
-      className="h-11 w-full rounded-lg border border-[#ded9d0] bg-[#fffdf9] px-3.5 text-sm text-[#202522] outline-none transition placeholder:text-[#a7aaa2] focus:border-neutral-950 focus:ring-1 focus:ring-neutral-950"
+      className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3.5 text-xs font-medium text-slate-900 shadow-2xs outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
     />
   );
 }
@@ -352,7 +353,7 @@ function Textarea({
       placeholder={placeholder}
       maxLength={maxLength}
       rows={rows}
-      className="w-full resize-y rounded-lg border border-[#ded9d0] bg-[#fffdf9] px-3.5 py-3 text-sm leading-6 text-[#202522] outline-none transition placeholder:text-[#a7aaa2] focus:border-neutral-950 focus:ring-1 focus:ring-neutral-950"
+      className="w-full resize-y rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-xs leading-relaxed text-slate-900 shadow-2xs outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
     />
   );
 }
@@ -370,7 +371,7 @@ function Select({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="h-11 w-full rounded-lg border border-[#ded9d0] bg-[#fffdf9] px-3.5 text-sm text-[#202522] outline-none focus:border-neutral-950 focus:ring-1 focus:ring-neutral-950"
+      className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3.5 text-xs font-semibold text-slate-900 shadow-2xs outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
     >
       {children}
     </select>
@@ -392,15 +393,15 @@ function Toggle({
     <button
       type="button"
       onClick={() => onChange(!checked)}
-      className="flex w-full items-center justify-between gap-5 py-3 text-left"
+      className="flex w-full items-center justify-between gap-5 py-2.5 text-left group"
       aria-pressed={checked}
     >
       <span className="min-w-0">
-        <span className="block text-sm font-medium text-[#202522]">
+        <span className="block text-xs font-bold text-slate-800">
           {label}
         </span>
         {description && (
-          <span className="mt-0.5 block text-xs leading-5 text-[#747b73]">
+          <span className="mt-0.5 block text-xs leading-relaxed text-slate-400">
             {description}
           </span>
         )}
@@ -408,16 +409,16 @@ function Toggle({
 
       <span
         className={cn(
-          "relative h-6 w-11 shrink-0 rounded-[7px] border transition",
+          "relative h-6 w-11 shrink-0 rounded-full transition-colors",
           checked
-            ? "border-neutral-950 bg-[#202522]"
-            : "border-[#c9c3b8] bg-[#ebe7df]"
+            ? "bg-emerald-600"
+            : "bg-slate-200"
         )}
       >
         <span
           className={cn(
-            "absolute top-0.5 h-5 w-5 rounded-[7px] bg-[#fffdf9] shadow-sm transition",
-            checked ? "left-[21px]" : "left-0.5"
+            "absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-xs transition-transform",
+            checked ? "left-[22px]" : "left-0.5"
           )}
         />
       </span>
@@ -437,16 +438,19 @@ function SaveBar({
   if (!dirty) return null;
 
   return (
-    <div className="sticky bottom-4 z-20 mt-8 flex items-center justify-between gap-4 rounded-[7px] border border-[#ded9d0] bg-[#fffdf9]/95 px-4 py-3 shadow-lg shadow-black/[0.06]">
-      <p className="text-sm text-[#747b73]">
-        Existem alterações por guardar.
-      </p>
+    <div className="sticky bottom-6 z-20 mt-8 flex items-center justify-between gap-4 rounded-xl border border-slate-200/90 bg-white/95 px-5 py-3.5 shadow-xl backdrop-blur-md">
+      <div className="flex items-center gap-2">
+        <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
+        <p className="text-xs font-semibold text-slate-700">
+          Existem alterações por guardar.
+        </p>
+      </div>
 
       <button
         type="button"
         onClick={onSave}
         disabled={saving}
-        className="inline-flex h-10 items-center gap-2 rounded-lg bg-[#202522] px-4 text-sm font-medium text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
+        className="inline-flex h-9 items-center gap-2 rounded-lg bg-emerald-600 px-4 text-xs font-semibold text-white shadow-xs transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
       >
         <Save className="h-4 w-4" />
         {saving ? "A guardar..." : "Guardar alterações"}
@@ -1695,19 +1699,22 @@ export default function CompanySettings() {
           </select>
         </div>
 
-        <div className="grid gap-8 lg:grid-cols-[235px_minmax(0,1fr)]">
+        <div className="grid gap-8 lg:grid-cols-[240px_minmax(0,1fr)]">
           <aside className="hidden lg:block">
             <div className="sticky top-24">
-              <div className="mb-5">
-                <p className="mt-1 text-sm text-[#747b73]">
-                  Configuração da empresa
+              <div className="mb-4">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                  Painel de Configuração
+                </span>
+                <p className="mt-0.5 text-xs text-slate-500 font-medium">
+                  {company?.name || "Minha Loja"}
                 </p>
               </div>
 
-              <nav className="space-y-6">
+              <nav className="space-y-5">
                 {NAVIGATION.map((group) => (
                   <div key={group.group}>
-                    <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#a7aaa2]">
+                    <p className="mb-1.5 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
                       {group.group}
                     </p>
 
@@ -1724,15 +1731,15 @@ export default function CompanySettings() {
                             type="button"
                             onClick={() => selectSection(item.id)}
                             className={cn(
-                              "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition",
+                              "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-xs font-semibold transition",
                               active
-                                ? "bg-[#202522] text-white"
-                                : "text-[#747b73] hover:bg-[#ebe7df] hover:text-[#202522]"
+                                ? "bg-slate-900 text-white shadow-xs"
+                                : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                             )}
                           >
                             <Icon className="h-4 w-4 shrink-0" />
 
-                            <span className="min-w-0 flex-1 truncate text-sm font-medium">
+                            <span className="min-w-0 flex-1 truncate">
                               {item.label}
                             </span>
 
@@ -1747,14 +1754,14 @@ export default function CompanySettings() {
                 ))}
               </nav>
 
-              <div className="mt-8 border-t border-[#ded9d0] pt-5">
+              <div className="mt-6 border-t border-slate-200/80 pt-4">
                 <Link
                   to={`/loja/${company?.slug}`}
                   target="_blank"
-                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-[#747b73] transition hover:bg-[#ebe7df] hover:text-[#202522]"
+                  className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
                 >
-                  <Store className="h-4 w-4" />
-                  Ver loja
+                  <Store className="h-4 w-4 text-slate-400" />
+                  Ver montra pública
                   <ArrowUpRight className="ml-auto h-3.5 w-3.5" />
                 </Link>
               </div>
@@ -1784,27 +1791,27 @@ function ChannelRow({
   href?: string;
 }) {
   return (
-    <div className="flex flex-col gap-4 rounded-[7px] border border-[#ded9d0] bg-[#fffdf9] p-5 sm:flex-row sm:items-center">
-      <div className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-[#ebe7df] text-[#5f625d]">
+    <div className="flex flex-col gap-4 rounded-xl border border-slate-200/80 bg-white p-4 shadow-xs sm:flex-row sm:items-center">
+      <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-700">
         {icon}
       </div>
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <p className="text-sm font-semibold text-[#202522]">{name}</p>
+          <p className="text-xs font-bold text-slate-900">{name}</p>
 
-          <span className="flex items-center gap-1.5 text-xs text-[#747b73]">
+          <span className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500">
             <span
               className={cn(
-                "h-1.5 w-1.5 rounded-[7px]",
-                connected ? "bg-[#202522]" : "bg-neutral-300"
+                "h-1.5 w-1.5 rounded-full",
+                connected ? "bg-emerald-500" : "bg-slate-300"
               )}
             />
-            {connected ? "Connected" : "Not connected"}
+            {connected ? "Ligado" : "Não ligado"}
           </span>
         </div>
 
-        <p className="mt-1 truncate text-xs text-[#747b73]">{detail}</p>
+        <p className="mt-0.5 truncate text-xs text-slate-500">{detail}</p>
       </div>
 
       {onToggle && (
@@ -1812,13 +1819,13 @@ function ChannelRow({
           type="button"
           onClick={onToggle}
           className={cn(
-            "h-9 rounded-lg border px-3 text-xs font-medium transition",
+            "h-8 rounded-lg border px-3 text-xs font-semibold transition",
             connected
-              ? "border-[#ded9d0] bg-[#fffdf9] text-[#5f625d] hover:bg-[#f1eee7]"
-              : "border-neutral-950 bg-[#202522] text-white hover:bg-neutral-800"
+              ? "border-slate-200 bg-white text-slate-700 hover:bg-slate-50 shadow-2xs"
+              : "border-slate-900 bg-slate-900 text-white hover:bg-slate-800 shadow-2xs"
           )}
         >
-          {connected ? "Desconectar" : "Marcar conectado"}
+          {connected ? "Desconectar" : "Conectar"}
         </button>
       )}
 
@@ -1827,7 +1834,7 @@ function ChannelRow({
           href={href}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-[#ded9d0] px-3 text-xs font-medium text-[#5f625d] transition hover:bg-[#f1eee7]"
+          className="inline-flex h-8 items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 shadow-2xs transition hover:bg-slate-50"
         >
           Abrir
           <ArrowUpRight className="h-3.5 w-3.5" />

@@ -679,36 +679,35 @@ export default function Products() {
       <div className="mx-auto max-w-[1500px]">
         {/* PAGE HEADER */}
 
-        <section className="mb-8 flex flex-col gap-5 border-b border-[#ded9d0] pb-7 lg:flex-row lg:items-end lg:justify-between">
+        <section className="mb-6 flex flex-col gap-4 border-b border-slate-100 pb-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#a7aaa2]">
-              Catálogo
-            </p>
+            <span className="mb-2 inline-flex items-center gap-1.5 rounded-md border border-emerald-200/80 bg-emerald-50 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-emerald-800">
+              Catálogo & Inventário
+            </span>
 
-            <h1 className="mt-2 text-3xl font-semibold tracking-[-0.045em] text-[#202522] sm:text-4xl">
+            <h1 className="font-sans text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
               Produtos
             </h1>
 
-            <p className="mt-2 max-w-xl text-sm leading-6 text-[#747b73]">
-              Gerencie o catálogo, preços, stock e publicação
-              dos produtos da sua loja.
+            <p className="mt-1 max-w-xl text-xs sm:text-sm text-slate-500">
+              Gerencie o catálogo, preços, stock e visibilidade dos produtos da sua loja.
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2.5">
             <button
               type="button"
               onClick={exportProducts}
-              className="inline-flex min-h-10 items-center gap-2 border border-[#c9c3b8] px-4 text-sm font-medium text-[#303732] transition hover:border-neutral-500 hover:bg-[#f1eee7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+              className="inline-flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3.5 text-xs font-semibold text-slate-700 shadow-2xs transition hover:bg-slate-50 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
             >
-              <Archive className="h-4 w-4" />
-              Exportar
+              <Archive className="h-3.5 w-3.5" />
+              Exportar CSV
             </button>
 
             <button
               type="button"
               onClick={openNew}
-              className="inline-flex min-h-10 items-center gap-2 bg-black px-4 text-sm font-semibold text-white transition hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
+              className="inline-flex h-9 items-center gap-2 rounded-lg bg-slate-900 px-4 text-xs font-bold text-white shadow-xs transition hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
             >
               <Plus className="h-4 w-4" />
               Adicionar produto
@@ -717,16 +716,15 @@ export default function Products() {
         </section>
 
         {loadError && (
-          <div className="mb-6 flex flex-col gap-3 rounded-xl bg-[#fff4ed] px-4 py-4 text-sm text-[#7b3f24] shadow-sm ring-1 ring-[#f0c7ad] sm:flex-row sm:items-center sm:justify-between">
+          <div className="mb-6 flex flex-col gap-3 rounded-xl bg-amber-50 px-4 py-4 text-sm text-amber-800 border border-amber-200 shadow-xs sm:flex-row sm:items-center sm:justify-between">
             <p>Não foi possível carregar o catálogo. Os valores abaixo não representam dados atuais.</p>
-            <button type="button" onClick={load} className="min-h-10 shrink-0 bg-[#202522] px-4 text-sm font-semibold text-white hover:bg-neutral-800">Tentar novamente</button>
+            <button type="button" onClick={load} className="h-9 shrink-0 rounded-lg bg-amber-800 px-4 text-xs font-bold text-white hover:bg-amber-900">Tentar novamente</button>
           </div>
         )}
 
         {/* SUMMARY FILTERS */}
 
-        <section className="mb-7 overflow-hidden rounded-xl bg-[#fffdf9] shadow-sm ring-1 ring-[#ebe7df]">
-          <div className="grid grid-cols-2 sm:grid-cols-5">
+        <section className="mb-6 grid grid-cols-2 sm:grid-cols-5 gap-2.5">
             <SummaryFilter
               label="Todos"
               value={loading || loadError ? "—" : stats.total}
@@ -763,8 +761,7 @@ export default function Products() {
               active={filter === "promo"}
               onClick={() => clearSelectionAnd(() => setFilter("promo"))}
             />
-          </div>
-        </section>
+          </section>
 
         {/* SEARCH + FILTERS */}
 
@@ -1174,37 +1171,29 @@ function SummaryFilter({
       type="button"
       onClick={onClick}
       className={cn(
-        "border-b border-r border-[#ded9d0] px-4 py-4 text-left transition last:border-r-0 sm:px-5",
+        "rounded-xl p-3.5 sm:p-4 text-left transition-all border shadow-2xs",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500",
         active
-          ? "bg-[#f5f5f2]"
-          : "bg-[#fffdf9] hover:bg-[#f1eee7]",
+          ? "border-slate-900 bg-slate-900 text-white shadow-xs"
+          : "border-slate-200/80 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50/70",
       )}
     >
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center justify-between gap-2">
         <span
           className={cn(
-            "text-xs font-medium",
-            active
-              ? "text-[#202522]"
-              : "text-[#747b73]",
+            "text-xs font-semibold uppercase tracking-wider",
+            active ? "text-slate-300" : "text-slate-400",
           )}
         >
           {label}
         </span>
 
-        {warning && typeof value === "number" && value > 0 && (
-          <span className="h-1.5 w-1.5 rounded-[7px] bg-black" />
+        {warning && typeof value === "number" && value > 0 && !active && (
+          <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
         )}
       </div>
 
-      <p
-        className={cn(
-          "mt-2 text-xl font-semibold tracking-tight",
-          active
-            ? "text-[#202522]"
-            : "text-[#5f625d]",
-        )}
-      >
+      <p className="mt-1 text-xl sm:text-2xl font-bold tracking-tight">
         {value}
       </p>
     </button>

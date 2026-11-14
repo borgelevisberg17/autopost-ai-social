@@ -359,35 +359,35 @@ export default function Customers() {
     <AdminLayout title="Clientes">
       <div className="space-y-8">
         {/* HEADER */}
-        <section className="flex flex-col gap-5 pb-2 lg:flex-row lg:items-end lg:justify-between">
+        <section className="flex flex-col gap-4 pb-1 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#a7aaa2]">
-              Relacionamento Comercial
-            </p>
+            <span className="mb-2 inline-flex items-center gap-1.5 rounded-md border border-emerald-200/80 bg-emerald-50 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-emerald-800">
+              Relacionamento Comercial & CRM
+            </span>
 
-            <h1 className="font-serif text-[clamp(2rem,4vw,2.8rem)] font-medium leading-[1.04] tracking-[-0.045em] text-[#202522]">
+            <h1 className="font-sans text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
               Clientes
             </h1>
 
-            <p className="mt-2 text-sm leading-6 text-[#747b73]">
-              Compreenda quem compra na sua loja e o histórico de cada cliente.
+            <p className="mt-1 text-xs sm:text-sm text-slate-500">
+              Acompanhe quem compra na sua loja, histórico de encomendas e canais de contacto.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2.5">
             <button
               type="button"
               onClick={exportCustomers}
-              className="inline-flex min-h-10 items-center gap-2 border border-[#ded9d0] bg-[#fffdf9] px-4 text-sm font-medium transition hover:border-neutral-400 hover:bg-[#f1eee7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+              className="inline-flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3.5 text-xs font-semibold text-slate-700 shadow-2xs transition hover:bg-slate-50 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
             >
-              <Download className="h-4 w-4" />
-              Exportar
+              <Download className="h-3.5 w-3.5" />
+              Exportar CSV
             </button>
 
             <button
               type="button"
               onClick={() => setNewModalOpen(true)}
-              className="inline-flex min-h-10 items-center gap-2 bg-black px-4 text-sm font-medium text-white transition hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+              className="inline-flex h-9 items-center gap-2 rounded-lg bg-slate-900 px-4 text-xs font-bold text-white shadow-xs transition hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
             >
               <Plus className="h-4 w-4" />
               Novo cliente
@@ -396,7 +396,7 @@ export default function Customers() {
         </section>
 
         {/* METRICS */}
-        <section className="grid border-y border-[#ded9d0] sm:grid-cols-2 lg:grid-cols-4">
+        <section className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <MetricCard
             label="Total de Clientes"
             value={String(stats.total)}
@@ -862,18 +862,20 @@ function MetricCard({
   loading: boolean;
 }) {
   return (
-    <div className="border-b border-[#ded9d0] px-5 py-5 sm:border-r last:border-r-0 lg:border-b-0">
-      <div className="flex items-center justify-between text-[#a7aaa2]">
-        <p className="text-xs font-medium uppercase tracking-[0.12em]">{label}</p>
-        <Icon className="h-4 w-4" />
+    <div className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-xs transition hover:border-slate-300">
+      <div className="flex items-center justify-between text-slate-400">
+        <p className="text-xs font-semibold uppercase tracking-wider">{label}</p>
+        <div className="grid h-8 w-8 place-items-center rounded-lg bg-slate-50 border border-slate-100 text-slate-600">
+          <Icon className="h-4 w-4" strokeWidth={1.8} />
+        </div>
       </div>
 
       {loading ? (
-        <div className="mt-3 h-7 w-24 animate-pulse bg-[#ebe7df]" />
+        <div className="mt-3 h-8 w-24 animate-pulse rounded-md bg-slate-100" />
       ) : (
         <>
-          <p className="mt-2 text-2xl font-semibold tracking-tight text-[#202522]">{value}</p>
-          {subText && <p className="mt-1 text-[11px] text-[#a7aaa2]">{subText}</p>}
+          <p className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">{value}</p>
+          {subText && <p className="mt-1 text-xs text-slate-500 font-medium">{subText}</p>}
         </>
       )}
     </div>

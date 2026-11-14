@@ -117,19 +117,18 @@ export default function Activity() {
 
   return (
     <AdminLayout title="Atividade">
-      <div className="space-y-8">
+      <div className="space-y-6">
         <PageHeader
-          eyebrow="Operação"
-          title="Atividade"
-          description="Uma linha do tempo dos agentes, notificações e ações registadas na operação."
-          className="[&_h1]:font-serif [&_h1]:font-medium"
+          eyebrow="Operação & Auditoria"
+          title="Linha do Tempo de Atividade"
+          description="Acompanhe em tempo real todos os eventos, execuções de agentes e notificações da loja."
           actions={
             <button
               type="button"
               onClick={() => load(true)}
               disabled={loading || refreshing}
               aria-busy={refreshing}
-              className="inline-flex h-11 items-center gap-2 border border-[#ded9d0] bg-[#fffdf9] px-3 text-sm font-semibold text-[#5f625d] transition hover:bg-[#f1eee7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] disabled:cursor-not-allowed disabled:opacity-60 sm:h-9"
+              className="inline-flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3.5 text-xs font-semibold text-slate-700 shadow-xs transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <RefreshCw className={refreshing ? "h-3.5 w-3.5 animate-spin" : "h-3.5 w-3.5"} />
               {refreshing ? "A atualizar..." : "Atualizar"}
@@ -138,26 +137,28 @@ export default function Activity() {
         />
 
         {loading ? (
-          <LoadingState label="A carregar atividade" />
+          <LoadingState label="A carregar histórico de atividades..." />
         ) : error ? (
           <ErrorState description={error} onRetry={() => load(true)} />
         ) : (
-          <div className="space-y-5">
+          <div className="space-y-4">
             {sourceErrors.length > 0 && (
-              <div className="border-l-2 border-[#c56749] bg-[#f5e7e2] px-4 py-3 text-sm leading-5 text-[#7e3929]" role="status">
-                Não foi possível carregar: <strong>{sourceErrors.join(", ")}</strong>. Os restantes eventos continuam visíveis.
+              <div className="rounded-xl border border-amber-200 bg-amber-50/70 px-4 py-3 text-xs leading-relaxed text-amber-900" role="status">
+                Não foi possível carregar: <strong>{sourceErrors.join(", ")}</strong>. Os restantes eventos continuam disponíveis.
               </div>
             )}
-            <div className="flex flex-col gap-3 border-y border-[#ded9d0] py-3 sm:flex-row sm:items-center sm:justify-between">
-              <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#747b73]">
-                Até 30 por fonte · máximo de 60 eventos visíveis
-              </p>
-              <label className="flex min-h-11 items-center gap-2 text-xs font-semibold text-[#5f625d] sm:min-h-0">
-                <span className="sr-only">Filtrar atividade por origem</span>
+            
+            {/* FILTER TOOLBAR */}
+            <div className="flex flex-col gap-3 rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-xs sm:flex-row sm:items-center sm:justify-between">
+              <span className="text-xs font-medium text-slate-500">
+                A apresentar os eventos mais recentes registados no sistema
+              </span>
+              <label className="flex items-center gap-2 text-xs font-semibold text-slate-700">
+                <span className="text-slate-400 font-normal">Origem:</span>
                 <select
                   value={sourceFilter}
                   onChange={(event) => setSourceFilter(event.target.value as ActivitySource | "all")}
-                  className="h-11 border border-[#ded9d0] bg-[#fffdf9] px-3 text-sm font-normal text-[#202522] outline-none transition focus:border-[#202522] focus:ring-2 focus:ring-[#e36c3f] sm:h-9"
+                  className="h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-xs font-semibold text-slate-700 outline-none transition focus:border-slate-900 focus:bg-white"
                 >
                   <option value="all">Todas as origens</option>
                   <option value="agent_runs">Execuções de agentes</option>
@@ -173,29 +174,33 @@ export default function Activity() {
                 description="As ações da operação aparecerão aqui quando houver pedidos, agentes ou notificações."
               />
             ) : visibleEntries.length === 0 ? (
-              <div className="border-y border-[#ded9d0] px-6 py-12 text-center">
-                <p className="font-serif text-lg font-medium text-[#202522]">Nenhum evento desta origem</p>
-                <p className="mt-2 text-sm text-[#747b73]">Escolha outra origem entre os eventos já carregados.</p>
+              <div className="rounded-xl border border-dashed border-slate-200 bg-white px-6 py-12 text-center shadow-xs">
+                <p className="font-sans text-base font-bold text-slate-900">Nenhum evento desta origem</p>
+                <p className="mt-1 text-xs text-slate-500">Escolha outro filtro para visualizar os eventos registados.</p>
               </div>
             ) : (
-              <section className="border-y border-[#ded9d0]" aria-label="Linha do tempo de atividade">
-                <div className="space-y-1 py-2">
+              <section className="overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-xs" aria-label="Linha do tempo de atividade">
+                <div className="divide-y divide-slate-100">
                   {visibleEntries.map((entry) => (
-                    <article key={entry.id} className="grid gap-3 px-4 py-4 transition hover:bg-[#f1eee7]/70 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-start sm:px-5">
-                      <div className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center bg-[#e9eee9] text-[#2c6457]" aria-hidden="true">
+                    <article key={entry.id} className="grid gap-3 p-4 transition hover:bg-slate-50/60 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-start sm:px-5">
+                      <div className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-700" aria-hidden="true">
                         <ActivityIcon className="h-4 w-4" />
                       </div>
                       <div className="min-w-0">
-                        <div className="flex flex-wrap items-start gap-x-3 gap-y-1">
-                          <span className="font-serif text-[15px] font-semibold text-[#202522]">{entry.label}</span>
-                          <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-[#2c6457]">{entry.kind}</span>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="font-sans text-sm font-bold text-slate-900">{entry.label}</span>
+                          <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold text-slate-600">
+                            {entry.kind}
+                          </span>
                         </div>
-                        <p className="mt-1 text-xs leading-5 text-[#747b73]">{entry.detail}</p>
-                        <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.08em] text-[#979c95]">Origem: {entry.source}</p>
+                        <p className="mt-1 text-xs leading-relaxed text-slate-600">{entry.detail}</p>
+                        <p className="mt-1.5 text-[10px] text-slate-400 font-medium">Origem: {SOURCE_LABELS[entry.source] || entry.source}</p>
                       </div>
                       <div className="flex items-center justify-between gap-3 sm:block sm:text-right">
-                        <span className="inline-flex bg-[#f1eee7] px-2 py-1 font-mono text-[10px] uppercase tracking-[0.08em] text-[#5f625d]">{entry.status}</span>
-                        <time className="block text-[10px] text-[#979c95] sm:mt-2">{date(entry.created_at)}</time>
+                        <span className="inline-flex rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-[10px] font-semibold text-slate-600">
+                          {entry.status}
+                        </span>
+                        <time className="block text-[11px] text-slate-400 sm:mt-2">{date(entry.created_at)}</time>
                       </div>
                     </article>
                   ))}

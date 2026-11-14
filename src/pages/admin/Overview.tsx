@@ -88,15 +88,17 @@ function statusLabel(status: string) {
 function statusClass(status: string) {
   switch (status) {
     case "confirmed":
-      return "bg-[#ebe7df] text-[#5f625d]";
+      return "bg-sky-50 text-sky-700 border border-sky-200/70 font-semibold rounded-md px-2 py-0.5 text-[11px]";
     case "shipped":
-      return "bg-[#ebe7df] text-[#5f625d]";
+      return "bg-indigo-50 text-indigo-700 border border-indigo-200/70 font-semibold rounded-md px-2 py-0.5 text-[11px]";
     case "completed":
-      return "bg-[#202522] text-white";
+      return "bg-emerald-50 text-emerald-700 border border-emerald-200/70 font-semibold rounded-md px-2 py-0.5 text-[11px]";
     case "cancelled":
-      return "bg-[#ebe7df] text-[#a7aaa2]";
+      return "bg-rose-50 text-rose-700 border border-rose-200/70 font-semibold rounded-md px-2 py-0.5 text-[11px]";
+    case "pending":
+      return "bg-amber-50 text-amber-800 border border-amber-200/70 font-semibold rounded-md px-2 py-0.5 text-[11px]";
     default:
-      return "bg-[#f5f5f2] text-[#5f625d]";
+      return "bg-slate-100 text-slate-700 border border-slate-200 font-semibold rounded-md px-2 py-0.5 text-[11px]";
   }
 }
 
@@ -402,25 +404,28 @@ export default function Overview() {
         {/* INTRO */}
         <section className="flex flex-col justify-between gap-3 pb-2 sm:flex-row sm:items-end">
           <div>
-            <p className="mb-2 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-[#718071]">
-              Painel de controlo
-            </p>
+            <span className="mb-2 inline-flex items-center gap-1.5 rounded-md border border-emerald-200/80 bg-emerald-50 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-emerald-800">
+              Painel de Controlo
+            </span>
 
-            <h1 className="font-serif text-[30px] font-medium leading-tight tracking-[-0.045em] text-[#202522] sm:text-[38px]">
+            <h1 className="font-sans text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
               Olá, {company.name}.
             </h1>
 
-            <p className="mt-2 max-w-xl text-[13px] leading-5 text-[#697168] sm:text-sm sm:leading-6">
-              Aqui está o estado atual da sua operação e o que merece atenção.
+            <p className="mt-1 text-xs sm:text-sm text-slate-500">
+              Aqui está o resumo da sua operação e o que requer atenção hoje.
             </p>
           </div>
 
-          <div className="font-mono text-[11px] text-[#858c83]">
-            {new Intl.DateTimeFormat("pt-PT", {
-              weekday: "long",
-              day: "numeric",
-              month: "long",
-            }).format(new Date())}
+          <div className="flex items-center gap-2 rounded-lg border border-slate-200/80 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 shadow-2xs">
+            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="capitalize">
+              {new Intl.DateTimeFormat("pt-PT", {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+              }).format(new Date())}
+            </span>
           </div>
         </section>
 
@@ -461,19 +466,19 @@ export default function Overview() {
         {/* PERFORMANCE + ATTENTION */}
         <section className="grid gap-4 xl:grid-cols-[minmax(0,1.65fr)_minmax(300px,0.85fr)]">
           {/* CHART */}
-          <div className="min-w-0 rounded-[5px] border border-[#e4e0d7] bg-[#fffdf9] p-4 shadow-[0_2px_10px_rgba(32,37,34,0.025)] sm:p-5">
-            <div className="mb-3 flex flex-col justify-between gap-3 border-b border-[#ece8df] pb-3 sm:flex-row sm:items-end">
+          <div className="min-w-0 rounded-xl border border-slate-200/80 bg-white p-5 shadow-xs">
+            <div className="mb-4 flex flex-col justify-between gap-3 border-b border-slate-100 pb-3.5 sm:flex-row sm:items-center">
               <div>
-                <p className="text-xs font-medium uppercase tracking-[0.16em] text-[#a7aaa2]">
-                  Desempenho
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  Desempenho Comercial
                 </p>
 
-                <h2 className="mt-1 font-serif text-lg font-semibold tracking-[-0.03em] text-[#202522]">
+                <h2 className="mt-0.5 text-base sm:text-lg font-bold tracking-tight text-slate-900">
                   Receita por dia
                 </h2>
               </div>
 
-              <div className="flex w-fit border border-[#e4e0d7] bg-[#faf9f4]">
+              <div className="flex w-fit rounded-lg border border-slate-200/80 bg-slate-100/80 p-0.5 shadow-2xs">
                 {(
                   [
                     ["7d", "7 dias"],
@@ -486,11 +491,11 @@ export default function Overview() {
                     type="button"
                     onClick={() => setPeriod(value)}
                     className={cn(
-                      "min-h-9 px-3 text-xs font-medium transition-colors",
-                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-inset",
+                      "min-h-7 rounded-md px-2.5 text-xs font-semibold transition-all",
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500",
                       period === value
-                        ? "bg-black text-white"
-                        : "text-[#747b73] hover:bg-[#f1eee7] hover:text-[#202522]",
+                        ? "bg-white text-slate-900 shadow-xs"
+                        : "text-slate-600 hover:text-slate-900",
                     )}
                   >
                     {label}
@@ -613,18 +618,18 @@ export default function Overview() {
           </div>
 
           {/* ATTENTION */}
-          <div className="rounded-[5px] border border-[#e4e0d7] bg-[#fffdf9] p-4 shadow-[0_2px_10px_rgba(32,37,34,0.025)] sm:p-5">
-            <div className="mb-3 border-b border-[#ece8df] pb-3">
-              <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#9d684d]">
+          <div className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-xs">
+            <div className="mb-3.5 border-b border-slate-100 pb-3">
+              <span className="inline-flex items-center gap-1 rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-amber-800 border border-amber-200/60">
                 Atenção
-              </p>
+              </span>
 
-              <h2 className="mt-1 font-serif text-lg font-semibold tracking-[-0.03em] text-[#202522]">
+              <h2 className="mt-1 text-base sm:text-lg font-bold tracking-tight text-slate-900">
                 O que precisa de si
               </h2>
             </div>
 
-            <div className="divide-y divide-[#eeeae2]">
+            <div className="divide-y divide-slate-100">
               {loading && (
                 <div className="space-y-3 py-5" aria-label="A carregar tarefas">
                   {[0, 1].map((item) => (
@@ -971,56 +976,62 @@ function Metric({
   const positive = change !== undefined && change !== null && change >= 0;
 
   return (
-    <div className="min-w-0 rounded-[5px] border border-[#e4e0d7] bg-[#fffdf9] p-4 shadow-[0_2px_10px_rgba(32,37,34,0.025)] sm:p-5">
+    <div className="min-w-0 rounded-xl border border-slate-200/80 bg-white p-5 shadow-xs transition hover:border-slate-300">
       <div className="flex items-center justify-between">
-        <p className="font-mono text-[9px] font-medium uppercase tracking-[0.12em] text-[#858c83]">
+        <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
           {label}
         </p>
 
-        <Icon
+        <div
           className={cn(
-            "h-4 w-4",
-            warning ? "text-[#bd592f]" : "text-[#95a092]",
+            "grid h-8 w-8 place-items-center rounded-lg border",
+            warning
+              ? "border-amber-200 bg-amber-50 text-amber-700"
+              : "border-slate-100 bg-slate-50 text-slate-600",
           )}
-          strokeWidth={1.7}
-        />
+        >
+          <Icon className="h-4 w-4" strokeWidth={1.8} />
+        </div>
       </div>
 
       {loading ? (
-        <div className="mt-3 h-7 w-28 animate-pulse bg-[#ebe7df]" />
+        <div className="mt-3 h-8 w-28 animate-pulse rounded-md bg-slate-100" />
       ) : (
-        <p className="mt-2 truncate font-serif text-[25px] font-normal tracking-[-0.03em] text-[#202522] sm:text-[29px]">
+        <p className="mt-2 truncate font-sans text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
           {value}
         </p>
       )}
 
       {change !== undefined && !loading && (
-        <div className="mt-2 flex items-center gap-1 text-[11px]">
+        <div className="mt-2.5 flex items-center gap-1.5 text-xs">
           {change === null ? (
-            <span className="text-[#a7aaa2]">sem base comparável</span>
+            <span className="text-slate-400">Sem base comparável</span>
           ) : (
             <>
-              {positive ? (
-                <ArrowUpRight className="h-3.5 w-3.5" />
-              ) : (
-                <ArrowDownRight className="h-3.5 w-3.5" />
-              )}
               <span
                 className={cn(
-                  "font-semibold",
-                  positive ? "text-[#2c6457]" : "text-[#bd592f]",
+                  "inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[11px] font-bold",
+                  positive
+                    ? "bg-emerald-50 text-emerald-700 border border-emerald-200/60"
+                    : "bg-rose-50 text-rose-700 border border-rose-200/60",
                 )}
               >
+                {positive ? (
+                  <ArrowUpRight className="h-3 w-3" />
+                ) : (
+                  <ArrowDownRight className="h-3 w-3" />
+                )}
                 {Math.abs(change).toFixed(1)}%
               </span>
-              <span className="text-[#a7aaa2]">vs. período anterior</span>
+              <span className="text-slate-400">vs. período anterior</span>
             </>
           )}
         </div>
       )}
 
       {warning && !loading && (
-        <p className="mt-2 text-[11px] font-medium text-[#747b73]">
+        <p className="mt-2.5 text-xs font-semibold text-amber-700 flex items-center gap-1">
+          <Clock3 className="h-3.5 w-3.5" />
           Requer atenção
         </p>
       )}
@@ -1044,25 +1055,28 @@ function AttentionItem({
   return (
     <Link
       to={href}
-      className="group flex items-start gap-3 border-b border-[#ebe7df] py-4 last:border-b-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-inset"
+      className="group flex items-start gap-3 rounded-lg p-3 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
     >
-      <Icon
+      <div
         className={cn(
-          "mt-0.5 h-4 w-4 shrink-0",
-          danger ? "text-[#bd592f]" : "text-[#7d8c7d]",
+          "grid h-8 w-8 shrink-0 place-items-center rounded-lg border text-sm mt-0.5",
+          danger
+            ? "border-rose-200 bg-rose-50 text-rose-700"
+            : "border-amber-200 bg-amber-50 text-amber-700",
         )}
-        strokeWidth={1.8}
-      />
+      >
+        <Icon className="h-4 w-4" strokeWidth={1.8} />
+      </div>
 
       <div className="min-w-0 flex-1">
-        <p className="font-serif text-[15px] font-medium group-hover:underline group-hover:underline-offset-2">
+        <p className="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-emerald-700 transition">
           {title}
         </p>
 
-        <p className="mt-1 text-xs text-[#a7aaa2]">{description}</p>
+        <p className="mt-0.5 text-xs text-slate-500">{description}</p>
       </div>
 
-      <ArrowRight className="mt-1 h-3.5 w-3.5 shrink-0 text-[#c9c3b8] transition-transform group-hover:translate-x-0.5 group-hover:text-[#5f625d]" />
+      <ArrowRight className="mt-1 h-3.5 w-3.5 shrink-0 text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:text-slate-700" />
     </Link>
   );
 }
@@ -1077,14 +1091,14 @@ function EmptyState({
   description: string;
 }) {
   return (
-    <div className="flex min-h-[150px] items-center gap-4">
-      <div className="grid h-9 w-9 shrink-0 place-items-center rounded-[7px] bg-[#ebe7df]">
-        <Icon className="h-4 w-4 text-[#a7aaa2]" />
+    <div className="flex min-h-[150px] items-center gap-4 rounded-xl border border-dashed border-slate-200 bg-slate-50/50 p-6">
+      <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-white border border-slate-200 text-slate-400">
+        <Icon className="h-5 w-5" />
       </div>
 
       <div>
-        <p className="text-sm font-medium">{title}</p>
-        <p className="mt-1 text-xs text-[#a7aaa2]">{description}</p>
+        <p className="text-sm font-bold text-slate-900">{title}</p>
+        <p className="mt-0.5 text-xs text-slate-500">{description}</p>
       </div>
     </div>
   );
@@ -1104,20 +1118,20 @@ function StoreStat({
   loading?: boolean;
 }) {
   return (
-    <div className="flex min-w-0 items-center gap-3 rounded-[5px] border border-[#e4e0d7] bg-[#fffdf9] p-4 shadow-[0_2px_10px_rgba(32,37,34,0.025)]">
-      <div className="grid h-8 w-8 shrink-0 place-items-center rounded-[7px] bg-[#ebe7df]">
+    <div className="flex min-w-0 items-center gap-3 rounded-xl border border-slate-200/80 bg-white p-4 shadow-xs">
+      <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-slate-50 border border-slate-100 text-slate-600">
         <Icon
           className={cn(
             "h-4 w-4",
-            warning ? "text-[#202522]" : "text-[#747b73]",
+            warning ? "text-amber-600" : "text-slate-600",
           )}
-          strokeWidth={1.7}
+          strokeWidth={1.8}
         />
       </div>
 
       <div className="min-w-0">
-        <p className="text-xs text-[#a7aaa2]">{label}</p>
-        <p className="mt-0.5 truncate font-serif text-base font-medium">
+        <p className="text-xs text-slate-400 font-medium">{label}</p>
+        <p className="mt-0.5 truncate text-base font-bold text-slate-900">
           {value}
         </p>
       </div>

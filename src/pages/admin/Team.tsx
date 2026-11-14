@@ -103,19 +103,18 @@ export default function Team() {
 
   return (
     <AdminLayout title="Equipa">
-      <div className="space-y-8">
+      <div className="space-y-6">
         <PageHeader
-          eyebrow="Definições / Equipa"
-          title="Equipa e funções"
-          description="Veja quem tem acesso a esta operação e o papel atribuído a cada pessoa."
-          className="[&_h1]:font-serif [&_h1]:font-medium"
+          eyebrow="Configurações & Acesso"
+          title="Equipa & Funções"
+          description="Controlo de utilizadores com permissões de acesso e gestão da loja."
           actions={
             <button
               type="button"
               onClick={() => load(true)}
               disabled={loading || refreshing}
               aria-busy={refreshing}
-              className="inline-flex h-11 items-center gap-2 border border-[#ded9d0] bg-[#fffdf9] px-3 text-sm font-semibold text-[#5f625d] transition hover:bg-[#f1eee7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] disabled:cursor-not-allowed disabled:opacity-60 sm:h-9"
+              className="inline-flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3.5 text-xs font-semibold text-slate-700 shadow-xs transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <RefreshCw className={refreshing ? "h-3.5 w-3.5 animate-spin" : "h-3.5 w-3.5"} />
               {refreshing ? "A atualizar..." : "Atualizar"}
@@ -124,34 +123,42 @@ export default function Team() {
         />
 
         {loading ? (
-          <LoadingState label="A carregar equipa" />
+          <LoadingState label="A carregar equipa..." />
         ) : error ? (
           <ErrorState description={error} onRetry={() => load(true)} />
         ) : members.length === 0 ? (
           <EmptyState
             title="Nenhum membro encontrado"
-            description="A equipa será criada quando existir uma associação à empresa."
+            description="A equipa será configurada quando existirem utilizadores associados à empresa."
           />
         ) : (
-          <section className="border-y border-[#ded9d0]" aria-label="Membros da equipa">
+          <section className="overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-xs" aria-label="Membros da equipa">
             {profileWarning && (
-              <div className="border-b border-[#e3b9ad] bg-[#f5e7e2] px-4 py-3 text-sm leading-5 text-[#7e3929] sm:px-5">
-                Alguns dados de perfil não estão disponíveis. A identificação abaixo usa apenas o ID visível, sem inventar nomes ou emails.
+              <div className="border-b border-amber-200 bg-amber-50/70 px-4 py-3 text-xs leading-relaxed text-amber-900">
+                Alguns dados de perfil não puderam ser carregados. Os identificadores abaixo utilizam os IDs autorizados.
               </div>
             )}
-            <div className="hidden grid-cols-[minmax(0,1fr)_120px_150px] bg-[#f1eee7] px-5 py-3 font-mono text-[10px] uppercase tracking-[0.12em] text-[#747b73] sm:grid">
+            <div className="hidden grid-cols-[minmax(0,1fr)_140px_160px] bg-slate-50/80 px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400 sm:grid border-b border-slate-100">
               <span>Membro</span>
-              <span>Função</span>
-              <span>Entrada</span>
+              <span>Nível de Acesso</span>
+              <span>Data de Registo</span>
             </div>
-            <div className="space-y-1 py-2">
+            <div className="divide-y divide-slate-100">
               {members.map((member) => {
                 const name = member.profile?.full_name || member.profile?.email;
                 const hasProfile = Boolean(member.profile);
+                const roleLower = member.role.toLowerCase();
+                const roleBadge =
+                  roleLower === "owner"
+                    ? "border-purple-200 bg-purple-50 text-purple-700"
+                    : roleLower === "admin"
+                      ? "border-blue-200 bg-blue-50 text-blue-700"
+                      : "border-slate-200 bg-slate-50 text-slate-700";
+
                 return (
                   <article
                     key={member.id}
-                    className="grid gap-3 px-4 py-4 transition hover:bg-[#f1eee7]/70 sm:grid-cols-[minmax(0,1fr)_120px_150px] sm:items-center sm:px-5"
+                    className="grid gap-3 p-4 transition hover:bg-slate-50/60 sm:grid-cols-[minmax(0,1fr)_140px_160px] sm:items-center sm:px-5"
                   >
                     <div className="flex min-w-0 items-center gap-3">
                       {member.profile?.avatar_url ? (
@@ -160,31 +167,31 @@ export default function Team() {
                           alt=""
                           loading="lazy"
                           decoding="async"
-                          className="h-10 w-10 shrink-0 rounded-[7px] object-cover"
+                          className="h-10 w-10 shrink-0 rounded-xl object-cover ring-1 ring-slate-200"
                         />
                       ) : (
-                        <div className="grid h-10 w-10 shrink-0 place-items-center bg-[#e9eee9] font-mono text-xs font-semibold text-[#2c6457]">
+                        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-slate-100 font-sans text-xs font-bold text-slate-700">
                           {initials(member.profile, member.user_id)}
                         </div>
                       )}
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-[#202522]">
+                        <p className="truncate font-sans text-sm font-bold text-slate-900">
                           {name || shortId(member.user_id)}
                         </p>
-                        <p className="truncate text-xs text-[#747b73]" title={member.user_id}>
-                          {hasProfile && member.profile?.email ? member.profile.email : "ID de utilizador · " + shortId(member.user_id)}
+                        <p className="truncate text-xs text-slate-400 font-medium" title={member.user_id}>
+                          {hasProfile && member.profile?.email ? member.profile.email : "ID: " + shortId(member.user_id)}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center justify-between gap-3 sm:block">
-                      <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#5f625d]">
+                      <span className={cn("inline-flex rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide", roleBadge)}>
                         {member.role}
                       </span>
-                      <span className="text-xs text-[#747b73] sm:hidden">
+                      <span className="text-xs text-slate-400 sm:hidden">
                         {new Intl.DateTimeFormat("pt-PT", { dateStyle: "medium" }).format(new Date(member.created_at))}
                       </span>
                     </div>
-                    <span className="hidden text-xs text-[#747b73] sm:block">
+                    <span className="hidden text-xs text-slate-500 sm:block">
                       {new Intl.DateTimeFormat("pt-PT", { dateStyle: "medium" }).format(new Date(member.created_at))}
                     </span>
                   </article>

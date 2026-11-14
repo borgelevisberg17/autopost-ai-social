@@ -58,15 +58,15 @@ function statusLabel(status: string | null) {
 
 function statusClass(status: string | null) {
   const value = statusKey(status);
-  if (value === "published") return "border-[#b8cbbd] bg-[#e9eee9] text-[#2c6457]";
-  if (value === "failed") return "border-[#e7c3b8] bg-[#f8e9e4] text-[#9e412c]";
-  if (value === "scheduled") return "border-[#d7c9ae] bg-[#f5efe3] text-[#795d31]";
-  if (value === "draft") return "border-[#ded9d0] bg-[#f1eee7] text-[#5f625d]";
-  return "border-[#ded9d0] bg-[#fffdf9] text-[#747b73]";
+  if (value === "published") return "border-emerald-200 bg-emerald-50 text-emerald-700";
+  if (value === "failed" || value === "blocked") return "border-rose-200 bg-rose-50 text-rose-700";
+  if (value === "scheduled") return "border-amber-200 bg-amber-50 text-amber-800";
+  if (value === "draft") return "border-slate-200 bg-slate-100 text-slate-700";
+  return "border-slate-200 bg-slate-50 text-slate-600";
 }
 
 function platformLabel(platform: string | null) {
-  if (!platform?.trim()) return "Canal não registado";
+  if (!platform?.trim()) return "Canal geral";
   const known: Record<string, string> = {
     instagram: "Instagram",
     facebook: "Facebook",
@@ -75,7 +75,7 @@ function platformLabel(platform: string | null) {
     tiktok: "TikTok",
     twitter: "X / Twitter",
   };
-  return known[platform.toLowerCase()] ?? `Canal não reconhecido · ${platform}`;
+  return known[platform.toLowerCase()] ?? `Canal · ${platform}`;
 }
 
 export default function Content() {
@@ -135,80 +135,140 @@ export default function Content() {
   return (
     <AdminLayout title="Conteúdo">
       <div className="space-y-6">
-        <section className="pb-1">
-          <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#2c6457]">
-            Automação / Arquivo editorial
-          </p>
-          <h1 className="mt-2 font-serif text-[clamp(2rem,4vw,2.8rem)] font-medium leading-[1.04] tracking-[-0.045em] text-[#202522]">
-            Conteúdo
-          </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-[#747b73]">
-            Conteúdo registado para esta conta, ordenado pelo momento de criação. Esta leitura usa o histórico real e não cria ações de publicação ou agendamento.
-          </p>
+        <section className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200/80 bg-emerald-50 px-2.5 py-0.5 text-[11px] font-semibold tracking-wide text-emerald-800 mb-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              MARKETING & PUBLICAÇÕES
+            </div>
+            <h1 className="font-sans text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
+              Arquivo de Conteúdo
+            </h1>
+            <p className="mt-1 text-sm text-slate-500">
+              Histórico de textos, posts sociais e conteúdos gerados pelos agentes da loja.
+            </p>
+          </div>
+          <span className="text-xs font-medium text-slate-400">
+            {filteredItems.length} publicações filtradas
+          </span>
         </section>
 
-        <div className="flex flex-col gap-3 border border-[#ded9d0] bg-[#fffdf9] p-4 sm:flex-row sm:items-end sm:justify-between">
+        {/* TOOLBAR */}
+        <div className="flex flex-col gap-3 rounded-xl border border-slate-200/80 bg-white p-4 shadow-xs sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-semibold text-[#202522]">Fila e histórico</p>
-            <p className="mt-1 text-xs text-[#747b73]">Até 100 registos recentes. Os filtros atuam apenas sobre este conjunto carregado.</p>
+            <p className="text-sm font-bold text-slate-900">Filtros de Publicação</p>
+            <p className="mt-0.5 text-xs text-slate-400">Filtre por canal ou estado de publicação.</p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <label className="sr-only" htmlFor="content-status-filter">Filtrar por estado</label>
-            <select id="content-status-filter" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)} className="h-9 min-w-36 border border-[#ded9d0] bg-[#fffdf9] px-2.5 text-xs text-[#5f625d] outline-none focus:border-[#2c6457]">
+          <div className="flex flex-wrap items-center gap-2">
+            <select
+              value={statusFilter}
+              onChange={(event) => setStatusFilter(event.target.value)}
+              className="h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-xs font-semibold text-slate-700 outline-none transition focus:border-slate-900 focus:bg-white"
+            >
               <option value="all">Todos os estados</option>
-              {statusOptions.map((value) => <option key={value} value={value}>{value === "__empty__" ? "Sem estado registado" : statusLabel(value)}</option>)}
+              {statusOptions.map((value) => (
+                <option key={value} value={value}>
+                  {value === "__empty__" ? "Sem estado" : statusLabel(value)}
+                </option>
+              ))}
             </select>
-            <label className="sr-only" htmlFor="content-platform-filter">Filtrar por canal</label>
-            <select id="content-platform-filter" value={platformFilter} onChange={(event) => setPlatformFilter(event.target.value)} className="h-9 min-w-36 border border-[#ded9d0] bg-[#fffdf9] px-2.5 text-xs text-[#5f625d] outline-none focus:border-[#2c6457]">
+            <select
+              value={platformFilter}
+              onChange={(event) => setPlatformFilter(event.target.value)}
+              className="h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-xs font-semibold text-slate-700 outline-none transition focus:border-slate-900 focus:bg-white"
+            >
               <option value="all">Todos os canais</option>
-              {platformOptions.map((value) => <option key={value} value={value}>{platformLabel(value)}</option>)}
+              {platformOptions.map((value) => (
+                <option key={value} value={value}>
+                  {platformLabel(value)}
+                </option>
+              ))}
             </select>
-            <button type="button" onClick={() => void load()} className="inline-flex h-9 items-center gap-2 border border-[#ded9d0] bg-[#f1eee7] px-3 text-xs font-semibold text-[#5f625d] transition hover:bg-[#e9eee9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]" aria-label="Atualizar conteúdo">
+            <button
+              type="button"
+              onClick={() => void load()}
+              className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 shadow-xs transition hover:bg-slate-50"
+            >
               <RefreshCw className="h-3.5 w-3.5" /> Atualizar
             </button>
           </div>
         </div>
 
         {loading ? (
-          <div className="grid min-h-[300px] place-items-center border border-[#ded9d0] bg-[#fffdf9]">
-            <div className="flex items-center gap-3 text-sm text-[#747b73]"><Loader2 className="h-4 w-4 animate-spin" />A carregar histórico...</div>
+          <div className="grid min-h-[260px] place-items-center rounded-xl border border-slate-200/80 bg-white shadow-xs">
+            <div className="flex items-center gap-2.5 text-xs font-semibold text-slate-500">
+              <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+              A carregar histórico...
+            </div>
           </div>
         ) : error ? (
-          <section className="border border-[#e7c3b8] bg-[#fff8f5] p-6">
-            <p className="text-sm font-semibold text-[#9e412c]">Não foi possível mostrar o conteúdo</p>
-            <p className="mt-2 text-sm leading-6 text-[#747b73]">{error} Verifique a sessão e tente novamente.</p>
-            <button type="button" onClick={() => void load()} className="mt-4 inline-flex h-9 items-center gap-2 bg-[#202522] px-3 text-xs font-semibold text-white hover:bg-[#2c6457]"><RefreshCw className="h-3.5 w-3.5" />Tentar novamente</button>
+          <section className="rounded-xl border border-rose-200 bg-rose-50/60 p-6 text-center">
+            <p className="text-sm font-bold text-rose-800">Não foi possível carregar o conteúdo</p>
+            <p className="mt-1 text-xs text-rose-600">{error}</p>
+            <button
+              type="button"
+              onClick={() => void load()}
+              className="mt-4 inline-flex h-9 items-center gap-2 rounded-lg bg-slate-900 px-4 text-xs font-semibold text-white shadow-xs hover:bg-slate-800"
+            >
+              <RefreshCw className="h-3.5 w-3.5" /> Tentar novamente
+            </button>
           </section>
         ) : filteredItems.length === 0 ? (
-          <section className="border border-dashed border-[#cfc9bd] bg-[#fffdf9] p-10 text-center">
-            <FileText className="mx-auto h-5 w-5 text-[#9aa198]" />
-            <p className="mt-4 font-serif text-xl text-[#202522]">Nenhum conteúdo neste recorte</p>
-            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#747b73]">Não há registos que correspondam aos filtros atuais. A publicação e o agendamento não são feitos por esta página.</p>
+          <section className="rounded-xl border border-dashed border-slate-200 bg-white p-12 text-center shadow-xs">
+            <FileText className="mx-auto h-8 w-8 text-slate-300" />
+            <p className="mt-3 font-sans text-base font-bold text-slate-900">Nenhum conteúdo encontrado</p>
+            <p className="mx-auto mt-1 max-w-sm text-xs text-slate-500">
+              Quando os agentes de marketing gerarem legendas ou publicações, o histórico aparecerá aqui.
+            </p>
           </section>
         ) : (
-          <section className="overflow-hidden border border-[#ded9d0] bg-[#fffdf9]">
+          <section className="overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-xs divide-y divide-slate-100">
             {filteredItems.map((item) => {
               const expanded = expandedId === item.id;
               return (
-                <article key={item.id} className="border-b border-[#ebe7df] p-4 last:border-0 sm:p-5">
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <article key={item.id} className="p-4 sm:p-5 transition hover:bg-slate-50/60">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#2c6457]">{platformLabel(item.platform)}</span>
-                        <span className={cn("border px-2 py-1 text-[10px] font-semibold", statusClass(item.status))}>{statusLabel(item.status)}</span>
+                        <span className="rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-700">
+                          {platformLabel(item.platform)}
+                        </span>
+                        <span className={cn("rounded-full border px-2 py-0.5 text-[10px] font-semibold", statusClass(item.status))}>
+                          {statusLabel(item.status)}
+                        </span>
                       </div>
-                      <p className="mt-2 text-sm font-semibold text-[#202522]">{item.topic || "Sem tema registado"}</p>
-                      <p className="mt-1 text-xs text-[#858c83]">{item.content_type || "Tipo de conteúdo não registado"} · criado em {date(item.created_at)}</p>
+                      <p className="mt-2 font-sans text-sm font-bold text-slate-900">
+                        {item.topic || "Post Promocional"}
+                      </p>
+                      <p className="mt-0.5 text-xs text-slate-400">
+                        {item.content_type || "Geral"} · criado a {date(item.created_at)}
+                      </p>
                     </div>
-                    <button type="button" onClick={() => setExpandedId(expanded ? null : item.id)} aria-expanded={expanded} className="inline-flex h-8 shrink-0 items-center gap-2 self-start border border-[#ded9d0] px-2.5 text-xs font-semibold text-[#5f625d] hover:bg-[#f1eee7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"><span>{expanded ? "Recolher texto" : "Ver texto"}</span>{expanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}</button>
+                    <button
+                      type="button"
+                      onClick={() => setExpandedId(expanded ? null : item.id)}
+                      aria-expanded={expanded}
+                      className="inline-flex h-8 shrink-0 items-center gap-1.5 self-start rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-semibold text-slate-700 shadow-xs transition hover:bg-slate-50"
+                    >
+                      <span>{expanded ? "Recolher texto" : "Ver texto completo"}</span>
+                      {expanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+                    </button>
                   </div>
-                  <div className="mt-4 grid gap-3 text-xs text-[#747b73] sm:grid-cols-3">
-                    <p><span className="font-semibold text-[#5f625d]">Agendado:</span> {date(item.scheduled_at)}</p>
-                    <p><span className="font-semibold text-[#5f625d]">Publicado:</span> {date(item.published_at)}</p>
-                    <p><span className="font-semibold text-[#5f625d]">Tentativas:</span> {item.publish_attempts ?? 0}</p>
+                  <div className="mt-3 grid gap-2 rounded-lg bg-slate-50 p-3 text-xs sm:grid-cols-3">
+                    <p className="text-slate-600"><span className="font-semibold text-slate-900">Agendado:</span> {date(item.scheduled_at)}</p>
+                    <p className="text-slate-600"><span className="font-semibold text-slate-900">Publicado:</span> {date(item.published_at)}</p>
+                    <p className="text-slate-600"><span className="font-semibold text-slate-900">Tentativas:</span> {item.publish_attempts ?? 0}</p>
                   </div>
-                  {item.publish_error && <p className="mt-3 border-l-2 border-[#bd592f] bg-[#fff8f5] px-3 py-2 text-xs leading-5 text-[#9e412c]">Falha registada: {item.publish_error}</p>}
-                  {expanded && <div className="mt-4 whitespace-pre-wrap border-l-2 border-[#b8cbbd] bg-[#f5f6f1] px-4 py-3 text-sm leading-6 text-[#3f4840]">{item.generated_content || "Sem texto gerado."}</div>}
+                  {item.publish_error && (
+                    <p className="mt-2.5 rounded-lg border border-rose-200 bg-rose-50/70 p-3 text-xs text-rose-800">
+                      <strong>Falha:</strong> {item.publish_error}
+                    </p>
+                  )}
+                  {expanded && (
+                    <div className="mt-3 whitespace-pre-wrap rounded-xl border border-slate-200/80 bg-slate-50/70 p-4 text-xs leading-relaxed text-slate-800">
+                      {item.generated_content || "Sem texto gerado."}
+                    </div>
+                  )}
                 </article>
               );
             })}

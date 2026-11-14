@@ -233,7 +233,7 @@ export default function Inventory() {
           </button>} />
 
         {/* METRICS */}
-        <section className="grid border-y border-[#ded9d0] sm:grid-cols-2 lg:grid-cols-4">
+        <section className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <MetricCard
             label="Total de Unidades"
             value={productsError ? "—" : String(stats.totalOnHand)}
@@ -557,21 +557,32 @@ function MetricCard({
   loading: boolean;
 }) {
   return (
-    <div className="border-b border-[#ded9d0] px-5 py-5 sm:border-r last:border-r-0 lg:border-b-0">
-      <div className="flex items-center justify-between text-[#a7aaa2]">
-        <p className="text-xs font-medium uppercase tracking-[0.12em]">{label}</p>
-        <Icon className={cn("h-4 w-4", warning && "text-amber-600", danger && "text-red-600")} />
+    <div className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-xs transition hover:border-slate-300">
+      <div className="flex items-center justify-between text-slate-400">
+        <p className="text-xs font-semibold uppercase tracking-wider">{label}</p>
+        <div
+          className={cn(
+            "grid h-8 w-8 place-items-center rounded-lg border",
+            warning
+              ? "border-amber-200 bg-amber-50 text-amber-700"
+              : danger
+              ? "border-rose-200 bg-rose-50 text-rose-700"
+              : "border-slate-100 bg-slate-50 text-slate-600",
+          )}
+        >
+          <Icon className="h-4 w-4" strokeWidth={1.8} />
+        </div>
       </div>
 
       {loading ? (
-        <div className="mt-3 h-7 w-20 animate-pulse bg-[#ebe7df]" />
+        <div className="mt-3 h-8 w-20 animate-pulse rounded-md bg-slate-100" />
       ) : (
         <p
           className={cn(
-            "mt-2 text-2xl font-semibold tracking-tight",
+            "mt-2 text-2xl sm:text-3xl font-bold tracking-tight",
             warning && "text-amber-700",
-            danger && "text-red-700",
-            !warning && !danger && "text-[#202522]"
+            danger && "text-rose-700",
+            !warning && !danger && "text-slate-900",
           )}
         >
           {value}

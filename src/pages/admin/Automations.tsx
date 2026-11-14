@@ -53,16 +53,16 @@ function statusLabel(status: string | null) {
 
 function statusClass(status: string | null) {
   const value = statusKey(status);
-  if (value === "success") return "border-[#b8cbbd] bg-[#e9eee9] text-[#2c6457]";
-  if (value === "failed") return "border-[#e7c3b8] bg-[#f8e9e4] text-[#9e412c]";
-  if (value === "running") return "border-[#d7c9ae] bg-[#f5efe3] text-[#795d31]";
-  return "border-[#ded9d0] bg-[#fffdf9] text-[#747b73]";
+  if (value === "success") return "border-emerald-200 bg-emerald-50 text-emerald-700";
+  if (value === "failed") return "border-rose-200 bg-rose-50 text-rose-700";
+  if (value === "running") return "border-amber-200 bg-amber-50 text-amber-800";
+  return "border-slate-200 bg-slate-50 text-slate-600";
 }
 
 function triggerLabel(trigger: string | null) {
   if (!trigger?.trim()) return "Sem gatilho registado";
   if (trigger.toLowerCase() === "manual") return "Manual";
-  return `Gatilho registado · ${trigger}`;
+  return `Gatilho · ${trigger}`;
 }
 
 export default function Automations() {
@@ -111,25 +111,157 @@ export default function Automations() {
   return (
     <AdminLayout title="Automações">
       <div className="space-y-6">
-        <section className="pb-1">
-          <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#2c6457]">Automação / Execuções</p>
-          <h1 className="mt-2 font-serif text-[clamp(2rem,4vw,2.8rem)] font-medium leading-[1.04] tracking-[-0.045em] text-[#202522]">Automações</h1>
-          <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <p className="max-w-2xl text-sm leading-6 text-[#747b73]">Acompanhamento das execuções reais de agentes desta loja. Os gatilhos customizáveis não existem nesta interface; não há agendamento nem ativação de regras aqui.</p>
-            <Link to="/admin/agentes" className="inline-flex h-9 shrink-0 items-center gap-2 border border-[#ded9d0] bg-[#fffdf9] px-3 text-xs font-semibold text-[#5f625d] hover:bg-[#e9eee9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]">Gerir agentes <ArrowRight className="h-3.5 w-3.5" /></Link>
+        <section className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200/80 bg-emerald-50 px-2.5 py-0.5 text-[11px] font-semibold tracking-wide text-emerald-800 mb-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              SISTEMA & AUTOMAÇÕES
+            </div>
+            <h1 className="font-sans text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
+              Automações & Execuções
+            </h1>
+            <p className="mt-1 text-sm text-slate-500">
+              Acompanhamento de rotinas e execuções autónomas dos agentes da sua loja.
+            </p>
+          </div>
+          <Link
+            to="/admin/agentes"
+            className="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3.5 text-xs font-semibold text-slate-700 shadow-xs transition hover:bg-slate-50"
+          >
+            Gerir agentes <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </section>
+
+        {/* METRICS */}
+        <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <div className="rounded-xl border border-slate-200/80 bg-white p-4 shadow-xs">
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              Total Carregadas
+            </span>
+            <p className="mt-2 font-sans text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
+              {summary.total}
+            </p>
+          </div>
+          <div className="rounded-xl border border-slate-200/80 bg-white p-4 shadow-xs">
+            <span className="text-xs font-semibold text-amber-600 uppercase tracking-wider">
+              Em Execução
+            </span>
+            <p className="mt-2 font-sans text-2xl sm:text-3xl font-bold tracking-tight text-amber-600">
+              {summary.running}
+            </p>
+          </div>
+          <div className="rounded-xl border border-slate-200/80 bg-white p-4 shadow-xs">
+            <span className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">
+              Concluídas
+            </span>
+            <p className="mt-2 font-sans text-2xl sm:text-3xl font-bold tracking-tight text-emerald-600">
+              {summary.success}
+            </p>
+          </div>
+          <div className="rounded-xl border border-slate-200/80 bg-white p-4 shadow-xs">
+            <span className="text-xs font-semibold text-rose-600 uppercase tracking-wider">
+              Falharam
+            </span>
+            <p className="mt-2 font-sans text-2xl sm:text-3xl font-bold tracking-tight text-rose-600">
+              {summary.failed}
+            </p>
           </div>
         </section>
 
-        <section className="grid gap-px border border-[#ded9d0] bg-[#ded9d0] sm:grid-cols-4">
-          {[["Carregadas", summary.total], ["Em execução", summary.running], ["Concluídas", summary.success], ["Falharam", summary.failed]].map(([label, value]) => <div key={String(label)} className="bg-[#fffdf9] p-4"><p className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#858c83]">{label}</p><p className="mt-2 font-serif text-2xl text-[#202522]">{value}</p></div>)}
-        </section>
-
-        <div className="flex flex-col gap-3 border border-[#ded9d0] bg-[#fffdf9] p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div><p className="text-sm font-semibold text-[#202522]">Histórico de execuções</p><p className="mt-1 text-xs text-[#747b73]">Limite de 50 execuções recentes; os estados acima são derivados apenas deste conjunto.</p></div>
-          <div className="flex flex-wrap gap-2"><label className="sr-only" htmlFor="run-status-filter">Filtrar por estado</label><select id="run-status-filter" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)} className="h-9 min-w-36 border border-[#ded9d0] bg-[#fffdf9] px-2.5 text-xs text-[#5f625d] outline-none focus:border-[#2c6457]"><option value="all">Todos os estados</option>{statuses.map((value) => <option key={value} value={value}>{value === "__empty__" ? "Sem estado registado" : statusLabel(value)}</option>)}</select><button type="button" onClick={() => void load()} className="inline-flex h-9 items-center gap-2 border border-[#ded9d0] bg-[#f1eee7] px-3 text-xs font-semibold text-[#5f625d] hover:bg-[#e9eee9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"><RefreshCw className="h-3.5 w-3.5" />Atualizar</button></div>
+        {/* TOOLBAR */}
+        <div className="flex flex-col gap-3 rounded-xl border border-slate-200/80 bg-white p-4 shadow-xs sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-bold text-slate-900">Histórico de Execuções Recentes</p>
+            <p className="mt-0.5 text-xs text-slate-400">Últimas 50 execuções registadas pelo motor de IA.</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <label className="sr-only" htmlFor="run-status-filter">Filtrar por estado</label>
+            <select
+              id="run-status-filter"
+              value={statusFilter}
+              onChange={(event) => setStatusFilter(event.target.value)}
+              className="h-9 rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-xs font-semibold text-slate-700 outline-none transition focus:border-slate-900 focus:bg-white"
+            >
+              <option value="all">Todos os estados</option>
+              {statuses.map((value) => (
+                <option key={value} value={value}>
+                  {value === "__empty__" ? "Sem estado registado" : statusLabel(value)}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={() => void load()}
+              className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 shadow-xs transition hover:bg-slate-50"
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+              Atualizar
+            </button>
+          </div>
         </div>
 
-        {loading ? <div className="grid min-h-[300px] place-items-center border border-[#ded9d0] bg-[#fffdf9]"><div className="flex items-center gap-3 text-sm text-[#747b73]"><Loader2 className="h-4 w-4 animate-spin" />A carregar execuções...</div></div> : error ? <section className="border border-[#e7c3b8] bg-[#fff8f5] p-6"><p className="text-sm font-semibold text-[#9e412c]">Não foi possível mostrar as execuções</p><p className="mt-2 text-sm leading-6 text-[#747b73]">{error} Confirme o acesso à loja e tente novamente.</p><button type="button" onClick={() => void load()} className="mt-4 inline-flex h-9 items-center gap-2 bg-[#202522] px-3 text-xs font-semibold text-white hover:bg-[#2c6457]"><RefreshCw className="h-3.5 w-3.5" />Tentar novamente</button></section> : filteredRuns.length === 0 ? <section className="border border-dashed border-[#cfc9bd] bg-[#fffdf9] p-10 text-center"><Activity className="mx-auto h-5 w-5 text-[#9aa198]" /><p className="mt-4 font-serif text-xl text-[#202522]">Nenhuma execução neste recorte</p><p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#747b73]">Quando um agente for executado, a execução registada aparecerá aqui.</p></section> : <section className="overflow-hidden border border-[#ded9d0] bg-[#fffdf9]">{filteredRuns.map((run) => <article key={run.id} className="border-b border-[#ebe7df] p-4 last:border-0 sm:p-5"><div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"><div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><p className="text-sm font-semibold text-[#202522]">{run.agent_name || "Agente sem nome"}</p><span className={cn("border px-2 py-1 text-[10px] font-semibold", statusClass(run.status))}>{statusLabel(run.status)}</span></div><p className="mt-2 text-xs text-[#858c83]">{triggerLabel(run.trigger)} · início {date(run.started_at)}</p></div><p className="font-mono text-[10px] text-[#a0a59e]" title={run.id}>ID {run.id.slice(0, 8)}</p></div><div className="mt-4 grid gap-3 text-xs text-[#747b73] sm:grid-cols-2"><p><span className="font-semibold text-[#5f625d]">Conclusão:</span> {date(run.completed_at)}</p><p><span className="font-semibold text-[#5f625d]">Resumo:</span> {run.summary || "Sem resumo registado"}</p></div></article>)}</section>}
+        {/* LIST / EMPTY / ERROR */}
+        {loading ? (
+          <div className="grid min-h-[260px] place-items-center rounded-xl border border-slate-200/80 bg-white shadow-xs">
+            <div className="flex items-center gap-2.5 text-xs font-semibold text-slate-500">
+              <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+              A carregar execuções...
+            </div>
+          </div>
+        ) : error ? (
+          <section className="rounded-xl border border-rose-200 bg-rose-50/60 p-6 text-center">
+            <p className="text-sm font-bold text-rose-800">Não foi possível carregar as execuções</p>
+            <p className="mt-1 text-xs text-rose-600">{error}</p>
+            <button
+              type="button"
+              onClick={() => void load()}
+              className="mt-4 inline-flex h-9 items-center gap-2 rounded-lg bg-slate-900 px-4 text-xs font-semibold text-white shadow-xs hover:bg-slate-800"
+            >
+              <RefreshCw className="h-3.5 w-3.5" /> Tentar novamente
+            </button>
+          </section>
+        ) : filteredRuns.length === 0 ? (
+          <section className="rounded-xl border border-dashed border-slate-200 bg-white p-12 text-center shadow-xs">
+            <Activity className="mx-auto h-8 w-8 text-slate-300" />
+            <p className="mt-3 font-sans text-base font-bold text-slate-900">Nenhuma execução registada</p>
+            <p className="mx-auto mt-1 max-w-sm text-xs text-slate-500">
+              Quando os agentes forem acionados, o progresso detalhado de cada execução surgirá nesta secção.
+            </p>
+          </section>
+        ) : (
+          <section className="overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-xs divide-y divide-slate-100">
+            {filteredRuns.map((run) => (
+              <article key={run.id} className="p-4 sm:p-5 transition hover:bg-slate-50/60">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="font-sans text-sm font-bold text-slate-900">
+                        {run.agent_name || "Agente Autónomo"}
+                      </p>
+                      <span className={cn("rounded-full border px-2 py-0.5 text-[10px] font-semibold", statusClass(run.status))}>
+                        {statusLabel(run.status)}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-xs text-slate-400">
+                      {triggerLabel(run.trigger)} · início a {date(run.started_at)}
+                    </p>
+                  </div>
+                  <span className="font-mono text-[10px] font-medium text-slate-400" title={run.id}>
+                    ID: #{run.id.slice(0, 8)}
+                  </span>
+                </div>
+                <div className="mt-3 grid gap-2 rounded-lg bg-slate-50 p-3 text-xs sm:grid-cols-2">
+                  <p className="text-slate-600">
+                    <span className="font-semibold text-slate-900">Conclusão:</span> {date(run.completed_at)}
+                  </p>
+                  <p className="text-slate-600">
+                    <span className="font-semibold text-slate-900">Resumo:</span> {run.summary || "Sem notas adicionais"}
+                  </p>
+                </div>
+              </article>
+            ))}
+          </section>
+        )}
       </div>
     </AdminLayout>
   );

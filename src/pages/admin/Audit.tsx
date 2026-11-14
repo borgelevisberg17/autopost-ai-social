@@ -78,20 +78,19 @@ export default function Audit() {
   }, [entries]);
 
   return (
-    <AdminLayout title="Audit log">
-      <div className="space-y-8">
+    <AdminLayout title="Audit Log">
+      <div className="space-y-6">
         <PageHeader
-          eyebrow="Sistema / Segurança"
-          title="Audit log"
-          description="Histórico das ações realizadas na operação."
-          className="[&_h1]:font-serif [&_h1]:font-medium"
+          eyebrow="Sistema & Segurança"
+          title="Registo de Auditoria"
+          description="Histórico rastreável e imutável de todas as ações administrativas realizadas na loja."
           actions={
             <button
               type="button"
               onClick={() => load(true)}
               disabled={loading || refreshing}
               aria-busy={refreshing}
-              className="inline-flex h-11 items-center gap-2 border border-[#ded9d0] bg-[#fffdf9] px-3 text-sm font-semibold text-[#5f625d] transition hover:bg-[#f1eee7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] disabled:cursor-not-allowed disabled:opacity-60 sm:h-9"
+              className="inline-flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3.5 text-xs font-semibold text-slate-700 shadow-xs transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <RefreshCw className={refreshing ? "h-3.5 w-3.5 animate-spin" : "h-3.5 w-3.5"} />
               {refreshing ? "A atualizar..." : "Atualizar"}
@@ -100,56 +99,55 @@ export default function Audit() {
         />
 
         {loading ? (
-          <LoadingState label="A carregar registos" />
+          <LoadingState label="A carregar registos de auditoria..." />
         ) : error ? (
           <ErrorState description={error} onRetry={() => load(true)} />
         ) : entries.length === 0 ? (
           <EmptyState
             title="Ainda não existem registos"
-            description="As ações importantes da operação aparecerão aqui quando forem registadas pelo backend."
+            description="As ações da loja aparecerão aqui quando forem registadas pela plataforma."
           />
         ) : (
-          <section aria-label="Cronologia do audit log" className="border-y border-[#ded9d0]">
-            <div className="space-y-9 py-5">
-              {groups.map((group) => (
-                <section key={group.key} aria-labelledby={`audit-${group.key}`}>
-                  <div className="flex items-baseline justify-between gap-4 px-4 pb-3 sm:px-5">
-                    <h2 id={`audit-${group.key}`} className="font-serif text-lg font-medium capitalize tracking-[-0.025em] text-[#202522]">
-                      {group.label}
-                    </h2>
-                    <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-[#979c95]">{group.entries.length} registos</span>
-                  </div>
-                  <ol className="relative ml-5 border-l border-[#ded9d0] sm:ml-7">
-                    {group.entries.map((entry) => (
-                      <li key={entry.id} className="relative grid gap-3 py-4 pl-5 pr-4 first:pt-2 last:pb-2 sm:grid-cols-[minmax(0,1fr)_150px_150px] sm:items-start sm:pl-6 sm:pr-5">
-                        <span className="absolute -left-[5px] top-6 h-2 w-2 rounded-full bg-[#2c6457] ring-4 ring-[#fffdf9]" aria-hidden="true" />
-                        <div className="min-w-0">
-                          <p className="font-serif text-[15px] font-semibold text-[#202522]">{entry.action}</p>
-                          <p className="mt-1 text-xs leading-5 text-[#747b73]">
-                            {entry.target_type || "Operação"}
-                            {entry.target_id && (
-                              <span
-                                className="ml-1 font-mono text-[10px] text-[#5f625d]"
-                                title={`ID completo: ${entry.target_id}`}
-                                aria-label={`ID completo: ${entry.target_id}`}
-                              >
-                                · {targetId(entry.target_id)}
-                              </span>
-                            )}
-                          </p>
-                        </div>
-                        <div className="text-xs text-[#5f625d]">
-                          <span>{entry.actor_name}</span>
-                          <span className="mt-1 block font-mono text-[10px] uppercase tracking-[0.08em] text-[#979c95]">{entry.actor_type}</span>
-                        </div>
-                        <time className="text-[10px] text-[#747b73] sm:text-right">{formatDate(entry.created_at)}</time>
-                      </li>
-                    ))}
-                  </ol>
-                </section>
-              ))}
-            </div>
-          </section>
+          <div className="space-y-6">
+            {groups.map((group) => (
+              <section key={group.key} aria-labelledby={`audit-${group.key}`} className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-xs">
+                <div className="flex items-center justify-between gap-4 border-b border-slate-100 pb-3">
+                  <h2 id={`audit-${group.key}`} className="font-sans text-sm font-bold capitalize text-slate-900">
+                    {group.label}
+                  </h2>
+                  <span className="rounded-full bg-slate-100 px-2 py-0.5 font-mono text-[10px] font-semibold text-slate-500">
+                    {group.entries.length} {group.entries.length === 1 ? "evento" : "eventos"}
+                  </span>
+                </div>
+                <ol className="relative ml-3 border-l border-slate-200 mt-4 space-y-4">
+                  {group.entries.map((entry) => (
+                    <li key={entry.id} className="relative grid gap-2 pl-6 sm:grid-cols-[minmax(0,1fr)_160px_140px] sm:items-start">
+                      <span className="absolute -left-[5px] top-1.5 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-4 ring-white" aria-hidden="true" />
+                      <div className="min-w-0">
+                        <p className="font-sans text-sm font-bold text-slate-900">{entry.action}</p>
+                        <p className="mt-0.5 text-xs text-slate-500">
+                          {entry.target_type || "Operação"}
+                          {entry.target_id && (
+                            <span
+                              className="ml-1 font-mono text-[10px] text-slate-400 font-medium"
+                              title={`ID: ${entry.target_id}`}
+                            >
+                              · {targetId(entry.target_id)}
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                      <div className="text-xs text-slate-600">
+                        <span className="font-semibold text-slate-900">{entry.actor_name}</span>
+                        <span className="mt-0.5 block font-mono text-[10px] uppercase tracking-wide text-slate-400">{entry.actor_type}</span>
+                      </div>
+                      <time className="text-xs text-slate-400 sm:text-right font-medium">{formatDate(entry.created_at)}</time>
+                    </li>
+                  ))}
+                </ol>
+              </section>
+            ))}
+          </div>
         )}
       </div>
     </AdminLayout>
