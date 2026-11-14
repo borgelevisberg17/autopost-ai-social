@@ -10,6 +10,7 @@ import {
   CreditCard,
   FileCheck,
   FileText,
+  Hash,
   Loader2,
   Lock,
   Upload,
@@ -62,14 +63,14 @@ function CopyRow({
   };
 
   return (
-    <div className="flex items-center justify-between gap-3 rounded-xl bg-white p-3.5 border border-neutral-200/80 shadow-2xs transition hover:border-neutral-300">
+    <div className="flex items-center justify-between gap-3 rounded-2xl bg-white p-3.5 sm:p-4 border border-neutral-200/80 shadow-2xs transition hover:border-neutral-300">
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5 text-xs font-semibold text-neutral-500">
           {Icon && <Icon className="h-3.5 w-3.5 text-neutral-400" />}
           <span>{label}</span>
           {helper && <span className="text-[10px] text-neutral-400">({helper})</span>}
         </div>
-        <p className="mt-1 break-all font-mono text-sm font-bold tracking-tight text-neutral-900">
+        <p className="mt-1 break-all font-mono text-sm sm:text-base font-bold tracking-tight text-neutral-900">
           {value}
         </p>
       </div>
@@ -78,10 +79,10 @@ function CopyRow({
         type="button"
         onClick={copy}
         aria-label={`Copiar ${label}`}
-        className={`flex h-9 shrink-0 items-center gap-1.5 rounded-lg px-3 text-xs font-semibold transition ${
+        className={`flex h-9 shrink-0 items-center gap-1.5 rounded-xl px-3.5 text-xs font-bold transition ${
           copied
             ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-            : "border border-neutral-200 bg-neutral-50 text-neutral-700 hover:bg-neutral-100 hover:text-black"
+            : "border border-neutral-200 bg-neutral-50 text-neutral-700 hover:border-black hover:bg-neutral-100 hover:text-black"
         }`}
       >
         {copied ? (
@@ -168,36 +169,53 @@ function CardPay({ orderId, onPaid }: { orderId: string; onPaid: () => void }) {
         type="button"
         disabled={!!busy}
         onClick={() => start("stripe")}
-        className="flex h-12 items-center justify-center gap-2.5 rounded-2xl border border-neutral-200 bg-white px-4 text-xs font-bold text-neutral-800 shadow-2xs transition hover:border-black hover:bg-neutral-50 disabled:opacity-50"
+        className="flex h-13 items-center justify-between gap-3 rounded-2xl border border-neutral-200/90 bg-white px-4 text-xs font-bold text-neutral-800 shadow-2xs transition hover:border-black hover:bg-neutral-50/60 disabled:opacity-50"
       >
-        {busy === "stripe" ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          <div className="flex items-center gap-2">
-            <CreditCard className="h-4 w-4 text-neutral-700" />
-            <span>Cartão de Crédito / Débito</span>
-          </div>
-        )}
+        <div className="flex items-center gap-2.5">
+          {busy === "stripe" ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <CreditCard className="h-4 w-4 text-neutral-600" />
+          )}
+          <span>Cartão de Crédito / Débito</span>
+        </div>
+
+        <div className="flex items-center gap-1.5 shrink-0">
+          <img
+            src="/media/payments/visa.svg"
+            alt="Visa"
+            className="h-3.5 w-auto object-contain"
+          />
+          <img
+            src="/media/payments/mastercard.svg"
+            alt="Mastercard"
+            className="h-4 w-auto object-contain"
+          />
+        </div>
       </button>
 
       <button
         type="button"
         disabled={!!busy}
         onClick={() => start("paypal")}
-        className="flex h-12 items-center justify-center gap-2.5 rounded-2xl border border-neutral-200 bg-white px-4 text-xs font-bold text-neutral-800 shadow-2xs transition hover:border-[#0070BA] hover:bg-neutral-50 disabled:opacity-50"
+        className="flex h-13 items-center justify-between gap-3 rounded-2xl border border-neutral-200/90 bg-white px-4 text-xs font-bold text-neutral-800 shadow-2xs transition hover:border-[#0070BA] hover:bg-neutral-50/60 disabled:opacity-50"
       >
-        {busy === "paypal" ? (
-          <Loader2 className="h-4 w-4 animate-spin text-[#0070BA]" />
-        ) : (
-          <div className="flex items-center gap-2">
-            <img
-              src="/media/payments/paypal.svg"
-              alt="PayPal"
-              className="h-4 w-auto object-contain"
-            />
-            <span>Pagar com PayPal</span>
-          </div>
-        )}
+        <div className="flex items-center gap-2.5">
+          {busy === "paypal" ? (
+            <Loader2 className="h-4 w-4 animate-spin text-[#0070BA]" />
+          ) : (
+            <span className="font-semibold text-neutral-700">Pagar com</span>
+          )}
+          <img
+            src="/media/payments/paypal.svg"
+            alt="PayPal"
+            className="h-4 w-auto object-contain"
+          />
+        </div>
+
+        <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
+          Checkout Seguro
+        </span>
       </button>
     </div>
   );
@@ -216,7 +234,7 @@ export function PaymentPanel({
     info.payment_express_number && {
       id: "express" as const,
       label: "Multicaixa Express",
-      badge: "Recomendado",
+      badge: "App Oficial",
     },
     info.payment_iban && {
       id: "iban" as const,
@@ -240,16 +258,16 @@ export function PaymentPanel({
   // If already marked as paid
   if (paymentStatus === "paid") {
     return (
-      <div className="rounded-3xl border border-emerald-200/80 bg-emerald-50/60 p-6 sm:p-7 shadow-xs">
+      <div className="rounded-3xl border border-emerald-200/80 bg-emerald-50/60 p-6 sm:p-8 shadow-xs">
         <div className="flex items-start gap-4">
           <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-emerald-600 text-white shadow-sm">
             <CheckCircle2 className="h-6 w-6" />
           </div>
           <div>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">
               Pagamento Confirmado
             </span>
-            <h2 className="mt-1.5 text-lg font-bold text-neutral-900">
+            <h2 className="mt-2 text-xl font-bold text-neutral-900">
               Transação validada com sucesso
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-neutral-600">
@@ -289,7 +307,8 @@ export function PaymentPanel({
 
   const submit = async () => {
     if (!file) {
-      toast.error("Por favor, anexe o comprovativo da transferência.");
+      toast.error("Por favor, selecione primeiro o ficheiro do comprovativo.");
+      fileInputRef.current?.click();
       return;
     }
 
@@ -497,10 +516,15 @@ export function PaymentPanel({
       </div>
 
       {/* COMPROVATIVO UPLOAD ZONE */}
-      <div className="mt-6">
-        <label className="text-xs font-bold uppercase tracking-wider text-neutral-500 block mb-2.5">
-          Anexar Comprovativo de Pagamento
-        </label>
+      <div className="mt-8 border-t border-neutral-100 pt-7">
+        <div className="flex items-center justify-between mb-3">
+          <label className="text-xs font-bold uppercase tracking-wider text-neutral-700">
+            Comprovativo de Pagamento
+          </label>
+          <span className="text-[11px] font-medium text-neutral-400">
+            Foto, captura de ecrã ou PDF
+          </span>
+        </div>
 
         <div
           onDragOver={(e) => e.preventDefault()}
@@ -508,8 +532,8 @@ export function PaymentPanel({
           onClick={() => fileInputRef.current?.click()}
           className={`group relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-6 text-center cursor-pointer transition ${
             file
-              ? "border-emerald-500 bg-emerald-50/30"
-              : "border-neutral-300 hover:border-black bg-neutral-50/50 hover:bg-neutral-50"
+              ? "border-emerald-500 bg-emerald-50/40"
+              : "border-neutral-200 hover:border-black bg-neutral-50/60 hover:bg-neutral-100/60"
           }`}
         >
           <input
@@ -521,15 +545,15 @@ export function PaymentPanel({
           />
 
           {file ? (
-            <div className="flex items-center gap-3 w-full max-w-md mx-auto">
-              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-emerald-100 text-emerald-700">
-                <FileCheck className="h-5 w-5" />
+            <div className="flex items-center gap-3.5 w-full max-w-md mx-auto">
+              <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-emerald-100 text-emerald-800 shadow-2xs">
+                <FileCheck className="h-6 w-6" />
               </div>
               <div className="min-w-0 flex-1 text-left">
                 <p className="truncate text-sm font-bold text-neutral-900">
                   {file.name}
                 </p>
-                <p className="text-xs text-neutral-500">
+                <p className="text-xs text-neutral-500 font-medium">
                   {(file.size / 1024).toFixed(0)} KB • Ficheiro pronto a enviar
                 </p>
               </div>
@@ -539,7 +563,7 @@ export function PaymentPanel({
                   e.stopPropagation();
                   setFile(null);
                 }}
-                className="grid h-8 w-8 place-items-center rounded-full text-neutral-400 hover:text-red-500 hover:bg-red-50 transition"
+                className="grid h-9 w-9 place-items-center rounded-full text-neutral-400 hover:text-red-500 hover:bg-red-50 transition"
                 aria-label="Remover ficheiro"
               >
                 <X className="h-4 w-4" />
@@ -547,13 +571,13 @@ export function PaymentPanel({
             </div>
           ) : (
             <>
-              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-white border border-neutral-200/80 text-neutral-600 shadow-2xs group-hover:scale-105 group-hover:border-black transition">
-                <Upload className="h-5 w-5 text-neutral-700" />
+              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-white border border-neutral-200/80 text-neutral-700 shadow-2xs group-hover:scale-105 group-hover:border-black transition">
+                <Upload className="h-5 w-5" />
               </div>
-              <p className="mt-3 text-sm font-bold text-neutral-800">
+              <p className="mt-3 text-sm font-bold text-neutral-900">
                 Clique para selecionar ou arraste o ficheiro
               </p>
-              <p className="mt-1 text-xs text-neutral-500">
+              <p className="mt-1 text-xs text-neutral-400">
                 Aceita imagem (JPEG, PNG, WebP) ou PDF até 5 MB
               </p>
             </>
@@ -561,42 +585,60 @@ export function PaymentPanel({
         </div>
 
         {/* TRANSACTION REFERENCE INPUT */}
-        <div className="mt-3">
-          <input
-            value={reference}
-            onChange={(e) => setReference(e.target.value)}
-            maxLength={120}
-            placeholder="Nº de Operação ou Referência Bancária (opcional)"
-            className="h-11 w-full rounded-xl border border-neutral-200/90 bg-neutral-50/50 px-3.5 text-xs text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:bg-white focus:outline-none transition shadow-2xs"
-          />
+        <div className="mt-3.5">
+          <div className="relative">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-neutral-400">
+              <Hash className="h-4 w-4" />
+            </div>
+            <input
+              value={reference}
+              onChange={(e) => setReference(e.target.value)}
+              maxLength={120}
+              placeholder="Nº de Operação ou Referência Bancária (opcional)"
+              className="h-12 w-full rounded-2xl border border-neutral-200 bg-neutral-50/70 pl-10 pr-4 text-xs font-medium text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:bg-white focus:outline-none transition shadow-2xs"
+            />
+          </div>
         </div>
 
         {/* SUBMIT BUTTON */}
         <button
           type="button"
           onClick={submit}
-          disabled={sending || !file}
-          className="mt-4 flex h-13 w-full items-center justify-center gap-2 rounded-full bg-[#111216] px-6 text-sm font-bold text-white shadow-md transition hover:bg-black active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40"
+          disabled={sending}
+          className={`mt-4 flex h-13 w-full items-center justify-center gap-2 rounded-full px-6 text-sm font-bold shadow-md transition active:scale-[0.99] ${
+            file
+              ? "bg-[#111216] hover:bg-black text-white cursor-pointer"
+              : "bg-[#111216] hover:bg-black text-white cursor-pointer opacity-90 hover:opacity-100"
+          }`}
+          style={{ height: "52px" }}
         >
           {sending ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
               <span>A enviar comprovativo...</span>
             </>
+          ) : file ? (
+            <>
+              <FileCheck className="h-4 w-4 text-emerald-400" />
+              <span>Confirmar e Enviar Comprovativo</span>
+            </>
           ) : (
             <>
-              <FileText className="h-4 w-4" />
-              <span>Confirmar e Enviar Comprovativo</span>
+              <Upload className="h-4 w-4" />
+              <span>Selecionar e Enviar Comprovativo</span>
             </>
           )}
         </button>
       </div>
 
       {/* OPTIONAL ONLINE CARD PAYMENT SECTION */}
-      <div className="mt-8 border-t border-neutral-100 pt-6">
-        <p className="text-xs font-bold uppercase tracking-wider text-neutral-400 mb-3">
-          Ou pagar online via Cartão / PayPal
-        </p>
+      <div className="mt-10 border-t border-neutral-100 pt-7">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-xs font-bold uppercase tracking-wider text-neutral-400">
+            Ou pagar online de imediato
+          </span>
+          <span className="h-px flex-1 bg-neutral-100" />
+        </div>
         <CardPay orderId={orderId} onPaid={onSubmitted} />
       </div>
     </div>
