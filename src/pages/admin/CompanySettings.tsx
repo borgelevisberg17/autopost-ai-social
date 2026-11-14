@@ -28,6 +28,7 @@ import {
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { useCompany } from "@/hooks/useCompany";
 import { useAuth } from "@/hooks/useAuth";
+import { useWhatsAppAccount } from "@/hooks/useWhatsAppAccount";
 import { supabase } from "@/integrations/supabase/client";
 import { CURRENCIES } from "@/lib/format";
 import { toast } from "sonner";
@@ -457,6 +458,7 @@ function SaveBar({
 export default function CompanySettings() {
   const { company, reload } = useCompany();
   const { user } = useAuth();
+  const whatsappAccount = useWhatsAppAccount(company?.id);
 
   const [section, setSection] = useState<Section>("company");
   const [business, setBusiness] =
@@ -1283,9 +1285,9 @@ export default function CompanySettings() {
         <ChannelRow
           icon={<MessageCircle className="h-5 w-5" />}
           name="WhatsApp"
-          detail={company?.whatsapp || "Número da loja não configurado"}
-          connected={Boolean(company?.whatsapp)}
-          href={company?.whatsapp ? `https://wa.me/${company.whatsapp.replace(/\D/g, "")}` : undefined}
+          detail={[whatsappAccount.data?.display_phone, whatsappAccount.label].filter(Boolean).join(" · ")}
+          connected={whatsappAccount.state === "associated" || whatsappAccount.state === "active"}
+          href="/admin/conversas"
         />
 
         <ChannelRow

@@ -4,6 +4,8 @@ import { Copy, Loader2, MessageCircle, Send, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { useCompany } from "@/hooks/useCompany";
+import { useWhatsAppAccount } from "@/hooks/useWhatsAppAccount";
+import { whatsappConnectionLabel, whatsappConnectionState } from "@/lib/whatsappStatus";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -62,7 +64,7 @@ function AccountSetup({ companyId, account, onSaved }: { companyId: string; acco
         <div>
           <h2 className="font-semibold">Número WhatsApp Business</h2>
           <p className="text-sm text-muted-foreground">
-            {account ? (account.status === "active" ? `Ativo — última mensagem ${account.last_event_at ? new Date(account.last_event_at).toLocaleString("pt-PT") : "—"}` : "A aguardar a primeira mensagem da Meta") : "Ainda não ligado"}
+            {whatsappConnectionLabel(whatsappConnectionState(account, false, false))}
           </p>
         </div>
         {account && (
@@ -93,7 +95,8 @@ function AccountSetup({ companyId, account, onSaved }: { companyId: string; acco
 
 export default function Conversations() {
   const { company } = useCompany();
-  const [account, setAccount] = useState<Account | null>(null);
+  const accountQuery = useWhatsAppAccount(company?.id);
+  const account = accountQuery.data ?? null;
   const [convos, setConvos] = useState<Convo[]>([]);
   const [active, setActive] = useState<string | null>(null);
   const [msgs, setMsgs] = useState<Msg[]>([]);
@@ -103,11 +106,7 @@ export default function Conversations() {
 
   const load = useCallback(async () => {
     if (!company) return;
-    const [{ data: acc }, { data: cs }] = await Promise.all([
-      db.from("whatsapp_accounts").select("*").eq("company_id", company.id).limit(1).maybeSingle(),
-      db.from("conversations").select("*").eq("company_id", company.id).order("last_message_at", { ascending: false }).limit(100),
-    ]);
-    setAccount(acc ?? null);
+    const { data: cs } = await db.from("conversations").select("*").eq("company_id", company.id).order("last_message_at", { ascending: false }).limit(100);
     setConvos(cs ?? []);
     setLoading(false);
   }, [company]);
@@ -156,7 +155,9 @@ export default function Conversations() {
             A Vendora usa uma única aplicação Meta. As credenciais ficam protegidas no servidor; cada empresa liga o seu número separadamente e as conversas continuam isoladas por loja. Na Meta, configure este endereço como callback e subscreva o campo “messages”.
           </AlertDescription>
         </Alert>
-        {company && !loading && <AccountSetup key={account?.id ?? "new"} companyId={company.id} account={account} onSaved={load} />}
+        {company && !loading && (accountQuery.isLoading || accountQuery.isError
+          ? <p role="status" className="text-sm text-muted-foreground">{accountQuery.label}</p>
+          : <AccountSetup key={account?.id ?? "new"} companyId={company.id} account={account} onSaved={() => { void accountQuery.refetch(); void load(); }} />)}
 
         <div className="grid gap-4 md:grid-cols-[280px_1fr]">
           <aside className="rounded border border-border bg-card">

@@ -1,5 +1,8 @@
 # Roadmap
 
+- [x] Reconciliar e aplicar alterações pendentes sem alterar o formato dos pedidos
+- [x] Unificar estado WhatsApp entre Conversas e Definições e verificar com sessão real
+
 - [x] Centralizar preços e diagnóstico Meta nas Definições da plataforma
 - [x] Preservar segredos Meta existentes ao guardar apenas o ID da aplicação
 - [x] Validar pertença do número à conta Business e guardar encaminhamento antes de subscrever eventos

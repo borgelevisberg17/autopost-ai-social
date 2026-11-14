@@ -28,7 +28,7 @@ Deno.serve(async req => {
       if (company) numberQuery = numberQuery.eq("company_id", company);
       const { data: numbers, error: numbersError } = await numberQuery;
       if (numbersError) return json({ error: "Não foi possível consultar o número WhatsApp da loja" }, 500);
-      return json({ stripe: data?.some(r => r.provider === "stripe") ?? false, paypal: false, meta: !!meta?.access_token && !!meta?.app_secret && !!meta?.verify_token, meta_app: !!meta?.app_id, numbers: numbers ?? [], updated_at: data?.map(r => ({ provider: r.provider, updated_at: r.updated_at })) ?? [] });
+      return json({ stripe: data?.some(r => r.provider === "stripe") ?? false, paypal: false, meta: !!meta?.access_token && !!meta?.app_secret && !!meta?.verify_token, meta_token: !!meta?.access_token, meta_app: !!meta?.app_id, meta_missing: Object.entries({ access_token: meta.access_token, app_secret: meta.app_secret, verify_token: meta.verify_token }).filter(([, value]) => !value).map(([key]) => key), numbers: numbers ?? [], updated_at: data?.map(r => ({ provider: r.provider, updated_at: r.updated_at })) ?? [] });
     }
     if (body.action === "check_meta") {
       if (company) return json({ error: "Reservado à plataforma" }, 403);

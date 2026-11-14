@@ -90,5 +90,24 @@ class SubscriptionRules(unittest.TestCase):
                                json={'action':'save','company_id':self.company,'provider':'meta','credentials':{}}, timeout=30)
         self.assertEqual(result.status_code,403)
 
+    def test_shared_meta_status_matches_missing_credential_flags(self):
+        result = requests.post(self.url + '/functions/v1/integration-settings', headers=self.headers,
+                               json={'action':'status'}, timeout=30)
+        self.assertEqual(result.status_code,200)
+        status = result.json()
+        self.assertEqual(status['meta'],len(status['meta_missing']) == 0)
+        self.assertEqual(status['meta_token'],'access_token' not in status['meta_missing'])
+
+    def test_public_tracking_hides_customer_identity_and_keeps_payment_fields(self):
+        orders = requests.get(self.url + '/rest/v1/orders?select=id&limit=1',headers=self.headers,timeout=30)
+        self.assertEqual(orders.status_code,200)
+        if not orders.json():
+            self.skipTest('No existing order to verify')
+        response = self.rpc('get_order_status',{'_order':orders.json()[0]['id']},True)
+        self.assertEqual(response.status_code,200)
+        self.assertIsNone(response.json()[0]['customer_name'])
+        self.assertIn('payment_status',response.json()[0])
+        self.assertIn('items',response.json()[0])
+
 if __name__ == '__main__':
     unittest.main()

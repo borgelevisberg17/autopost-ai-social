@@ -28,5 +28,6 @@ export async function readCredentials(scope: string, provider: string): Promise<
 }
 export async function metaCredentials() {
   const saved = await readCredentials("platform", "meta");
-  return saved ?? { access_token: Deno.env.get("WHATSAPP_ACCESS_TOKEN") ?? "", app_secret: Deno.env.get("WHATSAPP_APP_SECRET") ?? "", verify_token: Deno.env.get("WHATSAPP_VERIFY_TOKEN") ?? "", app_id: "" };
+  const defaults = { access_token: Deno.env.get("WHATSAPP_ACCESS_TOKEN") ?? "", app_secret: Deno.env.get("WHATSAPP_APP_SECRET") ?? "", verify_token: Deno.env.get("WHATSAPP_VERIFY_TOKEN") ?? "", app_id: "" };
+  return { ...defaults, ...Object.fromEntries(Object.entries(saved ?? {}).filter(([, value]) => value.trim() !== "")) };
 }
