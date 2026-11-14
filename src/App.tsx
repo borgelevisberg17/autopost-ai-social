@@ -40,6 +40,7 @@ const Payments = lazy(() => import("./pages/admin/Payments"));
 const Conversations = lazy(() => import("./pages/admin/Conversations"));
 const Platform = lazy(() => import("./pages/admin/Platform"));
 const Store = lazy(() => import("./pages/store/Store"));
+const ProductDetail = lazy(() => import("./pages/store/ProductDetail"));
 const OrderStatus = lazy(() => import("./pages/store/OrderStatus"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const LazyCookieBanner = lazy(() =>
@@ -106,6 +107,7 @@ const App = () => (
 
                 {/* Public Store */}
                 <Route path="/loja/:slug" element={<Store />} />
+                <Route path="/loja/:slug/produto/:productId" element={<ProductDetail />} />
                 <Route path="/loja/:slug/pedido/:id" element={<OrderStatus />} />
 
                 {/* Protected */}

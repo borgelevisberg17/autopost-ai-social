@@ -7,6 +7,7 @@
     { "path": "/forgot-password", "title": "Forgot password" },
     { "path": "/reset-password", "title": "Reset password" },
     { "path": "/loja/:slug", "title": "Store" },
+    { "path": "/loja/:slug/produto/:productId", "title": "Product details" },
     { "path": "/loja/:slug/pedido/:id", "title": "Order status" },
     { "path": "/onboarding", "title": "Onboarding" },
     { "path": "/dashboard", "title": "Operations" },

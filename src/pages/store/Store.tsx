@@ -1,13 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   ArrowLeft,
   ArrowRight,
   Check,
+  Heart,
   ImageOff,
   Loader2,
   Minus,
   Plus,
+  Play,
   Search,
   ShoppingBag,
   ShoppingCart,
@@ -54,15 +56,19 @@ type CartStep = "cart" | "checkout" | "success";
 export default function Store() {
   const { slug = "" } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [company, setCompany] = useState<
     Company | null | undefined
   >(undefined);
 
   const [products, setProducts] = useState<Product[]>([]);
+  const [storeLoaded, setStoreLoaded] = useState(false);
 
   const [category, setCategory] = useState("Todos");
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(
+    () => new URLSearchParams(window.location.search).get("q") || "",
+  );
 
   const [cart, setCart] = useState<Record<string, number>>(
     () => {
@@ -82,6 +88,8 @@ export default function Store() {
 
   const [productOpen, setProductOpen] =
     useState<Product | null>(null);
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [heroIndex, setHeroIndex] = useState(0);
 
   const [placing, setPlacing] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(
@@ -122,6 +130,7 @@ export default function Store() {
   }, [cartOpen, cartStep]);
 
   const loadStore = async () => {
+    setStoreLoaded(false);
     const { data: store, error: storeError } =
       await supabase
         .from("companies")
@@ -134,11 +143,13 @@ export default function Store() {
     if (storeError) {
       toast.error("Erro ao carregar a loja.");
       setCompany(null);
+      setStoreLoaded(true);
       return;
     }
 
     if (!store) {
       setCompany(null);
+      setStoreLoaded(true);
       return;
     }
 
@@ -160,10 +171,12 @@ export default function Store() {
 
     if (productError) {
       toast.error("Erro ao carregar os produtos.");
+      setStoreLoaded(true);
       return;
     }
 
     setProducts((productData as Product[]) ?? []);
+    setStoreLoaded(true);
   };
 
   useEffect(() => {
@@ -171,6 +184,13 @@ export default function Store() {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug]);
+
+  useEffect(() => {
+    if (!storeLoaded || searchParams.get("cart") !== "1") return;
+
+    setCartStep(searchParams.get("checkout") === "1" ? "checkout" : "cart");
+    setCartOpen(true);
+  }, [searchParams, storeLoaded]);
 
   const updateCart = (
     next: Record<string, number>,
@@ -300,7 +320,22 @@ export default function Store() {
   );
 
   const featuredProducts =
-    products.slice(0, 4);
+    products.slice(0, 3);
+
+  const categoryItems = categories
+    .filter((item) => item !== "Todos")
+    .map((name) => {
+      const matchingProducts = products.filter((product) => product.category === name);
+      return { name, image: matchingProducts.find((product) => product.images?.[0])?.images[0], count: matchingProducts.length };
+    });
+
+  const toggleFavorite = (productId: string) => {
+    setFavorites((current) =>
+      current.includes(productId)
+        ? current.filter((id) => id !== productId)
+        : [...current, productId],
+    );
+  };
 
   const openCart = () => {
     setCartStep("cart");
@@ -457,570 +492,209 @@ export default function Store() {
   const currency =
     company.currency;
 
-  return (
-    <div className="min-h-screen bg-[#fffdf9] text-[#202522]">
-      {/* HEADER */}
+  const currentHeroIndex = Math.min(heroIndex, Math.max(featuredProducts.length - 1, 0));
+  const heroProduct = featuredProducts[currentHeroIndex];
+  const heroImage = heroProduct?.images?.[0];
+  const changeHero = (direction: number) => {
+    if (featuredProducts.length < 2) return;
+    setHeroIndex((current) => (current + direction + featuredProducts.length) % featuredProducts.length);
+  };
+  const scrollTo = (id: string) =>
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
-      <header className="sticky top-0 z-50 border-b border-[#ded9d0] bg-[#fffdf9]">
-        <div className="mx-auto flex h-16 max-w-[1400px] items-center justify-between px-4 sm:px-5 lg:px-8">
+  return (
+    <div className="storefront min-h-screen bg-white text-[#111214]">
+      <header className="store-header">
+        <div className="store-header__bar">
           <button
             type="button"
-            onClick={() => {
-              window.scrollTo({
-                top: 0,
-                behavior: "smooth",
-              });
-            }}
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             aria-label={`Ir para o início da loja ${company.name}`}
-            className="group flex min-w-0 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
+            className="store-brand"
           >
-            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-[7px] bg-black text-white">
-              <span className="text-sm font-bold">
-                {company.name
-                  .charAt(0)
-                  .toUpperCase()}
-              </span>
-            </div>
-
-            <span className="max-w-[160px] truncate text-sm font-semibold tracking-tight text-[#202522] sm:max-w-[220px]">
-              {company.name}
-            </span>
+            <span className="store-brand__mark">{company.name.charAt(0).toUpperCase()}</span>
+            <span className="store-brand__name">{company.name}</span>
           </button>
 
-          <nav
-            aria-label="Navegação principal"
-            className="hidden items-center gap-8 md:flex"
-          >
-            <button
-              type="button"
-              onClick={() =>
-                document
-                  .getElementById(
-                    "produtos",
-                  )
-                  ?.scrollIntoView({
-                    behavior: "smooth",
-                  })
-              }
-              className="rounded-md px-1 py-2 text-sm font-medium text-[#5f625d] transition hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
-            >
-              Produtos
-            </button>
-
-            {categories.length >
-              1 && (
-              <button
-                type="button"
-                onClick={() =>
-                  document
-                    .getElementById(
-                      "categorias",
-                    )
-                    ?.scrollIntoView({
-                      behavior:
-                        "smooth",
-                    })
-                }
-                className="rounded-md px-1 py-2 text-sm font-medium text-[#5f625d] transition hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
-              >
-                Categorias
-              </button>
-            )}
+          <nav aria-label="Navegação principal" className="store-nav">
+            <button type="button" className="store-nav__active" onClick={() => scrollTo("inicio")}>Início</button>
+            <button type="button" onClick={() => scrollTo("produtos")}>Produtos</button>
+            {categoryItems.length > 0 && <button type="button" onClick={() => scrollTo("categorias")}>Categorias</button>}
+            <button type="button" onClick={() => scrollTo("sobre")}>Sobre</button>
+            <button type="button" onClick={() => scrollTo("contacto")}>Contacto</button>
           </nav>
 
-          <button
-            type="button"
-            onClick={openCart}
-            aria-label={
-              cartCount > 0
-                ? `Abrir carrinho com ${cartCount} produtos`
-                : "Abrir carrinho"
-            }
-            className="hidden min-h-10 items-center gap-2 rounded-[7px] border border-[#c9c3b8] px-3.5 py-2 text-sm font-semibold text-[#202522] transition hover:border-neutral-500 hover:bg-[#f1eee7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2 sm:px-4 md:flex"
-          >
-            <ShoppingBag className="h-4 w-4 shrink-0" />
-
-            <span className="hidden sm:block">
-              Carrinho
-            </span>
-
-            {cartCount > 0 && (
-              <span className="flex h-5 min-w-5 items-center justify-center rounded-[7px] bg-black px-1.5 text-[11px] font-bold text-white">
-                {cartCount}
-              </span>
-            )}
-          </button>
-        </div>
-      </header>
-
-      {/* HERO */}
-
-      <section className="border-b border-[#ded9d0] bg-[#f5f5f2]">
-        <div className="mx-auto grid min-h-[520px] max-w-[1400px] lg:grid-cols-2">
-          <div className="flex items-center px-5 py-16 sm:px-8 lg:px-12 lg:py-24">
-            <div className="max-w-xl">
-              <p className="mb-5 text-xs font-bold uppercase tracking-[0.2em] text-[#5f625d]">
-                {company.name}
-              </p>
-
-              <h1 className="text-[2.75rem] font-bold leading-[0.98] tracking-[-0.055em] text-[#202522] sm:text-6xl lg:text-7xl">
-                Produtos que
-                <br />
-                fazem sentido.
-              </h1>
-
-              {company.description && (
-                <p className="mt-7 max-w-lg text-base font-normal leading-7 text-[#5f625d] sm:text-[17px]">
-                  {
-                    company.description
-                  }
-                </p>
-              )}
-
-              <div className="mt-9 flex flex-wrap items-center gap-3">
-                <Button
-                  onClick={() =>
-                    document
-                      .getElementById(
-                        "produtos",
-                      )
-                      ?.scrollIntoView({
-                        behavior:
-                          "smooth",
-                      })
-                  }
-                  className="h-12 rounded-[7px] bg-black px-7 text-sm font-semibold text-white hover:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
-                >
-                  Explorar produtos
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-
-                {cartCount >
-                  0 && (
-                  <button
-                    type="button"
-                    onClick={openCart}
-                    className="h-12 rounded-[7px] px-5 text-sm font-semibold text-[#303732] transition hover:bg-[#fffdf9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
-                  >
-                    Ver carrinho
-                  </button>
-                )}
-              </div>
-
-              <div className="mt-12 flex items-center gap-8 border-t border-[#c9c3b8] pt-6">
-                <div>
-                  <p className="text-2xl font-bold tracking-tight text-[#202522]">
-                    {products.length}
-                  </p>
-
-                  <p className="mt-1 text-xs font-medium text-[#747b73]">
-                    produtos
-                  </p>
-                </div>
-
-                <div className="h-8 w-px bg-neutral-300" />
-
-                <div>
-                  <p className="text-2xl font-bold tracking-tight text-[#202522]">
-                    {
-                      products.filter(
-                        (product) =>
-                          product.stock >
-                          0,
-                      ).length
-                    }
-                  </p>
-
-                  <p className="mt-1 text-xs font-medium text-[#747b73]">
-                    disponíveis
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="relative min-h-[420px] bg-[#e7e2d9] lg:min-h-full">
-            {featuredProducts[0]
-              ?.images?.[0] ? (
-              <button
-                type="button"
-                onClick={() =>
-                  setProductOpen(
-                    featuredProducts[0],
-                  )
-                }
-                aria-label={`Ver ${featuredProducts[0].name}`}
-                className="group relative h-full w-full overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#e36c3f]"
-              >
-                <img
-                  src={
-                    featuredProducts[0]
-                      .images[0]
-                  }
-                  alt={
-                    featuredProducts[0]
-                      .name
-                  }
-                  className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.025]"
-                />
-
-                <div className="absolute inset-x-0 bottom-0 bg-black/65 p-6 pt-28 text-left text-white">
-                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-white">
-                    Destaque
-                  </p>
-
-                  <p className="mt-2 text-xl font-semibold">
-                    {
-                      featuredProducts[0]
-                        .name
-                    }
-                  </p>
-
-                  <p className="mt-1 text-sm font-medium text-white/90">
-                    Ver produto
-                  </p>
-                </div>
-              </button>
-            ) : (
-              <div className="grid h-full place-items-center">
-                <ImageOff className="h-10 w-10 text-[#747b73]" />
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* CATEGORIES */}
-
-      {categories.length >
-        1 && (
-        <section
-          id="categorias"
-          className="border-b border-[#ded9d0] bg-[#fffdf9]"
-        >
-          <div className="mx-auto max-w-[1400px] px-5 py-4 lg:px-8">
-            <div
-              className="flex items-center gap-1 overflow-x-auto pb-1"
-              role="tablist"
-              aria-label="Categorias de produtos"
-            >
-              {categories.map(
-                (item) => {
-                  const active =
-                    category ===
-                    item;
-
-                  return (
-                    <button
-                      key={item}
-                      type="button"
-                      onClick={() => {
-                        setCategory(
-                          item,
-                        );
-
-                        document
-                          .getElementById(
-                            "produtos",
-                          )
-                          ?.scrollIntoView(
-                            {
-                              behavior:
-                                "smooth",
-                            },
-                          );
-                      }}
-                      role="tab"
-                      aria-selected={
-                        active
-                      }
-                      className={`min-h-10 whitespace-nowrap rounded-[7px] px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] ${
-                        active
-                          ? "bg-black text-white"
-                          : "text-[#5f625d] hover:bg-[#ebe7df] hover:text-[#202522]"
-                      }`}
-                    >
-                      {item}
-                    </button>
-                  );
-                },
-              )}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* PRODUCTS */}
-
-      <MyOrders slug={slug} />
-<section
-        id="produtos"
-        className="mx-auto max-w-[1400px] px-5 py-16 sm:px-6 lg:px-8 lg:py-20"
-      >
-        <div className="mb-10 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#747b73]">
-              Catálogo
-            </p>
-
-            <h2 className="mt-2 text-3xl font-bold tracking-[-0.035em] text-[#202522] sm:text-4xl">
-              {category ===
-              "Todos"
-                ? "Todos os produtos"
-                : category}
-            </h2>
-
-            <p className="mt-2 text-sm text-[#747b73]">
-              {
-                filteredProducts.length
-              }{" "}
-              {filteredProducts.length ===
-              1
-                ? "produto encontrado"
-                : "produtos encontrados"}
-            </p>
-          </div>
-
-          <div className="relative w-full md:w-[320px]">
-            <Search
-              aria-hidden="true"
-              className="absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5f625d]"
-            />
-
-            <Input
-              value={search}
-              onChange={(event) =>
-                setSearch(
-                  event.target
-                    .value,
-                )
-              }
-              placeholder="Pesquisar produtos..."
-              aria-label="Pesquisar produtos"
-              className="h-11 rounded-none border-0 border-b border-neutral-400 bg-transparent pl-7 pr-8 text-sm font-medium text-[#202522] placeholder:text-[#747b73] shadow-none focus-visible:border-black focus-visible:ring-0"
-            />
-
-            {search && (
-              <button
-                type="button"
-                onClick={() =>
-                  setSearch("")
-                }
-                aria-label="Limpar pesquisa"
-                className="absolute right-0 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-[7px] text-[#5f625d] transition hover:bg-[#ebe7df] hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            )}
-          </div>
-        </div>
-
-        {filteredProducts.length ===
-        0 ? (
-          <div className="rounded-[7px] border border-[#ded9d0] bg-[#f1eee7] py-24 text-center">
-            <ShoppingBag className="mx-auto h-8 w-8 text-[#747b73]" />
-
-            <p className="mt-5 text-base font-semibold text-[#202522]">
-              Nenhum produto encontrado
-            </p>
-
-            <p className="mt-2 text-sm text-[#747b73]">
-              Tente alterar a pesquisa ou selecionar outra categoria.
-            </p>
-
-            <button
-              type="button"
-              onClick={() => {
-                setSearch("");
-                setCategory(
-                  "Todos",
-                );
-              }}
-              className="mt-5 text-sm font-semibold text-[#202522] underline underline-offset-4 hover:text-[#747b73]"
-            >
-              Limpar filtros
+          <div className="store-header__actions">
+            <label className="store-search store-search--desktop">
+              <Search aria-hidden="true" className="h-[18px] w-[18px] shrink-0" />
+              <input
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                onKeyDown={(event) => { if (event.key === "Enter") scrollTo("produtos"); }}
+                placeholder="Pesquisar produtos..."
+                aria-label="Pesquisar produtos"
+              />
+              {search && <button type="button" aria-label="Limpar pesquisa" onClick={() => setSearch("")}><X className="h-4 w-4" /></button>}
+            </label>
+            <span className="store-header__divider" aria-hidden="true" />
+            <button type="button" onClick={openCart} aria-label={cartCount ? `Abrir carrinho com ${cartCount} itens` : "Abrir carrinho"} className="store-cart-icon">
+              <ShoppingCart className="h-[19px] w-[19px]" />
+              {cartCount > 0 && <span className="store-cart-count">{cartCount}</span>}
+            </button>
+            <button type="button" onClick={openCart} className="store-cart-button">
+              Carrinho{cartCount > 0 && <span className="store-cart-button__count">{cartCount}</span>}
             </button>
           </div>
-        ) : (
-          <div className="grid grid-cols-2 gap-x-4 gap-y-12 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-6 lg:gap-y-16">
-            {filteredProducts.map(
-              (product) => {
-                const price =
-                  priceOf(
-                    product,
-                  );
+        </div>
+        <label className="store-search store-search--mobile">
+          <Search aria-hidden="true" className="h-[18px] w-[18px] shrink-0" />
+          <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Pesquisar produtos..." aria-label="Pesquisar produtos" />
+          {search && <button type="button" aria-label="Limpar pesquisa" onClick={() => setSearch("")}><X className="h-4 w-4" /></button>}
+        </label>
+      </header>
 
-                const discount =
-                  product.promo_price !=
-                    null &&
-                  product.price >
-                    0
-                    ? Math.round(
-                        ((product.price -
-                          product.promo_price) /
-                          product.price) *
-                          100,
-                      )
-                    : 0;
+      <main>
+        <section id="inicio" className="store-hero" aria-label={`Destaques de ${company.name}`}>
+          <div className="store-hero__visual" aria-hidden={!heroImage}>
+            {heroImage ? (
+              <img
+                key={heroProduct?.id}
+                src={heroImage}
+                alt={heroProduct?.name ?? ""}
+                onError={(event) => { event.currentTarget.style.display = "none"; }}
+              />
+            ) : (
+              <div className="store-hero__fallback">
+                <span className="store-hero__fallback-orbit store-hero__fallback-orbit--one" />
+                <span className="store-hero__fallback-orbit store-hero__fallback-orbit--two" />
+                <span className="store-hero__fallback-mark">{company.name.charAt(0).toUpperCase()}</span>
+                <span className="store-hero__fallback-caption">{company.name}</span>
+              </div>
+            )}
+          </div>
+          <div className="store-hero__shade" />
+          <div className="store-hero__content">
+            <p className="store-hero__eyebrow"><span>{company.name}</span><i /></p>
+            <h1><span className="store-hero__headline-line">Produtos que</span><span className="store-hero__headline-line store-hero__headline-line--final">fazem sentido</span></h1>
+            <p className="store-hero__copy">
+              {company.description || "Estilo, qualidade e escolhas feitas para si."}
+              <span> Descubra a coleção e encontre os seus favoritos.</span>
+            </p>
+            <div className="store-hero__actions">
+              <Button onClick={() => scrollTo("produtos")} className="store-hero__primary">
+                Explorar produtos <ArrowRight className="ml-2 h-[18px] w-[18px]" />
+              </Button>
+              <button type="button" onClick={() => { setCategory("Todos"); scrollTo("produtos"); }} className="store-hero__secondary">
+                <span className="store-hero__play" aria-hidden="true"><Play className="h-4 w-4" fill="currentColor" /></span>
+                Ver coleção
+              </button>
+            </div>
+          </div>
+          <div className="store-hero__side-note" aria-hidden="true">
+            <span>{String(currentHeroIndex + 1).padStart(2, "0")}</span><i /><span>{String(Math.max(featuredProducts.length, 1)).padStart(2, "0")}</span>
+          </div>
+          <div className="store-hero__bottom-note" aria-hidden="true">CURADORIA · {company.name.toUpperCase()}</div>
+          <div className="store-hero__controls" aria-label="Navegar pelos destaques">
+            <button type="button" onClick={() => changeHero(-1)} disabled={featuredProducts.length < 2} aria-label="Destaque anterior"><ArrowLeft className="h-5 w-5" /></button>
+            <button type="button" onClick={() => changeHero(1)} disabled={featuredProducts.length < 2} aria-label="Próximo destaque"><ArrowRight className="h-5 w-5" /></button>
+          </div>
+        </section>
 
-                const lowStock =
-                  product.stock >
-                    0 &&
-                  product.stock <=
-                    3;
+        {categoryItems.length > 0 && (
+          <section id="categorias" className="store-category-rail" aria-label="Explorar categorias">
+            <div className="store-category-rail__track">
+              {categoryItems.map((item) => (
+                <button
+                  key={item.name}
+                  type="button"
+                  aria-pressed={category === item.name}
+                  onClick={() => { setCategory(item.name); scrollTo("produtos"); }}
+                  className={`store-category-card${category === item.name ? " is-active" : ""}`}
+                >
+                  <span className="store-category-card__image">
+                    {item.image ? <img src={item.image} alt="" onError={(event) => { event.currentTarget.style.display = "none"; }} /> : <ShoppingBag aria-hidden="true" className="h-7 w-7" />}
+                  </span>
+                  <span className="store-category-card__text"><strong>{item.name}</strong><small>{item.count} {item.count === 1 ? "produto" : "produtos"}</small></span>
+                  <ArrowRight aria-hidden="true" className="store-category-card__arrow h-[18px] w-[18px]" />
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
 
+        <MyOrders slug={slug} />
+
+        <section id="produtos" className="store-products">
+          <div className="store-products__heading">
+            <div>
+              <p className="store-products__eyebrow">A ESCOLHA DA LOJA</p>
+              <h2><span aria-hidden="true" />{category === "Todos" ? "Produtos em destaque" : category}</h2>
+              <p className="store-products__count">{filteredProducts.length} {filteredProducts.length === 1 ? "produto disponível" : "produtos disponíveis"}</p>
+            </div>
+            <div className="store-products__heading-actions">
+              {category !== "Todos" && <button type="button" onClick={() => setCategory("Todos")} className="store-filter-reset">Todas as categorias</button>}
+              <button type="button" onClick={() => { setCategory("Todos"); setSearch(""); }} className="store-view-all">
+                Ver todos os produtos <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+
+          {filteredProducts.length === 0 ? (
+            <div className="store-empty">
+              <div className="store-empty__icon"><ShoppingBag className="h-6 w-6" /></div>
+              <p className="store-empty__eyebrow">{products.length === 0 ? "NOVA COLEÇÃO EM PREPARAÇÃO" : "NÃO ENCONTRÁMOS RESULTADOS"}</p>
+              <h3>{products.length === 0 ? "Algo especial está a caminho." : "Experimente outra pesquisa."}</h3>
+              <p>{products.length === 0 ? "Estamos a preparar a seleção desta loja. Volte em breve para descobrir novidades." : "Ajuste os filtros ou veja novamente todos os produtos da loja."}</p>
+              {(search || category !== "Todos") && <button type="button" onClick={() => { setSearch(""); setCategory("Todos"); }} className="store-empty__reset">Limpar filtros <ArrowRight className="h-4 w-4" /></button>}
+            </div>
+          ) : (
+            <div className={`store-product-grid${filteredProducts.length === 1 ? " store-product-grid--single" : ""}`}>
+              {filteredProducts.map((product, index) => {
+                const price = priceOf(product);
+                const discount = product.promo_price != null && product.price > 0 ? Math.round(((product.price - product.promo_price) / product.price) * 100) : 0;
+                const isFavorite = favorites.includes(product.id);
                 return (
-                  <article
-                    key={
-                      product.id
-                    }
-                    className="group min-w-0"
-                  >
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setProductOpen(
-                          product,
-                        )
-                      }
-                      aria-label={`Ver detalhes de ${product.name}`}
-                      className="relative block aspect-[4/5] w-full overflow-hidden bg-[#ebe7df] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
-                    >
-                      {product
-                        .images?.[0] ? (
-                        <img
-                          src={
-                            product
-                              .images[0]
-                          }
-                          alt={
-                            product.name
-                          }
-                          loading="lazy"
-                          className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.035]"
-                        />
-                      ) : (
-                        <div className="grid h-full place-items-center">
-                          <ImageOff className="h-7 w-7 text-[#747b73]" />
+                  <article key={product.id} className="store-product-card">
+                    <div className="store-product-card__media">
+                      <button type="button" onClick={() => navigate(`/loja/${slug}/produto/${product.id}`)} aria-label={`Ver detalhes de ${product.name}`} className="store-product-card__image-button">
+                        {product.images?.[0] ? <img src={product.images[0]} alt={product.name} loading="lazy" onError={(event) => { event.currentTarget.style.display = "none"; }} /> : <span className="store-product-card__placeholder"><ImageOff className="h-7 w-7" /></span>}
+                      </button>
+                      {discount > 0 ? <span className="store-product-card__badge">-{discount}%</span> : index === 0 ? <span className="store-product-card__badge store-product-card__badge--new">Novo</span> : null}
+                      <button type="button" onClick={() => toggleFavorite(product.id)} aria-label={isFavorite ? `Remover ${product.name} dos favoritos` : `Guardar ${product.name} nos favoritos`} aria-pressed={isFavorite} className={`store-product-card__favorite${isFavorite ? " is-active" : ""}`}>
+                        <Heart className="h-[18px] w-[18px]" fill={isFavorite ? "currentColor" : "none"} />
+                      </button>
+                      <button type="button" onClick={() => navigate(`/loja/${slug}/produto/${product.id}`)} className="store-product-card__quick-view">Ver produto <ArrowRight className="h-4 w-4" /></button>
+                    </div>
+                    <div className="store-product-card__details">
+                      <div className="store-product-card__meta">
+                        <div>
+                          {product.category && <p className="store-product-card__category">{product.category}</p>}
+                          <button type="button" onClick={() => navigate(`/loja/${slug}/produto/${product.id}`)} className="store-product-card__name">{product.name}</button>
                         </div>
-                      )}
-
-                      {discount >
-                        0 && (
-                        <span className="absolute left-3 top-3 rounded-sm bg-[#fffdf9] px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#202522] shadow-sm">
-                          -{discount}%
-                        </span>
-                      )}
-
-                      {product.stock ===
-                        0 && (
-                        <span className="absolute right-3 top-3 rounded-sm bg-black px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white">
-                          Esgotado
-                        </span>
-                      )}
-
-                      {lowStock && (
-                        <span className="absolute right-3 top-3 rounded-sm bg-[#fffdf9] px-2.5 py-1.5 text-[10px] font-bold text-[#202522] shadow-sm">
-                          Últimas unidades
-                        </span>
-                      )}
-
-                      {product.stock >
-                        0 && (
-                        <span className="absolute bottom-3 left-3 right-3 hidden translate-y-2 bg-[#fffdf9] px-4 py-3 text-center text-xs font-bold text-[#202522] opacity-0 shadow-sm transition duration-300 group-hover:translate-y-0 group-hover:opacity-100 sm:block">
-                          Ver produto
-                        </span>
-                      )}
-                    </button>
-
-                    <div className="pt-4">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          {product.category && (
-                            <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[#747b73]">
-                              {
-                                product.category
-                              }
-                            </p>
-                          )}
-
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setProductOpen(
-                                product,
-                              )
-                            }
-                            className="line-clamp-2 text-left text-sm font-semibold leading-5 text-[#202522] transition hover:text-[#747b73] focus-visible:outline-none focus-visible:underline focus-visible:underline-offset-4"
-                          >
-                            {
-                              product.name
-                            }
-                          </button>
+                        <div className="store-product-card__price-block">
+                          <strong>{formatMoney(price, currency)}</strong>
+                          {product.promo_price != null && <del>{formatMoney(product.price, currency)}</del>}
                         </div>
-
-                        <p className="shrink-0 text-sm font-bold text-[#202522]">
-                          {formatMoney(
-                            price,
-                            currency,
-                          )}
-                        </p>
                       </div>
-
-                      {product.promo_price !=
-                        null && (
-                        <div className="mt-1">
-                          <span className="text-xs font-medium text-[#747b73] line-through">
-                            {formatMoney(
-                              product.price,
-                              currency,
-                            )}
-                          </span>
-                        </div>
-                      )}
-
-                      <div className="mt-4 flex items-center justify-between gap-3">
-                        <span
-                          className={`text-xs font-medium ${
-                            product.stock ===
-                            0
-                              ? "text-[#5f625d]"
-                              : lowStock
-                                ? "text-[#202522]"
-                                : "text-[#747b73]"
-                          }`}
-                        >
-                          {product.stock >
-                          0
-                            ? `${product.stock} em stock`
-                            : "Sem stock"}
-                        </span>
-
-                        <button
-                          type="button"
-                          disabled={
-                            product.stock ===
-                            0
-                          }
-                          onClick={() =>
-                            changeQuantity(
-                              product,
-                              1,
-                            )
-                          }
-                          className="min-h-9 rounded-md px-1 text-xs font-bold text-[#202522] underline underline-offset-4 transition hover:text-[#747b73] disabled:cursor-not-allowed disabled:text-[#a7aaa2] disabled:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
-                        >
-                          Adicionar
-                        </button>
+                      <div className="store-product-card__footer">
+                        <span className={product.stock > 0 ? "in-stock" : "out-stock"}>{product.stock > 0 ? (product.stock <= 3 ? "Últimas unidades" : "Disponível") : "Esgotado"}</span>
+                        <button type="button" disabled={product.stock === 0} onClick={() => changeQuantity(product, 1)} className="store-product-card__add">Adicionar <Plus className="h-4 w-4" /></button>
                       </div>
                     </div>
                   </article>
                 );
-              },
-            )}
-          </div>
-        )}
-      </section>
+              })}
+            </div>
+          )}
+        </section>
+
+        <section id="sobre" className="store-about">
+          <div className="store-about__mark">{company.name.charAt(0).toUpperCase()}</div>
+          <div><p>SELECIONADO PARA SI</p><h2>Boas escolhas.<br /><span>Uma experiência simples.</span></h2></div>
+          <p className="store-about__copy">{company.description || `Descubra tudo o que ${company.name} preparou para si.`}</p>
+          <button type="button" onClick={() => scrollTo("produtos")} aria-label="Explorar produtos" className="store-about__arrow"><ArrowRight className="h-5 w-5" /></button>
+        </section>
+      </main>
 
       {/* PRODUCT DETAIL */}
 
@@ -1781,36 +1455,24 @@ export default function Store() {
 
       {/* FOOTER */}
 
-      <footer className="border-t border-[#ded9d0] bg-[#f5f5f2]">
-        <div className="mx-auto max-w-[1400px] px-5 py-12 sm:px-6 lg:px-8">
-          <div className="flex flex-col gap-8 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="text-lg font-bold tracking-tight text-[#202522]">
-                {company.name}
-              </p>
-
-              {company.description && (
-                <p className="mt-2 max-w-md text-sm leading-6 text-[#5f625d]">
-                  {
-                    company.description
-                  }
-                </p>
-              )}
-            </div>
-
-            <div className="text-left sm:text-right">
-              <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#5f625d]">
-                Loja online
-              </p>
-
-              <p className="mt-2 text-sm font-medium text-[#747b73]">
-                ©{" "}
-                {new Date().getFullYear()}{" "}
-                {company.name}
-              </p>
-            </div>
+      <footer id="contacto" className="store-footer">
+        <div className="store-footer__main">
+          <div className="store-footer__brand">
+            <span className="store-brand__mark">{company.name.charAt(0).toUpperCase()}</span>
+            <div><strong>{company.name}</strong><p>{company.description || "Compre com confiança. Escolha com estilo."}</p></div>
+          </div>
+          <div className="store-footer__links">
+            <span>EXPLORE</span>
+            <button type="button" onClick={() => scrollTo("produtos")}>Produtos</button>
+            {categoryItems.length > 0 && <button type="button" onClick={() => scrollTo("categorias")}>Categorias</button>}
+          </div>
+          <div className="store-footer__links">
+            <span>CONTACTO</span>
+            {company.whatsapp ? <a href={`https://wa.me/${company.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noreferrer">Fale connosco <ArrowRight className="h-3.5 w-3.5" /></a> : <p>Estamos disponíveis para ajudar.</p>}
+            <button type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>Voltar ao topo ↑</button>
           </div>
         </div>
+        <div className="store-footer__bottom"><span>© {new Date().getFullYear()} {company.name}</span><span>LOJA ONLINE · VENDORA</span></div>
       </footer>
     </div>
   );
