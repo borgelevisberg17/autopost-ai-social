@@ -387,6 +387,23 @@ html {
   overflow-x: clip;
   font-family: "DM Sans", system-ui, sans-serif;
 }
+.store-cart-sheet {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.16) transparent;
+}
+.store-cart-sheet::-webkit-scrollbar {
+  width: 6px;
+}
+.store-cart-sheet::-webkit-scrollbar-track {
+  background: transparent;
+}
+.store-cart-sheet::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.16);
+  border-radius: 9999px;
+}
+.store-cart-sheet::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.32);
+}
 .store-cart-sheet > button:last-child {
   top: 18px !important;
   right: 18px !important;

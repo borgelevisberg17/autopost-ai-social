@@ -988,11 +988,11 @@ export default function Store() {
         <SheetContent
           side="right"
           style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
-          className="store-cart-sheet flex h-full max-h-screen w-full flex-col gap-0 overflow-hidden border-l border-neutral-200 bg-white p-0 max-sm:inset-x-0 max-sm:top-auto max-sm:bottom-0 max-sm:h-[90dvh] max-sm:max-h-[90dvh] max-sm:w-full max-sm:rounded-t-[28px] max-sm:rounded-b-none max-sm:border-l-0 max-sm:border-t sm:max-w-[460px] sm:rounded-l-3xl shadow-2xl"
+          className="store-cart-sheet flex h-full max-h-screen w-full flex-col gap-0 overflow-y-auto overscroll-contain border-l border-neutral-200 bg-white p-0 max-sm:inset-x-0 max-sm:top-auto max-sm:bottom-0 max-sm:h-[92dvh] max-sm:max-h-[92dvh] max-sm:w-full max-sm:rounded-t-[28px] max-sm:rounded-b-none max-sm:border-l-0 max-sm:border-t sm:max-w-[460px] sm:rounded-l-3xl shadow-2xl"
         >
           {/* HEADER */}
 
-          <div className="shrink-0 border-b border-neutral-100 bg-white px-5 py-4 sm:px-6 sm:py-5">
+          <div className="shrink-0 border-b border-neutral-100 bg-white px-5 py-4 sm:px-6 sm:py-5 sticky top-0 z-10">
             <SheetHeader>
               <div className="flex items-center gap-3.5 sm:gap-4">
                 {cartStep !== "checkout" && (
@@ -1042,11 +1042,8 @@ export default function Store() {
 
           {/* EMPTY CART */}
 
-          {cartItems.length ===
-            0 &&
-          cartStep ===
-            "cart" ? (
-            <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-8 text-center">
+          {cartItems.length === 0 && cartStep === "cart" ? (
+            <div className="flex flex-1 flex-col items-center justify-center p-8 text-center my-auto">
               <div className="grid h-16 w-16 place-items-center rounded-2xl bg-[#f1f2f5]">
                 <ShoppingCart className="h-6 w-6 text-[#5f625d]" />
               </div>
@@ -1061,9 +1058,7 @@ export default function Store() {
 
               <Button
                 type="button"
-                onClick={
-                  continueShopping
-                }
+                onClick={continueShopping}
                 className="mt-7 h-11 rounded-full bg-[#155eef] px-6 text-sm font-bold text-white hover:bg-[#0e4fd1]"
               >
                 Ver produtos
@@ -1071,284 +1066,266 @@ export default function Store() {
             </div>
           ) : (
             <>
-              {/* SINGLE SCROLL AREA */}
-              {cartStep !== "success" && (
-                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-4 space-y-4">
-                  {cartStep === "cart" && (
-                    <>
-                      <div className="divide-y divide-neutral-100">
-                        {cartItems.map(({ product, quantity }) => {
-                          const unitPrice = priceOf(product);
-                          const itemTotal = unitPrice * quantity;
-                          const variant = cartVariants[product.id] || { size: 42, color: "Branco" };
+              {/* CART STEP: NO INNER SCROLLBAR, FULL CONTAINER FLOW */}
+              {cartStep === "cart" && (
+                <div className="flex flex-1 flex-col justify-between min-h-0">
+                  {/* PRODUCTS LIST & COUPON */}
+                  <div className="px-5 py-4 sm:px-6 space-y-4">
+                    <div className="divide-y divide-neutral-100">
+                      {cartItems.map(({ product, quantity }) => {
+                        const unitPrice = priceOf(product);
+                        const itemTotal = unitPrice * quantity;
+                        const variant = cartVariants[product.id] || { size: 42, color: "Branco" };
 
-                          return (
-                            <div key={product.id} className="py-4 first:pt-0 last:pb-0">
-                              <div className="flex items-start gap-3.5">
-                                <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-neutral-100">
-                                  {product.images?.[0] ? (
-                                    <img
-                                      src={product.images[0]}
-                                      alt={product.name}
-                                      className="h-full w-full object-cover"
-                                    />
-                                  ) : (
-                                    <div className="grid h-full place-items-center">
-                                      <ImageOff className="h-5 w-5 text-neutral-400" />
-                                    </div>
-                                  )}
+                        return (
+                          <div key={product.id} className="py-4 first:pt-1 last:pb-2">
+                            <div className="flex items-start gap-3.5">
+                              <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-neutral-100">
+                                {product.images?.[0] ? (
+                                  <img
+                                    src={product.images[0]}
+                                    alt={product.name}
+                                    className="h-full w-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="grid h-full place-items-center">
+                                    <ImageOff className="h-5 w-5 text-neutral-400" />
+                                  </div>
+                                )}
+                              </div>
+
+                              <div className="min-w-0 flex-1">
+                                {/* Row 1: Product name & price */}
+                                <div className="flex items-start justify-between gap-2">
+                                  <p className="min-w-0 flex-1 truncate text-sm font-bold text-neutral-900">
+                                    {product.name}
+                                  </p>
+                                  <p className="shrink-0 text-sm font-bold tabular-nums text-neutral-900">
+                                    {formatMoney(itemTotal, currency)}
+                                  </p>
                                 </div>
 
-                                <div className="min-w-0 flex-1">
-                                  {/* Row 1: Product name & price */}
-                                  <div className="flex items-start justify-between gap-2">
-                                    <p className="min-w-0 flex-1 truncate text-sm font-bold text-neutral-900">
-                                      {product.name}
-                                    </p>
-                                    <p className="shrink-0 text-sm font-bold tabular-nums text-neutral-900">
-                                      {formatMoney(itemTotal, currency)}
-                                    </p>
-                                  </div>
+                                {/* Row 2: Variants */}
+                                <p className="text-xs text-neutral-400 mt-0.5 font-medium">
+                                  Tamanho: {variant.size || 42} • Cor: {variant.color || "Branco"}
+                                </p>
 
-                                  {/* Row 2: Variants */}
-                                  <p className="text-xs text-neutral-400 mt-0.5 font-medium">
-                                    Tamanho: {variant.size || 42} • Cor: {variant.color || "Branco"}
-                                  </p>
-
-                                  {/* Row 3: Compact quantity pill and trash */}
-                                  <div className="mt-3 flex items-center justify-between">
-                                    <div className="inline-flex h-8 items-center rounded-lg bg-neutral-100 border border-neutral-200/60 p-0.5">
-                                      <button
-                                        type="button"
-                                        onClick={() => changeQuantity(product, -1)}
-                                        aria-label={`Diminuir quantidade de ${product.name}`}
-                                        className="grid h-7 w-7 place-items-center text-neutral-700 hover:bg-white rounded transition text-xs font-semibold"
-                                      >
-                                        <Minus className="h-3.5 w-3.5" />
-                                      </button>
-                                      <span className="w-8 text-center text-xs font-bold tabular-nums text-neutral-900">
-                                        {quantity}
-                                      </span>
-                                      <button
-                                        type="button"
-                                        onClick={() => changeQuantity(product, 1)}
-                                        aria-label={`Aumentar quantidade de ${product.name}`}
-                                        className="grid h-7 w-7 place-items-center text-neutral-700 hover:bg-white rounded transition text-xs font-semibold"
-                                      >
-                                        <Plus className="h-3.5 w-3.5" />
-                                      </button>
-                                    </div>
-
+                                {/* Row 3: Compact quantity pill and trash */}
+                                <div className="mt-3 flex items-center justify-between">
+                                  <div className="inline-flex h-8 items-center rounded-lg bg-neutral-100 border border-neutral-200/60 p-0.5">
                                     <button
                                       type="button"
-                                      onClick={() => {
-                                        const next = { ...cart };
-                                        delete next[product.id];
-                                        updateCart(next);
-                                      }}
-                                      aria-label={`Remover ${product.name}`}
-                                      className="p-1.5 text-neutral-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition"
+                                      onClick={() => changeQuantity(product, -1)}
+                                      aria-label={`Diminuir quantidade de ${product.name}`}
+                                      className="grid h-7 w-7 place-items-center text-neutral-700 hover:bg-white rounded transition text-xs font-semibold"
                                     >
-                                      <Trash2 className="h-4 w-4" />
+                                      <Minus className="h-3.5 w-3.5" />
+                                    </button>
+                                    <span className="w-8 text-center text-xs font-bold tabular-nums text-neutral-900">
+                                      {quantity}
+                                    </span>
+                                    <button
+                                      type="button"
+                                      onClick={() => changeQuantity(product, 1)}
+                                      aria-label={`Aumentar quantidade de ${product.name}`}
+                                      className="grid h-7 w-7 place-items-center text-neutral-700 hover:bg-white rounded transition text-xs font-semibold"
+                                    >
+                                      <Plus className="h-3.5 w-3.5" />
                                     </button>
                                   </div>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const next = { ...cart };
+                                      delete next[product.id];
+                                      updateCart(next);
+                                    }}
+                                    aria-label={`Remover ${product.name}`}
+                                    className="p-1.5 text-neutral-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </button>
                                 </div>
                               </div>
                             </div>
-                          );
-                        })}
-                      </div>
+                          </div>
+                        );
+                      })}
+                    </div>
 
-                      {/* Coupon / Discount Code */}
-                      <div className="pt-2">
-                        <div className="flex items-center gap-2 rounded-full bg-neutral-100/90 border border-neutral-200/60 p-1.5 pl-4 focus-within:border-blue-500 focus-within:bg-white transition">
-                          <Tag className="h-4 w-4 text-neutral-400 shrink-0" />
-                          <input
-                            type="text"
-                            placeholder="Código de desconto"
-                            className="flex-1 bg-transparent text-xs text-neutral-900 outline-none placeholder:text-neutral-400 min-w-0"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => toast.info("Nenhum cupom ativo no momento.")}
-                            className="h-8 px-4 rounded-full border border-blue-600 bg-white text-blue-600 font-bold text-xs hover:bg-blue-50 transition shrink-0"
-                          >
-                            Aplicar
-                          </button>
-                        </div>
-                      </div>
-                    </>
-                  )}
-
-              {cartStep === "checkout" && (
-                    <div className="px-5 py-6 sm:px-6">
-                      <div className="mb-7">
-                        <p className="text-2xl font-bold tracking-tight text-[#202522]">
-                          Quase concluído.
-                        </p>
-
-                        <p className="mt-2 text-sm leading-6 text-[#747b73]">
-                          Preencha os seus dados para receber o contacto da loja.
-                        </p>
-                      </div>
-
-                      <div className="space-y-4">
-                        <div>
-                          <label
-                            htmlFor="customer-name"
-                            className="mb-2 block text-sm font-semibold text-[#202522]"
-                          >
-                            Nome completo
-                          </label>
-
-                          <Input
-                            id="customer-name"
-                            ref={customerNameRef}
-                            value={
-                              customer.name
-                            }
-                            onChange={(
-                              event,
-                            ) =>
-                              setCustomer(
-                                {
-                                  ...customer,
-                                  name: event
-                                    .target
-                                    .value,
-                                },
-                              )
-                            }
-                            placeholder="O seu nome"
-                            className="h-12 rounded-xl border-[#c9c3b8] bg-[#fffdf9] text-base font-medium text-[#202522] placeholder:text-[#747b73] focus-visible:border-black focus-visible:ring-2 focus-visible:ring-[#e36c3f] sm:text-sm"
-                            maxLength={
-                              120
-                            }
-                            autoComplete="name"
-                          />
-                        </div>
-
-                        <div>
-                          <label
-                            htmlFor="customer-phone"
-                            className="mb-2 block text-sm font-semibold text-[#202522]"
-                          >
-                            Telefone / WhatsApp
-                          </label>
-
-                          <Input
-                            id="customer-phone"
-                            ref={customerPhoneRef}
-                            value={
-                              customer.phone
-                            }
-                            onChange={(
-                              event,
-                            ) =>
-                              setCustomer(
-                                {
-                                  ...customer,
-                                  phone: event
-                                    .target
-                                    .value,
-                                },
-                              )
-                            }
-                            placeholder="+244 9xx xxx xxx"
-                            className="h-12 rounded-xl border-[#c9c3b8] bg-[#fffdf9] text-base font-medium text-[#202522] placeholder:text-[#747b73] focus-visible:border-black focus-visible:ring-2 focus-visible:ring-[#e36c3f] sm:text-sm"
-                            maxLength={
-                              40
-                            }
-                            autoComplete="tel"
-                            inputMode="tel"
-                          />
-                        </div>
-
-                        <div>
-                          <label
-                            htmlFor="customer-email"
-                            className="mb-2 block text-sm font-semibold text-[#202522]"
-                          >
-                            Email
-                            <span className="ml-1 font-normal text-[#747b73]">
-                              opcional
-                            </span>
-                          </label>
-
-                          <Input
-                            id="customer-email"
-                            value={
-                              customer.email
-                            }
-                            onChange={(
-                              event,
-                            ) =>
-                              setCustomer(
-                                {
-                                  ...customer,
-                                  email: event
-                                    .target
-                                    .value,
-                                },
-                              )
-                            }
-                            placeholder="seu@email.com"
-                            type="email"
-                            className="h-12 rounded-xl border-[#c9c3b8] bg-[#fffdf9] text-base font-medium text-[#202522] placeholder:text-[#747b73] focus-visible:border-black focus-visible:ring-2 focus-visible:ring-[#e36c3f] sm:text-sm"
-                            maxLength={
-                              160
-                            }
-                            autoComplete="email"
-                          />
-                        </div>
-
-                        <div>
-                          <label
-                            htmlFor="customer-notes"
-                            className="mb-2 block text-sm font-semibold text-[#202522]"
-                          >
-                            Morada / observações
-                            <span className="ml-1 font-normal text-[#747b73]">
-                              opcional
-                            </span>
-                          </label>
-
-                          <Textarea
-                            id="customer-notes"
-                            value={
-                              customer.notes
-                            }
-                            onChange={(
-                              event,
-                            ) =>
-                              setCustomer(
-                                {
-                                  ...customer,
-                                  notes: event
-                                    .target
-                                    .value,
-                                },
-                              )
-                            }
-                            placeholder="Morada, referência ou alguma observação"
-                            className="min-h-[110px] resize-none rounded-xl border-[#c9c3b8] bg-[#fffdf9] text-base font-medium text-[#202522] placeholder:text-[#747b73] focus-visible:border-black focus-visible:ring-2 focus-visible:ring-[#e36c3f] sm:text-sm"
-                            maxLength={
-                              1000
-                            }
-                          />
-                        </div>
+                    {/* Coupon / Discount Code */}
+                    <div className="pt-2">
+                      <div className="flex items-center gap-2 rounded-full bg-[#f8f9fb] border border-[#e3e5e8] p-1.5 pl-4 focus-within:border-blue-500 focus-within:bg-white transition">
+                        <Tag className="h-4 w-4 text-neutral-400 shrink-0" />
+                        <input
+                          type="text"
+                          placeholder="Código de desconto"
+                          className="flex-1 bg-transparent text-xs sm:text-sm text-neutral-900 outline-none placeholder:text-neutral-400 min-w-0"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => toast.info("Nenhum cupom ativo no momento.")}
+                          className="h-8 px-4 rounded-full border border-blue-600 bg-white text-blue-600 font-bold text-xs hover:bg-blue-50 transition shrink-0"
+                        >
+                          Aplicar
+                        </button>
                       </div>
                     </div>
-                  )}
+                  </div>
+
+                  {/* SUMMARY & ACTION BUTTONS */}
+                  <div className="mt-auto border-t border-neutral-100 bg-white px-5 py-5 sm:px-6 space-y-4">
+                    <div className="space-y-2.5">
+                      <div className="flex items-center justify-between gap-4 text-sm">
+                        <span className="font-medium text-neutral-600">Subtotal</span>
+                        <span className="font-semibold tabular-nums text-neutral-900">{formatMoney(cartTotal, currency)}</span>
+                      </div>
+                      <div className="flex items-center justify-between gap-4 text-sm">
+                        <span className="inline-flex items-center gap-1.5 font-medium text-neutral-600">
+                          Entrega <Info className="h-3.5 w-3.5 text-neutral-400" />
+                        </span>
+                        <span className="text-xs font-bold text-blue-600">Grátis</span>
+                      </div>
+                      <div className="flex items-center justify-between gap-4 border-t border-neutral-100 pt-2.5">
+                        <span className="text-base font-bold text-neutral-900">Total</span>
+                        <span className="text-2xl font-extrabold tracking-tight tabular-nums text-neutral-900">{formatMoney(cartTotal, currency)}</span>
+                      </div>
+                    </div>
+                    <p className="text-[11px] leading-relaxed text-neutral-400">O valor e os detalhes da entrega serão combinados diretamente com a loja.</p>
+                    <div className="space-y-2.5 pt-1">
+                      <Button
+                        type="button"
+                        onClick={goToCheckout}
+                        className="h-12 w-full rounded-full bg-[#155eef] hover:bg-[#0e4fd1] text-sm font-bold text-white shadow-md focus-visible:ring-2 focus-visible:ring-[#4169f5] focus-visible:ring-offset-2 flex items-center justify-center gap-2 transition"
+                      >
+                        <Lock className="h-4 w-4" />
+                        Finalizar Compra →
+                      </Button>
+                      <button
+                        type="button"
+                        onClick={continueShopping}
+                        className="h-12 w-full rounded-full border border-blue-600 bg-white hover:bg-blue-50 text-blue-600 font-bold text-sm flex items-center justify-center gap-2 transition"
+                      >
+                        <ArrowLeft className="h-4 w-4" />
+                        Continuar Comprando
+                      </button>
+                    </div>
+                  </div>
                 </div>
               )}
 
-              {/* SUCCESS */}
+              {/* CHECKOUT STEP */}
+              {cartStep === "checkout" && (
+                <div className="flex flex-1 flex-col justify-between min-h-0">
+                  <div className="px-5 py-6 sm:px-6">
+                    <div className="mb-6">
+                      <p className="text-xl sm:text-2xl font-bold tracking-tight text-[#202522]">
+                        Quase concluído.
+                      </p>
+                      <p className="mt-1 text-sm text-[#747b73]">
+                        Preencha os seus dados para receber o contacto da loja.
+                      </p>
+                    </div>
 
-              {cartStep ===
-                "success" && (
-                <div className="min-h-0 flex-1 overflow-y-auto">
-                  <div className="flex min-h-full flex-col items-center justify-center px-7 py-12 text-center sm:px-10">
+                    <div className="space-y-4">
+                      <div>
+                        <label htmlFor="customer-name" className="mb-1.5 block text-sm font-semibold text-[#202522]">
+                          Nome completo
+                        </label>
+                        <Input
+                          id="customer-name"
+                          ref={customerNameRef}
+                          value={customer.name}
+                          onChange={(e) => setCustomer({ ...customer, name: e.target.value })}
+                          placeholder="O seu nome"
+                          className="h-11 rounded-xl border-[#c9c3b8] bg-[#fffdf9] text-sm text-[#202522] placeholder:text-[#747b73] focus-visible:ring-2 focus-visible:ring-blue-600"
+                          maxLength={120}
+                          autoComplete="name"
+                        />
+                      </div>
+
+                      <div>
+                        <label htmlFor="customer-phone" className="mb-1.5 block text-sm font-semibold text-[#202522]">
+                          Telefone / WhatsApp
+                        </label>
+                        <Input
+                          id="customer-phone"
+                          ref={customerPhoneRef}
+                          value={customer.phone}
+                          onChange={(e) => setCustomer({ ...customer, phone: e.target.value })}
+                          placeholder="+244 9xx xxx xxx"
+                          className="h-11 rounded-xl border-[#c9c3b8] bg-[#fffdf9] text-sm text-[#202522] placeholder:text-[#747b73] focus-visible:ring-2 focus-visible:ring-blue-600"
+                          maxLength={40}
+                          autoComplete="tel"
+                          inputMode="tel"
+                        />
+                      </div>
+
+                      <div>
+                        <label htmlFor="customer-email" className="mb-1.5 block text-sm font-semibold text-[#202522]">
+                          Email <span className="font-normal text-[#747b73]">opcional</span>
+                        </label>
+                        <Input
+                          id="customer-email"
+                          value={customer.email}
+                          onChange={(e) => setCustomer({ ...customer, email: e.target.value })}
+                          placeholder="seu@email.com"
+                          type="email"
+                          className="h-11 rounded-xl border-[#c9c3b8] bg-[#fffdf9] text-sm text-[#202522] placeholder:text-[#747b73] focus-visible:ring-2 focus-visible:ring-blue-600"
+                          maxLength={160}
+                          autoComplete="email"
+                        />
+                      </div>
+
+                      <div>
+                        <label htmlFor="customer-notes" className="mb-1.5 block text-sm font-semibold text-[#202522]">
+                          Morada / observações <span className="font-normal text-[#747b73]">opcional</span>
+                        </label>
+                        <Textarea
+                          id="customer-notes"
+                          value={customer.notes}
+                          onChange={(e) => setCustomer({ ...customer, notes: e.target.value })}
+                          placeholder="Morada, referência ou alguma observação"
+                          className="min-h-[90px] resize-none rounded-xl border-[#c9c3b8] bg-[#fffdf9] text-sm text-[#202522] placeholder:text-[#747b73] focus-visible:ring-2 focus-visible:ring-blue-600"
+                          maxLength={1000}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-auto border-t border-[#ded9d0] bg-[#fffdf9] px-5 py-5 sm:px-6 space-y-4">
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="text-sm font-medium text-[#747b73]">Total</span>
+                      <span className="text-xl font-bold text-[#202522]">{formatMoney(cartTotal, currency)}</span>
+                    </div>
+
+                    <Button
+                      type="button"
+                      onClick={checkout}
+                      disabled={placing}
+                      className="h-12 w-full rounded-full bg-[#155eef] hover:bg-[#0e4fd1] text-sm font-bold text-white shadow-md focus-visible:ring-2 focus-visible:ring-[#4169f5] focus-visible:ring-offset-2 flex items-center justify-center gap-2"
+                    >
+                      {placing ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          A processar pedido...
+                        </>
+                      ) : (
+                        <>
+                          Confirmar pedido
+                          <Check className="ml-2 h-4 w-4" />
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* SUCCESS STEP */}
+              {cartStep === "success" && (
+                <div className="flex flex-1 flex-col justify-between min-h-0">
+                  <div className="flex min-h-full flex-col items-center justify-center px-7 py-12 text-center sm:px-10 my-auto">
                     <div className="grid h-20 w-20 place-items-center rounded-2xl bg-black text-white">
                       <Check className="h-9 w-9 stroke-[2.5]" />
                     </div>
@@ -1381,118 +1358,23 @@ export default function Store() {
                       </div>
                     )}
                   </div>
-                </div>
-              )}
 
-              {/* FIXED FOOTER */}
-              {cartStep === "cart" && (
-                <div className="shrink-0 border-t border-neutral-100 bg-white px-6 py-5 space-y-4">
-                  <div className="space-y-2.5">
-                    <div className="flex items-center justify-between gap-4 text-sm">
-                      <span className="font-medium text-neutral-600">Subtotal</span>
-                      <span className="font-semibold tabular-nums text-neutral-900">{formatMoney(cartTotal, currency)}</span>
-                    </div>
-                    <div className="flex items-center justify-between gap-4 text-sm">
-                      <span className="inline-flex items-center gap-1.5 font-medium text-neutral-600">
-                        Entrega <Info className="h-3.5 w-3.5 text-neutral-400" />
-                      </span>
-                      <span className="text-xs font-bold text-blue-600">Grátis</span>
-                    </div>
-                    <div className="flex items-center justify-between gap-4 border-t border-neutral-100 pt-2.5">
-                      <span className="text-base font-bold text-neutral-900">Total</span>
-                      <span className="text-2xl font-extrabold tracking-tight tabular-nums text-neutral-900">{formatMoney(cartTotal, currency)}</span>
-                    </div>
-                  </div>
-                  <p className="text-[11px] leading-relaxed text-neutral-400">O valor e os detalhes da entrega serão combinados diretamente com a loja.</p>
-                  <div className="space-y-2.5 pt-1">
+                  <div className="mt-auto border-t border-[#ded9d0] bg-[#fffdf9] px-5 py-5 sm:px-6">
                     <Button
                       type="button"
-                      onClick={goToCheckout}
-                      className="h-12 w-full rounded-full bg-[#155eef] text-sm font-bold text-white shadow-md hover:bg-[#0e4fd1] focus-visible:ring-2 focus-visible:ring-[#4169f5] focus-visible:ring-offset-2 flex items-center justify-center gap-2 transition"
+                      onClick={() => {
+                        if (!orderId) return;
+                        closeCart();
+                        window.setTimeout(
+                          () => navigate(`/loja/${slug}/pedido/${orderId}`),
+                          180,
+                        );
+                      }}
+                      className="h-12 w-full rounded-full bg-[#155eef] hover:bg-[#0e4fd1] text-sm font-bold text-white shadow-md"
                     >
-                      <Lock className="h-4 w-4" />
-                      Finalizar Compra →
+                      Ver detalhes do pedido
                     </Button>
-                    <button
-                      type="button"
-                      onClick={continueShopping}
-                      className="h-12 w-full rounded-full border border-blue-600 bg-white hover:bg-blue-50 text-blue-600 font-bold text-sm flex items-center justify-center gap-2 transition"
-                    >
-                      <ArrowLeft className="h-4 w-4" />
-                      Continuar Comprando
-                    </button>
                   </div>
-                </div>
-              )}
-
-              {cartStep === "checkout" && (
-                <div className="shrink-0 border-t border-[#ded9d0] bg-[#fffdf9] px-5 py-5 sm:px-6">
-                  <div className="mb-4 flex items-center justify-between gap-4">
-                    <span className="text-sm font-medium text-[#747b73]">
-                      Total
-                    </span>
-
-                    <span className="text-lg font-bold text-[#202522]">
-                      {formatMoney(
-                        cartTotal,
-                        currency,
-                      )}
-                    </span>
-                  </div>
-
-                  <Button
-                    type="button"
-                    onClick={
-                      checkout
-                    }
-                    disabled={
-                      placing
-                    }
-                    className="h-12 w-full rounded-full bg-[#155eef] text-sm font-bold text-white hover:bg-[#0e4fd1] focus-visible:ring-2 focus-visible:ring-[#4169f5] focus-visible:ring-offset-2"
-                  >
-                    {placing ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        A processar pedido...
-                      </>
-                    ) : (
-                      <>
-                        Confirmar pedido
-                        <Check className="ml-2 h-4 w-4" />
-                      </>
-                    )}
-                  </Button>
-                </div>
-              )}
-
-              {cartStep ===
-                "success" && (
-                <div className="shrink-0 border-t border-[#ded9d0] bg-[#fffdf9] px-5 py-5 sm:px-6">
-                  <Button
-                    type="button"
-                    onClick={() => {
-                      if (!orderId) return;
-                      closeCart();
-                      window.setTimeout(
-                        () => navigate(`/loja/${slug}/pedido/${orderId}`),
-                        180,
-                      );
-                    }}
-                    className="h-12 w-full rounded-full bg-[#155eef] text-sm font-bold text-white hover:bg-[#0e4fd1] focus-visible:ring-2 focus-visible:ring-[#4169f5] focus-visible:ring-offset-2"
-                  >
-                    Ver pedido
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-
-                  <button
-                    type="button"
-                    onClick={
-                      continueShopping
-                    }
-                    className="mt-3 flex min-h-10 w-full items-center justify-center text-sm font-semibold text-[#5f625d] transition hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
-                  >
-                    Continuar a comprar
-                  </button>
                 </div>
               )}
             </>
