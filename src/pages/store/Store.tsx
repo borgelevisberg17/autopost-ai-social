@@ -674,19 +674,14 @@ export default function Store() {
                       <button type="button" onClick={() => navigate(`/loja/${slug}/produto/${product.id}`)} className="store-product-card__quick-view">Ver produto <ArrowRight className="h-4 w-4" /></button>
                     </div>
                     <div className="store-product-card__details">
-                      <div className="store-product-card__meta">
-                        <div>
-                          {product.category && <p className="store-product-card__category">{product.category}</p>}
-                          <button type="button" onClick={() => navigate(`/loja/${slug}/produto/${product.id}`)} className="store-product-card__name">{product.name}</button>
-                        </div>
+                      {product.category && <p className="store-product-card__category">{product.category}</p>}
+                      <button type="button" onClick={() => navigate(`/loja/${slug}/produto/${product.id}`)} className="store-product-card__name">{product.name}</button>
+                      <div className="store-product-card__footer">
                         <div className="store-product-card__price-block">
                           <strong>{formatMoney(price, currency)}</strong>
                           {product.promo_price != null && <del>{formatMoney(product.price, currency)}</del>}
                         </div>
-                      </div>
-                      <div className="store-product-card__footer">
-                        <span className={product.stock > 0 ? "in-stock" : "out-stock"}>{product.stock > 0 ? (product.stock <= 3 ? "Últimas unidades" : "Disponível") : "Esgotado"}</span>
-                        <button type="button" disabled={product.stock === 0} onClick={() => changeQuantity(product, 1)} className="store-product-card__add">Adicionar <Plus className="h-4 w-4" /></button>
+                        <button type="button" aria-label={`Adicionar ${product.name} ao carrinho`} disabled={product.stock === 0} onClick={() => changeQuantity(product, 1)} className="store-product-card__add"><ShoppingCart className="h-4 w-4" />Adicionar</button>
                       </div>
                     </div>
                   </article>
