@@ -14,7 +14,10 @@ import {
   Search,
   ShoppingBag,
   ShoppingCart,
+  Lock,
+  Tag,
   Trash2,
+  Truck,
   X,
 } from "lucide-react";
 
@@ -85,6 +88,13 @@ export default function Store() {
     },
   );
 
+  const [cartVariants] = useState<Record<string, { color?: string; size?: number }>>(() => {
+    try {
+      return JSON.parse(localStorage.getItem(`cart_variants.${slug}`) || "{}");
+    } catch {
+      return {};
+    }
+  });
   const [cartOpen, setCartOpen] = useState(false);
   const [cartStep, setCartStep] =
     useState<CartStep>("cart");
@@ -517,6 +527,29 @@ export default function Store() {
 
   return (
     <div className="storefront min-h-screen bg-white text-[#111214]">
+      {/* Top Announcement Bar */}
+      <div className="bg-[#0b0c0e] text-white/90 text-xs py-2 px-4 sm:px-8 flex flex-wrap items-center justify-between gap-2 border-b border-white/10">
+        <div className="flex items-center gap-2 text-[11px] sm:text-xs">
+          <span className="flex items-center gap-1.5">
+            <Truck className="h-3.5 w-3.5" /> Entrega para todo Angola
+          </span>
+          <span className="opacity-40">•</span>
+          <span>Compra segura e confiável</span>
+        </div>
+        <div className="flex items-center gap-4 text-[11px] sm:text-xs text-white/70">
+          <button type="button" onClick={() => scrollTo("sobre")} className="hover:text-white transition">
+            Ajuda
+          </button>
+          <span className="opacity-40">|</span>
+          <button type="button" onClick={() => scrollTo("sobre")} className="hover:text-white transition">
+            Trocas e Devoluções
+          </button>
+          <span className="opacity-40">|</span>
+          <button type="button" onClick={() => scrollTo("contacto")} className="hover:text-white transition">
+            Contacto
+          </button>
+        </div>
+      </div>
       <header className="store-header">
         <div className="store-header__bar">
           <button
@@ -1044,6 +1077,9 @@ export default function Store() {
                                       <p className="min-w-0 flex-1 line-clamp-2 text-base font-semibold leading-6 text-[#111216] sm:text-lg">
                                         {product.name}
                                       </p>
+                                      <p className="text-xs text-[#73757b] mt-0.5 font-medium">
+                                        Tamanho: {cartVariants[product.id]?.size || 42} • Cor: {cartVariants[product.id]?.color || "Branco"}
+                                      </p>
                                       <p className="shrink-0 text-sm font-bold tabular-nums text-[#111216] sm:text-lg">
                                         {formatMoney(itemTotal, currency)}
                                       </p>
@@ -1091,6 +1127,12 @@ export default function Store() {
                             );
                           },
                         )}
+                      </div>
+                      {/* Coupon / Discount Code */}
+                      <div className="cart-discount-row mx-6 sm:mx-8 my-4">
+                        <span className="cart-discount-row__icon"><Tag className="h-4 w-4" /></span>
+                        <input type="text" placeholder="Código de desconto" />
+                        <button type="button" onClick={() => toast.info("Nenhum cupom ativo no momento.")}>Aplicar</button>
                       </div>
                     </div>
                   )}
@@ -1312,7 +1354,7 @@ export default function Store() {
                     </div>
                     <div className="flex items-center justify-between gap-4 text-sm">
                       <span className="inline-flex items-center gap-2 font-medium text-[#747b73]">Entrega <Info className="h-4 w-4 text-[#92949b]" /></span>
-                      <span className="text-xs font-medium text-[#747b73]">A combinar com a loja</span>
+                      <span className="text-xs font-bold text-blue-600">Grátis</span>
                     </div>
                     <div className="flex items-center justify-between gap-4 border-t border-[#ded9d0] pt-3">
                       <span className="text-lg font-bold text-[#202522]">Total</span>
@@ -1323,17 +1365,18 @@ export default function Store() {
                   <Button
                     type="button"
                     onClick={goToCheckout}
-                    className="mt-4 h-14 w-full rounded-full bg-[#155eef] text-sm font-bold text-white shadow-md hover:bg-[#0e4fd1] focus-visible:ring-2 focus-visible:ring-[#4169f5] focus-visible:ring-offset-2 sm:h-[76px] sm:text-base"
+                    className="mt-4 h-14 w-full rounded-full bg-[#155eef] text-sm font-bold text-white shadow-md hover:bg-[#0e4fd1] focus-visible:ring-2 focus-visible:ring-[#4169f5] focus-visible:ring-offset-2 flex items-center justify-center gap-2"
                   >
-                    Finalizar pedido
-                    <ArrowRight className="ml-auto h-5 w-5" />
+                    <Lock className="h-4 w-4" />
+                    Finalizar Compra
+                    <ArrowRight className="ml-1 h-4 w-4" />
                   </Button>
                   <button
                     type="button"
                     onClick={continueShopping}
-                    className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-full border border-[#4169f5] bg-white text-sm font-semibold text-[#202522] transition hover:bg-[#f4f7ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4169f5] sm:h-[68px]"
+                    className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-full border border-blue-600 bg-white text-sm font-bold text-[#111216] transition hover:bg-blue-50"
                   >
-                    <ArrowLeft className="h-4 w-4" /> Continuar a comprar
+                    <ArrowLeft className="h-4 w-4" /> Continuar Comprando
                   </button>
                 </div>
               )}
