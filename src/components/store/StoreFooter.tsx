@@ -121,41 +121,54 @@ export function StoreFooter({
         </div>
       </div>
 
-      {/* 2. NEWSLETTER VIP CLUB ROW */}
-      <div className="bg-white/[0.02] py-8 sm:py-12">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
-            <div className="max-w-xl text-left">
-              <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-blue-400">
+      {/* 2. NEWSLETTER VIP CLUB ROW WITH SNEAKER BACKGROUND IMAGE */}
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+        <div className="relative overflow-hidden rounded-3xl border border-white/10 shadow-2xl">
+          {/* Background image & dark ambient vignette */}
+          <div className="absolute inset-0 z-0">
+            <img
+              src="https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=1600&q=80"
+              alt="Footwear VIP Club"
+              className="h-full w-full object-cover object-center filter brightness-[0.25] contrast-[1.1] scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0b0c10] via-[#0b0c10]/90 to-[#0b0c10]/70" />
+            <div className="absolute inset-0 bg-radial-gradient from-transparent to-[#0b0c10]/80" />
+          </div>
+
+          {/* Foreground content */}
+          <div className="relative z-10 p-6 sm:p-10 lg:p-12 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+            <div className="max-w-xl text-left space-y-2">
+              <span className="inline-flex items-center gap-2 text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.2em] text-neutral-400">
+                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
                 CLUBE VIP · {company.name.toUpperCase()}
               </span>
-              <h3 className="text-lg sm:text-2xl font-extrabold tracking-tight text-white mt-1">
+              <h3 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight text-white leading-tight">
                 Fique por dentro dos lançamentos e drops exclusivos
               </h3>
-              <p className="text-xs sm:text-sm text-neutral-400 mt-1">
-                Subscreva para receber reposições, novidades e ofertas especiais.
+              <p className="text-xs sm:text-sm text-neutral-300 leading-relaxed max-w-lg">
+                Subscreva para receber acesso prioritário a reposições, descontos privados e lançamentos da loja.
               </p>
             </div>
 
             <form
               onSubmit={handleSubscribe}
-              className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 max-w-md w-full"
+              className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 max-w-md w-full"
             >
               <div className="relative flex-1">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Seu melhor e-mail..."
-                  className="w-full bg-white/5 border border-white/10 focus:border-blue-500 rounded-full pl-10 pr-4 py-2.5 text-xs sm:text-sm text-white outline-none placeholder:text-neutral-500 transition"
+                  placeholder="Insira o seu melhor e-mail..."
+                  className="w-full h-12 pl-11 pr-4 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs sm:text-sm text-white outline-none placeholder:text-neutral-400 focus:border-white focus:bg-white/15 transition"
                 />
               </div>
               <button
                 type="submit"
-                className="bg-white hover:bg-neutral-200 text-[#0c0d11] font-bold text-xs sm:text-sm px-6 py-2.5 rounded-full shrink-0 transition"
+                className="h-12 px-6 rounded-full bg-white hover:bg-neutral-200 text-[#0c0d11] font-bold text-xs sm:text-sm active:scale-95 transition shrink-0 flex items-center justify-center gap-2 shadow-lg"
               >
-                Subscrever
+                Subscrever <ArrowRight className="h-4 w-4" />
               </button>
             </form>
           </div>
@@ -213,7 +226,7 @@ export function StoreFooter({
                     <button
                       type="button"
                       onClick={() => handleCategoryClick(cat.name)}
-                      className="hover:text-blue-400 hover:translate-x-0.5 transition flex items-center gap-1.5 text-left"
+                      className="hover:text-white hover:translate-x-0.5 transition flex items-center gap-1.5 text-left"
                     >
                       <ArrowRight className="h-3 w-3 text-neutral-500 shrink-0" />
                       <span className="truncate">{cat.name}</span>
@@ -226,7 +239,7 @@ export function StoreFooter({
                     <button
                       type="button"
                       onClick={() => handleCategoryClick("Sneakers")}
-                      className="hover:text-blue-400 transition"
+                      className="hover:text-white transition"
                     >
                       Sneakers & Ténis
                     </button>
@@ -235,7 +248,7 @@ export function StoreFooter({
                     <button
                       type="button"
                       onClick={() => handleCategoryClick("Casual")}
-                      className="hover:text-blue-400 transition"
+                      className="hover:text-white transition"
                     >
                       Casual & Urbano
                     </button>
@@ -244,7 +257,7 @@ export function StoreFooter({
                     <button
                       type="button"
                       onClick={() => handleCategoryClick("Sociais")}
-                      className="hover:text-blue-400 transition"
+                      className="hover:text-white transition"
                     >
                       Sapatos Sociais
                     </button>
@@ -253,7 +266,7 @@ export function StoreFooter({
                     <button
                       type="button"
                       onClick={() => handleCategoryClick("Chinelos")}
-                      className="hover:text-blue-400 transition"
+                      className="hover:text-white transition"
                     >
                       Chinelos & Slides
                     </button>
@@ -262,7 +275,7 @@ export function StoreFooter({
                     <button
                       type="button"
                       onClick={() => handleCategoryClick("Acessórios")}
-                      className="hover:text-blue-400 transition"
+                      className="hover:text-white transition"
                     >
                       Acessórios
                     </button>
@@ -273,7 +286,7 @@ export function StoreFooter({
                 <button
                   type="button"
                   onClick={() => onNavigateSection?.("produtos")}
-                  className="text-blue-400 hover:underline font-semibold text-xs sm:text-sm text-left"
+                  className="text-neutral-300 hover:text-white hover:underline font-semibold text-xs sm:text-sm text-left"
                 >
                   Ver todos →
                 </button>
@@ -291,9 +304,9 @@ export function StoreFooter({
                 <button
                   type="button"
                   onClick={() => onNavigateSection?.("faq")}
-                  className="hover:text-blue-400 text-blue-400 font-semibold transition flex items-center gap-1.5 text-left"
+                  className="hover:text-white text-neutral-300 font-semibold transition flex items-center gap-1.5 text-left"
                 >
-                  <HelpCircle className="h-3 w-3 text-blue-400 shrink-0" />
+                  <HelpCircle className="h-3 w-3 text-neutral-300 shrink-0" />
                   <span className="truncate">Perguntas Frequentes (FAQ)</span>
                 </button>
               </li>
@@ -358,7 +371,7 @@ export function StoreFooter({
                   href={`https://wa.me/${whatsappNumber}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="block font-bold text-white hover:text-blue-400 transition"
+                  className="block font-bold text-white hover:text-white transition"
                 >
                   +{whatsappNumber}
                 </a>

@@ -857,7 +857,7 @@ export default function Store() {
                     )
                   }
                   aria-label="Fechar detalhes do produto"
-                  className="absolute right-4 top-4 grid h-11 w-11 place-items-center rounded-full bg-white text-[#202522] shadow-md transition hover:bg-[#f1f2f5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4169f5]"
+                  className="absolute right-4 top-4 grid h-11 w-11 place-items-center rounded-full bg-white text-[#202522] shadow-md transition hover:bg-[#f1f2f5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -946,7 +946,7 @@ export default function Store() {
                       null,
                     );
                   }}
-                  className="mt-6 h-12 w-full rounded-full bg-[#155eef] text-sm font-bold text-white shadow-sm hover:bg-[#0e4fd1] focus-visible:ring-2 focus-visible:ring-[#4169f5] focus-visible:ring-offset-2"
+                  className="mt-6 h-12 w-full rounded-full bg-[#111216] text-sm font-bold text-white shadow-md hover:bg-black active:scale-[0.98] transition focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
                 >
                   {productOpen.stock >
                   0
@@ -1059,7 +1059,7 @@ export default function Store() {
               <Button
                 type="button"
                 onClick={continueShopping}
-                className="mt-7 h-11 rounded-full bg-[#155eef] px-6 text-sm font-bold text-white hover:bg-[#0e4fd1]"
+                className="mt-7 h-11 rounded-full bg-[#111216] px-6 text-sm font-bold text-white hover:bg-black transition"
               >
                 Ver produtos
               </Button>
@@ -1156,7 +1156,7 @@ export default function Store() {
 
                     {/* Coupon / Discount Code */}
                     <div className="pt-2">
-                      <div className="flex items-center gap-2 rounded-full bg-[#f8f9fb] border border-[#e3e5e8] p-1.5 pl-4 focus-within:border-blue-500 focus-within:bg-white transition">
+                      <div className="flex items-center gap-2 rounded-full bg-[#f8f9fb] border border-[#e3e5e8] p-1.5 pl-4 focus-within:border-neutral-900 focus-within:bg-white transition">
                         <Tag className="h-4 w-4 text-neutral-400 shrink-0" />
                         <input
                           type="text"
@@ -1166,7 +1166,7 @@ export default function Store() {
                         <button
                           type="button"
                           onClick={() => toast.info("Nenhum cupom ativo no momento.")}
-                          className="h-8 px-4 rounded-full border border-blue-600 bg-white text-blue-600 font-bold text-xs hover:bg-blue-50 transition shrink-0"
+                          className="h-8 px-4 rounded-full border border-neutral-900 bg-neutral-900 text-white font-bold text-xs hover:bg-black transition shrink-0"
                         >
                           Aplicar
                         </button>
@@ -1185,7 +1185,7 @@ export default function Store() {
                         <span className="inline-flex items-center gap-1.5 font-medium text-neutral-600">
                           Entrega <Info className="h-3.5 w-3.5 text-neutral-400" />
                         </span>
-                        <span className="text-xs font-bold text-blue-600">Grátis</span>
+                        <span className="text-xs font-bold text-emerald-600">Grátis</span>
                       </div>
                       <div className="flex items-center justify-between gap-4 border-t border-neutral-100 pt-2.5">
                         <span className="text-base font-bold text-neutral-900">Total</span>
@@ -1197,7 +1197,7 @@ export default function Store() {
                       <Button
                         type="button"
                         onClick={goToCheckout}
-                        className="h-12 w-full rounded-full bg-[#155eef] hover:bg-[#0e4fd1] text-sm font-bold text-white shadow-md focus-visible:ring-2 focus-visible:ring-[#4169f5] focus-visible:ring-offset-2 flex items-center justify-center gap-2 transition"
+                        className="h-12 w-full rounded-full bg-[#111216] hover:bg-black text-sm font-bold text-white shadow-md focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 flex items-center justify-center gap-2 transition active:scale-[0.98]"
                       >
                         <Lock className="h-4 w-4" />
                         Finalizar Compra →
@@ -1205,7 +1205,7 @@ export default function Store() {
                       <button
                         type="button"
                         onClick={continueShopping}
-                        className="h-12 w-full rounded-full border border-blue-600 bg-white hover:bg-blue-50 text-blue-600 font-bold text-sm flex items-center justify-center gap-2 transition"
+                        className="h-12 w-full rounded-full border border-neutral-300 bg-white hover:bg-neutral-100 text-neutral-800 font-bold text-sm flex items-center justify-center gap-2 transition"
                       >
                         <ArrowLeft className="h-4 w-4" />
                         Continuar Comprando
@@ -1239,7 +1239,7 @@ export default function Store() {
                           value={customer.name}
                           onChange={(e) => setCustomer({ ...customer, name: e.target.value })}
                           placeholder="O seu nome"
-                          className="h-11 rounded-xl border-[#c9c3b8] bg-[#fffdf9] text-sm text-[#202522] placeholder:text-[#747b73] focus-visible:ring-2 focus-visible:ring-blue-600"
+                          className="h-11 rounded-xl border-[#c9c3b8] bg-[#fffdf9] text-sm text-[#202522] placeholder:text-[#747b73] focus-visible:ring-2 focus-visible:ring-neutral-900"
                           maxLength={120}
                           autoComplete="name"
                         />
@@ -1255,7 +1255,7 @@ export default function Store() {
                           value={customer.phone}
                           onChange={(e) => setCustomer({ ...customer, phone: e.target.value })}
                           placeholder="+244 9xx xxx xxx"
-                          className="h-11 rounded-xl border-[#c9c3b8] bg-[#fffdf9] text-sm text-[#202522] placeholder:text-[#747b73] focus-visible:ring-2 focus-visible:ring-blue-600"
+                          className="h-11 rounded-xl border-[#c9c3b8] bg-[#fffdf9] text-sm text-[#202522] placeholder:text-[#747b73] focus-visible:ring-2 focus-visible:ring-neutral-900"
                           maxLength={40}
                           autoComplete="tel"
                           inputMode="tel"
@@ -1272,7 +1272,7 @@ export default function Store() {
                           onChange={(e) => setCustomer({ ...customer, email: e.target.value })}
                           placeholder="seu@email.com"
                           type="email"
-                          className="h-11 rounded-xl border-[#c9c3b8] bg-[#fffdf9] text-sm text-[#202522] placeholder:text-[#747b73] focus-visible:ring-2 focus-visible:ring-blue-600"
+                          className="h-11 rounded-xl border-[#c9c3b8] bg-[#fffdf9] text-sm text-[#202522] placeholder:text-[#747b73] focus-visible:ring-2 focus-visible:ring-neutral-900"
                           maxLength={160}
                           autoComplete="email"
                         />
@@ -1287,7 +1287,7 @@ export default function Store() {
                           value={customer.notes}
                           onChange={(e) => setCustomer({ ...customer, notes: e.target.value })}
                           placeholder="Morada, referência ou alguma observação"
-                          className="min-h-[90px] resize-none rounded-xl border-[#c9c3b8] bg-[#fffdf9] text-sm text-[#202522] placeholder:text-[#747b73] focus-visible:ring-2 focus-visible:ring-blue-600"
+                          className="min-h-[90px] resize-none rounded-xl border-[#c9c3b8] bg-[#fffdf9] text-sm text-[#202522] placeholder:text-[#747b73] focus-visible:ring-2 focus-visible:ring-neutral-900"
                           maxLength={1000}
                         />
                       </div>
@@ -1304,7 +1304,7 @@ export default function Store() {
                       type="button"
                       onClick={checkout}
                       disabled={placing}
-                      className="h-12 w-full rounded-full bg-[#155eef] hover:bg-[#0e4fd1] text-sm font-bold text-white shadow-md focus-visible:ring-2 focus-visible:ring-[#4169f5] focus-visible:ring-offset-2 flex items-center justify-center gap-2"
+                      className="h-12 w-full rounded-full bg-[#111216] hover:bg-black text-sm font-bold text-white shadow-md transition focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 flex items-center justify-center gap-2"
                     >
                       {placing ? (
                         <>
@@ -1370,7 +1370,7 @@ export default function Store() {
                           180,
                         );
                       }}
-                      className="h-12 w-full rounded-full bg-[#155eef] hover:bg-[#0e4fd1] text-sm font-bold text-white shadow-md"
+                      className="h-12 w-full rounded-full bg-[#111216] hover:bg-black text-sm font-bold text-white shadow-md transition"
                     >
                       Ver detalhes do pedido
                     </Button>
@@ -1395,7 +1395,7 @@ export default function Store() {
               cartTotal,
               currency,
             )}`}
-            className="fixed bottom-4 left-1/2 z-40 flex min-h-12 -translate-x-1/2 items-center gap-3 rounded-full bg-[#155eef] px-5 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-[#0e4fd1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#155eef] sm:bottom-5 md:hidden"
+            className="fixed bottom-4 left-1/2 z-40 flex min-h-12 -translate-x-1/2 items-center gap-3 rounded-full bg-[#111216] px-5 py-3 text-sm font-bold text-white shadow-xl transition hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#111216] sm:bottom-5 md:hidden"
           >
             <ShoppingBag className="h-4 w-4" />
 

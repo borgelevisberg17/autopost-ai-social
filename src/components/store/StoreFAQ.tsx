@@ -109,7 +109,7 @@ export function StoreFAQ({ company, onContactClick }: StoreFAQProps) {
                   className="w-full flex items-center justify-between gap-4 text-left group focus:outline-none"
                   aria-expanded={isOpen}
                 >
-                  <h3 className="text-base sm:text-lg font-bold text-neutral-900 group-hover:text-blue-600 transition pr-2">
+                  <h3 className="text-base sm:text-lg font-bold text-neutral-900 group-hover:text-black transition pr-2">
                     {faq.question}
                   </h3>
 
