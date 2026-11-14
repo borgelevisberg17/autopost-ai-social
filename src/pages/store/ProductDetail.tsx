@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
   ArrowRight,
+  Check,
   CheckCircle2,
   Headphones,
   Heart,
@@ -72,6 +74,7 @@ export default function ProductDetail() {
   const [tab, setTab] = useState<"description" | "details" | "reviews">("description");
   const [selectedColor, setSelectedColor] = useState<string>("branco");
   const [selectedSize, setSelectedSize] = useState<number>(42);
+  const [isAdded, setIsAdded] = useState(false);
   const [cart, setCart] = useState<Record<string, number>>(() => readCart(slug));
   const [search, setSearch] = useState("");
 
@@ -222,6 +225,8 @@ export default function ProductDetail() {
       return;
     }
 
+    setIsAdded(true);
+    setTimeout(() => setIsAdded(false), 1600);
     toast.success(`${product.name} adicionado ao carrinho.`);
   };
 
@@ -320,18 +325,31 @@ export default function ProductDetail() {
               />
             </form>
             <span className="store-header__divider" aria-hidden="true" />
-            <button
+            <motion.button
               type="button"
               onClick={openStoreCart}
+              whileTap={{ scale: 0.94 }}
+              whileHover={{ scale: 1.02 }}
               aria-label={cartCount ? `Abrir carrinho com ${cartCount} artigos` : "Abrir carrinho"}
-              className="store-cart-icon"
+              className="relative inline-flex items-center justify-center gap-2.5 h-[42px] px-3.5 sm:px-5 rounded-full bg-[#050506] text-white hover:bg-[#252529] shadow-sm transition-colors cursor-pointer select-none"
             >
-              <ShoppingCart className="h-[19px] w-[19px]" />
-              {cartCount > 0 && <span className="store-cart-count">{cartCount}</span>}
-            </button>
-            <button type="button" onClick={openStoreCart} className="store-cart-button">
-              Carrinho{cartCount > 0 && <span className="store-cart-button__count">{cartCount}</span>}
-            </button>
+              <ShoppingCart className="h-[18px] w-[18px] shrink-0" />
+              <span className="hidden sm:inline text-xs sm:text-[13px] font-bold tracking-tight">Carrinho</span>
+              <AnimatePresence mode="popLayout">
+                {cartCount > 0 && (
+                  <motion.span
+                    key={cartCount}
+                    initial={{ scale: 0.4, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.4, opacity: 0 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 22 }}
+                    className="inline-flex items-center justify-center min-w-[20px] h-[20px] px-1 text-[11px] font-black text-[#111] bg-white rounded-full leading-none shadow-xs"
+                  >
+                    {cartCount}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </motion.button>
           </div>
         </div>
         <form className="store-search store-search--mobile product-detail-mobile-search" onSubmit={searchProducts}>
@@ -371,45 +389,58 @@ export default function ProductDetail() {
             {/* Thumbnails list */}
             <div className="flex sm:flex-col gap-2 order-2 sm:order-1 overflow-x-auto sm:overflow-y-auto sm:w-20 shrink-0">
               {displayImages.map((image, index) => (
-                <button
+                <motion.button
                   key={`${image}-${index}`}
                   type="button"
-                  onClick={() => setActiveImage(index)}
-                  className={`w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-[#f1f2f5] border-2 transition shrink-0 ${
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => {
+                    setActiveImage(index);
+                    setImageFailed(false);
+                  }}
+                  className={`w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-[#f1f2f5] border-2 transition shrink-0 cursor-pointer ${
                     activeImage === index ? "border-[#101114] shadow-sm" : "border-transparent opacity-75 hover:opacity-100"
                   }`}
                 >
                   <img src={image} alt="" className="w-full h-full object-cover" />
-                </button>
+                </motion.button>
               ))}
 
               {/* Video Thumbnail placeholder if desired */}
-              <button
+              <motion.button
                 type="button"
-                className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-[#15161a] border-2 border-transparent text-white flex items-center justify-center relative shrink-0 opacity-80 hover:opacity-100 transition"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-[#15161a] border-2 border-transparent text-white flex items-center justify-center relative shrink-0 opacity-80 hover:opacity-100 transition cursor-pointer"
               >
                 <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center">
                   <Play className="h-3.5 w-3.5 fill-white text-white ml-0.5" />
                 </div>
-              </button>
+              </motion.button>
             </div>
 
             {/* Main Hero Photo Container */}
             <div className="relative flex-1 aspect-square sm:aspect-[4/3] rounded-2xl overflow-hidden bg-[#f1f2f5] border border-neutral-100 order-1 sm:order-2">
-              {currentImage && !imageFailed ? (
-                <img
-                  key={currentImage}
-                  src={currentImage}
-                  alt={product.name}
-                  onError={() => setImageFailed(true)}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-neutral-400">
-                  <ImageOff className="h-8 w-8" />
-                  <span className="text-xs">Imagem indisponível</span>
-                </div>
-              )}
+              <AnimatePresence mode="wait">
+                {currentImage && !imageFailed ? (
+                  <motion.img
+                    key={currentImage}
+                    src={currentImage}
+                    alt={product.name}
+                    initial={{ opacity: 0, scale: 0.97 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 1.02 }}
+                    transition={{ duration: 0.35, ease: "easeOut" }}
+                    onError={() => setImageFailed(true)}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-neutral-400">
+                    <ImageOff className="h-8 w-8" />
+                    <span className="text-xs">Imagem indisponível</span>
+                  </div>
+                )}
+              </AnimatePresence>
 
               {/* Novo Badge */}
               <span className="absolute top-4 left-4 bg-[#101114] text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">
@@ -508,30 +539,36 @@ export default function ProductDetail() {
             <div className="pt-2">
               <span className="text-xs font-bold text-[#111216] block mb-2">Cor:</span>
               <div className="flex items-center gap-3">
-                <button
+                <motion.button
                   type="button"
+                  whileHover={{ scale: 1.15 }}
+                  whileTap={{ scale: 0.9 }}
                   onClick={() => setSelectedColor("branco")}
-                  className={`w-7 h-7 rounded-full bg-white border-2 transition ${
+                  className={`w-7 h-7 rounded-full bg-white border-2 transition cursor-pointer ${
                     selectedColor === "branco"
                       ? "border-[#101114] ring-2 ring-[#101114]/20"
                       : "border-neutral-300"
                   }`}
                   aria-label="Branco"
                 />
-                <button
+                <motion.button
                   type="button"
+                  whileHover={{ scale: 1.15 }}
+                  whileTap={{ scale: 0.9 }}
                   onClick={() => setSelectedColor("preto")}
-                  className={`w-7 h-7 rounded-full bg-black border-2 transition ${
+                  className={`w-7 h-7 rounded-full bg-black border-2 transition cursor-pointer ${
                     selectedColor === "preto"
                       ? "border-[#101114] ring-2 ring-[#101114]/20"
                       : "border-transparent"
                   }`}
                   aria-label="Preto"
                 />
-                <button
+                <motion.button
                   type="button"
+                  whileHover={{ scale: 1.15 }}
+                  whileTap={{ scale: 0.9 }}
                   onClick={() => setSelectedColor("cinza")}
-                  className={`w-7 h-7 rounded-full bg-neutral-400 border-2 transition ${
+                  className={`w-7 h-7 rounded-full bg-neutral-400 border-2 transition cursor-pointer ${
                     selectedColor === "cinza"
                       ? "border-[#101114] ring-2 ring-[#101114]/20"
                       : "border-transparent"
@@ -546,18 +583,20 @@ export default function ProductDetail() {
               <span className="text-xs font-bold text-[#111216] block mb-2">Tamanho:</span>
               <div className="flex flex-wrap items-center gap-2">
                 {[40, 41, 42, 43, 44, 45].map((size) => (
-                  <button
+                  <motion.button
                     key={size}
                     type="button"
+                    whileHover={{ scale: 1.06 }}
+                    whileTap={{ scale: 0.92 }}
                     onClick={() => setSelectedSize(size)}
-                    className={`min-w-10 h-9 px-3 rounded-full text-xs font-bold transition ${
+                    className={`min-w-10 h-9 px-3 rounded-full text-xs font-bold transition cursor-pointer ${
                       selectedSize === size
                         ? "bg-[#101114] text-white shadow-xs"
                         : "bg-[#f1f2f5] text-[#111216] hover:bg-[#e4e6eb]"
                     }`}
                   >
                     {size}
-                  </button>
+                  </motion.button>
                 ))}
               </div>
             </div>
@@ -565,41 +604,75 @@ export default function ProductDetail() {
             {/* Quantity and Add to Cart Row */}
             <div className="flex items-center gap-3 pt-3">
               <div className="flex items-center justify-between border border-[#e0e1e5] rounded-full h-12 px-3 w-28 shrink-0 bg-white">
-                <button
+                <motion.button
                   type="button"
+                  whileTap={{ scale: 0.8 }}
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  className="text-neutral-500 hover:text-black transition"
+                  className="text-neutral-500 hover:text-black transition p-1 cursor-pointer"
                 >
                   <Minus className="h-3.5 w-3.5" />
-                </button>
-                <span className="text-xs font-bold">{quantity}</span>
-                <button
+                </motion.button>
+                <span className="text-xs font-bold tabular-nums">{quantity}</span>
+                <motion.button
                   type="button"
+                  whileTap={{ scale: 0.8 }}
                   onClick={() => setQuantity((q) => Math.min(product.stock || 99, q + 1))}
-                  className="text-neutral-500 hover:text-black transition"
+                  className="text-neutral-500 hover:text-black transition p-1 cursor-pointer"
                 >
                   <Plus className="h-3.5 w-3.5" />
-                </button>
+                </motion.button>
               </div>
-              <button
+              <motion.button
                 type="button"
+                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.01 }}
                 onClick={() => saveCart(false)}
-                className="flex-1 h-12 bg-[#101114] hover:bg-black text-white font-bold text-xs sm:text-sm rounded-full flex items-center justify-center gap-2 shadow-sm transition active:scale-[0.98]"
+                className={`flex-1 h-12 font-bold text-xs sm:text-sm rounded-full flex items-center justify-center gap-2 shadow-sm transition-colors duration-200 cursor-pointer ${
+                  isAdded
+                    ? "bg-emerald-600 text-white"
+                    : "bg-[#101114] hover:bg-black text-white"
+                }`}
               >
-                <ShoppingCart className="h-4 w-4" />
-                Adicionar ao Carrinho
-              </button>
+                <AnimatePresence mode="wait" initial={false}>
+                  {isAdded ? (
+                    <motion.span
+                      key="added"
+                      initial={{ scale: 0.75, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0.75, opacity: 0 }}
+                      transition={{ type: "spring", stiffness: 500, damping: 25 }}
+                      className="inline-flex items-center gap-2"
+                    >
+                      <Check className="h-4 w-4 stroke-[3]" />
+                      Adicionado com Sucesso!
+                    </motion.span>
+                  ) : (
+                    <motion.span
+                      key="default"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="inline-flex items-center gap-2"
+                    >
+                      <ShoppingCart className="h-4 w-4" />
+                      Adicionar ao Carrinho
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </motion.button>
             </div>
 
             {/* Direct Comprar Agora */}
-            <button
+            <motion.button
               type="button"
+              whileTap={{ scale: 0.98 }}
+              whileHover={{ scale: 1.01 }}
               onClick={() => saveCart(true)}
-              className="w-full h-12 border border-[#e0e1e5] hover:border-neutral-400 bg-white text-[#111216] font-bold text-xs sm:text-sm rounded-full flex items-center justify-center gap-2 transition"
+              className="w-full h-12 border border-[#e0e1e5] hover:border-neutral-400 bg-white text-[#111216] font-bold text-xs sm:text-sm rounded-full flex items-center justify-center gap-2 transition cursor-pointer"
             >
               <Zap className="h-3.5 w-3.5" />
               Comprar Agora
-            </button>
+            </motion.button>
           </div>
 
           {/* RIGHT: TRUST PANEL (approx 2 cols) */}
@@ -645,97 +718,122 @@ export default function ProductDetail() {
               <button
                 type="button"
                 onClick={() => setTab("description")}
-                className={`pb-2.5 text-sm font-bold transition relative ${
-                  tab === "description"
-                    ? "text-[#111216] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#101114]"
-                    : "text-[#73757b] hover:text-[#111216]"
+                className={`pb-2.5 text-sm font-bold transition relative cursor-pointer ${
+                  tab === "description" ? "text-[#111216]" : "text-[#73757b] hover:text-[#111216]"
                 }`}
               >
                 Descrição
+                {tab === "description" && (
+                  <motion.div
+                    layoutId="productTabIndicator"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#101114]"
+                    transition={{ type: "spring", stiffness: 450, damping: 30 }}
+                  />
+                )}
               </button>
               <button
                 type="button"
                 onClick={() => setTab("details")}
-                className={`pb-2.5 text-sm font-bold transition relative ${
-                  tab === "details"
-                    ? "text-[#111216] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#101114]"
-                    : "text-[#73757b] hover:text-[#111216]"
+                className={`pb-2.5 text-sm font-bold transition relative cursor-pointer ${
+                  tab === "details" ? "text-[#111216]" : "text-[#73757b] hover:text-[#111216]"
                 }`}
               >
                 Especificações
+                {tab === "details" && (
+                  <motion.div
+                    layoutId="productTabIndicator"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#101114]"
+                    transition={{ type: "spring", stiffness: 450, damping: 30 }}
+                  />
+                )}
               </button>
               <button
                 type="button"
                 onClick={() => setTab("reviews")}
-                className={`pb-2.5 text-sm font-bold transition relative ${
-                  tab === "reviews"
-                    ? "text-[#111216] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#101114]"
-                    : "text-[#73757b] hover:text-[#111216]"
+                className={`pb-2.5 text-sm font-bold transition relative cursor-pointer ${
+                  tab === "reviews" ? "text-[#111216]" : "text-[#73757b] hover:text-[#111216]"
                 }`}
               >
                 Avaliações (124)
+                {tab === "reviews" && (
+                  <motion.div
+                    layoutId="productTabIndicator"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#101114]"
+                    transition={{ type: "spring", stiffness: 450, damping: 30 }}
+                  />
+                )}
               </button>
             </div>
 
-            {tab === "description" && (
-              <div className="space-y-4 text-xs sm:text-sm text-[#5f625d] leading-relaxed">
-                <p>
-                  {product.description ||
-                    "O Nike Air Force 1 é um ícone do estilo urbano, combinando design clássico, conforto incomparável e durabilidade. Perfeito para todas as ocasiões."}
-                </p>
-                <div className="space-y-2.5 pt-2">
-                  <div className="flex items-center gap-2.5 text-[#111216] font-medium text-xs sm:text-sm">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-                    <span>Material premium</span>
-                  </div>
-                  <div className="flex items-center gap-2.5 text-[#111216] font-medium text-xs sm:text-sm">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-                    <span>Sola de borracha resistente</span>
-                  </div>
-                  <div className="flex items-center gap-2.5 text-[#111216] font-medium text-xs sm:text-sm">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-                    <span>Design icónico</span>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {tab === "details" && (
-              <div className="space-y-2 text-xs sm:text-sm text-[#5f625d]">
-                <div className="flex justify-between py-2 border-b border-neutral-100">
-                  <span className="text-[#73757b]">Categoria</span>
-                  <span className="font-semibold text-[#111216]">{product.category || "Sneakers"}</span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-neutral-100">
-                  <span className="text-[#73757b]">Referência</span>
-                  <span className="font-semibold text-[#111216]">{product.sku || "AF1-001"}</span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-neutral-100">
-                  <span className="text-[#73757b]">Disponibilidade</span>
-                  <span className="font-semibold text-emerald-600">Em stock</span>
-                </div>
-              </div>
-            )}
-
-            {tab === "reviews" && (
-              <div className="space-y-3 text-xs sm:text-sm text-[#5f625d]">
-                <div className="p-3.5 bg-[#f8f9fb] rounded-xl space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-[#111216]">Manuel D.</span>
-                    <div className="flex text-amber-400">
-                      <Star className="h-3 w-3 fill-amber-400" />
-                      <Star className="h-3 w-3 fill-amber-400" />
-                      <Star className="h-3 w-3 fill-amber-400" />
-                      <Star className="h-3 w-3 fill-amber-400" />
-                      <Star className="h-3 w-3 fill-amber-400" />
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={tab}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.2 }}
+              >
+                {tab === "description" && (
+                  <div className="space-y-4 text-xs sm:text-sm text-[#5f625d] leading-relaxed">
+                    <p>
+                      {product.description ||
+                        "O Nike Air Force 1 é um ícone do estilo urbano, combinando design clássico, conforto incomparável e durabilidade. Perfeito para todas as ocasiões."}
+                    </p>
+                    <div className="space-y-2.5 pt-2">
+                      <div className="flex items-center gap-2.5 text-[#111216] font-medium text-xs sm:text-sm">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                        <span>Material premium</span>
+                      </div>
+                      <div className="flex items-center gap-2.5 text-[#111216] font-medium text-xs sm:text-sm">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                        <span>Sola de borracha resistente</span>
+                      </div>
+                      <div className="flex items-center gap-2.5 text-[#111216] font-medium text-xs sm:text-sm">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                        <span>Design icónico</span>
+                      </div>
                     </div>
                   </div>
-                  <p className="text-xs text-[#73757b]">
-                    Excelente qualidade, calça muito bem e a entrega foi super rápida.
-                  </p>
-                </div>
-              </div>
-            )}
+                )}
+
+                {tab === "details" && (
+                  <div className="space-y-2 text-xs sm:text-sm text-[#5f625d]">
+                    <div className="flex justify-between py-2 border-b border-neutral-100">
+                      <span className="text-[#73757b]">Categoria</span>
+                      <span className="font-semibold text-[#111216]">{product.category || "Sneakers"}</span>
+                    </div>
+                    <div className="flex justify-between py-2 border-b border-neutral-100">
+                      <span className="text-[#73757b]">Referência</span>
+                      <span className="font-semibold text-[#111216]">{product.sku || "AF1-001"}</span>
+                    </div>
+                    <div className="flex justify-between py-2 border-b border-neutral-100">
+                      <span className="text-[#73757b]">Disponibilidade</span>
+                      <span className="font-semibold text-emerald-600">Em stock</span>
+                    </div>
+                  </div>
+                )}
+
+                {tab === "reviews" && (
+                  <div className="space-y-3 text-xs sm:text-sm text-[#5f625d]">
+                    <div className="p-3.5 bg-[#f8f9fb] rounded-xl space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-[#111216]">Manuel D.</span>
+                        <div className="flex text-amber-400">
+                          <Star className="h-3 w-3 fill-amber-400" />
+                          <Star className="h-3 w-3 fill-amber-400" />
+                          <Star className="h-3 w-3 fill-amber-400" />
+                          <Star className="h-3 w-3 fill-amber-400" />
+                          <Star className="h-3 w-3 fill-amber-400" />
+                        </div>
+                      </div>
+                      <p className="text-xs text-[#73757b]">
+                        Excelente qualidade, calça muito bem e a entrega foi super rápida.
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            </AnimatePresence>
           </div>
 
           {/* Related Products Column (approx 7 cols) */}
@@ -755,12 +853,14 @@ export default function ProductDetail() {
               {relatedProducts.slice(0, 4).map((related) => {
                 const isRelFav = favorites.includes(related.id);
                 return (
-                  <div
+                  <motion.div
                     key={related.id}
-                    className="group relative rounded-2xl border border-[#eceef1] bg-[#f8f9fb] p-2 text-left hover:shadow-sm transition"
+                    whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                    className="group relative rounded-2xl border border-[#eceef1] bg-[#f8f9fb] p-2 text-left hover:shadow-md transition-shadow cursor-pointer"
                   >
-                    <button
+                    <motion.button
                       type="button"
+                      whileTap={{ scale: 0.85 }}
                       onClick={(e) => {
                         e.stopPropagation();
                         toggleFavorite(related.id);
@@ -771,7 +871,7 @@ export default function ProductDetail() {
                       <Heart
                         className={`h-3.5 w-3.5 ${isRelFav ? "fill-rose-500 text-rose-500" : ""}`}
                       />
-                    </button>
+                    </motion.button>
                     <button
                       type="button"
                       onClick={() => navigate(`/loja/${slug}/produto/${related.id}`)}
@@ -782,7 +882,7 @@ export default function ProductDetail() {
                           <img
                             src={related.images[0]}
                             alt={related.name}
-                            className="h-full w-full object-cover group-hover:scale-105 transition"
+                            className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-108"
                           />
                         ) : (
                           <ImageOff className="h-5 w-5 text-neutral-400" />
@@ -793,7 +893,7 @@ export default function ProductDetail() {
                         {formatMoney(Number(related.promo_price ?? related.price), company.currency)}
                       </p>
                     </button>
-                  </div>
+                  </motion.div>
                 );
               })}
             </div>

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
   ArrowRight,
@@ -447,10 +448,12 @@ export default function OrderStatus() {
                         Pedido #{orderNumber.slice(0, 8).toUpperCase()}
                       </h1>
 
-                      <button
+                      <motion.button
                         type="button"
+                        whileTap={{ scale: 0.92 }}
+                        whileHover={{ scale: 1.03 }}
                         onClick={copyOrderId}
-                        className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold transition border ${
+                        className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold transition border cursor-pointer select-none ${
                           copied
                             ? "border-emerald-200 bg-emerald-50 text-emerald-700"
                             : "border-neutral-200 bg-neutral-50 text-neutral-600 hover:border-black hover:text-black"
@@ -468,7 +471,7 @@ export default function OrderStatus() {
                             <span>Copiar ID</span>
                           </>
                         )}
-                      </button>
+                      </motion.button>
                     </div>
                   </div>
 

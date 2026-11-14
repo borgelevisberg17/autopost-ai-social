@@ -110,6 +110,7 @@ export default function Store() {
   const [cartOpen, setCartOpen] = useState(false);
   const [cartStep, setCartStep] =
     useState<CartStep>("cart");
+  const [recentlyAddedId, setRecentlyAddedId] = useState<string | null>(null);
 
   const [productOpen, setProductOpen] =
     useState<Product | null>(null);
@@ -259,6 +260,13 @@ export default function Store() {
         "Quantidade máxima disponível atingida.",
       );
       return;
+    }
+
+    if (change > 0 && nextQuantity > current) {
+      setRecentlyAddedId(product.id);
+      setTimeout(() => {
+        setRecentlyAddedId((curr) => (curr === product.id ? null : curr));
+      }, 1500);
     }
 
     updateCart(next);
@@ -622,40 +630,31 @@ export default function Store() {
               {search && <button type="button" aria-label="Limpar pesquisa" onClick={() => setSearch("")}><X className="h-4 w-4" /></button>}
             </label>
             <span className="store-header__divider" aria-hidden="true" />
-            <button type="button" onClick={openCart} aria-label={cartCount ? `Abrir carrinho com ${cartCount} itens` : "Abrir carrinho"} className="store-cart-icon">
-              <ShoppingCart className="h-[19px] w-[19px]" />
-              {cartCount > 0 && (
-                <AnimatePresence mode="wait">
+            <motion.button
+              type="button"
+              onClick={openCart}
+              whileTap={{ scale: 0.94 }}
+              whileHover={{ scale: 1.02 }}
+              aria-label={cartCount ? `Abrir carrinho com ${cartCount} itens` : "Abrir carrinho"}
+              className="relative inline-flex items-center justify-center gap-2.5 h-[42px] px-3.5 sm:px-5 rounded-full bg-[#050506] text-white hover:bg-[#252529] shadow-sm transition-colors cursor-pointer select-none"
+            >
+              <ShoppingCart className="h-[18px] w-[18px] shrink-0" />
+              <span className="hidden sm:inline text-xs sm:text-[13px] font-bold tracking-tight">Carrinho</span>
+              <AnimatePresence mode="popLayout">
+                {cartCount > 0 && (
                   <motion.span
                     key={cartCount}
-                    initial={{ scale: 0.6 }}
-                    animate={{ scale: 1 }}
-                    exit={{ scale: 0.6 }}
-                    transition={{ type: "spring", stiffness: 500, damping: 20 }}
-                    className="store-cart-count"
+                    initial={{ scale: 0.4, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.4, opacity: 0 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 22 }}
+                    className="inline-flex items-center justify-center min-w-[20px] h-[20px] px-1 text-[11px] font-black text-[#111] bg-white rounded-full leading-none shadow-xs"
                   >
                     {cartCount}
                   </motion.span>
-                </AnimatePresence>
-              )}
-            </button>
-            <button type="button" onClick={openCart} className="store-cart-button">
-              Carrinho
-              {cartCount > 0 && (
-                <AnimatePresence mode="wait">
-                  <motion.span
-                    key={cartCount}
-                    initial={{ scale: 0.6 }}
-                    animate={{ scale: 1 }}
-                    exit={{ scale: 0.6 }}
-                    transition={{ type: "spring", stiffness: 500, damping: 20 }}
-                    className="store-cart-button__count"
-                  >
-                    {cartCount}
-                  </motion.span>
-                </AnimatePresence>
-              )}
-            </button>
+                )}
+              </AnimatePresence>
+            </motion.button>
           </div>
         </div>
         <label className="store-search store-search--mobile">
@@ -677,12 +676,18 @@ export default function Store() {
         <section id="inicio" className="store-hero" aria-label={`Destaques de ${company.name}`}>
           <div className="store-hero__visual" aria-hidden={!heroImage}>
             {heroImage ? (
-              <img
-                key={heroProduct?.id}
-                src={heroImage}
-                alt={heroProduct?.name ?? ""}
-                onError={(event) => { event.currentTarget.style.display = "none"; }}
-              />
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={heroProduct?.id || heroImage}
+                  src={heroImage}
+                  alt={heroProduct?.name ?? ""}
+                  initial={{ opacity: 0, scale: 1.05 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.65, ease: "easeOut" }}
+                  onError={(event) => { event.currentTarget.style.display = "none"; }}
+                />
+              </AnimatePresence>
             ) : (
               <div className="store-hero__fallback">
                 <span className="store-hero__fallback-orbit store-hero__fallback-orbit--one" />
@@ -693,14 +698,43 @@ export default function Store() {
             )}
           </div>
           <div className="store-hero__shade" />
-          <div className="store-hero__content">
-            <p className="store-hero__eyebrow"><span>{company.name}</span><i /></p>
-            <h1><span className="store-hero__headline-line">Produtos que</span><span className="store-hero__headline-line store-hero__headline-line--final">fazem sentido</span></h1>
-            <p className="store-hero__copy">
+          <motion.div
+            className="store-hero__content"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <motion.p
+              className="store-hero__eyebrow"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <span>{company.name}</span><i />
+            </motion.p>
+            <motion.h1
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+            >
+              <span className="store-hero__headline-line">Produtos que</span>
+              <span className="store-hero__headline-line store-hero__headline-line--final">fazem sentido</span>
+            </motion.h1>
+            <motion.p
+              className="store-hero__copy"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
               {company.description || "Estilo, qualidade e escolhas feitas para si."}
               <span> Descubra a coleção e encontre os seus favoritos.</span>
-            </p>
-            <div className="store-hero__actions">
+            </motion.p>
+            <motion.div
+              className="store-hero__actions"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+            >
               <Button onClick={() => scrollTo("produtos")} className="store-hero__primary">
                 Explorar produtos <ArrowRight className="ml-2 h-[18px] w-[18px]" />
               </Button>
@@ -708,8 +742,8 @@ export default function Store() {
                 <span className="store-hero__play" aria-hidden="true"><Play className="h-4 w-4" fill="currentColor" /></span>
                 Ver coleção
               </button>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
           <div className="store-hero__side-note" aria-hidden="true">
             <span>{String(currentHeroIndex + 1).padStart(2, "0")}</span><i /><span>{String(Math.max(featuredProducts.length, 1)).padStart(2, "0")}</span>
           </div>
@@ -796,13 +830,19 @@ export default function Store() {
                   return (
                     <motion.article
                       key={product.id}
-                      layout
-                      initial={{ opacity: 0, y: 12 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.96 }}
-                      transition={{ duration: 0.25 }}
-                      whileHover={{ y: -5 }}
-                      className="store-product-card group"
+                      initial={{ opacity: 0, y: 35 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-40px" }}
+                      transition={{
+                        duration: 0.5,
+                        delay: (index % 5) * 0.08,
+                        ease: [0.21, 0.47, 0.32, 0.98],
+                      }}
+                      whileHover={{
+                        y: -8,
+                        transition: { type: "spring", stiffness: 350, damping: 22 },
+                      }}
+                      className="store-product-card group transition-shadow duration-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.12)]"
                     >
                       <div className="store-product-card__media">
                         <button
@@ -816,7 +856,7 @@ export default function Store() {
                               src={product.images[0]}
                               alt={product.name}
                               loading="lazy"
-                              className="transition-transform duration-500 ease-out group-hover:scale-105"
+                              className="transition-transform duration-700 ease-out group-hover:scale-110"
                               onError={(event) => { event.currentTarget.style.display = "none"; }}
                             />
                           ) : (
@@ -846,6 +886,7 @@ export default function Store() {
                         <motion.button
                           type="button"
                           whileTap={{ scale: 0.85 }}
+                          whileHover={{ scale: 1.1 }}
                           onClick={() => toggleFavorite(product.id)}
                           aria-label={isFavorite ? `Remover ${product.name} dos favoritos` : `Guardar ${product.name} nos favoritos`}
                           aria-pressed={isFavorite}
@@ -883,14 +924,41 @@ export default function Store() {
 
                           <motion.button
                             type="button"
-                            whileTap={{ scale: 0.92 }}
+                            whileTap={{ scale: 0.9 }}
+                            whileHover={{ scale: 1.04 }}
                             aria-label={`Adicionar ${product.name} ao carrinho`}
                             disabled={isOutOfStock}
                             onClick={() => changeQuantity(product, 1)}
-                            className="store-product-card__add disabled:opacity-40 disabled:cursor-not-allowed"
+                            className={`store-product-card__add disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 ${
+                              recentlyAddedId === product.id ? "!bg-emerald-600 !border-emerald-600 !text-white shadow-sm" : ""
+                            }`}
                           >
-                            <ShoppingCart className="h-4 w-4" />
-                            {isOutOfStock ? "Esgotado" : "Adicionar"}
+                            <AnimatePresence mode="wait" initial={false}>
+                              {recentlyAddedId === product.id ? (
+                                <motion.span
+                                  key="added"
+                                  initial={{ scale: 0.7, opacity: 0 }}
+                                  animate={{ scale: 1, opacity: 1 }}
+                                  exit={{ scale: 0.7, opacity: 0 }}
+                                  transition={{ type: "spring", stiffness: 500, damping: 25 }}
+                                  className="inline-flex items-center gap-1.5 font-bold"
+                                >
+                                  <Check className="h-3.5 w-3.5 stroke-[3]" />
+                                  <span>Adicionado!</span>
+                                </motion.span>
+                              ) : (
+                                <motion.span
+                                  key="default"
+                                  initial={{ opacity: 0 }}
+                                  animate={{ opacity: 1 }}
+                                  exit={{ opacity: 0 }}
+                                  className="inline-flex items-center gap-1.5"
+                                >
+                                  <ShoppingCart className="h-3.5 w-3.5" />
+                                  <span>{isOutOfStock ? "Esgotado" : "Adicionar"}</span>
+                                </motion.span>
+                              )}
+                            </AnimatePresence>
                           </motion.button>
                         </div>
                       </div>
