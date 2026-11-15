@@ -37,6 +37,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { PlansSection } from "@/components/site/PlansSection";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { WaterWakeHero } from "@/components/site/WaterWakeHero";
 
 function ScrollProgressBar() {
   const { scrollYProgress } = useScroll();
@@ -1582,230 +1583,6 @@ function InteractiveHeroPrompt() {
   );
 }
 
-function LiquidMistHeroCanvas({
-  mouseX,
-  mouseY,
-  isHovered,
-}: {
-  mouseX: number;
-  mouseY: number;
-  isHovered: boolean;
-}) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  // Boat state (hull position, velocity, heading)
-  const boatRef = useRef({
-    x: 600,
-    y: 300,
-    vx: 0,
-    vy: 0,
-    speed: 0,
-    angle: 0,
-  });
-
-  // Fluid mist wake eddies (swirling puffs emitted like a boat in mist/fog)
-  const mistPuffsRef = useRef<
-    Array<{
-      x: number;
-      y: number;
-      vx: number;
-      vy: number;
-      radius: number;
-      maxRadius: number;
-      alpha: number;
-      color: string;
-      rotation: number;
-      rotSpeed: number;
-    }>
-  >([]);
-
-  const frameCountRef = useRef(0);
-  const sideToggleRef = useRef(false);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    let animId: number;
-
-    const handleResize = () => {
-      if (!canvas) return;
-      const rect = canvas.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
-      ctx.scale(dpr, dpr);
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-
-    const render = () => {
-      const rect = canvas.getBoundingClientRect();
-      const width = rect.width;
-      const height = rect.height;
-      frameCountRef.current++;
-      const time = frameCountRef.current * 0.02;
-
-      ctx.clearRect(0, 0, width, height);
-
-      const boat = boatRef.current;
-
-      // 1. Boat position & velocity gliding towards cursor
-      const targetX = isHovered ? mouseX : width * 0.5 + Math.sin(time * 0.4) * 90;
-      const targetY = isHovered ? mouseY : height * 0.35 + Math.cos(time * 0.3) * 60;
-
-      const dx = targetX - boat.x;
-      const dy = targetY - boat.y;
-
-      boat.vx += dx * 0.07;
-      boat.vy += dy * 0.07;
-      boat.vx *= 0.84; // fluid resistance
-      boat.vy *= 0.84;
-      boat.x += boat.vx;
-      boat.y += boat.vy;
-      boat.speed = Math.hypot(boat.vx, boat.vy);
-
-      if (boat.speed > 0.4) {
-        const targetAngle = Math.atan2(boat.vy, boat.vx);
-        let diff = targetAngle - boat.angle;
-        while (diff < -Math.PI) diff += Math.PI * 2;
-        while (diff > Math.PI) diff -= Math.PI * 2;
-        boat.angle += diff * 0.2;
-      }
-
-      // 2. Emit mist wake puffs when moving (like boat parting fog/water)
-      if (boat.speed > 0.8) {
-        if (frameCountRef.current % 2 === 0) {
-          sideToggleRef.current = !sideToggleRef.current;
-          const side = sideToggleRef.current ? 1 : -1;
-
-          // Wake eddy offset behind and to the side of the hull
-          const sternDist = 18 + Math.random() * 8;
-          const sideDist = (14 + Math.random() * 12) * side;
-          const perpAngle = boat.angle + Math.PI / 2;
-
-          const puffX =
-            boat.x -
-            Math.cos(boat.angle) * sternDist +
-            Math.cos(perpAngle) * sideDist;
-          const puffY =
-            boat.y -
-            Math.sin(boat.angle) * sternDist +
-            Math.sin(perpAngle) * sideDist;
-
-          // Outward drift velocity from the boat's wake
-          const pushAngle = perpAngle * side;
-          const pushSpeed = 0.6 + Math.random() * 1.2;
-
-          const colors = [
-            "rgba(49, 46, 129, ",   // deep indigo
-            "rgba(88, 28, 135, ",   // royal purple
-            "rgba(30, 27, 75, ",    // dark violet
-            "rgba(30, 58, 138, ",   // oceanic cobalt
-            "rgba(15, 23, 42, ",    // deep midnight
-          ];
-          const color = colors[Math.floor(Math.random() * colors.length)];
-
-          mistPuffsRef.current.push({
-            x: puffX,
-            y: puffY,
-            vx: Math.cos(pushAngle) * pushSpeed + (Math.random() - 0.5) * 0.5,
-            vy: Math.sin(pushAngle) * pushSpeed + (Math.random() - 0.5) * 0.5,
-            radius: 45 + Math.random() * 35,
-            maxRadius: 220 + Math.random() * 80,
-            alpha: 0.65,
-            color,
-            rotation: Math.random() * Math.PI * 2,
-            rotSpeed: (Math.random() - 0.5) * 0.03 * side,
-          });
-
-          if (mistPuffsRef.current.length > 70) {
-            mistPuffsRef.current.shift();
-          }
-        }
-      }
-
-      // 3. Render Mist Puffs (Soft, billowy, fluid smoke eddies with NO sharp strokes)
-      const puffs = mistPuffsRef.current;
-      for (let i = puffs.length - 1; i >= 0; i--) {
-        const p = puffs[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vx *= 0.96;
-        p.vy *= 0.96;
-        p.radius += 1.4; // organic expansion as smoke diffuses
-        p.rotation += p.rotSpeed;
-        p.alpha *= 0.97;
-
-        if (p.alpha <= 0.015 || p.radius >= p.maxRadius) {
-          puffs.splice(i, 1);
-          continue;
-        }
-
-        ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.rotate(p.rotation);
-
-        // Soft, organic multi-stop radial gradient (no sharp lines anywhere!)
-        const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, p.radius);
-        grad.addColorStop(0, `${p.color}${p.alpha * 0.75})`);
-        grad.addColorStop(0.35, `${p.color}${p.alpha * 0.5})`);
-        grad.addColorStop(0.7, `${p.color}${p.alpha * 0.2})`);
-        grad.addColorStop(1, "transparent");
-
-        ctx.fillStyle = grad;
-        ctx.beginPath();
-        // Slightly asymmetrical ellipse to simulate swirling smoke eddies
-        ctx.ellipse(0, 0, p.radius, p.radius * 0.85, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      }
-
-      // 4. Soft Hull Mist-Parting Spotlight (A proa que afasta a névoa suavemente)
-      if (boat.speed > 0.8) {
-        ctx.save();
-        ctx.globalCompositeOperation = "destination-out";
-        const clearGrad = ctx.createRadialGradient(
-          boat.x,
-          boat.y,
-          0,
-          boat.x,
-          boat.y,
-          75
-        );
-        clearGrad.addColorStop(0, "rgba(0, 0, 0, 0.45)");
-        clearGrad.addColorStop(0.5, "rgba(0, 0, 0, 0.2)");
-        clearGrad.addColorStop(1, "transparent");
-
-        ctx.fillStyle = clearGrad;
-        ctx.beginPath();
-        ctx.arc(boat.x, boat.y, 75, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      }
-
-      animId = requestAnimationFrame(render);
-    };
-
-    animId = requestAnimationFrame(render);
-
-    return () => {
-      cancelAnimationFrame(animId);
-      window.removeEventListener("resize", handleResize);
-    };
-  }, [mouseX, mouseY, isHovered]);
-
-  return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 h-full w-full pointer-events-none filter blur-[45px] sm:blur-[60px] mix-blend-multiply opacity-90 transition-opacity duration-300"
-    />
-  );
-}
-
 function HeroSection({
   startPath,
   onStart,
@@ -1813,182 +1590,96 @@ function HeroSection({
   startPath: string;
   onStart: () => void;
 }) {
-  const heroRef = useRef<HTMLElement>(null);
-  const [isHovered, setIsHovered] = useState(false);
-  const [mousePos, setMousePos] = useState({ x: 600, y: 300 });
-
-  // Framer Motion spring values for silky liquid inertia
-  const mouseMotionX = useMotionValue(600);
-  const mouseMotionY = useMotionValue(300);
-
-  // Fast liquid spring for primary fluid blob (responsive & bouncy)
-  const springX = useSpring(mouseMotionX, { stiffness: 140, damping: 18, mass: 0.5 });
-  const springY = useSpring(mouseMotionY, { stiffness: 140, damping: 18, mass: 0.5 });
-
-  // Viscous trailing spring for secondary fluid blob (heavy inertia creates teardrop stretching)
-  const trailingX = useSpring(mouseMotionX, { stiffness: 60, damping: 22, mass: 1.1 });
-  const trailingY = useSpring(mouseMotionY, { stiffness: 60, damping: 22, mass: 1.1 });
-
-  // Soft ambient parallax for the background aurora blobs
-  const parallax1X = useTransform(mouseMotionX, [0, 1400], [45, -45]);
-  const parallax1Y = useTransform(mouseMotionY, [0, 900], [35, -35]);
-
-  const parallax2X = useTransform(mouseMotionX, [0, 1400], [-55, 55]);
-  const parallax2Y = useTransform(mouseMotionY, [0, 900], [-40, 40]);
-
-  const parallax3X = useTransform(mouseMotionX, [0, 1400], [40, -40]);
-  const parallax3Y = useTransform(mouseMotionY, [0, 900], [-45, 45]);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
-    if (!heroRef.current) return;
-    const rect = heroRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    setMousePos({ x, y });
-    mouseMotionX.set(x);
-    mouseMotionY.set(y);
-    if (!isHovered) setIsHovered(true);
-  };
-
-  const handleMouseEnter = () => setIsHovered(true);
-  const handleMouseLeave = () => setIsHovered(false);
-
   return (
-    <section
-      ref={heroRef}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      className="relative overflow-hidden border-b border-slate-200/80 bg-slate-50/40 pb-20 pt-16 sm:pb-28 sm:pt-24 cursor-default"
-    >
-      {/* Kraft Aurora Liquid Mesh Background + Interactive Liquid Mist Wake */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none select-none z-0">
-        {/* Pure Top Luminous Glow (Diffuser matching Kraft) */}
-        <div className="absolute -top-36 left-1/2 -translate-x-1/2 w-[1200px] h-[520px] bg-gradient-to-b from-white via-white/85 to-transparent blur-3xl opacity-95 z-10" />
+    <section className="relative overflow-hidden border-b border-slate-200/80 bg-[#fcfdfd] cursor-default">
+      <WaterWakeHero
+        damping={0.991}
+        dropRadius={0.024}
+        className="pb-20 pt-16 sm:pb-28 sm:pt-24 min-h-[920px] flex flex-col justify-center"
+      >
+        {/* Diffuser superior luminoso (estilo Kraft) */}
+        <div className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 w-[1200px] h-[480px] bg-gradient-to-b from-white via-white/80 to-transparent blur-3xl opacity-90 z-10" />
 
-        {/* Floating Atmospheric Nebulae (matching Kraft's dark organic misty masses) */}
-        <motion.div
-          style={{ x: parallax1X, y: parallax1Y }}
-          className="absolute top-[8%] left-[4%] w-[720px] h-[560px] rounded-full bg-gradient-to-tr from-indigo-700/40 via-purple-700/35 to-slate-900/30 blur-[115px] animate-aurora-1 mix-blend-multiply"
-        />
-        <motion.div
-          style={{ x: parallax2X, y: parallax2Y }}
-          className="absolute top-[12%] right-[3%] w-[680px] h-[680px] rounded-full bg-gradient-to-br from-violet-700/40 via-indigo-800/35 to-slate-950/35 blur-[125px] animate-aurora-2 mix-blend-multiply"
-        />
-        <motion.div
-          style={{ x: parallax3X, y: parallax3Y }}
-          className="absolute top-[36%] left-[22%] w-[700px] h-[520px] rounded-full bg-gradient-to-tl from-indigo-800/30 via-purple-800/25 to-slate-900/25 blur-[120px] animate-aurora-3 mix-blend-multiply"
-        />
-        <div className="absolute top-[4%] right-[28%] w-[500px] h-[500px] rounded-full bg-gradient-to-r from-blue-700/25 via-indigo-500/30 to-purple-800/25 blur-[105px] animate-aurora-4 mix-blend-multiply" />
+        {/* Soft atmospheric fade into the product section */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-slate-50 via-slate-50/70 to-transparent z-10" />
 
-        {/* PRIMARY LIQUID FOLLOWER BLOB (Elastic spring follower with rich Kraft mist colors) */}
-        <motion.div
-          style={{
-            left: springX,
-            top: springY,
-            opacity: isHovered ? 0.9 : 0.4,
-          }}
-          className="absolute -translate-x-1/2 -translate-y-1/2 w-[620px] h-[620px] sm:w-[780px] sm:h-[780px] rounded-full bg-[radial-gradient(circle,rgba(55,48,163,0.65)_0%,rgba(88,28,135,0.55)_35%,rgba(30,27,75,0.4)_60%,transparent_85%)] blur-[105px] mix-blend-multiply pointer-events-none transition-opacity duration-300"
-        />
+        <div className="relative z-20 mx-auto max-w-[1240px] px-5 lg:px-8">
+          {/* Hero Editorial Headline (Kraft Inspired) */}
+          <div className="mx-auto max-w-4xl text-center">
+            <div className="pointer-events-auto mb-6 inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/85 px-4 py-1.5 shadow-sm backdrop-blur-md">
+              <Sparkles className="h-3.5 w-3.5 text-emerald-600" />
+              <span className="text-xs font-semibold text-slate-800 tracking-wide">
+                Commerce OS com Inteligência Artificial
+              </span>
+              <span className="flex h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            </div>
 
-        {/* TRAILING VISCOUS MIST TEARDROP (Heavy inertia creates stretched fluid wake behind cursor) */}
-        <motion.div
-          style={{
-            left: trailingX,
-            top: trailingY,
-            opacity: isHovered ? 0.85 : 0.35,
-          }}
-          className="absolute -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] sm:w-[620px] sm:h-[620px] rounded-full bg-[radial-gradient(circle,rgba(109,40,217,0.6)_0%,rgba(67,56,202,0.48)_35%,rgba(15,23,42,0.35)_60%,transparent_80%)] blur-[115px] mix-blend-multiply pointer-events-none transition-opacity duration-500"
-        />
+            <h1 className="text-balance text-[clamp(2.5rem,7.5vw,5.6rem)] font-bold tracking-tight text-slate-950 leading-[0.98] sm:leading-[0.96]">
+              Vender com IA —
+              <br />
+              <span className="text-slate-900">
+                o{" "}
+                <span className="font-serif italic font-normal text-slate-800 tracking-tight">
+                  futuro
+                </span>{" "}
+                do comércio
+              </span>
+            </h1>
 
-        {/* INTERACTIVE LIQUID MIST CANVAS (Soft swirling smoke eddies trailing the boat) */}
-        <LiquidMistHeroCanvas
-          mouseX={mousePos.x}
-          mouseY={mousePos.y}
-          isHovered={isHovered}
-        />
-
-        {/* Frosted Glass Mesh Diffusion Layer */}
-        <div className="absolute inset-0 backdrop-blur-[70px] sm:backdrop-blur-[85px] bg-white/20" />
-
-        {/* Bottom soft atmospheric fade into dashboard */}
-        <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-slate-50 via-slate-50/70 to-transparent" />
-      </div>
-
-      <div className="relative z-10 mx-auto max-w-[1240px] px-5 lg:px-8">
-        {/* Hero Editorial Headline (Kraft Inspired) */}
-        <div className="mx-auto max-w-4xl text-center">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/80 px-4 py-1.5 shadow-sm backdrop-blur-md">
-            <Sparkles className="h-3.5 w-3.5 text-emerald-600" />
-            <span className="text-xs font-semibold text-slate-800 tracking-wide">
-              Commerce OS com Inteligência Artificial
-            </span>
-            <span className="flex h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          </div>
-
-          <h1 className="text-balance text-[clamp(2.5rem,7.5vw,5.6rem)] font-bold tracking-tight text-slate-950 leading-[0.98] sm:leading-[0.96]">
-            Vender com IA —
-            <br />
-            <span className="text-slate-900">
-              o{" "}
-              <span className="font-serif italic font-normal text-slate-800 tracking-tight">
-                futuro
-              </span>{" "}
-              do comércio
-            </span>
-          </h1>
-
-          <p className="mx-auto mt-6 max-w-2xl text-base sm:text-lg leading-relaxed text-slate-600">
-            A plataforma inteligente que unifica o seu site, WhatsApp, Instagram e Facebook. Opere catálogo, pedidos e atendimento com agentes de IA conscientes de estoque em tempo real.
-          </p>
-
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5">
-            <button
-              type="button"
-              onClick={onStart}
-              className="inline-flex h-12 w-full sm:w-auto items-center justify-center gap-2.5 rounded-full bg-slate-950 px-7 text-sm font-semibold text-white shadow-lg shadow-slate-950/15 transition-all hover:bg-slate-800 hover:scale-[1.02] active:scale-[0.98]"
-            >
-              Começar Gratuitamente
-              <ArrowRight className="h-4 w-4" />
-            </button>
-            <a
-              href="#whatsapp"
-              className="inline-flex h-12 w-full sm:w-auto items-center justify-center gap-2 rounded-full border border-slate-300/80 bg-white/80 px-6 text-sm font-semibold text-slate-700 shadow-sm backdrop-blur-md transition-all hover:bg-white hover:text-slate-900 hover:border-slate-400"
-            >
-              <Play className="h-3.5 w-3.5 fill-current text-slate-500" />
-              Ver Demonstração
-            </a>
-          </div>
-
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-slate-500 font-medium">
-            <span className="flex items-center gap-1.5">
-              <Check className="h-3.5 w-3.5 text-emerald-600" /> Sem cartão de crédito
-            </span>
-            <span className="flex items-center gap-1.5">
-              <Check className="h-3.5 w-3.5 text-emerald-600" /> Configuração em 2 min
-            </span>
-            <span className="flex items-center gap-1.5">
-              <Check className="h-3.5 w-3.5 text-emerald-600" /> Conexão oficial WhatsApp
-            </span>
-          </div>
-        </div>
-
-        {/* Kraft Floating Interactive Command/Prompt Card */}
-        <InteractiveHeroPrompt />
-
-        {/* Seamless Bridge & Live Dashboard Preview */}
-        <div className="mt-20">
-          <div className="mb-6 flex flex-col items-center justify-center text-center">
-            <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-600">
-              Visão Unificada da Operação
-            </span>
-            <p className="mt-1 text-xs text-slate-600">
-              Tudo o que sua equipe precisa para acompanhar pedidos, canais e receita em um só lugar.
+            <p className="mx-auto mt-6 max-w-2xl text-base sm:text-lg leading-relaxed text-slate-600">
+              A plataforma inteligente que unifica o seu site, WhatsApp, Instagram e Facebook. Opere catálogo, pedidos e atendimento com agentes de IA conscientes de estoque em tempo real.
             </p>
+
+            <div className="pointer-events-auto mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5">
+              <button
+                type="button"
+                onClick={onStart}
+                className="inline-flex h-12 w-full sm:w-auto items-center justify-center gap-2.5 rounded-full bg-slate-950 px-7 text-sm font-semibold text-white shadow-lg shadow-slate-950/15 transition-all hover:bg-slate-800 hover:scale-[1.02] active:scale-[0.98]"
+              >
+                Começar Gratuitamente
+                <ArrowRight className="h-4 w-4" />
+              </button>
+              <a
+                href="#whatsapp"
+                className="inline-flex h-12 w-full sm:w-auto items-center justify-center gap-2 rounded-full border border-slate-300/80 bg-white/85 px-6 text-sm font-semibold text-slate-700 shadow-sm backdrop-blur-md transition-all hover:bg-white hover:text-slate-900 hover:border-slate-400"
+              >
+                <Play className="h-3.5 w-3.5 fill-current text-slate-500" />
+                Ver Demonstração
+              </a>
+            </div>
+
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-slate-500 font-medium">
+              <span className="flex items-center gap-1.5">
+                <Check className="h-3.5 w-3.5 text-emerald-600" /> Sem cartão de crédito
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Check className="h-3.5 w-3.5 text-emerald-600" /> Configuração em 2 min
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Check className="h-3.5 w-3.5 text-emerald-600" /> Conexão oficial WhatsApp
+              </span>
+            </div>
           </div>
-          <ProductFrame />
+
+          {/* Kraft Floating Interactive Command/Prompt Card */}
+          <div className="pointer-events-auto">
+            <InteractiveHeroPrompt />
+          </div>
+
+          {/* Seamless Bridge & Live Dashboard Preview */}
+          <div className="pointer-events-auto mt-20">
+            <div className="mb-6 flex flex-col items-center justify-center text-center">
+              <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-600">
+                Visão Unificada da Operação
+              </span>
+              <p className="mt-1 text-xs text-slate-600">
+                Tudo o que sua equipe precisa para acompanhar pedidos, canais e receita em um só lugar.
+              </p>
+            </div>
+            <ProductFrame />
+          </div>
         </div>
-      </div>
+      </WaterWakeHero>
     </section>
   );
 }
