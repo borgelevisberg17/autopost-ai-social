@@ -71,6 +71,13 @@
       "when": 1794632519671,
       "tag": "0009_reconcile_pending_storefront_security",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1794720399170,
+      "tag": "0010_authorized_whatsapp_groups",
+      "breakpoints": true
     }
   ]
 }

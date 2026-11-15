@@ -1504,11 +1504,205 @@ export type Database = {
           },
         ]
       }
+      whatsapp_group_connections: {
+        Row: {
+          company_id: string
+          created_at: string
+          id: string
+          instance_id: string
+          last_event_at: string | null
+          provider: string
+          status: string
+          webhook_hash: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          id?: string
+          instance_id: string
+          last_event_at?: string | null
+          provider?: string
+          status?: string
+          webhook_hash: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          id?: string
+          instance_id?: string
+          last_event_at?: string | null
+          provider?: string
+          status?: string
+          webhook_hash?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_group_connections_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      whatsapp_group_messages: {
+        Row: {
+          body: string
+          company_id: string
+          created_at: string
+          dedupe_key: string
+          direction: string
+          error: string | null
+          external_id: string | null
+          group_id: string
+          id: string
+          kind: string
+          product_id: string | null
+          sender: string | null
+          status: string
+        }
+        Insert: {
+          body?: string
+          company_id: string
+          created_at?: string
+          dedupe_key: string
+          direction: string
+          error?: string | null
+          external_id?: string | null
+          group_id: string
+          id?: string
+          kind: string
+          product_id?: string | null
+          sender?: string | null
+          status?: string
+        }
+        Update: {
+          body?: string
+          company_id?: string
+          created_at?: string
+          dedupe_key?: string
+          direction?: string
+          error?: string | null
+          external_id?: string | null
+          group_id?: string
+          id?: string
+          kind?: string
+          product_id?: string | null
+          sender?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_group_messages_group_id_company_id_fkey"
+            columns: ["group_id", "company_id"]
+            isOneToOne: false
+            referencedRelation: "whatsapp_groups"
+            referencedColumns: ["id", "company_id"]
+          },
+          {
+            foreignKeyName: "whatsapp_group_messages_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      whatsapp_groups: {
+        Row: {
+          account_ref: string
+          authorized: boolean
+          authorized_by: string | null
+          available: boolean
+          call_word: string
+          company_id: string
+          created_at: string
+          end_hour: number
+          external_id: string
+          id: string
+          interval_minutes: number
+          last_error: string | null
+          last_inbound_at: string | null
+          last_marketing_at: string | null
+          marketing_enabled: boolean
+          name: string
+          next_marketing_at: string
+          provider: string
+          sales_enabled: boolean
+          start_hour: number
+          timezone: string
+          verified_at: string
+          weekdays: number[]
+        }
+        Insert: {
+          account_ref: string
+          authorized?: boolean
+          authorized_by?: string | null
+          available?: boolean
+          call_word?: string
+          company_id: string
+          created_at?: string
+          end_hour?: number
+          external_id: string
+          id?: string
+          interval_minutes?: number
+          last_error?: string | null
+          last_inbound_at?: string | null
+          last_marketing_at?: string | null
+          marketing_enabled?: boolean
+          name: string
+          next_marketing_at?: string
+          provider: string
+          sales_enabled?: boolean
+          start_hour?: number
+          timezone?: string
+          verified_at?: string
+          weekdays?: number[]
+        }
+        Update: {
+          account_ref?: string
+          authorized?: boolean
+          authorized_by?: string | null
+          available?: boolean
+          call_word?: string
+          company_id?: string
+          created_at?: string
+          end_hour?: number
+          external_id?: string
+          id?: string
+          interval_minutes?: number
+          last_error?: string | null
+          last_inbound_at?: string | null
+          last_marketing_at?: string | null
+          marketing_enabled?: boolean
+          name?: string
+          next_marketing_at?: string
+          provider?: string
+          sales_enabled?: boolean
+          start_hour?: number
+          timezone?: string
+          verified_at?: string
+          weekdays?: number[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_groups_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      claim_group_marketing: {
+        Args: { _group: string; _key: string }
+        Returns: string
+      }
       company_entitlement: { Args: { _company: string }; Returns: Json }
       consume_company_ai: {
         Args: { _company: string; _feature: string }
