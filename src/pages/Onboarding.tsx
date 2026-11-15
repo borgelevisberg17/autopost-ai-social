@@ -14,10 +14,18 @@ const initialForm: FormState = { name: "", slug: "", currency: "AOA", descriptio
 const stepLabels = ["Loja", "Produto", "Confirmar"];
 
 function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
-  return <div><div className="mb-2 flex items-baseline justify-between gap-3"><label className="text-xs font-semibold text-[#3f4640]">{label}</label>{hint && <span className="text-[11px] text-[#979c95]">{hint}</span>}</div>{children}</div>;
+  return (
+    <div>
+      <div className="mb-2 flex items-baseline justify-between gap-3">
+        <label className="text-xs font-bold text-slate-800">{label}</label>
+        {hint && <span className="text-[11px] font-medium text-slate-400">{hint}</span>}
+      </div>
+      {children}
+    </div>
+  );
 }
 
-const inputClass = "h-11 w-full border border-[#d8d6ce] bg-[#fffdf9] px-3 text-sm text-[#202522] outline-none transition focus:border-[#2c6457] focus:ring-2 focus:ring-[#2c6457]/10";
+const inputClass = "h-11 w-full rounded-xl border border-slate-200/80 bg-white px-3.5 text-sm font-medium text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/10 shadow-2xs";
 
 export default function Onboarding() {
   const { user } = useAuth();
@@ -32,8 +40,8 @@ export default function Onboarding() {
 
   if (companyLoading) {
     return (
-      <main className="grid min-h-screen place-items-center bg-[#f6f3ed] text-[#202522]">
-        <p role="status" className="text-sm text-[#747b73]">
+      <main className="grid min-h-screen place-items-center bg-slate-50 text-slate-900">
+        <p role="status" className="text-sm font-medium text-slate-500">
           A validar o acesso à loja…
         </p>
       </main>
@@ -42,13 +50,13 @@ export default function Onboarding() {
 
   if (companyError) {
     return (
-      <main className="grid min-h-screen place-items-center bg-[#f6f3ed] px-5 text-[#202522]">
-        <section className="w-full max-w-sm border border-[#ded9d0] bg-[#fffdf9] p-6 text-center">
-          <p className="font-serif text-xl">Não foi possível carregar a sua loja.</p>
+      <main className="grid min-h-screen place-items-center bg-slate-50 px-5 text-slate-900">
+        <section className="w-full max-w-sm rounded-2xl border border-slate-200/80 bg-white p-6 text-center shadow-xs">
+          <p className="text-lg font-bold text-slate-900">Não foi possível carregar a sua loja.</p>
           <button
             type="button"
             onClick={() => void reload()}
-            className="mt-5 h-10 bg-[#202522] px-5 text-sm font-semibold text-white hover:bg-[#2c6457]"
+            className="mt-5 h-10 rounded-xl bg-slate-900 px-5 text-sm font-semibold text-white shadow-xs hover:bg-slate-800"
           >
             Tentar novamente
           </button>
@@ -95,18 +103,280 @@ export default function Onboarding() {
     navigate("/dashboard");
   };
 
-  return <main className="min-h-screen bg-[#f6f3ed] text-[#202522]">
-    <header className="border-b border-[#dedbd2] bg-[#fffdf9]"><div className="mx-auto flex h-16 max-w-[1120px] items-center justify-between px-5 sm:px-8"><div className="flex items-center gap-2"><span className="grid h-7 w-7 place-items-center bg-[#202522] text-[#fffdf9]"><Circle className="h-2.5 w-2.5 fill-current" /></span><span className="text-sm font-bold tracking-[-0.04em]">Vendora</span></div><span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#979c95]">Configuração inicial</span></div></header>
-    <div className="mx-auto grid min-h-[calc(100vh-64px)] max-w-[1120px] lg:grid-cols-[220px_minmax(0,620px)] lg:gap-20 lg:px-8">
-      <aside className="border-b border-[#dedbd2] py-6 lg:border-b-0 lg:py-12"><div className="mb-5 font-mono text-[10px] uppercase tracking-[0.14em] text-[#979c95]">3 passos</div><nav aria-label="Progresso da configuração" className="flex gap-5 lg:block lg:space-y-5">{stepLabels.map((label, index) => { const number = index + 1; const active = step === number; const complete = step > number; return <div key={label} className="flex items-center gap-3 lg:items-start"><div className="relative"><span className={`grid h-7 w-7 place-items-center rounded-[5px] border text-[10px] font-semibold ${complete ? "border-[#2c6457] bg-[#2c6457] text-white" : active ? "border-[#202522] bg-[#202522] text-white" : "border-[#d8d6ce] bg-[#fffdf9] text-[#979c95]"}`}>{complete ? <Check className="h-3.5 w-3.5" /> : number}</span>{number < 3 && <span className={`absolute left-1/2 top-8 hidden h-5 w-px -translate-x-1/2 lg:block ${complete ? "bg-[#2c6457]" : "bg-[#d8d6ce]"}`} />}</div><div className="hidden lg:block"><div className={`text-xs font-semibold ${active ? "text-[#202522]" : "text-[#747b73]"}`}>{label}</div><div className="mt-1 text-[11px] text-[#979c95]">{number === 1 ? "Dados da loja" : number === 2 ? "Opcional" : "Rever e criar"}</div></div><span className={`text-xs font-semibold lg:hidden ${active ? "text-[#202522]" : "text-[#979c95]"}`}>{label}</span></div>; })}</nav></aside>
-      <section className="px-5 py-8 sm:px-0 lg:py-14">
-        <div className="mb-9"><p className="mb-3 font-mono text-[10px] uppercase tracking-[0.14em] text-[#2c6457]">Passo 0{step} de 03</p><h1 className="text-[30px] font-semibold leading-tight tracking-[-0.055em]">{step === 1 ? "Configure a sua loja" : step === 2 ? "Adicione um produto" : "Confirme os dados"}</h1><p className="mt-3 max-w-lg text-sm leading-6 text-[#747b73]">{step === 1 ? "Estes dados identificam a sua operação e aparecem na loja pública." : step === 2 ? "Comece com um produto real ou deixe o catálogo para configurar depois." : "Tudo o que for criado aqui pode ser alterado no dashboard."}</p></div>
-        {step === 1 && <div className="space-y-5"><Field label="Nome da loja"><input className={inputClass} value={form.name} onChange={(event) => { update("name", event.target.value); if (!form.slug || form.slug === slugify(form.name)) update("slug", slugify(event.target.value)); }} placeholder="Ex.: Sapataria Luanda" maxLength={80} /></Field><Field label="Endereço público" hint="editável"><div className="flex items-center border border-[#d8d6ce] bg-[#fffdf9]"><span className="pl-3 font-mono text-xs text-[#979c95]">/loja/</span><input className="h-11 min-w-0 flex-1 bg-transparent px-2 text-sm outline-none" value={form.slug} onChange={(event) => update("slug", slugify(event.target.value))} /></div><p className="mt-2 text-[11px] text-[#979c95]">vendora.co/loja/{slugify(form.slug || form.name) || "nome-da-loja"}</p></Field><Field label="Moeda principal"><select className={inputClass} value={form.currency} onChange={(event) => update("currency", event.target.value)}>{CURRENCIES.map((item) => <option key={item.code} value={item.code}>{item.label}</option>)}</select></Field><Field label="Descrição" hint="opcional"><textarea className="min-h-[94px] w-full resize-none border border-[#d8d6ce] bg-[#fffdf9] p-3 text-sm outline-none focus:border-[#2c6457] focus:ring-2 focus:ring-[#2c6457]/10" value={form.description} onChange={(event) => update("description", event.target.value)} maxLength={500} placeholder="Uma frase sobre o que a sua loja vende." /></Field></div>}
-        {step === 2 && <div className="space-y-5"><div className="border border-[#dedbd2] bg-[#fffdf9] p-4 text-sm leading-6 text-[#5f625d]">Este passo é opcional. Não criamos dados de demonstração: só será criado um produto se preencher o nome abaixo.</div><Field label="Nome do produto" hint="opcional"><input className={inputClass} value={form.productName} onChange={(event) => update("productName", event.target.value)} placeholder="Ex.: Camisa de linho" /></Field><div className="grid gap-4 sm:grid-cols-2"><Field label={`Preço (${currency?.label || form.currency})`}><input className={inputClass} type="number" min="0" step="0.01" value={form.productPrice} onChange={(event) => update("productPrice", event.target.value)} placeholder="0,00" disabled={!hasProduct} /></Field><Field label="Stock inicial"><input className={inputClass} type="number" min="0" step="1" value={form.productStock} onChange={(event) => update("productStock", event.target.value)} disabled={!hasProduct} /></Field></div><Field label="Categoria" hint="opcional"><input className={inputClass} value={form.productCategory} onChange={(event) => update("productCategory", event.target.value)} placeholder="Ex.: Camisas" disabled={!hasProduct} /></Field><Field label="WhatsApp da operação" hint="opcional"><input className={inputClass} type="tel" value={form.whatsapp} onChange={(event) => update("whatsapp", event.target.value)} placeholder="+244 900 000 000" /></Field></div>}
-        {step === 3 && <div className="border border-[#dedbd2] bg-[#fffdf9]"><div className="flex items-center gap-3 border-b border-[#ebe8e0] p-4"><div className="grid h-9 w-9 place-items-center bg-[#f1eee7] text-[#2c6457]"><Store className="h-4 w-4" /></div><div><div className="text-sm font-semibold">{form.name}</div><div className="font-mono text-[10px] text-[#979c95]">/loja/{slugify(form.slug || form.name)}</div></div></div><dl className="divide-y divide-[#ebe8e0] text-sm"><div className="flex items-center justify-between gap-4 p-4"><dt className="text-[#747b73]">Moeda</dt><dd className="font-medium">{form.currency}</dd></div><div className="flex items-center justify-between gap-4 p-4"><dt className="text-[#747b73]">Produto inicial</dt><dd className="font-medium">{hasProduct ? form.productName : "Nenhum"}</dd></div><div className="flex items-center justify-between gap-4 p-4"><dt className="text-[#747b73]">WhatsApp</dt><dd className="font-medium">{form.whatsapp || "Não indicado"}</dd></div></dl><div className="border-t border-[#ebe8e0] bg-[#f6f3ed] p-4 text-xs leading-5 text-[#747b73]">Depois de criar a loja, pode continuar no dashboard com produtos, pedidos, inventário, canais e configurações.</div></div>}
-        <div className="mt-10 flex items-center justify-between border-t border-[#dedbd2] pt-5"><button type="button" onClick={back} disabled={step === 1 || saving} className="inline-flex h-10 items-center gap-2 px-2 text-sm font-semibold text-[#747b73] hover:text-[#202522] disabled:invisible"><ArrowLeft className="h-4 w-4" />Voltar</button>{step < 3 ? <button type="button" onClick={next} className="inline-flex h-10 items-center gap-2 bg-[#202522] px-5 text-sm font-semibold text-white hover:bg-[#2c6457]">Continuar<ArrowRight className="h-4 w-4" /></button> : <button type="button" onClick={finish} disabled={saving} className="inline-flex h-10 items-center gap-2 bg-[#2c6457] px-5 text-sm font-semibold text-white hover:bg-[#225247] disabled:opacity-60">{saving ? "A criar loja..." : "Criar loja"}<Check className="h-4 w-4" /></button>}</div>
-      </section>
-    </div>
-    <footer className="border-t border-[#dedbd2] bg-[#fffdf9] px-5 py-4 text-center font-mono text-[10px] text-[#979c95]">Pode alterar estes dados depois em Configurações.</footer>
-  </main>;
+  return (
+    <main className="min-h-screen bg-slate-50 text-slate-900">
+      <header className="border-b border-slate-200/80 bg-white shadow-2xs">
+        <div className="mx-auto flex h-16 max-w-[1120px] items-center justify-between px-5 sm:px-8">
+          <div className="flex items-center gap-2.5">
+            <span className="grid h-7 w-7 place-items-center rounded-lg bg-emerald-600 text-white shadow-xs">
+              <Circle className="h-2 w-2 fill-current" />
+            </span>
+            <span className="text-base font-bold tracking-tight text-slate-900">Vendora</span>
+          </div>
+          <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+            Configuração inicial
+          </span>
+        </div>
+      </header>
+
+      <div className="mx-auto grid min-h-[calc(100vh-64px)] max-w-[1120px] lg:grid-cols-[220px_minmax(0,620px)] lg:gap-20 lg:px-8">
+        <aside className="border-b border-slate-200/80 py-6 lg:border-b-0 lg:py-12">
+          <div className="mb-5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            3 passos simples
+          </div>
+          <nav aria-label="Progresso da configuração" className="flex gap-5 lg:block lg:space-y-5">
+            {stepLabels.map((label, index) => {
+              const number = index + 1;
+              const active = step === number;
+              const complete = step > number;
+              return (
+                <div key={label} className="flex items-center gap-3 lg:items-start">
+                  <div className="relative">
+                    <span
+                      className={`grid h-8 w-8 place-items-center rounded-xl border text-xs font-bold transition shadow-xs ${
+                        complete
+                          ? "border-emerald-600 bg-emerald-600 text-white"
+                          : active
+                          ? "border-slate-900 bg-slate-900 text-white"
+                          : "border-slate-200 bg-white text-slate-400"
+                      }`}
+                    >
+                      {complete ? <Check className="h-4 w-4" /> : number}
+                    </span>
+                    {number < 3 && (
+                      <span
+                        className={`absolute left-1/2 top-9 hidden h-5 w-px -translate-x-1/2 lg:block ${
+                          complete ? "bg-emerald-600" : "bg-slate-200"
+                        }`}
+                      />
+                    )}
+                  </div>
+                  <div className="hidden lg:block">
+                    <div className={`text-xs font-bold ${active ? "text-slate-900" : "text-slate-500"}`}>
+                      {label}
+                    </div>
+                    <div className="mt-0.5 text-[11px] text-slate-400">
+                      {number === 1 ? "Dados da loja" : number === 2 ? "Opcional" : "Rever e criar"}
+                    </div>
+                  </div>
+                  <span className={`text-xs font-bold lg:hidden ${active ? "text-slate-900" : "text-slate-400"}`}>
+                    {label}
+                  </span>
+                </div>
+              );
+            })}
+          </nav>
+        </aside>
+
+        <section className="px-5 py-8 sm:px-0 lg:py-14">
+          <div className="mb-8">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200/80 bg-emerald-50 px-2.5 py-0.5 text-[10px] font-semibold tracking-wide text-emerald-800 mb-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              PASSO 0{step} DE 03
+            </span>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
+              {step === 1 ? "Configure a sua loja" : step === 2 ? "Adicione um produto" : "Confirme os dados"}
+            </h1>
+            <p className="mt-2 max-w-lg text-sm leading-6 text-slate-500">
+              {step === 1
+                ? "Estes dados identificam a sua operação e aparecem na loja pública."
+                : step === 2
+                ? "Comece com um produto real ou deixe o catálogo para configurar depois."
+                : "Tudo o que for criado aqui pode ser alterado no painel da loja."}
+            </p>
+          </div>
+
+          {step === 1 && (
+            <div className="space-y-5 rounded-2xl border border-slate-200/80 bg-white p-6 sm:p-7 shadow-xs">
+              <Field label="Nome da loja">
+                <input
+                  className={inputClass}
+                  value={form.name}
+                  onChange={(event) => {
+                    update("name", event.target.value);
+                    if (!form.slug || form.slug === slugify(form.name))
+                      update("slug", slugify(event.target.value));
+                  }}
+                  placeholder="Ex.: Sapataria Luanda"
+                  maxLength={80}
+                />
+              </Field>
+
+              <Field label="Endereço público" hint="editável">
+                <div className="flex items-center rounded-xl border border-slate-200/80 bg-slate-50 shadow-2xs">
+                  <span className="pl-3.5 text-xs font-semibold text-slate-400">/loja/</span>
+                  <input
+                    className="h-11 min-w-0 flex-1 bg-transparent px-2 text-sm font-medium text-slate-900 outline-none"
+                    value={form.slug}
+                    onChange={(event) => update("slug", slugify(event.target.value))}
+                  />
+                </div>
+                <p className="mt-2 text-[11px] text-slate-400 font-medium">
+                  vendora.co/loja/{slugify(form.slug || form.name) || "nome-da-loja"}
+                </p>
+              </Field>
+
+              <Field label="Moeda principal">
+                <select
+                  className={inputClass}
+                  value={form.currency}
+                  onChange={(event) => update("currency", event.target.value)}
+                >
+                  {CURRENCIES.map((item) => (
+                    <option key={item.code} value={item.code}>
+                      {item.label}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+
+              <Field label="Descrição" hint="opcional">
+                <textarea
+                  className="min-h-[94px] w-full resize-none rounded-xl border border-slate-200/80 bg-white p-3.5 text-sm font-medium text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/10 shadow-2xs"
+                  value={form.description}
+                  onChange={(event) => update("description", event.target.value)}
+                  maxLength={500}
+                  placeholder="Uma frase sobre o que a sua loja vende."
+                />
+              </Field>
+            </div>
+          )}
+
+          {step === 2 && (
+            <div className="space-y-5 rounded-2xl border border-slate-200/80 bg-white p-6 sm:p-7 shadow-xs">
+              <div className="rounded-xl border border-slate-200/80 bg-slate-50 p-4 text-xs leading-relaxed text-slate-600">
+                Este passo é opcional. Não criamos dados de demonstração: só será criado um produto se preencher o nome abaixo.
+              </div>
+
+              <Field label="Nome do produto" hint="opcional">
+                <input
+                  className={inputClass}
+                  value={form.productName}
+                  onChange={(event) => update("productName", event.target.value)}
+                  placeholder="Ex.: Camisa de linho"
+                />
+              </Field>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label={`Preço (${currency?.label || form.currency})`}>
+                  <input
+                    className={inputClass}
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={form.productPrice}
+                    onChange={(event) => update("productPrice", event.target.value)}
+                    placeholder="0,00"
+                    disabled={!hasProduct}
+                  />
+                </Field>
+
+                <Field label="Stock inicial">
+                  <input
+                    className={inputClass}
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={form.productStock}
+                    onChange={(event) => update("productStock", event.target.value)}
+                    disabled={!hasProduct}
+                  />
+                </Field>
+              </div>
+
+              <Field label="Categoria" hint="opcional">
+                <input
+                  className={inputClass}
+                  value={form.productCategory}
+                  onChange={(event) => update("productCategory", event.target.value)}
+                  placeholder="Ex.: Camisas"
+                  disabled={!hasProduct}
+                />
+              </Field>
+
+              <Field label="WhatsApp da operação" hint="opcional">
+                <input
+                  className={inputClass}
+                  type="tel"
+                  value={form.whatsapp}
+                  onChange={(event) => update("whatsapp", event.target.value)}
+                  placeholder="+244 900 000 000"
+                />
+              </Field>
+            </div>
+          )}
+
+          {step === 3 && (
+            <div className="rounded-2xl border border-slate-200/80 bg-white shadow-xs overflow-hidden">
+              <div className="flex items-center gap-3.5 border-b border-slate-100 p-5">
+                <div className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-50 text-emerald-600 shadow-2xs">
+                  <Store className="h-5 w-5" />
+                </div>
+                <div>
+                  <div className="text-base font-bold text-slate-900">{form.name}</div>
+                  <div className="text-xs text-slate-400 font-medium">/loja/{slugify(form.slug || form.name)}</div>
+                </div>
+              </div>
+
+              <dl className="divide-y divide-slate-100 text-sm">
+                <div className="flex items-center justify-between gap-4 px-5 py-4">
+                  <dt className="text-xs font-semibold text-slate-500">Moeda</dt>
+                  <dd className="font-bold text-slate-900">{form.currency}</dd>
+                </div>
+                <div className="flex items-center justify-between gap-4 px-5 py-4">
+                  <dt className="text-xs font-semibold text-slate-500">Produto inicial</dt>
+                  <dd className="font-bold text-slate-900">{hasProduct ? form.productName : "Nenhum"}</dd>
+                </div>
+                <div className="flex items-center justify-between gap-4 px-5 py-4">
+                  <dt className="text-xs font-semibold text-slate-500">WhatsApp</dt>
+                  <dd className="font-bold text-slate-900">{form.whatsapp || "Não indicado"}</dd>
+                </div>
+              </dl>
+
+              <div className="border-t border-slate-100 bg-slate-50 p-4 text-xs leading-relaxed text-slate-500">
+                Depois de criar a loja, pode continuar no painel com produtos, pedidos, inventário, canais e configurações.
+              </div>
+            </div>
+          )}
+
+          <div className="mt-8 flex items-center justify-between border-t border-slate-200/80 pt-5">
+            <button
+              type="button"
+              onClick={back}
+              disabled={step === 1 || saving}
+              className="inline-flex h-10 items-center gap-2 rounded-xl px-3 text-xs font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 disabled:invisible"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Voltar
+            </button>
+
+            {step < 3 ? (
+              <button
+                type="button"
+                onClick={next}
+                className="inline-flex h-10 items-center gap-2 rounded-xl bg-slate-900 px-5 text-xs font-semibold text-white shadow-xs transition hover:bg-slate-800"
+              >
+                Continuar
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={finish}
+                disabled={saving}
+                className="inline-flex h-10 items-center gap-2 rounded-xl bg-emerald-600 px-5 text-xs font-semibold text-white shadow-xs transition hover:bg-emerald-500 disabled:opacity-60"
+              >
+                {saving ? "A criar loja..." : "Criar loja"}
+                <Check className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+        </section>
+      </div>
+
+      <footer className="border-t border-slate-200/80 bg-white px-5 py-4 text-center text-xs text-slate-400">
+        Pode alterar estes dados a qualquer momento em Configurações.
+      </footer>
+    </main>
+  );
 }

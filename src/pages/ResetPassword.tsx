@@ -84,16 +84,16 @@ export default function ResetPassword() {
     return (
       <AuthShell compact>
         <div className="flex flex-col items-center py-12 text-center">
-          <div className="mb-4 h-8 w-8 animate-spin rounded-full border-2 border-[#e2ded5] border-t-[#202522]" />
-          <p className="text-[14px] font-medium text-[#202522]">
+          <div className="mb-4 h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-slate-900" />
+          <p className="text-sm font-semibold text-slate-900">
             A verificar ligação...
           </p>
-          <p className="mt-1 text-xs text-[#8f8a80]">
+          <p className="mt-1 text-xs text-slate-500">
             Link inválido ou expirado?
           </p>
           <Link
             to="/forgot-password"
-            className="mt-5 text-xs font-semibold text-[#202522] underline decoration-[#d8d3c8] underline-offset-4"
+            className="mt-5 text-xs font-semibold text-slate-900 underline decoration-slate-300 underline-offset-4"
           >
             Solicitar novo link
           </Link>
@@ -106,18 +106,18 @@ export default function ResetPassword() {
     return (
       <AuthShell compact>
         <div>
-          <div className="mb-6 grid h-11 w-11 place-items-center rounded-full bg-[#d9e7de] text-[#2c6457]">
+          <div className="mb-6 grid h-11 w-11 place-items-center rounded-xl bg-emerald-50 text-emerald-600 shadow-2xs">
             <CheckCircle2 className="h-6 w-6" strokeWidth={1.8} />
           </div>
 
-          <h1 className="text-[32px] font-semibold leading-[1.05] tracking-[-0.04em] text-[#202522] sm:text-[36px]">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
             Palavra-passe atualizada
           </h1>
 
           <button
             type="button"
             onClick={() => navigate("/login", { replace: true })}
-            className="mt-7 flex h-12 w-full items-center justify-center gap-2 rounded-[3px] bg-[#202522] text-[14px] font-semibold text-white transition-colors hover:bg-[#2c6457]"
+            className="mt-7 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-slate-900 text-sm font-semibold text-white shadow-xs transition hover:bg-slate-800"
           >
             Entrar
           </button>
@@ -131,7 +131,7 @@ export default function ResetPassword() {
       footer={
         <Link
           to="/login"
-          className="text-xs font-medium text-[#6e716b] hover:text-[#202522] transition-colors"
+          className="text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors"
         >
           Cancelar
         </Link>
@@ -140,7 +140,7 @@ export default function ResetPassword() {
     >
       <div>
         <div className="mb-7">
-          <h1 className="text-[32px] font-semibold leading-[1.05] tracking-[-0.04em] text-[#202522] sm:text-[36px]">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
             Redefinir palavra-passe
           </h1>
         </div>
@@ -149,7 +149,7 @@ export default function ResetPassword() {
           <div>
             <label
               htmlFor="password"
-              className="mb-1.5 block text-[13px] font-medium text-[#202522]"
+              className="mb-1.5 block text-xs font-semibold text-slate-700"
             >
               Nova palavra-passe
             </label>
@@ -166,7 +166,7 @@ export default function ResetPassword() {
                 disabled={isLoading}
                 required
                 minLength={8}
-                className="h-12 w-full border border-[#d8d3c8] bg-transparent pl-3.5 pr-11 text-[14px] text-[#202522] outline-none transition-all placeholder:text-[#a09b90] hover:border-[#c8c1b4] focus:border-[#202522] focus:ring-1 focus:ring-[#202522]"
+                className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-3.5 pr-11 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/10 shadow-2xs"
               />
 
               <button
@@ -177,7 +177,7 @@ export default function ResetPassword() {
                     : "Mostrar palavra-passe"
                 }
                 onClick={() => setShowPassword((value) => !value)}
-                className="absolute right-2.5 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded text-[#8f8a80] hover:text-[#202522]"
+                className="absolute right-2.5 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded text-slate-400 hover:text-slate-700"
               >
                 {showPassword ? (
                   <EyeOff className="h-4 w-4" strokeWidth={1.8} />
@@ -191,7 +191,7 @@ export default function ResetPassword() {
           <div>
             <label
               htmlFor="confirmation"
-              className="mb-1.5 block text-[13px] font-medium text-[#202522]"
+              className="mb-1.5 block text-xs font-semibold text-slate-700"
             >
               Confirmar palavra-passe
             </label>
@@ -207,7 +207,7 @@ export default function ResetPassword() {
                 onChange={(event) => setConfirmation(event.target.value)}
                 disabled={isLoading}
                 required
-                className="h-12 w-full border border-[#d8d3c8] bg-transparent pl-3.5 pr-11 text-[14px] text-[#202522] outline-none transition-all placeholder:text-[#a09b90] hover:border-[#c8c1b4] focus:border-[#202522] focus:ring-1 focus:ring-[#202522]"
+                className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-3.5 pr-11 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/10 shadow-2xs"
               />
 
               <button
@@ -218,7 +218,7 @@ export default function ResetPassword() {
                     : "Mostrar confirmação"
                 }
                 onClick={() => setShowConfirmation((value) => !value)}
-                className="absolute right-2.5 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded text-[#8f8a80] hover:text-[#202522]"
+                className="absolute right-2.5 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded text-slate-400 hover:text-slate-700"
               >
                 {showConfirmation ? (
                   <EyeOff className="h-4 w-4" strokeWidth={1.8} />
@@ -232,7 +232,7 @@ export default function ResetPassword() {
           <button
             type="submit"
             disabled={isLoading || !password || !confirmation}
-            className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-[3px] bg-[#202522] text-[14px] font-semibold text-white transition-all hover:bg-[#2c6457] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40"
+            className="mt-2 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-slate-900 text-sm font-semibold text-white shadow-xs transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40"
           >
             {isLoading ? "A guardar…" : "Guardar"}
           </button>

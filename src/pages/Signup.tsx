@@ -48,11 +48,11 @@ export default function Signup() {
   return (
     <AuthShell
       footer={
-        <div className="flex items-center gap-1.5 text-xs text-[#6e716b]">
+        <div className="flex items-center gap-1.5 text-xs text-slate-500">
           <span>Já tem conta?</span>
           <Link
             to="/login"
-            className="font-semibold text-[#202522] underline decoration-[#d8d3c8] underline-offset-4 transition-colors hover:decoration-[#202522]"
+            className="font-semibold text-slate-900 underline decoration-slate-300 underline-offset-4 transition-colors hover:decoration-slate-900"
           >
             Entrar
           </Link>
@@ -61,11 +61,11 @@ export default function Signup() {
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-          <h1 className="font-serif text-[34px] font-medium leading-none tracking-[-0.045em] text-[#202522] sm:text-[38px]">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
             Criar conta
           </h1>
           {selectedPlan && (
-            <span className="border border-[#d8d3c8] px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.08em] text-[#6e716b]">
+            <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-emerald-800">
               {selectedPlan} · {billing === "annual" ? "Anual" : "Mensal"}
             </span>
           )}
@@ -74,7 +74,7 @@ export default function Signup() {
         <div>
           <label
             htmlFor="name"
-            className="mb-1.5 block text-xs font-medium text-[#202522]"
+            className="mb-1.5 block text-xs font-semibold text-slate-700"
           >
             Nome completo
           </label>
@@ -88,14 +88,14 @@ export default function Signup() {
             onChange={(event) => setName(event.target.value)}
             disabled={isLoading}
             required
-            className="h-12 w-full border border-[#d8d3c8] bg-transparent px-3.5 text-sm text-[#202522] outline-none transition-colors placeholder:text-[#a09b90] hover:border-[#aaa397] focus:border-[#2c6457] focus:ring-2 focus:ring-[#2c6457]/10 disabled:cursor-not-allowed disabled:bg-[#f6f3ed]"
+            className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/10 disabled:cursor-not-allowed disabled:bg-slate-50 shadow-2xs"
           />
         </div>
 
         <div>
           <label
             htmlFor="email"
-            className="mb-1.5 block text-xs font-medium text-[#202522]"
+            className="mb-1.5 block text-xs font-semibold text-slate-700"
           >
             Email
           </label>
@@ -110,14 +110,14 @@ export default function Signup() {
             onChange={(event) => setEmail(event.target.value)}
             disabled={isLoading}
             required
-            className="h-12 w-full border border-[#d8d3c8] bg-transparent px-3.5 text-sm text-[#202522] outline-none transition-colors placeholder:text-[#a09b90] hover:border-[#aaa397] focus:border-[#2c6457] focus:ring-2 focus:ring-[#2c6457]/10 disabled:cursor-not-allowed disabled:bg-[#f6f3ed]"
+            className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/10 disabled:cursor-not-allowed disabled:bg-slate-50 shadow-2xs"
           />
         </div>
 
         <div>
           <label
             htmlFor="password"
-            className="mb-1.5 block text-xs font-medium text-[#202522]"
+            className="mb-1.5 block text-xs font-semibold text-slate-700"
           >
             Palavra-passe
           </label>
@@ -133,7 +133,7 @@ export default function Signup() {
               disabled={isLoading}
               required
               minLength={8}
-              className="h-12 w-full border border-[#d8d3c8] bg-transparent px-3.5 pr-11 text-sm text-[#202522] outline-none transition-colors placeholder:text-[#a09b90] hover:border-[#aaa397] focus:border-[#2c6457] focus:ring-2 focus:ring-[#2c6457]/10 disabled:cursor-not-allowed disabled:bg-[#f6f3ed]"
+              className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 pr-11 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/10 disabled:cursor-not-allowed disabled:bg-slate-50 shadow-2xs"
             />
             <button
               type="button"
@@ -142,7 +142,7 @@ export default function Signup() {
               }
               onClick={() => setShowPassword((value) => !value)}
               disabled={isLoading}
-              className="absolute right-1.5 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center text-[#8f8a80] transition-colors hover:text-[#202522] disabled:opacity-50"
+              className="absolute right-1.5 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center text-slate-400 transition-colors hover:text-slate-700 disabled:opacity-50"
             >
               {showPassword ? (
                 <EyeOff
@@ -160,18 +160,18 @@ export default function Signup() {
         <button
           type="submit"
           disabled={isLoading}
-          className="mt-2 flex h-12 w-full items-center justify-center bg-[#202522] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#2c6457] disabled:cursor-not-allowed disabled:opacity-60"
+          className="mt-2 flex h-11 w-full items-center justify-center rounded-xl bg-slate-900 px-4 text-sm font-semibold text-white shadow-xs transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isLoading ? "A criar conta…" : "Continuar"}
         </button>
 
-        <p className="pt-1 text-center text-[11px] leading-5 text-[#8f8a80]">
+        <p className="pt-1 text-center text-xs leading-5 text-slate-400">
           Ao criar conta, concorda com os{" "}
-          <Link to="/terms" className="font-semibold text-[#2c6457] underline underline-offset-2">
+          <Link to="/terms" className="font-semibold text-emerald-600 hover:underline">
             Termos de Serviço
           </Link>{" "}
           e a{" "}
-          <Link to="/policy" className="font-semibold text-[#2c6457] underline underline-offset-2">
+          <Link to="/policy" className="font-semibold text-emerald-600 hover:underline">
             Política de Privacidade
           </Link>.
         </p>

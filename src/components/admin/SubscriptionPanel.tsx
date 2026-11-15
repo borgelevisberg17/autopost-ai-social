@@ -23,7 +23,7 @@ export function SubscriptionPanel({ companyId }: { companyId: string }) {
     else { const result = data as { percent_off?: number }; toast.success(`Cupão reservado: ${result.percent_off}% de desconto. O acesso só muda após ativação do plano.`); setCode(""); }
   }
   return <section className="border-y border-border py-5 space-y-4" aria-label="Limites da subscrição">
-    <h2 className="font-serif text-xl">Subscrição da empresa</h2>
+    <h2 className="text-lg font-bold tracking-tight text-slate-900">Subscrição da empresa</h2>
     {value ? <><p className="font-semibold">{value.name} · {value.status} · Loja {value.company_status}</p><div className="flex flex-wrap gap-5 text-sm"><span>Produtos: até {value.product_limit}</span><span>IA este mês: {value.ai_used} / {value.monthly_ai_limit}</span></div><p className="text-sm text-muted-foreground">{value.features.join(" · ") || "Acesso suspenso"}</p>{value.grant_expires_at && <p className="text-sm">Concessão até {new Date(value.grant_expires_at).toLocaleDateString("pt-PT")} · Plano de origem: {value.base_plan}</p>}</> : <p>A carregar plano…</p>}
     <form className="flex flex-wrap gap-2" onSubmit={e => { e.preventDefault(); void redeem(); }}><Input className="max-w-xs" aria-label="Código do cupão" placeholder="Código do cupão" value={code} onChange={e => setCode(e.target.value)} required /><Button disabled={busy}>Aplicar cupão</Button></form>
   </section>;

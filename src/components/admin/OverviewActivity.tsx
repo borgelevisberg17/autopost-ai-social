@@ -202,45 +202,45 @@ export function OverviewActivity() {
   }, [company?.id]);
 
   return (
-    <section className="rounded-[5px] border border-[#e4e0d7] bg-[#fffdf9] p-4 shadow-[0_2px_10px_rgba(32,37,34,0.025)] sm:p-5">
-      <div className="mb-3 flex items-end justify-between gap-3 border-b border-[#ece8df] pb-3">
+    <section className="rounded-2xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-xs">
+      <div className="mb-4 flex items-center justify-between gap-3 border-b border-slate-100 pb-4">
         <div>
-          <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#7f897e]">
-            Operação / Sistema
+          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            Operação & Sistema
           </p>
-          <h2 className="mt-1 font-serif text-base font-semibold tracking-[-0.03em] text-[#202522] sm:text-lg">
+          <h2 className="mt-0.5 text-base font-semibold text-slate-900">
             Atividade e auditoria
           </h2>
         </div>
-        <div className="flex shrink-0 items-center gap-3">
+        <div className="flex shrink-0 items-center gap-2">
           <Link
             to="/admin/atividade"
-            className="group inline-flex items-center gap-1 text-[11px] font-medium text-[#687168] transition hover:text-[#202522]"
+            className="group inline-flex items-center gap-1 text-xs font-semibold text-slate-600 transition hover:text-slate-900"
           >
             Atividade
-            <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
           </Link>
           <Link
             to="/admin/auditoria"
             aria-label="Abrir auditoria"
-            className="grid h-7 w-7 place-items-center border border-[#e4e0d7] text-[#687168] transition hover:border-[#b9c6b7] hover:text-[#202522]"
+            className="grid h-8 w-8 place-items-center rounded-lg border border-slate-200/80 text-slate-600 transition hover:bg-slate-50 hover:text-slate-900 shadow-xs"
           >
-            <FileClock aria-hidden="true" className="h-3.5 w-3.5" />
+            <FileClock aria-hidden="true" className="h-4 w-4" />
           </Link>
         </div>
       </div>
 
       {loading ? (
-        <div className="space-y-2" aria-label="A carregar atividade">
+        <div className="space-y-3" aria-label="A carregar atividade">
           {[0, 1, 2, 3].map((item) => (
             <div
               key={item}
-              className="flex items-center gap-3 border-b border-[#f0ede6] py-3 last:border-0"
+              className="flex items-center gap-3 border-b border-slate-100 py-3 last:border-0"
             >
-              <span className="h-8 w-8 animate-pulse bg-[#f0efe9]" />
+              <span className="h-8 w-8 animate-pulse rounded-lg bg-slate-200/80" />
               <span className="min-w-0 flex-1 space-y-2">
-                <span className="block h-3 w-2/5 animate-pulse bg-[#f0efe9]" />
-                <span className="block h-2.5 w-3/5 animate-pulse bg-[#f0efe9]" />
+                <span className="block h-3 w-2/5 animate-pulse rounded bg-slate-200/80" />
+                <span className="block h-2.5 w-3/5 animate-pulse rounded bg-slate-200/80" />
               </span>
             </div>
           ))}
@@ -249,12 +249,12 @@ export function OverviewActivity() {
         <div className="flex min-h-[200px] flex-col items-center justify-center px-4 text-center">
           <RefreshCw
             aria-hidden="true"
-            className="mb-3 h-4 w-4 text-[#aaa99f]"
+            className="mb-3 h-5 w-5 text-slate-400"
           />
-          <p className="text-sm font-medium text-[#525c54]">
+          <p className="text-sm font-semibold text-slate-800">
             Atividade indisponível
           </p>
-          <p className="mt-1 text-xs leading-5 text-[#858c83]">
+          <p className="mt-1 text-xs leading-5 text-slate-500">
             As fontes de atividade não responderam. Pode consultar cada registo
             nas páginas do sistema.
           </p>
@@ -263,47 +263,44 @@ export function OverviewActivity() {
         <div className="flex min-h-[200px] flex-col items-center justify-center px-4 text-center">
           <Activity
             aria-hidden="true"
-            className="mb-3 h-5 w-5 text-[#a7ada2]"
+            className="mb-3 h-5 w-5 text-slate-400"
           />
-          <p className="text-sm font-medium text-[#525c54]">
+          <p className="text-sm font-semibold text-slate-800">
             Ainda sem atividade
           </p>
-          <p className="mt-1 text-xs leading-5 text-[#858c83]">
+          <p className="mt-1 text-xs leading-5 text-slate-500">
             As ações de pessoas e agentes aparecerão aqui quando forem
             registadas.
           </p>
         </div>
       ) : (
-        <div>
+        <div className="divide-y divide-slate-100">
           {entries.map((entry, index) => (
             <div
               key={entry.id}
-              className={cn(
-                "grid grid-cols-[34px_minmax(0,1fr)] gap-x-3 py-3 sm:grid-cols-[34px_66px_minmax(0,1fr)_auto] sm:items-center",
-                index < entries.length - 1 && "border-b border-[#f0ede6]",
-              )}
+              className="grid grid-cols-[34px_minmax(0,1fr)] gap-x-3 py-3 sm:grid-cols-[34px_66px_minmax(0,1fr)_auto] sm:items-center"
             >
-              <span className="relative grid h-8 w-8 place-items-center border border-[#e4e0d7] bg-[#faf9f4] text-[#546454]">
+              <span className="relative grid h-8 w-8 place-items-center rounded-lg border border-slate-200/80 bg-slate-50 text-slate-600 shadow-xs">
                 <SourceIcon source={entry.source} />
                 {index < entries.length - 1 && (
                   <span
                     aria-hidden="true"
-                    className="absolute -bottom-[14px] left-1/2 h-3.5 w-px bg-[#e4e0d7]"
+                    className="absolute -bottom-[14px] left-1/2 h-3.5 w-px bg-slate-200"
                   />
                 )}
               </span>
-              <time className="col-start-2 row-start-1 font-mono text-[10px] text-[#858c83] sm:col-start-2 sm:row-auto">
+              <time className="col-start-2 row-start-1 text-[11px] font-medium text-slate-400 sm:col-start-2 sm:row-auto">
                 {formatTime(entry.created_at)}
               </time>
               <div className="col-start-2 min-w-0 pl-0.5 sm:col-start-3 sm:row-auto sm:pl-0">
-                <p className="truncate font-serif text-[13px] font-semibold text-[#202522]">
+                <p className="truncate text-xs font-semibold text-slate-900">
                   {entry.title}
                 </p>
-                <p className="mt-0.5 line-clamp-1 text-[11px] leading-4 text-[#737a72]">
+                <p className="mt-0.5 line-clamp-1 text-[11px] leading-4 text-slate-500">
                   {entry.detail}
                 </p>
               </div>
-              <span className="col-start-2 mt-1 w-fit border border-[#e7e4da] bg-[#f8f7f1] px-2 py-0.5 text-[9px] text-[#657064] sm:col-start-4 sm:row-auto sm:mt-0">
+              <span className="col-start-2 mt-1 w-fit rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-medium text-slate-600 sm:col-start-4 sm:row-auto sm:mt-0">
                 {entry.status}
               </span>
             </div>

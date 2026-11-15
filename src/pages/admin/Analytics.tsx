@@ -56,12 +56,14 @@ function DataError({ onRetry }: { onRetry: () => void }) {
   return (
     <div className="grid h-full min-h-32 place-items-center px-4 text-center" role="alert">
       <div>
-        <AlertCircle className="mx-auto h-5 w-5 text-[#b94e37]" />
-        <p className="mt-2 text-xs font-semibold text-[#202522]">Não foi possível carregar estes dados.</p>
+        <div className="mx-auto grid h-10 w-10 place-items-center rounded-xl border border-rose-200 bg-rose-50 text-rose-600 shadow-xs">
+          <AlertCircle className="h-4 w-4" />
+        </div>
+        <p className="mt-3 text-xs font-semibold text-slate-900">Não foi possível carregar estes dados.</p>
         <button
           type="button"
           onClick={onRetry}
-          className="mt-3 inline-flex min-h-11 items-center justify-center border border-[#ded9d0] bg-[#fffdf9] px-4 text-xs font-semibold text-[#202522] transition hover:bg-[#f1eee7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+          className="mt-3 inline-flex h-9 items-center justify-center rounded-lg border border-slate-200/80 bg-white px-3.5 text-xs font-semibold text-slate-700 shadow-xs transition hover:bg-slate-50 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
         >
           Tentar novamente
         </button>
@@ -71,7 +73,7 @@ function DataError({ onRetry }: { onRetry: () => void }) {
 }
 
 function LoadingBlock({ className = "" }: { className?: string }) {
-  return <div className={cn("animate-pulse bg-[#ebe7df]", className)} aria-label="A carregar" />;
+  return <div className={cn("animate-pulse rounded-lg bg-slate-200/80", className)} aria-label="A carregar" />;
 }
 
 export default function Analytics() {
@@ -292,10 +294,10 @@ export default function Analytics() {
         </section>
 
         <section className="grid gap-8 lg:grid-cols-3">
-          <div className="border border-[#ded9d0] bg-[#fffdf9] p-5 sm:p-6 lg:col-span-2">
+          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-xs lg:col-span-2">
             <div className="mb-6">
-              <h3 className="text-base font-semibold text-[#202522]">Receita por dia</h3>
-              <p className="text-xs leading-5 text-[#a7aaa2]">Receita diária e contagem de pedidos no período selecionado.</p>
+              <h3 className="text-base font-semibold text-slate-900">Receita por dia</h3>
+              <p className="text-xs leading-5 text-slate-500">Receita diária e contagem de pedidos no período selecionado.</p>
             </div>
             <div className="h-[280px] w-full">
               {loading ? (
@@ -303,7 +305,7 @@ export default function Analytics() {
               ) : error ? (
                 <DataError onRetry={loadData} />
               ) : stats.salesTrend.length === 0 ? (
-                <div className="grid h-full place-items-center text-xs text-[#a7aaa2]">Sem dados no período.</div>
+                <div className="grid h-full place-items-center text-xs text-slate-400">Sem dados no período.</div>
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={stats.salesTrend} margin={{ top: 8, right: 8, bottom: 4, left: 4 }}>
@@ -312,12 +314,12 @@ export default function Analytics() {
                       axisLine={false}
                       tickLine={false}
                       interval={period === "7d" ? 0 : period === "30d" ? 4 : 14}
-                      tick={{ fontSize: 10, fill: "#737373" }}
+                      tick={{ fontSize: 10, fill: "#64748b" }}
                     />
                     <YAxis
                       axisLine={false}
                       tickLine={false}
-                      tick={{ fontSize: 10, fill: "#737373" }}
+                      tick={{ fontSize: 10, fill: "#64748b" }}
                       tickFormatter={formatCurrency}
                       width={76}
                     />
@@ -326,25 +328,25 @@ export default function Analytics() {
                         if (!active || !payload?.length) return null;
                         const point = payload[0].payload as SalesPoint;
                         return (
-                          <div className="border border-[#ded9d0] bg-[#fffdf9] px-3 py-2 text-xs shadow-[0_8px_20px_rgba(32,37,34,0.08)]">
-                            <p className="font-semibold text-[#202522]">{label}</p>
-                            <p className="mt-1 text-[#5f625d]">Receita: {formatCurrency(point.receita)}</p>
-                            <p className="text-[#5f625d]">Pedidos: {point.pedidos}</p>
+                          <div className="rounded-xl border border-slate-200/80 bg-white px-3.5 py-2.5 text-xs shadow-md">
+                            <p className="font-semibold text-slate-900">{label}</p>
+                            <p className="mt-1 text-slate-600">Receita: {formatCurrency(point.receita)}</p>
+                            <p className="text-slate-500">Pedidos: {point.pedidos}</p>
                           </div>
                         );
                       }}
                     />
-                    <Area type="monotone" dataKey="receita" stroke="#243b53" strokeWidth={2} fill="#e6ecef" />
+                    <Area type="monotone" dataKey="receita" stroke="#059669" strokeWidth={2} fill="#ecfdf5" />
                   </AreaChart>
                 </ResponsiveContainer>
               )}
             </div>
           </div>
 
-          <div className="border border-[#ded9d0] bg-[#fffdf9] p-5 sm:p-6">
+          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-xs">
             <div className="mb-6">
-              <h3 className="text-base font-semibold text-[#202522]">Origem por canal</h3>
-              <p className="text-xs leading-5 text-[#a7aaa2]">Receita e pedidos por canal de venda.</p>
+              <h3 className="text-base font-semibold text-slate-900">Origem por canal</h3>
+              <p className="text-xs leading-5 text-slate-500">Receita e pedidos por canal de venda.</p>
             </div>
             <div className="h-[220px] w-full">
               {loading ? (
@@ -352,7 +354,7 @@ export default function Analytics() {
               ) : error ? (
                 <DataError onRetry={loadData} />
               ) : stats.channelBreakdown.length === 0 ? (
-                <div className="grid h-full place-items-center text-xs text-[#a7aaa2]">Sem vendas no período.</div>
+                <div className="grid h-full place-items-center text-xs text-slate-400">Sem vendas no período.</div>
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -371,12 +373,12 @@ export default function Analytics() {
                 {stats.channelBreakdown.map((channel) => (
                   <div key={channel.channel} className="flex items-start justify-between gap-3 text-xs">
                     <span className="flex min-w-0 items-start gap-2">
-                      <span className="mt-1 h-2.5 w-2.5 shrink-0" style={{ background: CHANNEL_COLORS[channel.channel] || CHANNEL_COLORS.Outros }} />
-                      <span className="font-medium leading-5 text-[#303732]">{channel.channel}</span>
+                      <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: CHANNEL_COLORS[channel.channel] || CHANNEL_COLORS.Outros }} />
+                      <span className="font-medium leading-5 text-slate-700">{channel.channel}</span>
                     </span>
-                    <span className="shrink-0 text-right font-semibold leading-5 text-[#202522]">
+                    <span className="shrink-0 text-right font-semibold leading-5 text-slate-900">
                       {formatCurrency(channel.revenue)}
-                      <span className="block font-normal text-[#a7aaa2]">{channel.count} {channel.count === 1 ? "pedido" : "pedidos"}</span>
+                      <span className="block font-normal text-slate-400">{channel.count} {channel.count === 1 ? "pedido" : "pedidos"}</span>
                     </span>
                   </div>
                 ))}
@@ -385,13 +387,13 @@ export default function Analytics() {
           </div>
         </section>
 
-        <section className="border border-[#ded9d0] bg-[#fffdf9] p-5 sm:p-6">
+        <section className="rounded-2xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-xs">
           <div className="mb-5 flex items-start justify-between gap-4">
             <div>
-              <h3 className="text-base font-semibold text-[#202522]">Maiores compradores</h3>
-              <p className="text-xs leading-5 text-[#a7aaa2]">Clientes com maior volume de compras no período.</p>
+              <h3 className="text-base font-semibold text-slate-900">Maiores compradores</h3>
+              <p className="text-xs leading-5 text-slate-500">Clientes com maior volume de compras no período.</p>
             </div>
-            <Users className="h-4 w-4 shrink-0 text-[#a7aaa2]" />
+            <Users className="h-4 w-4 shrink-0 text-slate-400" />
           </div>
           {loading ? (
             <div className="space-y-3" aria-label="A carregar compradores">
@@ -400,18 +402,18 @@ export default function Analytics() {
           ) : error ? (
             <DataError onRetry={loadData} />
           ) : stats.topBuyers.length === 0 ? (
-            <p className="py-6 text-center text-xs text-[#a7aaa2]">Sem dados de compradores.</p>
+            <p className="py-6 text-center text-xs text-slate-400">Sem dados de compradores.</p>
           ) : (
             <div className="space-y-1">
               {stats.topBuyers.map((buyer, index) => (
-                <div key={buyer.name} className="flex items-center justify-between gap-4 border-t border-[#ebe7df] py-3 text-sm first:border-t-0">
+                <div key={buyer.name} className="flex items-center justify-between gap-4 border-t border-slate-100 py-3 text-sm first:border-t-0">
                   <div className="flex min-w-0 items-center gap-3">
-                    <span className="font-mono text-xs font-semibold text-[#a7aaa2]">#{index + 1}</span>
-                    <span className="break-words font-medium text-[#202522]">{buyer.name}</span>
+                    <span className="font-mono text-xs font-semibold text-slate-400">#{index + 1}</span>
+                    <span className="break-words font-medium text-slate-900">{buyer.name}</span>
                   </div>
                   <div className="shrink-0 text-right">
-                    <p className="font-semibold text-[#202522]">{formatCurrency(buyer.spent)}</p>
-                    <p className="text-[10px] text-[#a7aaa2]">{buyer.orders} {buyer.orders === 1 ? "pedido" : "pedidos"}</p>
+                    <p className="font-semibold text-slate-900">{formatCurrency(buyer.spent)}</p>
+                    <p className="text-[10px] text-slate-400">{buyer.orders} {buyer.orders === 1 ? "pedido" : "pedidos"}</p>
                   </div>
                 </div>
               ))}

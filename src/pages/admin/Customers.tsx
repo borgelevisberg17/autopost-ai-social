@@ -427,18 +427,18 @@ export default function Customers() {
         {/* FILTERS & SEARCH */}
         <section className="flex flex-col gap-3 lg:flex-row lg:items-center">
           <div className="relative min-w-0 flex-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#a7aaa2]" />
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Pesquisar cliente por nome, email ou telefone..."
-              className="h-11 w-full rounded-sm border border-[#ded9d0] bg-[#fffdf9] pl-10 pr-4 text-sm outline-none transition placeholder:text-[#a7aaa2] focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
+              className="h-10 w-full rounded-xl border border-slate-200/80 bg-white pl-10 pr-4 text-xs font-medium text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 shadow-2xs"
             />
             {query && (
               <button
                 type="button"
                 onClick={() => setQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#a7aaa2] hover:text-[#202522]"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -449,7 +449,7 @@ export default function Customers() {
             <select
               value={channelFilter}
               onChange={(e) => setChannelFilter(e.target.value)}
-              className="h-11 rounded-sm border border-[#ded9d0] bg-[#fffdf9] px-3 text-sm font-medium outline-none focus:border-neutral-900"
+              className="h-10 rounded-xl border border-slate-200/80 bg-white px-3 text-xs font-medium text-slate-800 outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900 shadow-2xs"
             >
               <option value="all">Todos os canais</option>
               <option value="website">Website</option>
@@ -461,7 +461,7 @@ export default function Customers() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as "spent" | "orders" | "recent")}
-              className="h-11 rounded-sm border border-[#ded9d0] bg-[#fffdf9] px-3 text-sm font-medium outline-none focus:border-neutral-900"
+              className="h-10 rounded-xl border border-slate-200/80 bg-white px-3 text-xs font-medium text-slate-800 outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900 shadow-2xs"
             >
               <option value="spent">Ordenar: Maior gasto</option>
               <option value="orders">Ordenar: Mais pedidos</option>
@@ -471,63 +471,63 @@ export default function Customers() {
         </section>
 
         {/* CUSTOMERS LIST */}
-        <section className="border-y border-[#ded9d0] bg-[#fffdf9]">
+        <section className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xs">
           {loading ? (
             <div className="p-8 space-y-4">
               {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="h-12 w-full animate-pulse bg-[#ebe7df]" />
+                <div key={i} className="h-12 w-full animate-pulse rounded-lg bg-slate-100" />
               ))}
             </div>
           ) : loadError ? (
             <div className="flex min-h-[220px] flex-col items-center justify-center px-5 text-center">
-              <p className="text-sm font-medium text-[#5f625d]">Não foi possível carregar os clientes.</p>
+              <p className="text-xs font-medium text-rose-600">Não foi possível carregar os clientes.</p>
               <button
                 type="button"
                 onClick={loadData}
-                className="mt-4 text-xs font-semibold text-[#2c6457] underline underline-offset-4"
+                className="mt-3 inline-flex h-8 items-center rounded-lg bg-slate-900 px-3 text-xs font-semibold text-white hover:bg-slate-800 transition"
               >
                 Tentar novamente
               </button>
             </div>
           ) : filteredCustomers.length === 0 ? (
             <div className="py-16 text-center">
-              <Users className="mx-auto h-8 w-8 text-[#c9c3b8]" />
-              <p className="mt-3 text-sm font-semibold text-[#202522]">Nenhum cliente encontrado</p>
-              <p className="mt-1 text-xs text-[#a7aaa2]">
+              <Users className="mx-auto h-8 w-8 text-slate-300" />
+              <p className="mt-3 text-sm font-bold text-slate-900">Nenhum cliente encontrado</p>
+              <p className="mt-1 text-xs text-slate-500">
                 {query ? "Tente ajustar a pesquisa ou os filtros." : "Quando receber pedidos, os clientes aparecerão aqui."}
               </p>
             </div>
           ) : (
             <>
-              <div className="divide-y divide-[#eeeae2] lg:hidden">
+              <div className="divide-y divide-slate-100 lg:hidden">
                 {filteredCustomers.map((customer) => (
                   <button
                     key={customer.id}
                     type="button"
                     onClick={() => setSelectedCustomer(customer)}
-                    className="flex w-full items-start gap-3 px-4 py-4 text-left transition hover:bg-[#f1eee7]"
+                    className="flex w-full items-start gap-3 p-4 text-left transition hover:bg-slate-50"
                   >
-                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[7px] bg-[#202522] text-xs font-semibold text-white">
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-slate-900 text-xs font-bold text-white shadow-2xs">
                       {customer.name.slice(0, 2).toUpperCase()}
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-semibold text-[#202522]">{customer.name}</span>
-                      <span className="mt-1 block truncate text-xs text-[#747b73]">
+                      <span className="block truncate text-xs font-bold text-slate-900">{customer.name}</span>
+                      <span className="mt-0.5 block truncate text-[11px] text-slate-500">
                         {customer.phone || customer.email || "Sem contacto"}
                       </span>
-                      <span className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#747b73]">
+                      <span className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-500">
                         <span>{customer.orders_count} {customer.orders_count === 1 ? "pedido" : "pedidos"}</span>
-                        <span className="font-semibold text-[#202522]">{formatMoney(customer.total_spent, currency)}</span>
+                        <span className="font-bold text-slate-900">{formatMoney(customer.total_spent, currency)}</span>
                       </span>
                     </span>
-                    <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-[#c9c3b8]" />
+                    <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-slate-300" />
                   </button>
                 ))}
               </div>
               <div className="hidden overflow-x-auto lg:block">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-[#ded9d0] bg-[#f1eee7]/50 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#a7aaa2]">
+                  <tr className="border-b border-slate-200/80 bg-slate-50/75 text-[10px] font-bold uppercase tracking-wider text-slate-500">
                     <th className="px-5 py-3.5">Cliente</th>
                     <th className="px-5 py-3.5">Contactos</th>
                     <th className="px-5 py-3.5">Canal</th>
@@ -538,65 +538,65 @@ export default function Customers() {
                   </tr>
                 </thead>
 
-                <tbody className="divide-y divide-neutral-100">
+                <tbody className="divide-y divide-slate-100">
                   {filteredCustomers.map((customer) => (
                     <tr
                       key={customer.id}
                       onClick={() => setSelectedCustomer(customer)}
-                      className="group cursor-pointer transition hover:bg-[#f1eee7]"
+                      className="group cursor-pointer transition hover:bg-slate-50"
                     >
-                      <td className="px-5 py-4">
+                      <td className="px-5 py-3.5">
                         <div className="flex items-center gap-3">
-                          <div className="grid h-9 w-9 shrink-0 place-items-center rounded-[7px] bg-[#202522] text-xs font-semibold text-white">
+                          <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-slate-900 text-xs font-bold text-white shadow-2xs">
                             {customer.name.slice(0, 2).toUpperCase()}
                           </div>
                           <div>
-                            <p className="text-sm font-semibold text-[#202522] group-hover:underline">
+                            <p className="text-xs font-bold text-slate-900 group-hover:text-emerald-700 transition">
                               {customer.name}
                             </p>
-                            <p className="text-xs text-[#a7aaa2]">
+                            <p className="text-[11px] text-slate-400">
                               Cliente desde {formatDate(customer.created_at)}
                             </p>
                           </div>
                         </div>
                       </td>
 
-                      <td className="px-5 py-4 text-xs text-[#747b73]">
+                      <td className="px-5 py-3.5 text-xs text-slate-600">
                         {customer.phone && (
                           <div className="flex items-center gap-1.5">
-                            <Phone className="h-3 w-3 text-[#a7aaa2]" />
+                            <Phone className="h-3 w-3 text-slate-400" />
                             <span>{customer.phone}</span>
                           </div>
                         )}
                         {customer.email && (
                           <div className="flex items-center gap-1.5 mt-0.5">
-                            <Mail className="h-3 w-3 text-[#a7aaa2]" />
+                            <Mail className="h-3 w-3 text-slate-400" />
                             <span>{customer.email}</span>
                           </div>
                         )}
-                        {!customer.phone && !customer.email && <span className="text-[#a7aaa2]">—</span>}
+                        {!customer.phone && !customer.email && <span className="text-slate-400">—</span>}
                       </td>
 
-                      <td className="px-5 py-4 text-xs font-medium text-[#5f625d]">
-                        <span className="inline-flex items-center gap-1.5 rounded-[7px] border border-[#ded9d0] bg-[#f1eee7] px-2.5 py-1 text-[11px]">
+                      <td className="px-5 py-3.5 text-xs">
+                        <span className="inline-flex items-center gap-1 rounded-full border border-slate-200/80 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold text-slate-700">
                           {channelLabel(customer.channel)}
                         </span>
                       </td>
 
-                      <td className="px-5 py-4 text-center text-sm font-semibold text-[#202522]">
+                      <td className="px-5 py-3.5 text-center text-xs font-bold text-slate-900">
                         {customer.orders_count}
                       </td>
 
-                      <td className="px-5 py-4 text-right text-sm font-semibold text-[#202522]">
+                      <td className="px-5 py-3.5 text-right text-xs font-bold text-slate-900">
                         {formatMoney(customer.total_spent, currency)}
                       </td>
 
-                      <td className="px-5 py-4 text-xs text-[#747b73]">
+                      <td className="px-5 py-3.5 text-xs text-slate-500">
                         {formatDate(customer.last_order_at)}
                       </td>
 
-                      <td className="px-5 py-4">
-                        <ArrowRight className="h-4 w-4 text-[#c9c3b8] transition-transform group-hover:translate-x-0.5 group-hover:text-[#202522]" />
+                      <td className="px-5 py-3.5">
+                        <ArrowRight className="h-4 w-4 text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-slate-600" />
                       </td>
                     </tr>
                   ))}
@@ -612,49 +612,49 @@ export default function Customers() {
       {selectedCustomer && (
         <div className="fixed inset-0 z-[70]">
           <div
-            className="absolute inset-0 bg-black/20"
+            className="absolute inset-0 bg-slate-900/50 backdrop-blur-xs animate-in fade-in-50"
             onClick={() => setSelectedCustomer(null)}
           />
 
-          <aside className="absolute inset-y-0 right-0 flex w-full max-w-xl flex-col border-l border-[#ded9d0] bg-[#fffdf9] shadow-2xl">
-            <header className="flex min-h-[68px] items-center justify-between border-b border-[#ded9d0] px-6">
+          <aside className="absolute inset-y-0 right-0 flex w-full max-w-xl flex-col border-l border-slate-200/80 bg-white shadow-2xl animate-in slide-in-from-right duration-200">
+            <header className="flex min-h-[64px] items-center justify-between border-b border-slate-100 px-6">
               <div className="flex items-center gap-3">
-                <div className="grid h-10 w-10 place-items-center rounded-[7px] bg-black text-sm font-semibold text-white">
+                <div className="grid h-9 w-9 place-items-center rounded-lg bg-slate-900 text-xs font-bold text-white shadow-2xs">
                   {selectedCustomer.name.slice(0, 2).toUpperCase()}
                 </div>
                 <div>
-                  <h3 className="text-base font-semibold text-[#202522]">{selectedCustomer.name}</h3>
-                  <p className="text-xs text-[#a7aaa2]">Cliente desde {formatDate(selectedCustomer.created_at)}</p>
+                  <h3 className="text-sm font-bold text-slate-900">{selectedCustomer.name}</h3>
+                  <p className="text-[11px] text-slate-400">Cliente desde {formatDate(selectedCustomer.created_at)}</p>
                 </div>
               </div>
 
               <button
                 type="button"
                 onClick={() => setSelectedCustomer(null)}
-                className="grid h-9 w-9 place-items-center text-[#a7aaa2] hover:text-[#202522]"
+                className="grid h-8 w-8 place-items-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition"
               >
-                <X className="h-5 w-5" />
+                <X className="h-4 w-4" />
               </button>
             </header>
 
-            <div className="min-h-0 flex-1 overflow-y-auto p-6 space-y-7">
+            <div className="min-h-0 flex-1 overflow-y-auto p-6 space-y-6">
               {/* CONTACT & OVERVIEW */}
-              <section className="grid grid-cols-3 gap-4 border border-[#ded9d0] bg-[#f1eee7] p-4 rounded-sm">
+              <section className="grid grid-cols-3 gap-3 rounded-xl border border-slate-200/80 bg-slate-50/70 p-4">
                 <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-[#a7aaa2]">Total Gasto</p>
-                  <p className="mt-1 text-base font-semibold text-[#202522]">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Gasto</p>
+                  <p className="mt-0.5 text-sm font-bold text-slate-900">
                     {formatMoney(selectedCustomer.total_spent, currency)}
                   </p>
                 </div>
 
                 <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-[#a7aaa2]">Pedidos</p>
-                  <p className="mt-1 text-base font-semibold text-[#202522]">{selectedCustomer.orders_count}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Pedidos</p>
+                  <p className="mt-0.5 text-sm font-bold text-slate-900">{selectedCustomer.orders_count}</p>
                 </div>
 
                 <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-[#a7aaa2]">Ticket Médio</p>
-                  <p className="mt-1 text-base font-semibold text-[#202522]">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Ticket Médio</p>
+                  <p className="mt-0.5 text-sm font-bold text-slate-900">
                     {formatMoney(
                       selectedCustomer.orders_count > 0
                         ? selectedCustomer.total_spent / selectedCustomer.orders_count
@@ -666,26 +666,26 @@ export default function Customers() {
               </section>
 
               {/* CONTACT DETAILS */}
-              <section className="space-y-3">
-                <p className="text-xs font-semibold uppercase tracking-wider text-[#a7aaa2]">Contactos</p>
+              <section className="space-y-2.5">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Contactos</p>
 
-                <div className="space-y-2 text-sm text-[#5f625d]">
+                <div className="space-y-2 text-xs text-slate-600">
                   {selectedCustomer.phone && (
-                    <a href={`tel:${selectedCustomer.phone}`} className="flex items-center gap-3 hover:text-[#202522]">
-                      <Phone className="h-4 w-4 text-[#a7aaa2]" />
+                    <a href={`tel:${selectedCustomer.phone}`} className="flex items-center gap-2.5 hover:text-slate-900 transition">
+                      <Phone className="h-3.5 w-3.5 text-slate-400" />
                       <span>{selectedCustomer.phone}</span>
                     </a>
                   )}
 
                   {selectedCustomer.email && (
-                    <a href={`mailto:${selectedCustomer.email}`} className="flex items-center gap-3 hover:text-[#202522]">
-                      <Mail className="h-4 w-4 text-[#a7aaa2]" />
+                    <a href={`mailto:${selectedCustomer.email}`} className="flex items-center gap-2.5 hover:text-slate-900 transition">
+                      <Mail className="h-3.5 w-3.5 text-slate-400" />
                       <span>{selectedCustomer.email}</span>
                     </a>
                   )}
 
-                  <div className="flex items-center gap-3 text-[#747b73]">
-                    <MessageCircle className="h-4 w-4 text-[#a7aaa2]" />
+                  <div className="flex items-center gap-2.5 text-slate-500">
+                    <MessageCircle className="h-3.5 w-3.5 text-slate-400" />
                     <span>Canal de origem: {channelLabel(selectedCustomer.channel)}</span>
                   </div>
                 </div>
@@ -693,35 +693,35 @@ export default function Customers() {
 
               {/* ORDER HISTORY */}
               <section className="space-y-3">
-                <p className="text-xs font-semibold uppercase tracking-wider text-[#a7aaa2]">Histórico de Pedidos</p>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Histórico de Pedidos</p>
 
                 {loadingOrders ? (
-                  <p className="text-xs text-[#a7aaa2]">A carregar pedidos...</p>
+                  <p className="text-xs text-slate-400">A carregar pedidos...</p>
                 ) : customerOrdersError ? (
                   <div>
-                    <p className="text-xs text-[#a44d2e]">Não foi possível carregar o histórico.</p>
+                    <p className="text-xs text-rose-600">Não foi possível carregar o histórico.</p>
                     <button
                       type="button"
                       onClick={() => setOrdersRefreshKey((current) => current + 1)}
-                      className="mt-2 text-xs font-semibold text-[#2c6457] underline underline-offset-4"
+                      className="mt-1 text-xs font-semibold text-emerald-700 underline underline-offset-4"
                     >
                       Tentar novamente
                     </button>
                   </div>
                 ) : customerOrders.length === 0 ? (
-                  <p className="text-xs text-[#a7aaa2]">Nenhum pedido efetuado ainda.</p>
+                  <p className="text-xs text-slate-400">Nenhum pedido efetuado ainda.</p>
                 ) : (
-                  <div className="divide-y divide-neutral-100 border-y border-[#ded9d0]">
+                  <div className="divide-y divide-slate-100 rounded-xl border border-slate-200/80 bg-white overflow-hidden shadow-2xs">
                     {customerOrders.map((order) => (
-                      <div key={order.id} className="flex items-center justify-between py-3 text-sm">
+                      <div key={order.id} className="flex items-center justify-between p-3 text-xs">
                         <div>
-                          <p className="font-mono text-xs font-semibold text-[#202522]">#{order.id.slice(0, 8).toUpperCase()}</p>
-                          <p className="text-xs text-[#a7aaa2]">{formatShortDate(order.created_at)} · {channelLabel(order.channel)}</p>
+                          <p className="font-mono text-xs font-bold text-slate-900">#{order.id.slice(0, 8).toUpperCase()}</p>
+                          <p className="mt-0.5 text-[11px] text-slate-400">{formatShortDate(order.created_at)} · {channelLabel(order.channel)}</p>
                         </div>
 
                         <div className="text-right">
-                          <p className="font-semibold text-[#202522]">{formatMoney(order.total, currency)}</p>
-                          <span className="text-[10px] uppercase font-medium text-[#747b73]">{order.status}</span>
+                          <p className="font-bold text-slate-900">{formatMoney(order.total, currency)}</p>
+                          <span className="text-[10px] uppercase font-semibold text-slate-500">{order.status}</span>
                         </div>
                       </div>
                     ))}
@@ -730,20 +730,20 @@ export default function Customers() {
               </section>
 
               {/* ACTIVITY TIMELINE */}
-              <section className="space-y-3">
-                <p className="text-xs font-semibold uppercase tracking-wider text-[#a7aaa2]">Atividade</p>
+              <section className="space-y-2.5">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Atividade</p>
 
-                <div className="space-y-3 border-l-2 border-[#ded9d0] pl-4 text-xs text-[#747b73]">
+                <div className="space-y-3 border-l-2 border-slate-200 pl-4 text-xs text-slate-600">
                   {selectedCustomer.last_order_at && (
                     <div>
-                      <p className="font-semibold text-[#202522]">Última compra realizada</p>
-                      <p className="text-[#a7aaa2]">{formatDate(selectedCustomer.last_order_at)}</p>
+                      <p className="font-bold text-slate-900">Última compra realizada</p>
+                      <p className="text-[11px] text-slate-400">{formatDate(selectedCustomer.last_order_at)}</p>
                     </div>
                   )}
 
                   <div>
-                    <p className="font-semibold text-[#202522]">Registo de cliente</p>
-                    <p className="text-[#a7aaa2]">{formatDate(selectedCustomer.created_at)} via {channelLabel(selectedCustomer.channel)}</p>
+                    <p className="font-bold text-slate-900">Registo de cliente</p>
+                    <p className="text-[11px] text-slate-400">{formatDate(selectedCustomer.created_at)} via {channelLabel(selectedCustomer.channel)}</p>
                   </div>
                 </div>
               </section>
@@ -754,56 +754,56 @@ export default function Customers() {
 
       {/* NEW CUSTOMER MODAL */}
       {newModalOpen && (
-        <div className="fixed inset-0 z-[80] grid place-items-center bg-black/40 px-4">
-          <div className="w-full max-w-md bg-[#fffdf9] p-6 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-[#ded9d0] pb-4">
-              <h3 className="text-lg font-semibold text-[#202522]">Novo Cliente</h3>
+        <div className="fixed inset-0 z-[80] grid place-items-center bg-slate-900/50 p-4 backdrop-blur-xs animate-in fade-in-50">
+          <div className="w-full max-w-md rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xl animate-in zoom-in-95">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 className="text-base font-bold text-slate-900">Novo Cliente</h3>
               <button
                 type="button"
                 onClick={() => setNewModalOpen(false)}
-                className="text-[#a7aaa2] hover:text-[#202522]"
+                className="grid h-8 w-8 place-items-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition"
               >
-                <X className="h-5 w-5" />
+                <X className="h-4 w-4" />
               </button>
             </div>
 
-            <div className="mt-4 space-y-4">
+            <div className="mt-4 space-y-3.5">
               <div>
-                <label className="mb-1 block text-xs font-semibold text-[#5f625d]">Nome *</label>
+                <label className="mb-1 block text-xs font-semibold text-slate-700">Nome *</label>
                 <input
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   placeholder="Ex: Maria Silva"
-                  className="h-10 w-full border border-[#c9c3b8] px-3 text-sm outline-none focus:border-black"
+                  className="h-10 w-full rounded-xl border border-slate-200/80 bg-white px-3 text-xs text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 shadow-2xs"
                 />
               </div>
 
               <div>
-                <label className="mb-1 block text-xs font-semibold text-[#5f625d]">Email</label>
+                <label className="mb-1 block text-xs font-semibold text-slate-700">Email</label>
                 <input
                   value={formEmail}
                   onChange={(e) => setFormEmail(e.target.value)}
                   placeholder="maria@exemplo.com"
-                  className="h-10 w-full border border-[#c9c3b8] px-3 text-sm outline-none focus:border-black"
+                  className="h-10 w-full rounded-xl border border-slate-200/80 bg-white px-3 text-xs text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 shadow-2xs"
                 />
               </div>
 
               <div>
-                <label className="mb-1 block text-xs font-semibold text-[#5f625d]">Telefone</label>
+                <label className="mb-1 block text-xs font-semibold text-slate-700">Telefone</label>
                 <input
                   value={formPhone}
                   onChange={(e) => setFormPhone(e.target.value)}
                   placeholder="+244 9xx xxx xxx"
-                  className="h-10 w-full border border-[#c9c3b8] px-3 text-sm outline-none focus:border-black"
+                  className="h-10 w-full rounded-xl border border-slate-200/80 bg-white px-3 text-xs text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 shadow-2xs"
                 />
               </div>
 
               <div>
-                <label className="mb-1 block text-xs font-semibold text-[#5f625d]">Canal Principal</label>
+                <label className="mb-1 block text-xs font-semibold text-slate-700">Canal Principal</label>
                 <select
                   value={formChannel}
                   onChange={(e) => setFormChannel(e.target.value)}
-                  className="h-10 w-full border border-[#c9c3b8] px-3 text-sm outline-none focus:border-black bg-[#fffdf9]"
+                  className="h-10 w-full rounded-xl border border-slate-200/80 bg-white px-3 text-xs font-medium text-slate-800 outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900 shadow-2xs"
                 >
                   <option value="website">Website</option>
                   <option value="whatsapp">WhatsApp</option>
@@ -813,22 +813,22 @@ export default function Customers() {
               </div>
 
               <div>
-                <label className="mb-1 block text-xs font-semibold text-[#5f625d]">Notas</label>
+                <label className="mb-1 block text-xs font-semibold text-slate-700">Notas</label>
                 <textarea
                   value={formNotes}
                   onChange={(e) => setFormNotes(e.target.value)}
                   placeholder="Preferências, notas de entrega..."
-                  rows={3}
-                  className="w-full border border-[#c9c3b8] p-3 text-sm outline-none focus:border-black"
+                  rows={2}
+                  className="w-full resize-y rounded-xl border border-slate-200/80 bg-white p-3 text-xs leading-relaxed text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 shadow-2xs"
                 />
               </div>
             </div>
 
-            <div className="mt-6 flex justify-end gap-2">
+            <div className="mt-5 flex justify-end gap-2">
               <button
                 type="button"
                 onClick={() => setNewModalOpen(false)}
-                className="h-10 px-4 text-sm font-medium text-[#747b73] hover:bg-[#ebe7df]"
+                className="h-9 px-4 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg transition"
               >
                 Cancelar
               </button>
@@ -836,7 +836,7 @@ export default function Customers() {
                 type="button"
                 onClick={handleCreateCustomer}
                 disabled={saving}
-                className="h-10 bg-black px-5 text-sm font-semibold text-white hover:bg-neutral-800 disabled:opacity-50"
+                className="inline-flex h-9 items-center justify-center rounded-lg bg-emerald-600 px-4 text-xs font-semibold text-white shadow-xs hover:bg-emerald-500 transition disabled:opacity-50"
               >
                 {saving ? "A guardar..." : "Guardar Cliente"}
               </button>

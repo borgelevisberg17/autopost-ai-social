@@ -385,11 +385,11 @@ export default function Overview() {
     return (
       <AdminLayout title="Visão geral">
         <div className="flex min-h-[360px] flex-col items-center justify-center px-5 text-center">
-          <p className="text-sm font-medium text-[#5f625d]">{dataError}</p>
+          <p className="text-xs font-medium text-rose-600">{dataError}</p>
           <button
             type="button"
             onClick={() => setRefreshKey((current) => current + 1)}
-            className="mt-4 text-xs font-semibold text-[#2c6457] underline underline-offset-4 hover:text-[#202522]"
+            className="mt-3 inline-flex h-8 items-center rounded-lg bg-slate-900 px-3 text-xs font-semibold text-white hover:bg-slate-800 transition"
           >
             Tentar novamente
           </button>
@@ -506,17 +506,17 @@ export default function Overview() {
 
             <div className="h-[270px] w-full sm:h-[310px]">
               {loading ? (
-                <div className="grid h-full place-items-center text-sm text-[#a7aaa2]">
+                <div className="grid h-full place-items-center text-xs text-slate-400">
                   A carregar dados...
                 </div>
               ) : stats.chart.every((item) => item.receita === 0) ? (
                 <div className="grid h-full place-items-center px-6 text-center">
                   <div>
-                    <TrendingUp className="mx-auto mb-3 h-5 w-5 text-[#c9c3b8]" />
-                    <p className="text-sm font-medium text-[#5f625d]">
+                    <TrendingUp className="mx-auto mb-3 h-5 w-5 text-slate-300" />
+                    <p className="text-xs font-semibold text-slate-700">
                       Ainda não existem vendas neste período.
                     </p>
-                    <p className="mt-1 text-xs text-[#a7aaa2]">
+                    <p className="mt-1 text-[11px] text-slate-400">
                       Os dados de vendas aparecerão aqui quando os pedidos forem
                       recebidos.
                     </p>
@@ -686,13 +686,13 @@ export default function Overview() {
                 lowStock.length === 0 &&
                 stats.pendingOrders.length === 0 &&
                 stats.cancelledOrders.length === 0 && (
-                  <div className="flex items-start gap-3 py-5">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 text-[#5f625d]" />
+                  <div className="flex items-start gap-3 rounded-xl border border-slate-200/80 bg-slate-50/70 p-4">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-600" />
 
                     <div>
-                      <p className="text-sm font-medium">Tudo em ordem</p>
+                      <p className="text-xs font-bold text-slate-900">Tudo em ordem</p>
 
-                      <p className="mt-1 text-xs leading-5 text-[#a7aaa2]">
+                      <p className="mt-0.5 text-xs text-slate-500">
                         Não há tarefas urgentes neste momento.
                       </p>
                     </div>
@@ -704,16 +704,16 @@ export default function Overview() {
 
         {/* CHANNELS + ACTIVITY */}
         <section className="grid gap-4 xl:grid-cols-2">
-          <div className="rounded-[5px] border border-[#e4e0d7] bg-[#fffdf9] p-4 shadow-[0_2px_10px_rgba(32,37,34,0.025)] sm:p-5">
-            <div className="mb-3 flex items-end justify-between gap-3 border-b border-[#ece8df] pb-3">
+          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-xs">
+            <div className="mb-4 flex items-center justify-between gap-3 border-b border-slate-100 pb-3">
               <div>
-                <h2 className="mt-1 font-serif text-base font-semibold tracking-[-0.03em] text-[#202522] sm:text-lg">
+                <h2 className="text-base font-bold tracking-tight text-slate-900">
                   Vendas por origem
                 </h2>
               </div>
               <Link
                 to="/admin/canais"
-                className="group inline-flex shrink-0 items-center gap-1 text-[10px] font-medium text-[#687168] transition hover:text-[#202522]"
+                className="group inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-slate-600 transition hover:text-slate-900"
               >
                 Plataformas
                 <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
@@ -721,31 +721,31 @@ export default function Overview() {
             </div>
 
             {loading ? (
-              <div className="space-y-2 py-3" aria-label="A carregar canais">
+              <div className="space-y-3 py-3" aria-label="A carregar canais">
                 {[0, 1, 2].map((item) => (
                   <div
                     key={item}
-                    className="flex items-center gap-3 border-b border-[#f0ede6] py-4 last:border-0"
+                    className="flex items-center gap-3 border-b border-slate-100 py-3 last:border-0"
                   >
-                    <span className="h-3 w-16 animate-pulse bg-[#f0efe9]" />
-                    <span className="h-1.5 flex-1 animate-pulse bg-[#f0efe9]" />
-                    <span className="h-3 w-20 animate-pulse bg-[#f0efe9]" />
+                    <span className="h-3 w-16 animate-pulse rounded bg-slate-200" />
+                    <span className="h-1.5 flex-1 animate-pulse rounded bg-slate-200" />
+                    <span className="h-3 w-20 animate-pulse rounded bg-slate-200" />
                   </div>
                 ))}
               </div>
             ) : stats.channelSales.length === 0 ? (
               <div className="flex min-h-[200px] flex-col items-center justify-center px-5 text-center">
-                <ShoppingBag className="mb-3 h-5 w-5 text-[#a7ada2]" />
-                <p className="text-sm font-medium text-[#525c54]">
+                <ShoppingBag className="mb-2 h-5 w-5 text-slate-300" />
+                <p className="text-xs font-bold text-slate-900">
                   Ainda sem vendas por canal
                 </p>
-                <p className="mt-1 text-xs leading-5 text-[#858c83]">
+                <p className="mt-1 text-xs text-slate-500">
                   As origens dos pedidos aparecerão quando houver vendas neste
                   período.
                 </p>
               </div>
             ) : (
-              <div className="divide-y divide-[#f0ede6]">
+              <div className="divide-y divide-slate-100">
                 {stats.channelSales.map((channel) => {
                   const totalRevenue = stats.channelSales.reduce(
                     (sum, item) => sum + item.revenue,
@@ -759,24 +759,24 @@ export default function Overview() {
                   return (
                     <div
                       key={channel.channel}
-                      className="grid grid-cols-[minmax(72px,0.7fr)_minmax(42px,1fr)_auto] items-center gap-3 py-4 sm:grid-cols-[minmax(100px,0.7fr)_minmax(60px,1fr)_auto] sm:gap-4"
+                      className="grid grid-cols-[minmax(72px,0.7fr)_minmax(42px,1fr)_auto] items-center gap-3 py-3.5 sm:grid-cols-[minmax(100px,0.7fr)_minmax(60px,1fr)_auto] sm:gap-4"
                     >
-                      <span className="truncate text-xs font-medium text-[#39423a]">
+                      <span className="truncate text-xs font-semibold text-slate-700">
                         {channel.channel}
                       </span>
-                      <div className="h-1.5 overflow-hidden bg-[#eeeae2]">
+                      <div className="h-1.5 overflow-hidden rounded-full bg-slate-100">
                         <div
-                          className="h-full bg-[#2c6457] transition-all"
+                          className="h-full rounded-full bg-emerald-600 transition-all"
                           style={{
                             width: `${Math.min(Math.max(percentage, 0), 100)}%`,
                           }}
                         />
                       </div>
                       <div className="text-right">
-                        <p className="whitespace-nowrap text-xs font-semibold text-[#202522]">
+                        <p className="whitespace-nowrap text-xs font-bold text-slate-900">
                           {formatMoney(channel.revenue, currency)}
                         </p>
-                        <p className="mt-0.5 whitespace-nowrap text-[10px] text-[#858c83]">
+                        <p className="mt-0.5 whitespace-nowrap text-[10px] text-slate-400">
                           {channel.orders} pedido
                           {channel.orders !== 1 ? "s" : ""}
                         </p>
@@ -794,41 +794,41 @@ export default function Overview() {
         {/* PRODUCTS + ORDERS */}
         <section className="grid gap-4 xl:grid-cols-2">
           {/* TOP PRODUCTS */}
-          <div className="rounded-[5px] border border-[#e4e0d7] bg-[#fffdf9] p-4 shadow-[0_2px_10px_rgba(32,37,34,0.025)] sm:p-5">
-            <div className="mb-5 flex items-end justify-between gap-4">
+          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-xs">
+            <div className="mb-4 flex items-center justify-between gap-4 border-b border-slate-100 pb-3">
               <div>
-                <p className="text-xs font-medium uppercase tracking-[0.16em] text-[#a7aaa2]">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                   Produtos
                 </p>
 
-                <h2 className="mt-1 font-serif text-lg font-semibold tracking-[-0.03em] text-[#202522]">
+                <h2 className="mt-0.5 text-base font-bold tracking-tight text-slate-900">
                   Mais vendidos
                 </h2>
               </div>
 
               <Link
                 to="/admin/produtos"
-                className="group flex shrink-0 items-center gap-1 text-xs font-medium text-[#747b73] hover:text-[#202522]"
+                className="group flex shrink-0 items-center gap-1 text-xs font-semibold text-slate-600 hover:text-slate-900 transition"
               >
                 Ver produtos
-                <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
               </Link>
             </div>
 
-            <div className="border-y border-[#ded9d0]">
+            <div className="divide-y divide-slate-100">
               {loading ? (
                 <div
-                  className="space-y-3 py-6"
+                  className="space-y-3 py-4"
                   aria-label="A carregar produtos"
                 >
                   {[0, 1, 2].map((item) => (
                     <div key={item} className="flex items-center gap-4 py-2">
-                      <span className="h-3 w-5 animate-pulse bg-[#f0efe9]" />
-                      <span className="flex-1 space-y-2">
-                        <span className="block h-3 w-2/3 animate-pulse bg-[#f0efe9]" />
-                        <span className="block h-2.5 w-1/3 animate-pulse bg-[#f0efe9]" />
+                      <span className="h-3 w-5 animate-pulse rounded bg-slate-200" />
+                      <span className="flex-1 space-y-1.5">
+                        <span className="block h-3 w-2/3 animate-pulse rounded bg-slate-200" />
+                        <span className="block h-2.5 w-1/3 animate-pulse rounded bg-slate-200" />
                       </span>
-                      <span className="h-3 w-16 animate-pulse bg-[#f0efe9]" />
+                      <span className="h-3 w-16 animate-pulse rounded bg-slate-200" />
                     </div>
                   ))}
                 </div>
@@ -842,25 +842,25 @@ export default function Overview() {
                 stats.productSales.map((product, index) => (
                   <div
                     key={product.name}
-                    className="flex items-center gap-4 border-b border-[#ebe7df] py-4 last:border-b-0"
+                    className="flex items-center gap-4 py-3.5 first:pt-1 last:pb-1"
                   >
-                    <span className="w-5 text-xs text-[#a7aaa2]">
+                    <span className="w-5 text-xs font-mono font-bold text-slate-400">
                       {String(index + 1).padStart(2, "0")}
                     </span>
 
                     <div className="min-w-0 flex-1">
-                      <p className="truncate font-serif text-[15px] font-medium text-[#202522]">
+                      <p className="truncate text-xs font-bold text-slate-900">
                         {product.name}
                       </p>
 
-                      <p className="mt-0.5 text-xs text-[#a7aaa2]">
+                      <p className="mt-0.5 text-[11px] text-slate-400">
                         {product.quantity} unidade
                         {product.quantity !== 1 ? "s" : ""} vendida
                         {product.quantity !== 1 ? "s" : ""}
                       </p>
                     </div>
 
-                    <p className="text-right text-sm font-semibold">
+                    <p className="text-right text-xs font-bold text-slate-900">
                       {formatMoney(product.revenue, currency)}
                     </p>
                   </div>
@@ -870,38 +870,38 @@ export default function Overview() {
           </div>
 
           {/* RECENT ORDERS */}
-          <div className="rounded-[5px] border border-[#e4e0d7] bg-[#fffdf9] p-4 shadow-[0_2px_10px_rgba(32,37,34,0.025)] sm:p-5">
-            <div className="mb-5 flex items-end justify-between gap-4">
+          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-xs">
+            <div className="mb-4 flex items-center justify-between gap-4 border-b border-slate-100 pb-3">
               <div>
-                <p className="text-xs font-medium uppercase tracking-[0.16em] text-[#a7aaa2]">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                   Operação
                 </p>
 
-                <h2 className="mt-1 font-serif text-lg font-semibold tracking-[-0.03em] text-[#202522]">
+                <h2 className="mt-0.5 text-base font-bold tracking-tight text-slate-900">
                   Pedidos recentes
                 </h2>
               </div>
 
               <Link
                 to="/admin/pedidos"
-                className="group flex shrink-0 items-center gap-1 text-xs font-medium text-[#747b73] hover:text-[#202522]"
+                className="group flex shrink-0 items-center gap-1 text-xs font-semibold text-slate-600 hover:text-slate-900 transition"
               >
                 Ver todos
-                <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
               </Link>
             </div>
 
-            <div className="border-y border-[#ded9d0]">
+            <div className="divide-y divide-slate-100">
               {loading ? (
-                <div className="space-y-3 py-6" aria-label="A carregar pedidos">
+                <div className="space-y-3 py-4" aria-label="A carregar pedidos">
                   {[0, 1, 2].map((item) => (
                     <div key={item} className="flex items-center gap-4 py-2">
-                      <span className="h-9 w-9 animate-pulse bg-[#f0efe9]" />
-                      <span className="flex-1 space-y-2">
-                        <span className="block h-3 w-2/3 animate-pulse bg-[#f0efe9]" />
-                        <span className="block h-2.5 w-1/3 animate-pulse bg-[#f0efe9]" />
+                      <span className="h-8 w-8 animate-pulse rounded-lg bg-slate-200" />
+                      <span className="flex-1 space-y-1.5">
+                        <span className="block h-3 w-2/3 animate-pulse rounded bg-slate-200" />
+                        <span className="block h-2.5 w-1/3 animate-pulse rounded bg-slate-200" />
                       </span>
-                      <span className="h-3 w-16 animate-pulse bg-[#f0efe9]" />
+                      <span className="h-3 w-16 animate-pulse rounded bg-slate-200" />
                     </div>
                   ))}
                 </div>
@@ -915,31 +915,31 @@ export default function Overview() {
                 orders.slice(0, 5).map((order) => (
                   <div
                     key={order.id}
-                    className="flex items-center gap-4 border-b border-[#ebe7df] py-4 last:border-b-0"
+                    className="flex items-center gap-3.5 py-3 first:pt-1 last:pb-1"
                   >
-                    <div className="grid h-9 w-9 shrink-0 place-items-center rounded-[4px] bg-[#e9eee9]">
-                      <ShoppingBag className="h-3.5 w-3.5 text-[#747b73]" />
+                    <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-slate-200/80 bg-slate-50 text-slate-600">
+                      <ShoppingBag className="h-3.5 w-3.5 text-slate-600" />
                     </div>
 
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium">
+                      <p className="truncate text-xs font-bold text-slate-900">
                         {order.customer_name}
                       </p>
 
-                      <p className="mt-0.5 text-xs text-[#a7aaa2]">
+                      <p className="mt-0.5 text-[11px] text-slate-400">
                         {formatDate(order.created_at)} ·{" "}
                         {channelLabel(order.channel)}
                       </p>
                     </div>
 
                     <div className="shrink-0 text-right">
-                      <p className="font-serif text-[15px] font-semibold text-[#202522]">
+                      <p className="text-xs font-bold text-slate-900">
                         {formatMoney(order.total, currency)}
                       </p>
 
                       <span
                         className={cn(
-                          "mt-1 inline-flex px-1.5 py-0.5 text-[10px] font-medium",
+                          "mt-0.5 inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold",
                           statusClass(order.status),
                         )}
                       >

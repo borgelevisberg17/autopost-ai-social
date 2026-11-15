@@ -48,10 +48,10 @@ function stateLabel(value: string | null, labels: Record<string, string>, kind: 
 }
 function stateClass(value: string | null, kind: "payment" | "order" | "fulfillment") {
   const normalized = key(value);
-  if (kind === "payment" && normalized === "paid") return "border-[#b8cbbd] bg-[#e9eee9] text-[#2c6457]";
-  if (kind === "payment" && (normalized === "failed" || normalized === "refunded")) return "border-[#e7c3b8] bg-[#f8e9e4] text-[#9e412c]";
-  if (kind === "order" && normalized === "cancelled") return "border-[#e7c3b8] bg-[#f8e9e4] text-[#9e412c]";
-  return "border-[#ded9d0] bg-[#fffdf9] text-[#747b73]";
+  if (kind === "payment" && normalized === "paid") return "border-emerald-200 bg-emerald-50 text-emerald-800";
+  if (kind === "payment" && (normalized === "failed" || normalized === "refunded")) return "border-rose-200 bg-rose-50 text-rose-700";
+  if (kind === "order" && normalized === "cancelled") return "border-rose-200 bg-rose-50 text-rose-700";
+  return "border-slate-200 bg-slate-50 text-slate-600";
 }
 function date(value: string) { const parsed = new Date(value); return Number.isNaN(parsed.getTime()) ? "Data inválida" : new Intl.DateTimeFormat("pt-PT", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(parsed); }
 function channelLabel(value: string | null) { if (!value) return "Canal não registado"; const known: Record<string, string> = { website: "Loja", store: "Loja", whatsapp: "WhatsApp", instagram: "Instagram", facebook: "Facebook" }; return known[value.toLowerCase()] ?? value; }

@@ -116,7 +116,7 @@ export function SalesSubscriptionTrends({ companyId, currency }: { companyId: st
         <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase text-muted-foreground">Últimos 12 meses</p>
-            <h2 className="mt-1 font-serif text-xl font-semibold">Crescimento das vendas</h2>
+            <h2 className="mt-1 text-lg font-bold tracking-tight text-slate-900">Crescimento das vendas</h2>
           </div>
           <div className="flex items-center gap-2 text-sm">
             <TrendingUp className="h-4 w-4 text-primary" />
@@ -158,7 +158,7 @@ export function SalesSubscriptionTrends({ companyId, currency }: { companyId: st
         <div className="mb-5 flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase text-muted-foreground">Plano da loja</p>
-            <h2 className="mt-1 font-serif text-xl font-semibold">Subscrição e crescimento</h2>
+            <h2 className="mt-1 text-lg font-bold tracking-tight text-slate-900">Subscrição e crescimento</h2>
           </div>
           {subscription && (
             <div className="flex min-w-48 items-center gap-3 border-l border-border pl-4">

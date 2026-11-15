@@ -20,8 +20,8 @@ const selectClass = "h-10 rounded border border-input bg-background px-3 text-sm
 
 function PlanEditor({ plan, save }: { plan: Plan; save: (action: string, data: Record<string, unknown>) => Promise<boolean> }) {
   const [p, setP] = useState(plan);
-  return <form onSubmit={e => { e.preventDefault(); void save("plan", { ...p, price: p.monthly_price }); }} className="border border-border rounded p-5 space-y-4">
-    <h2 className="font-serif text-xl">{plan.name}</h2>
+  return <form onSubmit={e => { e.preventDefault(); void save("plan", { ...p, price: p.monthly_price }); }} className="rounded-2xl border border-slate-200/80 bg-white p-5 space-y-4 shadow-xs">
+    <h2 className="text-base font-bold text-slate-900">{plan.name}</h2>
     <label className="block text-sm">Nome<Input value={p.name} required onChange={e => setP({ ...p, name: e.target.value })} /></label>
     <div className="grid grid-cols-2 gap-3"><label className="text-sm">Preço mensal<Input type="number" min="0" step="0.01" value={p.monthly_price ?? ""} placeholder="Por definir" onChange={e => setP({ ...p, monthly_price: e.target.value === "" ? null : Number(e.target.value) })} /></label><label className="text-sm">Moeda<Input required maxLength={3} value={p.currency} onChange={e => setP({ ...p, currency: e.target.value })} /></label></div>
     <label className="block text-sm">Limite de produtos<Input required type="number" min="0" value={p.product_limit} onChange={e => setP({ ...p, product_limit: Number(e.target.value) })} /></label>

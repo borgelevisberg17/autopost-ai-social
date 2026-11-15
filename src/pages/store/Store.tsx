@@ -532,7 +532,7 @@ export default function Store() {
 
   if (company === undefined) {
     return (
-      <div className="grid min-h-screen place-items-center bg-[#fffdf9]">
+      <div className="grid min-h-screen place-items-center bg-white">
         <Loader2 className="h-5 w-5 animate-spin text-black" />
       </div>
     );
@@ -540,17 +540,17 @@ export default function Store() {
 
   if (company === null) {
     return (
-      <div className="grid min-h-screen place-items-center bg-[#fffdf9] px-6">
+      <div className="grid min-h-screen place-items-center bg-white px-6">
         <div className="max-w-sm text-center">
-          <div className="mx-auto grid h-14 w-14 place-items-center rounded-[7px] bg-[#ebe7df]">
-            <ShoppingBag className="h-6 w-6 text-[#5f625d]" />
+          <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-neutral-100">
+            <ShoppingBag className="h-6 w-6 text-neutral-600" />
           </div>
 
-          <h1 className="mt-6 text-xl font-semibold tracking-tight text-[#202522]">
+          <h1 className="mt-6 text-xl font-bold tracking-tight text-neutral-900">
             Loja não encontrada
           </h1>
 
-          <p className="mt-2 text-sm leading-6 text-[#747b73]">
+          <p className="mt-2 text-sm leading-6 text-neutral-500">
             Esta loja não está disponível neste momento.
           </p>
         </div>
@@ -1018,11 +1018,11 @@ export default function Store() {
       >
         <SheetContent
           side="right"
-          className="h-[100dvh] w-full overflow-y-auto border-l border-[#ded9d0] bg-[#fffdf9] p-0 sm:max-w-xl"
+          className="h-[100dvh] w-full overflow-y-auto border-l border-neutral-200 bg-white p-0 sm:max-w-xl"
         >
           {productOpen && (
             <div>
-              <div className="relative aspect-[4/5] bg-[#f1f2f5]">
+              <div className="relative aspect-[4/5] bg-neutral-100">
                 {productOpen
                   .images?.[0] ? (
                   <img
@@ -1037,7 +1037,7 @@ export default function Store() {
                   />
                 ) : (
                   <div className="grid h-full place-items-center">
-                    <ImageOff className="h-10 w-10 text-[#747b73]" />
+                    <ImageOff className="h-10 w-10 text-neutral-400" />
                   </div>
                 )}
 
@@ -1049,7 +1049,7 @@ export default function Store() {
                     )
                   }
                   aria-label="Fechar detalhes do produto"
-                  className="absolute right-4 top-4 grid h-11 w-11 place-items-center rounded-full bg-white text-[#202522] shadow-md transition hover:bg-[#f1f2f5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+                  className="absolute right-4 top-4 grid h-11 w-11 place-items-center rounded-full bg-white text-neutral-900 shadow-md transition hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -1058,14 +1058,14 @@ export default function Store() {
               <div className="p-6 sm:p-8">
                 <SheetHeader className="space-y-3 text-left">
                   {productOpen.category && (
-                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#5f625d]">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-neutral-500">
                       {
                         productOpen.category
                       }
                     </p>
                   )}
 
-                  <SheetTitle className="text-2xl font-bold tracking-tight text-[#202522] sm:text-3xl">
+                  <SheetTitle className="text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">
                     {
                       productOpen.name
                     }
@@ -1073,7 +1073,7 @@ export default function Store() {
                 </SheetHeader>
 
                 <div className="mt-5 flex flex-wrap items-baseline gap-3">
-                  <span className="text-2xl font-bold text-[#202522]">
+                  <span className="text-2xl font-bold text-neutral-900">
                     {formatMoney(
                       priceOf(
                         productOpen,
@@ -1084,7 +1084,7 @@ export default function Store() {
 
                   {productOpen.promo_price !=
                     null && (
-                    <span className="text-sm font-medium text-[#747b73] line-through">
+                    <span className="text-sm font-medium text-neutral-400 line-through">
                       {formatMoney(
                         productOpen.price,
                         currency,
@@ -1094,16 +1094,16 @@ export default function Store() {
                 </div>
 
                 {productOpen.description && (
-                  <p className="mt-6 whitespace-pre-wrap text-[15px] leading-7 text-[#5f625d]">
+                  <p className="mt-6 whitespace-pre-wrap text-[15px] leading-7 text-neutral-600">
                     {
                       productOpen.description
                     }
                   </p>
                 )}
 
-                <div className="mt-7 border-y border-[#ded9d0] py-5">
+                <div className="mt-7 border-y border-neutral-100 py-5">
                   <div className="flex items-center justify-between gap-4">
-                    <span className="text-sm font-medium text-[#5f625d]">
+                    <span className="text-sm font-medium text-neutral-500">
                       Disponibilidade
                     </span>
 
@@ -1111,8 +1111,8 @@ export default function Store() {
                       className={`text-sm font-bold ${
                         productOpen.stock >
                         0
-                          ? "text-[#202522]"
-                          : "text-[#5f625d]"
+                          ? "text-neutral-900"
+                          : "text-neutral-400"
                       }`}
                     >
                       {productOpen.stock >
@@ -1154,7 +1154,7 @@ export default function Store() {
                     );
                     openCart();
                   }}
-                  className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 text-sm font-semibold text-[#5f625d] transition hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+                  className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 text-sm font-semibold text-neutral-600 transition hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
                 >
                   Ver carrinho
                   <ArrowRight className="h-4 w-4" />
@@ -1197,7 +1197,7 @@ export default function Store() {
                     type="button"
                     onClick={goBackToCart}
                     aria-label="Voltar ao carrinho"
-                    className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[#ded9d0] text-[#303732] transition hover:bg-[#ebe7df] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+                    className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-neutral-200 text-neutral-700 transition hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
                   >
                     <ArrowLeft className="h-4 w-4" />
                   </button>
@@ -1223,7 +1223,7 @@ export default function Store() {
                   )}
 
                   {cartStep === "checkout" && (
-                    <p className="mt-0.5 text-xs sm:text-sm font-medium text-[#747b73]">
+                    <p className="mt-0.5 text-xs sm:text-sm font-medium text-neutral-500">
                       Dados para contacto
                     </p>
                   )}
@@ -1237,14 +1237,14 @@ export default function Store() {
           {cartItems.length === 0 && cartStep === "cart" ? (
             <div className="flex flex-1 flex-col items-center justify-center p-8 text-center my-auto">
               <div className="grid h-16 w-16 place-items-center rounded-2xl bg-[#f1f2f5]">
-                <ShoppingCart className="h-6 w-6 text-[#5f625d]" />
+                <ShoppingCart className="h-6 w-6 text-neutral-600" />
               </div>
 
-              <h3 className="mt-6 text-base font-bold text-[#202522]">
+              <h3 className="mt-6 text-base font-bold text-neutral-900">
                 O seu carrinho está vazio
               </h3>
 
-              <p className="mt-2 max-w-xs text-sm leading-6 text-[#747b73]">
+              <p className="mt-2 max-w-xs text-sm leading-6 text-neutral-500">
                 Adicione produtos para continuar.
               </p>
 
@@ -1428,17 +1428,17 @@ export default function Store() {
                 <div className="flex flex-1 flex-col justify-between min-h-0">
                   <div className="px-5 py-6 sm:px-6">
                     <div className="mb-6">
-                      <p className="text-xl sm:text-2xl font-bold tracking-tight text-[#202522]">
+                      <p className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900">
                         Quase concluído.
                       </p>
-                      <p className="mt-1 text-sm text-[#747b73]">
+                      <p className="mt-1 text-sm text-neutral-500">
                         Preencha os seus dados para receber o contacto da loja.
                       </p>
                     </div>
 
                     <div className="space-y-4">
                       <div>
-                        <label htmlFor="customer-name" className="mb-1.5 block text-sm font-semibold text-[#202522]">
+                        <label htmlFor="customer-name" className="mb-1.5 block text-sm font-semibold text-neutral-900">
                           Nome completo
                         </label>
                         <Input
@@ -1447,14 +1447,14 @@ export default function Store() {
                           value={customer.name}
                           onChange={(e) => setCustomer({ ...customer, name: e.target.value })}
                           placeholder="O seu nome"
-                          className="h-11 rounded-xl border-[#c9c3b8] bg-[#fffdf9] text-sm text-[#202522] placeholder:text-[#747b73] focus-visible:ring-2 focus-visible:ring-neutral-900"
+                          className="h-11 rounded-xl border-neutral-200 bg-white text-sm text-neutral-900 placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-neutral-900"
                           maxLength={120}
                           autoComplete="name"
                         />
                       </div>
 
                       <div>
-                        <label htmlFor="customer-phone" className="mb-1.5 block text-sm font-semibold text-[#202522]">
+                        <label htmlFor="customer-phone" className="mb-1.5 block text-sm font-semibold text-neutral-900">
                           Telefone / WhatsApp
                         </label>
                         <Input
@@ -1463,7 +1463,7 @@ export default function Store() {
                           value={customer.phone}
                           onChange={(e) => setCustomer({ ...customer, phone: e.target.value })}
                           placeholder="+244 9xx xxx xxx"
-                          className="h-11 rounded-xl border-[#c9c3b8] bg-[#fffdf9] text-sm text-[#202522] placeholder:text-[#747b73] focus-visible:ring-2 focus-visible:ring-neutral-900"
+                          className="h-11 rounded-xl border-neutral-200 bg-white text-sm text-neutral-900 placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-neutral-900"
                           maxLength={40}
                           autoComplete="tel"
                           inputMode="tel"
@@ -1471,8 +1471,8 @@ export default function Store() {
                       </div>
 
                       <div>
-                        <label htmlFor="customer-email" className="mb-1.5 block text-sm font-semibold text-[#202522]">
-                          Email <span className="font-normal text-[#747b73]">opcional</span>
+                        <label htmlFor="customer-email" className="mb-1.5 block text-sm font-semibold text-neutral-900">
+                          Email <span className="font-normal text-neutral-400">opcional</span>
                         </label>
                         <Input
                           id="customer-email"
@@ -1480,32 +1480,32 @@ export default function Store() {
                           onChange={(e) => setCustomer({ ...customer, email: e.target.value })}
                           placeholder="seu@email.com"
                           type="email"
-                          className="h-11 rounded-xl border-[#c9c3b8] bg-[#fffdf9] text-sm text-[#202522] placeholder:text-[#747b73] focus-visible:ring-2 focus-visible:ring-neutral-900"
+                          className="h-11 rounded-xl border-neutral-200 bg-white text-sm text-neutral-900 placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-neutral-900"
                           maxLength={160}
                           autoComplete="email"
                         />
                       </div>
 
                       <div>
-                        <label htmlFor="customer-notes" className="mb-1.5 block text-sm font-semibold text-[#202522]">
-                          Morada / observações <span className="font-normal text-[#747b73]">opcional</span>
+                        <label htmlFor="customer-notes" className="mb-1.5 block text-sm font-semibold text-neutral-900">
+                          Morada / observações <span className="font-normal text-neutral-400">opcional</span>
                         </label>
                         <Textarea
                           id="customer-notes"
                           value={customer.notes}
                           onChange={(e) => setCustomer({ ...customer, notes: e.target.value })}
                           placeholder="Morada, referência ou alguma observação"
-                          className="min-h-[90px] resize-none rounded-xl border-[#c9c3b8] bg-[#fffdf9] text-sm text-[#202522] placeholder:text-[#747b73] focus-visible:ring-2 focus-visible:ring-neutral-900"
+                          className="min-h-[90px] resize-none rounded-xl border-neutral-200 bg-white text-sm text-neutral-900 placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-neutral-900"
                           maxLength={1000}
                         />
                       </div>
                     </div>
                   </div>
 
-                  <div className="mt-auto border-t border-[#ded9d0] bg-[#fffdf9] px-5 py-5 sm:px-6 space-y-4">
+                  <div className="mt-auto border-t border-neutral-100 bg-white px-5 py-5 sm:px-6 space-y-4">
                     <div className="flex items-center justify-between gap-4">
-                      <span className="text-sm font-medium text-[#747b73]">Total</span>
-                      <span className="text-xl font-bold text-[#202522]">{formatMoney(cartTotal, currency)}</span>
+                      <span className="text-sm font-medium text-neutral-500">Total</span>
+                      <span className="text-xl font-bold text-neutral-900">{formatMoney(cartTotal, currency)}</span>
                     </div>
 
                     <Button
@@ -1538,36 +1538,36 @@ export default function Store() {
                       <Check className="h-9 w-9 stroke-[2.5]" />
                     </div>
 
-                    <p className="mt-8 text-xs font-bold uppercase tracking-[0.2em] text-[#747b73]">
+                    <p className="mt-8 text-xs font-bold uppercase tracking-[0.2em] text-neutral-400">
                       Pedido recebido
                     </p>
 
                     <h2
                       ref={successHeadingRef}
                       tabIndex={-1}
-                      className="mt-3 text-3xl font-bold tracking-[-0.04em] text-[#202522] focus:outline-none"
+                      className="mt-3 text-3xl font-bold tracking-[-0.04em] text-neutral-900 focus:outline-none"
                     >
                       Tudo certo.
                     </h2>
 
-                    <p className="mt-4 max-w-sm text-sm leading-6 text-[#747b73]">
+                    <p className="mt-4 max-w-sm text-sm leading-6 text-neutral-500">
                       O seu pedido foi registado com sucesso. A loja poderá entrar em contacto consigo para combinar os próximos passos.
                     </p>
 
                     {orderId && (
-                      <div className="mt-7 rounded-xl border border-[#ded9d0] bg-[#f1eee7] px-5 py-4">
-                        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#747b73]">
+                      <div className="mt-7 rounded-xl border border-neutral-200 bg-neutral-50 px-5 py-4">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-neutral-400">
                           Pedido
                         </p>
 
-                        <p className="mt-1 font-mono text-sm font-bold text-[#202522]">
+                        <p className="mt-1 font-mono text-sm font-bold text-neutral-900">
                           #{orderId}
                         </p>
                       </div>
                     )}
                   </div>
 
-                  <div className="mt-auto border-t border-[#ded9d0] bg-[#fffdf9] px-5 py-5 sm:px-6">
+                  <div className="mt-auto border-t border-neutral-100 bg-white px-5 py-5 sm:px-6">
                     <Button
                       type="button"
                       onClick={() => {

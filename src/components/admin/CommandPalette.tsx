@@ -211,13 +211,13 @@ export function CommandPalette({
     <div
       role="presentation"
       onMouseDown={(event) => event.target === event.currentTarget && onClose()}
-      className="fixed inset-0 z-[100] grid place-items-start justify-center bg-[#202522]/35 px-4 pt-[12vh] backdrop-blur-[2px]"
+      className="fixed inset-0 z-[100] grid place-items-start justify-center bg-slate-900/40 px-4 pt-[12vh] backdrop-blur-[2px]"
     >
       <div
         role="dialog"
         aria-modal="true"
         aria-label="Pesquisa global"
-        className="w-full max-w-2xl overflow-hidden rounded-xl border border-slate-200/90 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.18)]"
+        className="w-full max-w-2xl overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.18)]"
       >
         <div className="flex items-center border-b border-slate-100 px-4">
           <Search className="h-4 w-4 shrink-0 text-slate-400" />
@@ -248,7 +248,7 @@ export function CommandPalette({
               Nenhum resultado para "{query}"
             </p>
           ) : (
-            <div className="space-y-0.5">
+            <div className="space-y-1">
               {results.map((res) => (
                 <button
                   key={`${res.type}-${res.id}`}
@@ -257,34 +257,34 @@ export function CommandPalette({
                     navigate(res.url);
                     onClose();
                   }}
-                  className="flex w-full items-center justify-between rounded-[3px] px-3 py-3 text-left transition hover:bg-[#f0f2ec] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2c6457]"
+                  className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
                 >
                   <div className="flex items-center gap-3">
-                    <span className="grid h-8 w-8 place-items-center rounded-[3px] bg-[#e9eee9] text-[#526755]">
+                    <span className="grid h-8 w-8 place-items-center rounded-lg bg-emerald-50 text-emerald-700">
                       {res.type === "product" && (
-                        <Package className="h-3.5 w-3.5" />
+                        <Package className="h-4 w-4" />
                       )}
                       {res.type === "order" && (
-                        <ShoppingBag className="h-3.5 w-3.5" />
+                        <ShoppingBag className="h-4 w-4" />
                       )}
                       {res.type === "customer" && (
-                        <Users className="h-3.5 w-3.5" />
+                        <Users className="h-4 w-4" />
                       )}
                       {res.type === "nav" && (
-                        <LayoutDashboard className="h-3.5 w-3.5" />
+                        <LayoutDashboard className="h-4 w-4" />
                       )}
                     </span>
                     <div>
-                      <p className="text-sm font-semibold text-[#202522]">
+                      <p className="text-sm font-semibold text-slate-900">
                         {res.title}
                       </p>
-                      <p className="text-[11px] text-[#858c83]">
+                      <p className="text-xs text-slate-500">
                         {res.subtitle}
                       </p>
                     </div>
                   </div>
 
-                  <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-[#858c83]">
+                  <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-medium uppercase text-slate-500">
                     {res.type}
                   </span>
                 </button>

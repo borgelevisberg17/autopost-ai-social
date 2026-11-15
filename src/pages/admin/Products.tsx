@@ -101,20 +101,20 @@ function stockState(product: Product) {
   if (product.stock <= 0) {
     return {
       label: "Sem stock",
-      className: "text-[#202522]",
+      className: "text-rose-600 font-semibold",
     };
   }
 
   if (product.stock <= LOW_STOCK_LIMIT) {
     return {
       label: "Stock baixo",
-      className: "text-[#747b73]",
+      className: "text-amber-600 font-medium",
     };
   }
 
   return {
     label: "Disponível",
-    className: "text-[#747b73]",
+    className: "text-emerald-700 font-medium",
   };
 }
 
@@ -767,7 +767,7 @@ export default function Products() {
 
         <section className="mb-5 flex flex-col gap-3 lg:flex-row">
           <div className="relative min-w-0 flex-1">
-            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#a7aaa2]" />
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
 
             <input
               value={query}
@@ -775,7 +775,7 @@ export default function Products() {
                 clearSelectionAnd(() => setQuery(event.target.value))
               }
               placeholder="Pesquisar produto, SKU ou categoria..."
-              className="min-h-11 w-full border border-[#c9c3b8] bg-[#fffdf9] pl-10 pr-10 text-sm text-[#202522] outline-none transition placeholder:text-[#a7aaa2] focus:border-neutral-700 focus:ring-1 focus:ring-neutral-700"
+              className="h-10 w-full rounded-xl border border-slate-200/80 bg-white pl-10 pr-10 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 shadow-2xs"
             />
 
             {query && (
@@ -783,7 +783,7 @@ export default function Products() {
                 type="button"
                 onClick={() => clearSelectionAnd(() => setQuery(""))}
                 aria-label="Limpar pesquisa"
-                className="absolute right-3 top-1/2 grid h-6 w-6 -translate-y-1/2 place-items-center text-[#a7aaa2] hover:text-[#202522]"
+                className="absolute right-3 top-1/2 grid h-6 w-6 -translate-y-1/2 place-items-center text-slate-400 hover:text-slate-700"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -808,7 +808,7 @@ export default function Products() {
             <button
               type="button"
               onClick={clearFilters}
-              className="min-h-11 px-3 text-sm font-medium text-[#747b73] hover:text-[#202522]"
+              className="h-10 px-3 text-xs font-semibold text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition"
             >
               Limpar filtros
             </button>
@@ -818,20 +818,23 @@ export default function Products() {
         {/* BULK ACTION BAR */}
 
         {selectedIds.length > 0 && (
-          <section className="mb-4 flex flex-col gap-3 rounded-xl bg-[#f5f5f2] px-4 py-3 shadow-sm ring-1 ring-[#ebe7df] sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm font-medium text-[#202522]">
-              {selectedIds.length}{" "}
-              {selectedIds.length === 1
-                ? "produto selecionado"
-                : "produtos selecionados"}
-            </p>
-            <p className="text-xs text-[#747b73]">A seleção é limpa ao mudar pesquisa, categoria ou filtros.</p>
+          <section className="mb-4 flex flex-col gap-3 rounded-xl bg-slate-900 text-white p-3.5 shadow-md border border-slate-800 sm:flex-row sm:items-center sm:justify-between animate-in fade-in-50">
+            <div className="flex items-center gap-2">
+              <span className="flex h-6 w-6 items-center justify-center rounded-md bg-emerald-500 text-xs font-bold text-white">
+                {selectedIds.length}
+              </span>
+              <p className="text-xs font-medium text-slate-200">
+                {selectedIds.length === 1
+                  ? "produto selecionado"
+                  : "produtos selecionados"}
+              </p>
+            </div>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <button
                 type="button"
                 onClick={() => bulkSetActive(true)}
-                className="inline-flex min-h-9 items-center gap-2 border border-[#c9c3b8] bg-[#fffdf9] px-3 text-xs font-semibold text-[#303732] hover:border-neutral-500"
+                className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-emerald-600 px-3 text-xs font-semibold text-white shadow-xs hover:bg-emerald-500 transition"
               >
                 <Check className="h-3.5 w-3.5" />
                 Ativar
@@ -840,7 +843,7 @@ export default function Products() {
               <button
                 type="button"
                 onClick={() => bulkSetActive(false)}
-                className="inline-flex min-h-9 items-center gap-2 border border-[#c9c3b8] bg-[#fffdf9] px-3 text-xs font-semibold text-[#303732] hover:border-neutral-500"
+                className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-slate-800 px-3 text-xs font-semibold text-slate-200 hover:bg-slate-700 transition"
               >
                 Ocultar
               </button>
@@ -848,7 +851,7 @@ export default function Products() {
               <button
                 type="button"
                 onClick={() => setSelectedIds([])}
-                className="inline-flex min-h-9 items-center gap-2 px-3 text-xs font-medium text-[#747b73] hover:text-[#202522]"
+                className="inline-flex h-8 items-center px-3 text-xs font-medium text-slate-400 hover:text-white transition"
               >
                 Cancelar
               </button>
@@ -858,48 +861,48 @@ export default function Products() {
 
         {/* RESULTS */}
 
-        <section className="overflow-hidden rounded-xl bg-[#fffdf9] shadow-sm ring-1 ring-[#ebe7df]">
+        <section className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xs">
           {/* DESKTOP TABLE */}
 
           <div className="hidden overflow-x-auto lg:block">
             <table className="w-full min-w-[980px] border-collapse">
               <thead>
-                <tr className="border-b border-[#ded9d0] bg-[#fafafa]">
-                  <th className="w-12 px-4 py-3 text-left">
+                <tr className="border-b border-slate-200/80 bg-slate-50/75 text-slate-500">
+                  <th className="w-12 px-4 py-3.5 text-left">
                     <input
                       type="checkbox"
                       checked={allVisibleSelected}
                       onChange={toggleAllVisible}
                       aria-label="Selecionar todos os produtos visíveis"
-                      className="h-4 w-4 accent-black"
+                      className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
                     />
                   </th>
 
-                  <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.12em] text-[#a7aaa2]">
+                  <th className="px-4 py-3.5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">
                     Produto
                   </th>
 
-                  <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.12em] text-[#a7aaa2]">
+                  <th className="px-4 py-3.5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">
                     SKU
                   </th>
 
-                  <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.12em] text-[#a7aaa2]">
+                  <th className="px-4 py-3.5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">
                     Categoria
                   </th>
 
-                  <th className="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-[0.12em] text-[#a7aaa2]">
+                  <th className="px-4 py-3.5 text-right text-[11px] font-bold uppercase tracking-wider text-slate-500">
                     Preço
                   </th>
 
-                  <th className="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-[0.12em] text-[#a7aaa2]">
+                  <th className="px-4 py-3.5 text-right text-[11px] font-bold uppercase tracking-wider text-slate-500">
                     Stock
                   </th>
 
-                  <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.12em] text-[#a7aaa2]">
+                  <th className="px-4 py-3.5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">
                     Estado
                   </th>
 
-                  <th className="w-16 px-4 py-3" />
+                  <th className="w-16 px-4 py-3.5" />
                 </tr>
               </thead>
 
@@ -907,7 +910,7 @@ export default function Products() {
                 {loading ? (
                   <LoadingRows />
                 ) : loadError ? (
-                  <tr><td colSpan={8}><div className="p-8"><p className="text-sm text-[#7b3f24]">O catálogo não está disponível.</p><button type="button" onClick={load} className="mt-3 min-h-10 bg-[#202522] px-4 text-sm font-semibold text-white">Tentar novamente</button></div></td></tr>
+                  <tr><td colSpan={8}><div className="p-8 text-center"><p className="text-sm text-rose-600 font-medium">O catálogo não está disponível no momento.</p><button type="button" onClick={load} className="mt-3 inline-flex h-9 items-center rounded-lg bg-slate-900 px-4 text-xs font-semibold text-white hover:bg-slate-800 transition">Tentar novamente</button></div></td></tr>
                 ) : filtered.length === 0 ? (
                   <EmptyProducts
                     hasFilters={
@@ -968,27 +971,27 @@ export default function Products() {
 
           {/* MOBILE */}
 
-          <div className="lg:hidden p-3">
+          <div className="lg:hidden p-3 space-y-3">
             {loading ? (
               <div className="space-y-3">
                 {Array.from({ length: 5 }).map(
                   (_, index) => (
                     <div
                       key={index}
-                      className="flex animate-pulse gap-3 rounded-xl bg-[#f5f5f2] p-4"
+                      className="flex animate-pulse gap-3 rounded-xl border border-slate-100 bg-slate-50/70 p-4"
                     >
-                      <div className="h-16 w-16 shrink-0 bg-[#ebe7df]" />
+                      <div className="h-16 w-16 shrink-0 rounded-lg bg-slate-200" />
                       <div className="flex-1 space-y-2">
-                        <div className="h-4 w-2/3 bg-[#ebe7df]" />
-                        <div className="h-3 w-1/2 bg-[#ebe7df]" />
-                        <div className="h-3 w-1/3 bg-[#ebe7df]" />
+                        <div className="h-4 w-2/3 rounded bg-slate-200" />
+                        <div className="h-3 w-1/2 rounded bg-slate-200" />
+                        <div className="h-3 w-1/3 rounded bg-slate-200" />
                       </div>
                     </div>
                   ),
                 )}
               </div>
             ) : loadError ? (
-              <div className="p-8"><p className="text-sm text-[#7b3f24]">O catálogo não está disponível.</p><button type="button" onClick={load} className="mt-3 min-h-10 bg-[#202522] px-4 text-sm font-semibold text-white">Tentar novamente</button></div>
+              <div className="p-8 text-center"><p className="text-sm font-medium text-rose-600">O catálogo não está disponível no momento.</p><button type="button" onClick={load} className="mt-3 inline-flex h-9 items-center rounded-lg bg-slate-900 px-4 text-xs font-semibold text-white hover:bg-slate-800 transition">Tentar novamente</button></div>
             ) : filtered.length === 0 ? (
               <div className="p-8">
                 <EmptyProductsContent
@@ -1051,14 +1054,14 @@ export default function Products() {
         {/* RESULT FOOTER */}
 
         {!loading && filtered.length > 0 && (
-          <div className="flex flex-col gap-2 py-4 text-xs text-[#a7aaa2] sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-2 py-4 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
             <span>
               A mostrar {filtered.length} de {items.length}{" "}
               produtos
             </span>
 
             {selectedIds.length > 0 && (
-              <span className="text-[#747b73]">
+              <span className="font-semibold text-slate-900">
                 {selectedIds.length} selecionados
               </span>
             )}
@@ -1088,21 +1091,21 @@ export default function Products() {
 
       {deleteProduct && (
         <div
-          className="fixed inset-0 z-[100] grid place-items-center bg-black/50 px-5"
+          className="fixed inset-0 z-[100] grid place-items-center bg-slate-900/60 p-4 backdrop-blur-xs"
           role="dialog"
           aria-modal="true"
           aria-labelledby="delete-product-title"
         >
-          <div className="w-full max-w-md bg-[#fffdf9] p-6 shadow-2xl">
+          <div className="w-full max-w-md rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xl animate-in zoom-in-95">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#a7aaa2]">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-rose-600">
                   Remover produto
                 </p>
 
                 <h2
                   id="delete-product-title"
-                  className="mt-2 text-xl font-semibold tracking-tight text-[#202522]"
+                  className="mt-1 text-lg font-bold tracking-tight text-slate-900"
                 >
                   Apagar este produto?
                 </h2>
@@ -1112,15 +1115,15 @@ export default function Products() {
                 type="button"
                 onClick={() => setDeleteProduct(null)}
                 aria-label="Fechar"
-                className="grid h-9 w-9 shrink-0 place-items-center text-[#a7aaa2] hover:bg-[#ebe7df] hover:text-[#202522]"
+                className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
-            <p className="mt-4 text-sm leading-6 text-[#747b73]">
+            <p className="mt-3 text-sm leading-relaxed text-slate-600">
               O produto{" "}
-              <strong className="font-semibold text-[#202522]">
+              <strong className="font-semibold text-slate-900">
                 “{deleteProduct.name}”
               </strong>{" "}
               será removido do catálogo. Para produtos que
@@ -1132,7 +1135,7 @@ export default function Products() {
               <button
                 type="button"
                 onClick={() => setDeleteProduct(null)}
-                className="min-h-10 px-4 text-sm font-medium text-[#747b73] hover:bg-[#ebe7df]"
+                className="h-9 px-4 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg transition"
               >
                 Cancelar
               </button>
@@ -1140,9 +1143,9 @@ export default function Products() {
               <button
                 type="button"
                 onClick={remove}
-                className="inline-flex min-h-10 items-center justify-center gap-2 bg-black px-4 text-sm font-semibold text-white hover:bg-neutral-800"
+                className="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-rose-600 px-4 text-xs font-semibold text-white shadow-xs hover:bg-rose-500 transition"
               >
-                <Trash2 className="h-4 w-4" />
+                <Trash2 className="h-3.5 w-3.5" />
                 Apagar produto
               </button>
             </div>
@@ -1219,7 +1222,7 @@ function FilterSelect({
         onChange={(event) =>
           onChange(event.target.value)
         }
-        className="min-h-11 min-w-[190px] appearance-none border border-[#c9c3b8] bg-[#fffdf9] pl-3.5 pr-10 text-sm text-[#303732] outline-none focus:border-neutral-700 focus:ring-1 focus:ring-neutral-700"
+        className="h-10 min-w-[190px] appearance-none rounded-xl border border-slate-200/80 bg-white pl-3.5 pr-10 text-xs font-medium text-slate-800 outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900 shadow-2xs"
       >
         {options.map((option) => (
           <option
@@ -1231,7 +1234,7 @@ function FilterSelect({
         ))}
       </select>
 
-      <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#a7aaa2]" />
+      <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
     </div>
   );
 }
@@ -1271,21 +1274,21 @@ function ProductRow({
   return (
     <tr
       className={cn(
-        "border-b border-[#ebe7df] transition last:border-b-0 hover:bg-[#f1eee7]/70",
-        selected && "bg-[#fafafa]",
+        "border-b border-slate-100 transition last:border-b-0 hover:bg-slate-50/70",
+        selected && "bg-slate-50/80",
       )}
     >
-      <td className="px-4 py-4 align-middle">
+      <td className="px-4 py-3.5 align-middle">
         <input
           type="checkbox"
           checked={selected}
           onChange={onSelect}
           aria-label={`Selecionar ${product.name}`}
-          className="h-4 w-4 accent-black"
+          className="h-4 w-4 rounded border-slate-300 text-slate-900 accent-slate-900"
         />
       </td>
 
-      <td className="px-4 py-4">
+      <td className="px-4 py-3.5">
         <button
           type="button"
           onClick={onEdit}
@@ -1294,12 +1297,12 @@ function ProductRow({
           <ProductImage product={product} />
 
           <span className="min-w-0">
-            <span className="block max-w-[260px] truncate text-sm font-semibold text-[#202522] group-hover:underline group-hover:underline-offset-2">
+            <span className="block max-w-[260px] truncate text-sm font-bold text-slate-900 group-hover:text-emerald-700 transition">
               {product.name}
             </span>
 
             {product.description && (
-              <span className="mt-0.5 block max-w-[260px] truncate text-xs text-[#a7aaa2]">
+              <span className="mt-0.5 block max-w-[260px] truncate text-xs text-slate-400">
                 {product.description}
               </span>
             )}
@@ -1307,26 +1310,26 @@ function ProductRow({
         </button>
       </td>
 
-      <td className="px-4 py-4">
+      <td className="px-4 py-3.5">
         <button
           type="button"
           onClick={onCopySku}
-          className="text-xs text-[#747b73] hover:text-[#202522]"
+          className="font-mono text-xs text-slate-500 hover:text-slate-900 font-medium"
         >
           {product.sku || "—"}
         </button>
       </td>
 
-      <td className="px-4 py-4">
-        <span className="text-sm text-[#747b73]">
-          {product.category || "Sem categoria"}
+      <td className="px-4 py-3.5">
+        <span className="text-xs font-medium text-slate-600">
+          {product.category || "Geral"}
         </span>
       </td>
 
-      <td className="px-4 py-4 text-right">
+      <td className="px-4 py-3.5 text-right">
         {product.promo_price != null ? (
           <div>
-            <p className="text-sm font-semibold text-[#202522]">
+            <p className="font-sans text-sm font-bold text-slate-900">
               {formatMoney(
                 product.promo_price,
                 currency,
@@ -1334,7 +1337,7 @@ function ProductRow({
             </p>
 
             <div className="mt-0.5 flex items-center justify-end gap-1.5">
-              <s className="text-[11px] text-[#a7aaa2]">
+              <s className="text-xs text-slate-400 font-normal">
                 {formatMoney(
                   product.price,
                   currency,
@@ -1342,14 +1345,14 @@ function ProductRow({
               </s>
 
               {discount !== null && (
-                <span className="text-[10px] font-semibold text-[#747b73]">
+                <span className="rounded-full bg-rose-50 px-1.5 py-0.2 text-[10px] font-bold text-rose-700 border border-rose-200">
                   -{discount}%
                 </span>
               )}
             </div>
           </div>
         ) : (
-          <span className="text-sm font-semibold text-[#202522]">
+          <span className="font-sans text-sm font-bold text-slate-900">
             {formatMoney(
               product.price,
               currency,
@@ -1358,15 +1361,15 @@ function ProductRow({
         )}
       </td>
 
-      <td className="px-4 py-4 text-right">
-        <div className="inline-flex items-center gap-2">
+      <td className="px-4 py-3.5 text-right">
+        <div className="inline-flex items-center gap-1.5">
           <button
             type="button"
             disabled={product.stock <= 0}
             onClick={() =>
               onStockChange(product.stock - 1)
             }
-            className="grid h-10 w-10 place-items-center border border-[#ded9d0] text-[#747b73] hover:border-neutral-400 hover:text-[#202522] disabled:cursor-not-allowed disabled:opacity-30"
+            className="grid h-7 w-7 place-items-center rounded-md border border-slate-200 bg-white text-xs font-bold text-slate-600 shadow-2xs hover:bg-slate-50 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-30"
             aria-label={`Diminuir stock de ${product.name}`}
           >
             −
@@ -1374,7 +1377,7 @@ function ProductRow({
 
           <span
             className={cn(
-              "min-w-[34px] text-center text-sm font-semibold",
+              "min-w-[32px] text-center font-sans text-xs font-bold",
               stock.className,
             )}
           >
@@ -1386,23 +1389,28 @@ function ProductRow({
             onClick={() =>
               onStockChange(product.stock + 1)
             }
-            className="grid h-10 w-10 place-items-center border border-[#ded9d0] text-[#747b73] hover:border-neutral-400 hover:text-[#202522]"
+            className="grid h-7 w-7 place-items-center rounded-md border border-slate-200 bg-white text-xs font-bold text-slate-600 shadow-2xs hover:bg-slate-50 hover:text-slate-900"
             aria-label={`Aumentar stock de ${product.name}`}
           >
             +
           </button>
         </div>
 
-        <p className="mt-1 text-[10px] text-[#a7aaa2]">
+        <p className="mt-0.5 text-[10px] text-slate-400 font-medium">
           {stock.label}
         </p>
       </td>
 
-      <td className="px-4 py-4">
+      <td className="px-4 py-3.5">
         <button
           type="button"
           onClick={onToggle}
-          className="inline-flex items-center gap-2 text-xs font-medium text-[#5f625d]"
+          className={cn(
+            "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-semibold border transition",
+            product.active
+              ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+              : "border-slate-200 bg-slate-50 text-slate-500",
+          )}
           title={
             product.active
               ? "Ocultar da loja"
@@ -1411,10 +1419,10 @@ function ProductRow({
         >
           <span
             className={cn(
-              "h-1.5 w-1.5 rounded-[7px]",
+              "h-1.5 w-1.5 rounded-full",
               product.active
-                ? "bg-black"
-                : "bg-neutral-300",
+                ? "bg-emerald-500"
+                : "bg-slate-400",
             )}
           />
 
@@ -1422,12 +1430,12 @@ function ProductRow({
         </button>
       </td>
 
-      <td className="relative px-4 py-4 text-right">
+      <td className="relative px-4 py-3.5 text-right">
         <button
           type="button"
           onClick={onMenu}
           aria-label={`Ações para ${product.name}`}
-          className="grid h-10 w-10 place-items-center text-[#a7aaa2] hover:bg-[#ebe7df] hover:text-[#202522]"
+          className="grid h-8 w-8 place-items-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition"
         >
           <MoreHorizontal className="h-4 w-4" />
         </button>
@@ -1482,8 +1490,8 @@ function MobileProduct({
   return (
     <article
       className={cn(
-        "relative mb-3 rounded-xl bg-[#fffdf9] p-4 shadow-sm ring-1 ring-[#ebe7df]",
-        selected && "bg-[#fafafa]",
+        "relative mb-3 rounded-xl border border-slate-200/80 bg-white p-4 shadow-xs transition",
+        selected && "bg-slate-50/80 border-slate-300",
       )}
     >
       <div className="flex gap-3">
@@ -1492,7 +1500,7 @@ function MobileProduct({
           checked={selected}
           onChange={onSelect}
           aria-label={`Selecionar ${product.name}`}
-          className="mt-1 h-4 w-4 shrink-0 accent-black"
+          className="mt-1 h-4 w-4 shrink-0 rounded border-slate-300 accent-slate-900"
         />
 
         <button
@@ -1511,22 +1519,19 @@ function MobileProduct({
               onClick={onEdit}
               className="min-w-0 text-left"
             >
-              <p className="truncate text-sm font-semibold text-[#202522]">
+              <p className="truncate text-sm font-bold text-slate-900">
                 {product.name}
               </p>
 
-              <p className="mt-0.5 truncate text-xs text-[#a7aaa2]">
-                {product.sku || "Sem SKU"}{" "}
-                ·{" "}
-                {product.category ||
-                  "Sem categoria"}
+              <p className="mt-0.5 truncate text-xs text-slate-400">
+                {product.sku || "Sem SKU"} · {product.category || "Geral"}
               </p>
             </button>
 
             <button
               type="button"
               onClick={onMenu}
-              className="grid h-8 w-8 shrink-0 place-items-center text-[#a7aaa2] hover:bg-[#ebe7df] hover:text-[#202522]"
+              className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700"
               aria-label={`Ações para ${product.name}`}
             >
               <MoreHorizontal className="h-4 w-4" />
@@ -1537,14 +1542,14 @@ function MobileProduct({
             <div>
               {product.promo_price != null ? (
                 <>
-                  <p className="text-sm font-semibold text-[#202522]">
+                  <p className="font-sans text-sm font-bold text-slate-900">
                     {formatMoney(
                       product.promo_price,
                       currency,
                     )}
                   </p>
 
-                  <s className="text-[11px] text-[#a7aaa2]">
+                  <s className="text-xs text-slate-400">
                     {formatMoney(
                       product.price,
                       currency,
@@ -1552,7 +1557,7 @@ function MobileProduct({
                   </s>
                 </>
               ) : (
-                <p className="text-sm font-semibold text-[#202522]">
+                <p className="font-sans text-sm font-bold text-slate-900">
                   {formatMoney(
                     product.price,
                     currency,
@@ -1564,7 +1569,7 @@ function MobileProduct({
             <div className="text-right">
               <p
                 className={cn(
-                  "text-sm font-semibold",
+                  "font-sans text-xs font-bold",
                   stock.className,
                 )}
               >
@@ -1574,10 +1579,15 @@ function MobileProduct({
               <button
                 type="button"
                 onClick={onToggle}
-                className="mt-0.5 text-[11px] text-[#a7aaa2]"
+                className={cn(
+                  "mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold border",
+                  product.active
+                    ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                    : "border-slate-200 bg-slate-50 text-slate-500",
+                )}
               >
                 {product.active
-                  ? "Publicado"
+                  ? "Ativo"
                   : "Oculto"}
               </button>
             </div>
@@ -1598,8 +1608,8 @@ function MobileProduct({
         />
       )}
 
-      <div className="ml-7 mt-3 flex items-center gap-2 border-t border-[#ebe7df] pt-3">
-        <span className="text-[11px] text-[#a7aaa2]">
+      <div className="ml-7 mt-3 flex items-center gap-2 border-t border-slate-100 pt-3">
+        <span className="text-xs font-medium text-slate-400">
           Ajustar stock
         </span>
 
@@ -1609,13 +1619,13 @@ function MobileProduct({
           onClick={() =>
             onStockChange(product.stock - 1)
           }
-          className="grid h-10 w-10 place-items-center border border-[#ded9d0] text-[#747b73] disabled:opacity-30"
+          className="grid h-7 w-7 place-items-center rounded-md border border-slate-200 bg-white text-xs font-bold text-slate-600 shadow-2xs hover:bg-slate-50 disabled:opacity-30"
           aria-label={`Diminuir stock de ${product.name}`}
         >
           −
         </button>
 
-        <span className="min-w-[30px] text-center text-xs font-semibold">
+        <span className="min-w-[28px] text-center font-sans text-xs font-bold">
           {product.stock}
         </span>
 
@@ -1624,7 +1634,7 @@ function MobileProduct({
           onClick={() =>
             onStockChange(product.stock + 1)
           }
-          className="grid h-10 w-10 place-items-center border border-[#ded9d0] text-[#747b73]"
+          className="grid h-7 w-7 place-items-center rounded-md border border-slate-200 bg-white text-xs font-bold text-slate-600 shadow-2xs hover:bg-slate-50"
           aria-label={`Aumentar stock de ${product.name}`}
         >
           +
@@ -1656,7 +1666,7 @@ function ProductMenu({
   return (
     <div
       className={cn(
-        "absolute z-30 w-52 border border-[#ded9d0] bg-[#fffdf9] p-1 shadow-xl",
+        "absolute z-30 w-52 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl",
         mobile
           ? "right-4 top-16"
           : "right-4 top-12",
@@ -1665,21 +1675,21 @@ function ProductMenu({
       <button
         type="button"
         onClick={onEdit}
-        className="flex min-h-9 w-full items-center gap-2 px-3 text-left text-xs font-medium text-[#5f625d] hover:bg-[#f1eee7] hover:text-[#202522]"
+        className="flex h-9 w-full items-center gap-2 rounded-lg px-2.5 text-left text-xs font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition"
       >
-        <Pencil className="h-3.5 w-3.5" />
+        <Pencil className="h-3.5 w-3.5 text-slate-400" />
         Editar produto
       </button>
 
       <button
         type="button"
         onClick={onToggle}
-        className="flex min-h-9 w-full items-center gap-2 px-3 text-left text-xs font-medium text-[#5f625d] hover:bg-[#f1eee7] hover:text-[#202522]"
+        className="flex h-9 w-full items-center gap-2 rounded-lg px-2.5 text-left text-xs font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition"
       >
         {product.active ? (
-          <Archive className="h-3.5 w-3.5" />
+          <Archive className="h-3.5 w-3.5 text-slate-400" />
         ) : (
-          <Zap className="h-3.5 w-3.5" />
+          <Zap className="h-3.5 w-3.5 text-emerald-600" />
         )}
 
         {product.active
@@ -1690,9 +1700,9 @@ function ProductMenu({
       <button
         type="button"
         onClick={onCopySku}
-        className="flex min-h-9 w-full items-center gap-2 px-3 text-left text-xs font-medium text-[#5f625d] hover:bg-[#f1eee7] hover:text-[#202522]"
+        className="flex h-9 w-full items-center gap-2 rounded-lg px-2.5 text-left text-xs font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition"
       >
-        <Copy className="h-3.5 w-3.5" />
+        <Copy className="h-3.5 w-3.5 text-slate-400" />
         Copiar SKU
       </button>
 
@@ -1702,22 +1712,22 @@ function ProductMenu({
           target="_blank"
           rel="noreferrer"
           onClick={onClose}
-          className="flex min-h-9 w-full items-center gap-2 px-3 text-xs font-medium text-[#5f625d] hover:bg-[#f1eee7] hover:text-[#202522]"
+          className="flex h-9 w-full items-center gap-2 rounded-lg px-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition"
         >
-          <ExternalLink className="h-3.5 w-3.5" />
-          Ver na loja
+          <ExternalLink className="h-3.5 w-3.5 text-slate-400" />
+          Ver na loja pública
         </a>
       )}
 
-      <div className="my-1 border-t border-[#ebe7df]" />
+      <div className="my-1 border-t border-slate-100" />
 
       <button
         type="button"
         onClick={onDelete}
-        className="flex min-h-9 w-full items-center gap-2 px-3 text-left text-xs font-medium text-[#747b73] hover:bg-[#f1eee7] hover:text-[#202522]"
+        className="flex h-9 w-full items-center gap-2 rounded-lg px-2.5 text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 hover:text-rose-700 transition"
       >
         <Trash2 className="h-3.5 w-3.5" />
-        Apagar
+        Apagar produto
       </button>
     </div>
   );
@@ -1733,7 +1743,7 @@ function ProductImage({
   return (
     <div
       className={cn(
-        "grid shrink-0 place-items-center overflow-hidden border border-[#ded9d0] bg-[#f5f5f2]",
+        "grid shrink-0 place-items-center overflow-hidden rounded-lg border border-slate-200/80 bg-slate-100",
         large
           ? "h-16 w-16"
           : "h-11 w-11",
@@ -1748,21 +1758,7 @@ function ProductImage({
           className="h-full w-full object-cover"
         />
       ) : (
-        <div className="flex flex-col items-center justify-center gap-1 text-[#a7aaa2]">
-          <ImageOff
-            className={cn(
-              large
-                ? "h-5 w-5"
-                : "h-4 w-4",
-            )}
-          />
-
-          {!large && (
-            <span className="text-[7px] font-semibold uppercase tracking-wider">
-              {getInitials(product.name)}
-            </span>
-          )}
-        </div>
+        <ImageOff className="h-4 w-4 text-slate-400" />
       )}
     </div>
   );
@@ -1809,15 +1805,15 @@ function ProductEditor({
     .filter((value) => /^https:\/\//i.test(value));
 
   return (
-    <div className="fixed inset-0 z-[90] bg-black/45" role="dialog" aria-modal="true" aria-labelledby="product-editor-title">
-      <div className="absolute inset-y-0 right-0 flex w-full max-w-2xl flex-col bg-[#fffdf9] shadow-2xl">
-        <header className="flex shrink-0 items-center justify-between border-b border-[#ded9d0] px-5 py-4 sm:px-7">
+    <div className="fixed inset-0 z-[90] bg-slate-900/50 backdrop-blur-xs" role="dialog" aria-modal="true" aria-labelledby="product-editor-title">
+      <div className="absolute inset-y-0 right-0 flex w-full max-w-2xl flex-col bg-white shadow-2xl border-l border-slate-200/80 animate-in slide-in-from-right duration-200">
+        <header className="flex shrink-0 items-center justify-between border-b border-slate-100 px-6 py-4">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#a7aaa2]">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
               Catálogo
             </p>
 
-            <h2 id="product-editor-title" className="mt-1 text-lg font-semibold tracking-tight text-[#202522]">
+            <h2 id="product-editor-title" className="mt-0.5 text-lg font-bold tracking-tight text-slate-900">
               {editing
                 ? "Editar produto"
                 : "Novo produto"}
@@ -1829,14 +1825,14 @@ function ProductEditor({
             onClick={onClose}
             disabled={saving}
             aria-label="Fechar"
-            className="grid h-9 w-9 place-items-center text-[#a7aaa2] hover:bg-[#ebe7df] hover:text-[#202522] disabled:opacity-40"
+            className="grid h-8 w-8 place-items-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-40 transition"
           >
             <X className="h-5 w-5" />
           </button>
         </header>
 
         <div className="min-h-0 flex-1 overflow-y-auto">
-          <div className="space-y-10 px-5 py-7 sm:px-7">
+          <div className="space-y-8 px-6 py-6">
             {/* INFORMATION */}
 
             <section>
@@ -1845,7 +1841,7 @@ function ProductEditor({
                 title="Dados do produto"
               />
 
-              <div className="mt-5 space-y-5">
+              <div className="mt-4 space-y-4">
                 <Field
                   label="Nome"
                   required
@@ -1858,7 +1854,7 @@ function ProductEditor({
                 />
 
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-[#5f625d]">
+                  <label className="mb-1.5 block text-xs font-semibold text-slate-700">
                     Descrição
                   </label>
 
@@ -1872,11 +1868,11 @@ function ProductEditor({
                     }
                     placeholder="Descreva o produto para os seus clientes..."
                     maxLength={2000}
-                    rows={5}
-                    className="w-full resize-y border border-[#c9c3b8] bg-[#fffdf9] px-3.5 py-3 text-sm leading-6 text-[#202522] outline-none placeholder:text-[#a7aaa2] focus:border-neutral-700 focus:ring-1 focus:ring-neutral-700"
+                    rows={4}
+                    className="w-full resize-y rounded-xl border border-slate-200/80 bg-white px-3.5 py-2.5 text-xs leading-relaxed text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 shadow-2xs"
                   />
 
-                  <p className="mt-1 text-right text-[10px] text-[#a7aaa2]">
+                  <p className="mt-1 text-right text-[10px] text-slate-400">
                     {form.description.length}/2000
                   </p>
                 </div>
@@ -1910,13 +1906,13 @@ function ProductEditor({
 
             {/* PRICE & STOCK */}
 
-            <section className="border-t border-[#ded9d0] pt-8">
+            <section className="border-t border-slate-100 pt-6">
               <SectionHeading
                 eyebrow="Comercial"
                 title="Preço e inventário"
               />
 
-              <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <NumberField
                   label={`Preço (${currency})`}
                   value={form.price}
@@ -1959,11 +1955,11 @@ function ProductEditor({
                 Number.isFinite(price) &&
                 promo >= 0 &&
                 promo < price && (
-                  <div className="mt-4 flex items-center gap-2 bg-[#f5f5f2] px-3.5 py-3 text-xs text-[#5f625d]">
-                    <Tag className="h-4 w-4 text-[#747b73]" />
+                  <div className="mt-3 flex items-center gap-2 rounded-xl bg-amber-50 border border-amber-200/60 px-3.5 py-2 text-xs text-amber-800">
+                    <Tag className="h-4 w-4 text-amber-600 shrink-0" />
 
                     <span>
-                      Promoção de{" "}
+                      Promoção com desconto de{" "}
                       <strong>
                         {Math.round(
                           ((price - promo) /
@@ -1979,7 +1975,7 @@ function ProductEditor({
 
             {/* PUBLICATION */}
 
-            <section className="border-t border-[#ded9d0] pt-8">
+            <section className="border-t border-slate-100 pt-6">
               <SectionHeading
                 eyebrow="Publicação"
                 title="Visibilidade na loja"
@@ -1993,15 +1989,15 @@ function ProductEditor({
                     !form.active,
                   )
                 }
-                className="mt-5 flex w-full items-center justify-between border border-[#ded9d0] px-4 py-4 text-left transition hover:border-neutral-400"
+                className="mt-4 flex w-full items-center justify-between rounded-xl border border-slate-200/80 bg-white p-4 text-left transition hover:border-slate-300 hover:bg-slate-50/50"
               >
                 <div className="flex items-center gap-3">
                   <span
                     className={cn(
-                      "grid h-9 w-9 place-items-center",
+                      "grid h-9 w-9 place-items-center rounded-lg transition-colors",
                       form.active
-                        ? "bg-black text-white"
-                        : "bg-[#ebe7df] text-[#a7aaa2]",
+                        ? "bg-emerald-600 text-white"
+                        : "bg-slate-100 text-slate-400",
                     )}
                   >
                     {form.active ? (
@@ -2012,31 +2008,31 @@ function ProductEditor({
                   </span>
 
                   <div>
-                    <p className="text-sm font-semibold text-[#202522]">
+                    <p className="text-xs font-bold text-slate-900">
                       {form.active
                         ? "Produto publicado"
                         : "Produto oculto"}
                     </p>
 
-                    <p className="mt-0.5 text-xs text-[#747b73]">
+                    <p className="mt-0.5 text-[11px] text-slate-500">
                       {form.active
-                        ? "Os clientes podem encontrar este produto na loja."
-                        : "Este produto não aparece no catálogo público."}
+                        ? "Os clientes podem encontrar e comprar este produto na loja."
+                        : "Este produto não aparece no catálogo público da loja."}
                     </p>
                   </div>
                 </div>
 
                 <span
                   className={cn(
-                    "relative h-6 w-11 rounded-[7px] transition",
+                    "relative h-6 w-11 rounded-full transition-colors",
                     form.active
-                      ? "bg-black"
-                      : "bg-[#e7e2d9]",
+                      ? "bg-emerald-600"
+                      : "bg-slate-200",
                   )}
                 >
                   <span
                     className={cn(
-                      "absolute top-1 h-4 w-4 rounded-[7px] bg-[#fffdf9] transition",
+                      "absolute top-1 h-4 w-4 rounded-full bg-white shadow-xs transition-transform",
                       form.active
                         ? "left-6"
                         : "left-1",
@@ -2048,19 +2044,19 @@ function ProductEditor({
 
             {/* IMAGES */}
 
-            <section className="border-t border-[#ded9d0] pt-8">
+            <section className="border-t border-slate-100 pt-6">
               <SectionHeading
                 eyebrow="Conteúdo"
                 title="Imagens"
               />
 
-              <div className="mt-5">
+              <div className="mt-4">
                 <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
                   {previewImages.slice(0, 7).map(
                     (image, index) => (
                       <div
                         key={`${image}-${index}`}
-                        className="aspect-square overflow-hidden border border-[#ded9d0] bg-[#f5f5f2]"
+                        className="aspect-square overflow-hidden rounded-xl border border-slate-200/80 bg-slate-50"
                       >
                         <img
                           src={image}
@@ -2074,11 +2070,11 @@ function ProductEditor({
                   )}
 
                   {previewImages.length < 8 && (
-                    <div className="grid aspect-square place-items-center border border-dashed border-[#c9c3b8] bg-[#f1eee7] text-center">
+                    <div className="grid aspect-square place-items-center rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/50 text-center">
                       <div>
-                        <Plus className="mx-auto h-5 w-5 text-[#a7aaa2]" />
+                        <Plus className="mx-auto h-5 w-5 text-slate-400" />
 
-                        <p className="mt-1 text-[10px] font-medium text-[#747b73]">
+                        <p className="mt-1 text-[10px] font-semibold text-slate-500">
                           Adicionar
                         </p>
                       </div>
@@ -2086,7 +2082,7 @@ function ProductEditor({
                   )}
                 </div>
 
-                <label className="mt-4 block text-xs font-semibold text-[#5f625d]">
+                <label className="mt-4 block text-xs font-semibold text-slate-700">
                   Links das imagens
                 </label>
 
@@ -2101,28 +2097,26 @@ function ProductEditor({
                   placeholder={
                     "https://exemplo.com/imagem-1.jpg\nhttps://exemplo.com/imagem-2.jpg"
                   }
-                  rows={4}
-                  className="mt-1.5 w-full resize-y border border-[#c9c3b8] bg-[#fffdf9] px-3.5 py-3 text-xs leading-5 text-[#202522] outline-none placeholder:text-[#a7aaa2] focus:border-neutral-700 focus:ring-1 focus:ring-neutral-700"
+                  rows={3}
+                  className="mt-1.5 w-full resize-y rounded-xl border border-slate-200/80 bg-white px-3.5 py-2.5 text-xs leading-relaxed text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 shadow-2xs"
                 />
 
-                <p className="mt-2 text-[11px] leading-5 text-[#a7aaa2]">
-                  Até 8 links HTTPS, um por linha. O
-                  armazenamento direto de imagens pode ser
-                  ligado posteriormente ao Storage.
+                <p className="mt-1.5 text-[11px] leading-relaxed text-slate-400">
+                  Insira até 8 links HTTPS, um por linha.
                 </p>
               </div>
             </section>
 
             {/* PREVIEW */}
 
-            <section className="border-t border-[#ded9d0] pt-8">
+            <section className="border-t border-slate-100 pt-6">
               <SectionHeading
                 eyebrow="Pré-visualização"
                 title="Como ficará na loja"
               />
 
-              <div className="mt-5 max-w-sm border border-[#ded9d0] bg-[#fffdf9]">
-                <div className="aspect-square bg-[#f5f5f2]">
+              <div className="mt-4 max-w-sm rounded-xl border border-slate-200/80 bg-white overflow-hidden shadow-2xs">
+                <div className="aspect-square bg-slate-100">
                   {previewImages[0] ? (
                     <img
                       src={previewImages[0]}
@@ -2132,20 +2126,20 @@ function ProductEditor({
                       className="h-full w-full object-cover"
                     />
                   ) : (
-                    <div className="grid h-full place-items-center text-[#c9c3b8]">
+                    <div className="grid h-full place-items-center text-slate-300">
                       <ImageOff className="h-8 w-8" />
                     </div>
                   )}
                 </div>
 
-                <div className="p-4">
-                  <p className="truncate text-sm font-semibold text-[#202522]">
+                <div className="p-3.5">
+                  <p className="truncate text-xs font-bold text-slate-900">
                     {form.name.trim() ||
                       "Nome do produto"}
                   </p>
 
-                  <div className="mt-2 flex items-center gap-2">
-                    <span className="text-sm font-semibold text-[#202522]">
+                  <div className="mt-1 flex items-center gap-2">
+                    <span className="text-xs font-bold text-slate-900">
                       {Number.isFinite(previewPrice)
                         ? formatMoney(
                             previewPrice,
@@ -2160,7 +2154,7 @@ function ProductEditor({
                     {form.promo_price.trim() &&
                       promo < price &&
                       price > 0 && (
-                        <s className="text-xs text-[#a7aaa2]">
+                        <s className="text-[11px] text-slate-400">
                           {formatMoney(
                             price,
                             currency,
@@ -2174,12 +2168,12 @@ function ProductEditor({
           </div>
         </div>
 
-        <footer className="flex shrink-0 items-center justify-end gap-2 border-t border-[#ded9d0] bg-[#fffdf9] px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:px-7">
+        <footer className="flex shrink-0 items-center justify-end gap-2 border-t border-slate-100 bg-white px-6 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
           <button
             type="button"
             onClick={onClose}
             disabled={saving}
-            className="min-h-10 px-4 text-sm font-medium text-[#747b73] hover:bg-[#ebe7df] disabled:opacity-40"
+            className="h-9 px-4 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg transition disabled:opacity-40"
           >
             Cancelar
           </button>
@@ -2188,11 +2182,11 @@ function ProductEditor({
             type="button"
             onClick={onSave}
             disabled={saving}
-            className="inline-flex min-h-10 min-w-[130px] items-center justify-center gap-2 bg-black px-5 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:cursor-wait disabled:opacity-60"
+            className="inline-flex h-9 min-w-[130px] items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 text-xs font-semibold text-white shadow-xs transition hover:bg-emerald-500 disabled:cursor-wait disabled:opacity-60"
           >
             {saving ? (
               <>
-                <span className="h-4 w-4 animate-spin rounded-[7px] border-2 border-white/30 border-t-white" />
+                <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
                 A guardar...
               </>
             ) : (
@@ -2218,11 +2212,11 @@ function SectionHeading({
 }) {
   return (
     <div>
-      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#a7aaa2]">
+      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
         {eyebrow}
       </p>
 
-      <h3 className="mt-1 text-base font-semibold tracking-tight text-[#202522]">
+      <h3 className="mt-0.5 text-sm font-bold tracking-tight text-slate-900">
         {title}
       </h3>
     </div>
@@ -2246,10 +2240,10 @@ function Field({
 }) {
   return (
     <div>
-      <label className="mb-1.5 block text-xs font-semibold text-[#5f625d]">
+      <label className="mb-1.5 block text-xs font-semibold text-slate-700">
         {label}
         {required && (
-          <span className="ml-1 text-[#a7aaa2]">
+          <span className="ml-1 text-rose-500">
             *
           </span>
         )}
@@ -2262,7 +2256,7 @@ function Field({
         }
         placeholder={placeholder}
         maxLength={maxLength}
-        className="min-h-11 w-full border border-[#c9c3b8] bg-[#fffdf9] px-3.5 text-sm text-[#202522] outline-none placeholder:text-[#a7aaa2] focus:border-neutral-700 focus:ring-1 focus:ring-neutral-700"
+        className="h-10 w-full rounded-xl border border-slate-200/80 bg-white px-3.5 text-xs text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 shadow-2xs"
       />
     </div>
   );
@@ -2285,7 +2279,7 @@ function NumberField({
 }) {
   return (
     <div>
-      <label className="mb-1.5 block text-xs font-semibold text-[#5f625d]">
+      <label className="mb-1.5 block text-xs font-semibold text-slate-700">
         {label}
       </label>
 
@@ -2298,7 +2292,7 @@ function NumberField({
           onChange(event.target.value)
         }
         placeholder={placeholder}
-        className="min-h-11 w-full border border-[#c9c3b8] bg-[#fffdf9] px-3.5 text-sm text-[#202522] outline-none placeholder:text-[#a7aaa2] focus:border-neutral-700 focus:ring-1 focus:ring-neutral-700"
+        className="h-10 w-full rounded-xl border border-slate-200/80 bg-white px-3.5 text-xs text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 shadow-2xs"
       />
     </div>
   );
@@ -2341,21 +2335,21 @@ function EmptyProductsContent({
 }) {
   return (
     <div className="flex min-h-[300px] flex-col items-center justify-center px-6 py-12 text-center">
-      <div className="grid h-12 w-12 place-items-center bg-[#ebe7df]">
+      <div className="grid h-12 w-12 place-items-center rounded-xl bg-slate-100 text-slate-500 shadow-2xs">
         {hasFilters ? (
-          <Search className="h-5 w-5 text-[#a7aaa2]" />
+          <Search className="h-5 w-5" />
         ) : (
-          <Package className="h-5 w-5 text-[#a7aaa2]" />
+          <Package className="h-5 w-5" />
         )}
       </div>
 
-      <h3 className="mt-5 text-sm font-semibold text-[#202522]">
+      <h3 className="mt-4 text-sm font-bold text-slate-900">
         {hasFilters
           ? "Nenhum produto encontrado"
           : "O catálogo ainda está vazio"}
       </h3>
 
-      <p className="mt-1 max-w-sm text-xs leading-5 text-[#a7aaa2]">
+      <p className="mt-1 max-w-sm text-xs leading-relaxed text-slate-500">
         {hasFilters
           ? "Experimente alterar a pesquisa ou remover alguns filtros."
           : "Adicione o primeiro produto para começar a construir a sua loja."}
@@ -2364,7 +2358,7 @@ function EmptyProductsContent({
       <button
         type="button"
         onClick={hasFilters ? onClear : onCreate}
-        className="mt-5 inline-flex min-h-9 items-center gap-2 bg-black px-4 text-xs font-semibold text-white hover:bg-neutral-800"
+        className="mt-4 inline-flex h-9 items-center gap-2 rounded-lg bg-slate-900 px-4 text-xs font-semibold text-white shadow-xs hover:bg-slate-800 transition"
       >
         {hasFilters ? (
           "Limpar filtros"
@@ -2385,40 +2379,40 @@ function LoadingRows() {
       {Array.from({ length: 6 }).map((_, index) => (
         <tr
           key={index}
-          className="border-b border-[#ebe7df]"
+          className="border-b border-slate-100"
         >
-          <td className="px-4 py-5">
-            <div className="h-4 w-4 animate-pulse bg-[#ebe7df]" />
+          <td className="px-4 py-4">
+            <div className="h-4 w-4 animate-pulse rounded bg-slate-200" />
           </td>
 
-          <td className="px-4 py-5">
+          <td className="px-4 py-4">
             <div className="flex items-center gap-3">
-              <div className="h-11 w-11 animate-pulse bg-[#ebe7df]" />
-              <div className="space-y-2">
-                <div className="h-3.5 w-36 animate-pulse bg-[#ebe7df]" />
-                <div className="h-2.5 w-24 animate-pulse bg-[#ebe7df]" />
+              <div className="h-10 w-10 animate-pulse rounded-lg bg-slate-200" />
+              <div className="space-y-1.5">
+                <div className="h-3.5 w-36 animate-pulse rounded bg-slate-200" />
+                <div className="h-2.5 w-24 animate-pulse rounded bg-slate-200" />
               </div>
             </div>
           </td>
 
-          <td className="px-4 py-5">
-            <div className="h-3 w-16 animate-pulse bg-[#ebe7df]" />
+          <td className="px-4 py-4">
+            <div className="h-3 w-16 animate-pulse rounded bg-slate-200" />
           </td>
 
-          <td className="px-4 py-5">
-            <div className="h-3 w-20 animate-pulse bg-[#ebe7df]" />
+          <td className="px-4 py-4">
+            <div className="h-3 w-20 animate-pulse rounded bg-slate-200" />
           </td>
 
-          <td className="px-4 py-5">
-            <div className="ml-auto h-3 w-20 animate-pulse bg-[#ebe7df]" />
+          <td className="px-4 py-4">
+            <div className="ml-auto h-3 w-20 animate-pulse rounded bg-slate-200" />
           </td>
 
-          <td className="px-4 py-5">
-            <div className="ml-auto h-3 w-12 animate-pulse bg-[#ebe7df]" />
+          <td className="px-4 py-4">
+            <div className="ml-auto h-3 w-12 animate-pulse rounded bg-slate-200" />
           </td>
 
-          <td className="px-4 py-5">
-            <div className="h-3 w-12 animate-pulse bg-[#ebe7df]" />
+          <td className="px-4 py-4">
+            <div className="h-3 w-12 animate-pulse rounded bg-slate-200" />
           </td>
 
           <td />

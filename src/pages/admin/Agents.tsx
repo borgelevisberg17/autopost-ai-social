@@ -129,19 +129,19 @@ const formatRelativeDate = (date: string) => {
 const actionStatusClass = (status: string) => {
   switch (status) {
     case "DRAFT":
-      return "border-[#ded9d0] bg-[#f1eee7] text-[#5f625d]";
+      return "border-slate-200 bg-slate-100 text-slate-700";
 
     case "PUBLISHED":
-      return "border-[#ded9d0] bg-[#202522] text-white";
+      return "border-emerald-200 bg-emerald-50 text-emerald-800";
 
     case "BLOCKED":
       return "border-amber-200 bg-amber-50 text-amber-800";
 
     case "FAILED":
-      return "border-red-200 bg-red-50 text-red-700";
+      return "border-rose-200 bg-rose-50 text-rose-700";
 
     default:
-      return "border-[#ded9d0] bg-[#fffdf9] text-[#747b73]";
+      return "border-slate-200 bg-slate-50 text-slate-600";
   }
 };
 
@@ -459,11 +459,11 @@ export default function Agents() {
         <section>
           <div className="mb-4 flex items-end justify-between">
             <div>
-              <h3 className="text-lg font-semibold tracking-[-0.025em]">
+              <h3 className="text-base font-bold tracking-tight text-slate-900">
                 Seus agentes
               </h3>
 
-              <p className="mt-1 text-sm text-[#747b73]">
+              <p className="mt-0.5 text-xs text-slate-500">
                 Agentes atualmente disponíveis na sua operação.
               </p>
             </div>
@@ -471,32 +471,32 @@ export default function Agents() {
 
           <div className="grid gap-4 xl:grid-cols-2">
             {/* MARKETING AGENT */}
-            <article className="group border border-[#ded9d0] bg-[#fffdf9] transition-colors hover:border-[#c9c3b8]">
+            <article className="group rounded-2xl border border-slate-200/80 bg-white shadow-xs transition hover:border-slate-300">
               <div className="p-5 sm:p-6">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-3.5">
-                    <div className="grid h-11 w-11 shrink-0 place-items-center border border-[#ded9d0] bg-[#f1eee7]">
+                    <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-slate-200/80 bg-slate-50 text-slate-700 shadow-2xs">
                       <Megaphone
-                        className="h-[19px] w-[19px] text-[#303732]"
-                        strokeWidth={1.7}
+                        className="h-5 w-5 text-slate-700"
+                        strokeWidth={1.75}
                       />
                     </div>
 
                     <div>
                       <div className="mb-1 flex items-center gap-2">
-                        <span className="h-1.5 w-1.5 rounded-[7px] bg-[#202522]" />
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
 
-                        <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#747b73]">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
                           Disponível · manual
                         </span>
                       </div>
 
-                      <h4 className="text-lg font-semibold tracking-[-0.025em]">
+                      <h4 className="text-base font-bold tracking-tight text-slate-900">
                         Marketing Agent
                       </h4>
 
-                      <p className="mt-0.5 text-sm text-[#747b73]">
-                        Conteúdo para revisão
+                      <p className="mt-0.5 text-xs text-slate-500">
+                        Conteúdo para revisão e catálogo social
                       </p>
                     </div>
                   </div>
@@ -508,7 +508,7 @@ export default function Agents() {
                       aria-label="Mais opções"
                       aria-expanded={showMenu}
                       aria-haspopup="menu"
-                      className="grid h-9 w-9 touch-manipulation place-items-center rounded-sm text-[#a7aaa2] transition-colors hover:bg-[#ebe7df] hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+                      className="grid h-8 w-8 place-items-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition"
                     >
                       <MoreHorizontal className="h-4 w-4" />
                     </button>
@@ -517,7 +517,7 @@ export default function Agents() {
                       <div
                         role="menu"
                         aria-label="Informações do agente"
-                        className="absolute right-0 top-10 z-20 w-56 border border-[#ded9d0] bg-[#fffdf9] p-1 shadow-sm"
+                        className="absolute right-0 top-9 z-20 w-56 rounded-xl border border-slate-200/80 bg-white p-1.5 shadow-lg"
                       >
                         <button
                           type="button"
@@ -526,7 +526,7 @@ export default function Agents() {
                             setShowMenu(false);
                             toast.info("O Marketing Agent é executado manualmente e cria rascunhos para revisão.");
                           }}
-                          className="flex min-h-10 w-full items-center gap-2 rounded-sm px-3 py-2 text-left text-xs font-medium text-[#5f625d] hover:bg-[#f1eee7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+                          className="flex min-h-9 w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs font-medium text-slate-700 hover:bg-slate-100 transition"
                         >
                           Execução manual e rascunhos
                         </button>
@@ -535,11 +535,11 @@ export default function Agents() {
                   </div>
                 </div>
 
-                <div className="mt-5 flex flex-wrap gap-1.5">
+                <div className="mt-4 flex flex-wrap gap-1.5">
                   {PLATFORMS.map((platform) => (
                     <span
                       key={platform.id}
-                      className="inline-flex items-center gap-1.5 border border-[#ded9d0] px-2.5 py-1 text-[11px] font-medium text-[#747b73]"
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200/80 bg-slate-50/70 px-2.5 py-1 text-[11px] font-medium text-slate-600"
                     >
                       {platform.id === "instagram" ? (
                         <Instagram className="h-3 w-3" />
@@ -554,60 +554,60 @@ export default function Agents() {
                   ))}
                 </div>
 
-                <div className="my-5 border-t border-[#ded9d0]" />
+                <div className="my-5 border-t border-slate-100" />
 
                 {actionsLoading ? (
-                  <div className="flex items-center gap-2 text-xs text-[#747b73]">
+                  <div className="flex items-center gap-2 text-xs text-slate-500">
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
                     A carregar o resumo da atividade...
                   </div>
                 ) : actionsError ? (
-                  <p className="text-xs leading-5 text-red-700">
+                  <p className="text-xs leading-5 text-rose-600">
                     Resumo indisponível. Os dados anteriores podem estar desatualizados.
                   </p>
                 ) : (
-                  <div className="grid grid-cols-2 gap-y-5 sm:grid-cols-4">
+                  <div className="grid grid-cols-2 gap-y-4 sm:grid-cols-4">
                     <div>
-                      <p className="text-[11px] text-[#a7aaa2]">Hoje</p>
-                      <p className="mt-1 text-lg font-semibold">{stats.totalToday}</p>
+                      <p className="text-[11px] font-semibold text-slate-400">Hoje</p>
+                      <p className="mt-0.5 text-lg font-bold text-slate-900">{stats.totalToday}</p>
                     </div>
 
                     <div>
-                      <p className="text-[11px] text-[#a7aaa2]">Rascunhos</p>
-                      <p className="mt-1 text-lg font-semibold">{stats.drafts}</p>
+                      <p className="text-[11px] font-semibold text-slate-400">Rascunhos</p>
+                      <p className="mt-0.5 text-lg font-bold text-slate-900">{stats.drafts}</p>
                     </div>
 
                     <div>
-                      <p className="text-[11px] text-[#a7aaa2]">Bloqueados</p>
-                      <p className="mt-1 text-lg font-semibold">{stats.blocked}</p>
+                      <p className="text-[11px] font-semibold text-slate-400">Bloqueados</p>
+                      <p className="mt-0.5 text-lg font-bold text-slate-900">{stats.blocked}</p>
                     </div>
 
                     <div>
-                      <p className="text-[11px] text-[#a7aaa2]">Falhas</p>
-                      <p className="mt-1 text-lg font-semibold">{stats.failed}</p>
+                      <p className="text-[11px] font-semibold text-slate-400">Falhas</p>
+                      <p className="mt-0.5 text-lg font-bold text-slate-900">{stats.failed}</p>
                     </div>
                   </div>
                 )}
 
                 {latestAction && (
                   <>
-                    <div className="my-5 border-t border-[#ded9d0]" />
+                    <div className="my-5 border-t border-slate-100" />
 
                     <div>
-                      <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#a7aaa2]">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                         Última atividade
                       </p>
 
                       <div className="mt-2 flex items-start gap-2.5">
-                        <div className="mt-0.5 h-1.5 w-1.5 shrink-0 rounded-[7px] bg-[#202522]" />
+                        <div className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" />
 
                         <div className="min-w-0">
-                          <p className="truncate text-sm font-medium text-[#303732]">
+                          <p className="truncate text-xs font-semibold text-slate-900">
                             {ACTION_LABEL[latestAction.action] ??
                               latestAction.action}
                           </p>
 
-                          <p className="mt-0.5 truncate text-xs text-[#747b73]">
+                          <p className="mt-0.5 truncate text-[11px] text-slate-500">
                             {platformLabel(latestAction.platform)}
                             {" · "}
                             {productName(latestAction.product_id)}
@@ -626,9 +626,9 @@ export default function Agents() {
                   <button
                     type="button"
                     onClick={() => setShowRunPanel(true)}
-                    className="inline-flex h-10 items-center justify-center gap-2 bg-[#202522] px-4 text-sm font-medium text-white transition-colors hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
+                    className="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 text-xs font-semibold text-white shadow-xs transition hover:bg-emerald-500"
                   >
-                    <Play className="h-3.5 w-3.5" />
+                    <Play className="h-3.5 w-3.5 fill-current" />
                     Executar agente
                   </button>
 
@@ -645,7 +645,7 @@ export default function Agents() {
                         block: "start",
                       });
                     }}
-                    className="inline-flex h-10 items-center justify-center gap-2 border border-[#ded9d0] px-4 text-sm font-medium text-[#5f625d] transition-colors hover:bg-[#f1eee7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
+                    className="inline-flex h-9 items-center justify-center gap-1.5 rounded-lg border border-slate-200/80 bg-white px-4 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
                   >
                     Ver atividade
                     <ChevronRight className="h-3.5 w-3.5" />
@@ -655,95 +655,88 @@ export default function Agents() {
             </article>
 
             {/* CURRENT CAPABILITIES */}
-            <article className="border border-[#ded9d0] bg-[#f1eee7]">
-              <div className="p-5 sm:p-6">
+            <article className="rounded-2xl border border-slate-200/80 bg-slate-50/70 p-5 sm:p-6 shadow-xs">
+              <div>
                 <div className="flex items-start gap-3.5">
-                  <div className="grid h-11 w-11 shrink-0 place-items-center border border-[#ded9d0] bg-[#fffdf9]">
+                  <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-slate-200/80 bg-white text-slate-700 shadow-2xs">
                     <ShieldCheck
-                      className="h-[19px] w-[19px] text-[#303732]"
-                      strokeWidth={1.7}
+                      className="h-5 w-5 text-emerald-600"
+                      strokeWidth={1.75}
                     />
                   </div>
 
                   <div>
-                    <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#a7aaa2]">
+                    <p className="mb-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
                       Guardrails
                     </p>
 
-                    <h4 className="text-lg font-semibold tracking-[-0.025em]">
+                    <h4 className="text-base font-bold tracking-tight text-slate-900">
                       Operação controlada
                     </h4>
 
-                    <p className="mt-1 text-sm leading-5 text-[#747b73]">
-                      O agente trabalha apenas com dados disponíveis
-                      no sistema e passa pelas regras antes de gerar
-                      qualquer publicação.
+                    <p className="mt-0.5 text-xs text-slate-500 leading-relaxed">
+                      O agente trabalha apenas com dados do catálogo e regras antes de gerar qualquer conteúdo.
                     </p>
                   </div>
                 </div>
 
-                <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                  <div className="flex items-start gap-3 bg-[#fffdf9] px-4 py-3.5">
-                    <Check className="h-4 w-4 shrink-0 text-[#303732]" />
+                <div className="mt-5 grid gap-2.5 sm:grid-cols-2">
+                  <div className="flex items-start gap-2.5 rounded-xl border border-slate-200/80 bg-white p-3 shadow-2xs">
+                    <Check className="h-4 w-4 shrink-0 text-emerald-600 mt-0.5" />
 
                     <div>
-                      <p className="text-sm font-medium">
+                      <p className="text-xs font-bold text-slate-900">
                         Produtos
                       </p>
-                      <p className="text-xs text-[#747b73]">
+                      <p className="text-[11px] text-slate-500">
                         Consulta dados reais do catálogo.
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-3 bg-[#fffdf9] px-4 py-3.5">
-                    <Check className="h-4 w-4 shrink-0 text-[#303732]" />
+                  <div className="flex items-start gap-2.5 rounded-xl border border-slate-200/80 bg-white p-3 shadow-2xs">
+                    <Check className="h-4 w-4 shrink-0 text-emerald-600 mt-0.5" />
 
                     <div>
-                      <p className="text-sm font-medium">
+                      <p className="text-xs font-bold text-slate-900">
                         Stock e preços
                       </p>
-                      <p className="text-xs text-[#747b73]">
+                      <p className="text-[11px] text-slate-500">
                         Não inventa disponibilidade ou valores.
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-3 bg-[#fffdf9] px-4 py-3.5">
-                    <Check className="h-4 w-4 shrink-0 text-[#303732]" />
+                  <div className="flex items-start gap-2.5 rounded-xl border border-slate-200/80 bg-white p-3 shadow-2xs">
+                    <Check className="h-4 w-4 shrink-0 text-emerald-600 mt-0.5" />
 
                     <div>
-                      <p className="text-sm font-medium">
+                      <p className="text-xs font-bold text-slate-900">
                         Promoções
                       </p>
-                      <p className="text-xs text-[#747b73]">
-                        Valida a promoção antes da geração.
+                      <p className="text-[11px] text-slate-500">
+                        Valida descontos antes de publicar.
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-3 bg-[#fffdf9] px-4 py-3.5">
-                    <Check className="h-4 w-4 shrink-0 text-[#303732]" />
+                  <div className="flex items-start gap-2.5 rounded-xl border border-slate-200/80 bg-white p-3 shadow-2xs">
+                    <Check className="h-4 w-4 shrink-0 text-emerald-600 mt-0.5" />
 
                     <div>
-                      <p className="text-sm font-medium">
-                        Conteúdo por canal
+                      <p className="text-xs font-bold text-slate-900">
+                        Por canal
                       </p>
-                      <p className="text-xs text-[#747b73]">
-                        Adapta o texto para cada plataforma.
+                      <p className="text-[11px] text-slate-500">
+                        Formato ideal para cada rede.
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-5 flex items-start gap-2 text-xs leading-5 text-[#747b73]">
-                  <TriangleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-
-                  <p>
-                    A publicação direta nas redes ainda não está
-                    ativa. Atualmente os conteúdos são criados como
-                    rascunhos para revisão e cópia.
-                  </p>
+                <div className="mt-4 flex items-center gap-2 text-xs text-slate-500">
+                  <TriangleAlert className="h-3.5 w-3.5 shrink-0 text-amber-500" />
+                  <span>Publicações passam primeiro por aprovação da equipe.</span>
                 </div>
               </div>
             </article>
@@ -753,63 +746,63 @@ export default function Agents() {
         {/* AGENT DETAIL / CAPABILITIES */}
         <section>
           <div className="mb-4">
-            <h3 className="text-lg font-semibold tracking-[-0.025em]">
+            <h3 className="text-base font-bold tracking-tight text-slate-900">
               Marketing Agent
             </h3>
 
-            <p className="mt-1 text-sm text-[#747b73]">
+            <p className="mt-0.5 text-xs text-slate-500">
               O que este agente pode consultar e executar atualmente.
             </p>
           </div>
 
           <div className="grid gap-4 lg:grid-cols-3">
-            <div className="bg-[#f1eee7] p-5">
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs">
               <div className="flex items-center gap-2">
-                <Package className="h-4 w-4 text-[#747b73]" />
-                <h4 className="text-sm font-semibold">
+                <Package className="h-4 w-4 text-emerald-600" />
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">
                   Conhecimento
                 </h4>
               </div>
 
-              <div className="mt-4 space-y-3">
-                <div className="flex items-center justify-between pb-3">
-                  <span className="text-sm text-[#747b73]">
+              <div className="mt-4 space-y-2.5">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                  <span className="text-xs text-slate-500">
                     Produtos
                   </span>
-                  <span className="text-xs font-medium text-[#202522]">
+                  <span className="text-xs font-bold text-slate-900">
                     {productsLoading ? "…" : productsError ? "Indisponível" : products.length}
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between pb-3">
-                  <span className="text-sm text-[#747b73]">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                  <span className="text-xs text-slate-500">
                     Informações da loja
                   </span>
-                  <span className="text-xs font-medium text-[#202522]">
+                  <span className="text-xs font-semibold text-emerald-700">
                     No contexto
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-[#747b73]">
+                  <span className="text-xs text-slate-500">
                     Preços e stock
                   </span>
-                  <span className="text-xs font-medium text-[#202522]">
+                  <span className="text-xs font-semibold text-emerald-700">
                     No contexto
                   </span>
                 </div>
               </div>
             </div>
 
-            <div className="bg-[#f1eee7] p-5">
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs">
               <div className="flex items-center gap-2">
-                <ShieldCheck className="h-4 w-4 text-[#747b73]" />
-                <h4 className="text-sm font-semibold">
+                <ShieldCheck className="h-4 w-4 text-emerald-600" />
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">
                   Permissões
                 </h4>
               </div>
 
-              <div className="mt-4 space-y-3">
+              <div className="mt-4 space-y-2">
                 {[
                   ["Consultar produtos", true],
                   ["Consultar stock", true],
@@ -820,16 +813,16 @@ export default function Agents() {
                 ].map(([label, enabled]) => (
                   <div
                     key={String(label)}
-                    className="flex items-center justify-between"
+                    className="flex items-center justify-between text-xs"
                   >
-                    <span className="text-sm text-[#747b73]">
+                    <span className="text-slate-500">
                       {label}
                     </span>
 
                     {enabled ? (
-                      <CheckCircle2 className="h-4 w-4 text-[#303732]" />
+                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
                     ) : (
-                      <span className="text-xs text-[#a7aaa2]">
+                      <span className="text-[11px] font-medium text-slate-400">
                         Não
                       </span>
                     )}
@@ -838,18 +831,18 @@ export default function Agents() {
               </div>
             </div>
 
-            <div className="bg-[#f1eee7] p-5">
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs">
               <div className="flex items-center gap-2">
-                <Clock3 className="h-4 w-4 text-[#747b73]" />
-                <h4 className="text-sm font-semibold">
+                <Clock3 className="h-4 w-4 text-emerald-600" />
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">
                   Execução
                 </h4>
               </div>
 
               <div className="mt-4">
-                <p className="text-sm leading-6 text-[#747b73]">
+                <p className="text-xs leading-relaxed text-slate-500">
                   A execução é manual. O agente usa o produto e os canais
-                  escolhidos e cria rascunhos para revisão.
+                  escolhidos e cria rascunhos para aprovação da equipe.
                 </p>
               </div>
             </div>
@@ -861,18 +854,17 @@ export default function Agents() {
           <section>
             <div className="mb-4 flex items-end justify-between">
               <div>
-                <h3 className="text-lg font-semibold tracking-[-0.025em]">
+                <h3 className="text-base font-bold tracking-tight text-slate-900">
                   Atenção
                 </h3>
 
-                <p className="mt-1 text-sm text-[#747b73]">
-                  Eventos que exigiram intervenção ou foram
-                  bloqueados pelas regras do sistema.
+                <p className="mt-0.5 text-xs text-slate-500">
+                  Eventos que exigiram intervenção ou foram bloqueados pelas regras do sistema.
                 </p>
               </div>
             </div>
 
-            <div className="border border-[#ded9d0] bg-[#fffdf9]">
+            <div className="rounded-2xl border border-slate-200/80 bg-white shadow-xs overflow-hidden">
               {log
                 .filter(
                   (item) =>
@@ -892,38 +884,38 @@ export default function Agents() {
                       key={item.id}
                       onClick={() => setSelectedAction(item)}
                       className={cn(
-                        "flex min-h-14 w-full items-start gap-3 px-4 py-4 text-left transition-colors hover:bg-[#f1eee7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#e36c3f]",
+                        "flex min-h-14 w-full items-start gap-3 px-5 py-3.5 text-left transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500",
                         index < array.length - 1 &&
-                          "border-b border-[#ded9d0]",
+                          "border-b border-slate-100",
                       )}
                     >
                       <Icon
                         className={cn(
                           "mt-0.5 h-4 w-4 shrink-0",
                           item.status === "FAILED"
-                            ? "text-red-600"
-                            : "text-amber-600",
+                            ? "text-rose-600"
+                            : "text-amber-500",
                         )}
                       />
 
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <p className="text-sm font-medium">
+                          <p className="text-xs font-bold text-slate-900">
                             {ACTION_LABEL[item.action] ??
                               item.action}
                           </p>
 
-                          <span className="text-xs text-[#a7aaa2]">
+                          <span className="text-[11px] text-slate-400">
                             {platformLabel(item.platform)}
                           </span>
                         </div>
 
-                        <p className="mt-1 text-xs text-[#747b73]">
+                        <p className="mt-0.5 text-xs text-slate-500">
                           {item.reason ?? "Sem motivo registado"}
                         </p>
                       </div>
 
-                      <span className="shrink-0 text-xs text-[#a7aaa2]">
+                      <span className="shrink-0 text-[11px] text-slate-400">
                         {formatRelativeDate(item.created_at)}
                       </span>
                     </button>
@@ -935,62 +927,61 @@ export default function Agents() {
 
         {/* ACTIVITY */}
         <section id="agent-activity">
-          <div className="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+          <div className="mb-4 flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
             <div>
-              <h3 className="text-lg font-semibold tracking-[-0.025em]">
+              <h3 className="text-base font-bold tracking-tight text-slate-900">
                 Atividade
               </h3>
 
-              <p className="mt-1 text-sm text-[#747b73]">
-                Amostra das últimas 100 ações registadas; não é o histórico completo.
+              <p className="mt-0.5 text-xs text-slate-500">
+                Amostra das últimas ações registadas.
               </p>
             </div>
 
-            <span className="text-xs text-[#a7aaa2]">
+            <span className="text-[11px] font-medium text-slate-400">
               Amostra: {Math.min(log.length, 100)} de 100 máximas
             </span>
           </div>
 
           {actionsLoading ? (
-            <div className="flex min-h-36 items-center justify-center gap-2 bg-[#f1eee7] px-6 py-10 text-sm text-[#747b73]">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              A carregar a amostra de atividade...
+            <div className="flex min-h-36 items-center justify-center gap-2 rounded-2xl border border-slate-200/80 bg-white p-8 text-xs text-slate-500 shadow-xs">
+              <Loader2 className="h-4 w-4 animate-spin text-emerald-600" />
+              A carregar histórico de atividade...
             </div>
           ) : actionsError ? (
-            <div className="bg-red-50 px-6 py-10 text-center">
-              <TriangleAlert className="mx-auto h-5 w-5 text-red-600" />
-              <p className="mt-3 text-sm font-medium text-red-800">
+            <div className="rounded-2xl border border-rose-200 bg-rose-50/60 p-6 text-center shadow-xs">
+              <TriangleAlert className="mx-auto h-5 w-5 text-rose-600" />
+              <p className="mt-2 text-xs font-bold text-rose-900">
                 Não foi possível carregar a atividade.
               </p>
-              <p className="mx-auto mt-1 max-w-md text-xs leading-5 text-red-700">
-                O conteúdo anterior pode estar desatualizado. Tente novamente para consultar a amostra real.
+              <p className="mx-auto mt-1 max-w-md text-xs text-rose-700">
+                Tente novamente para consultar o registo.
               </p>
               <button
                 type="button"
                 onClick={loadData}
-                className="mt-4 inline-flex min-h-10 items-center gap-2 border border-red-200 bg-white px-3 text-xs font-medium text-red-800 hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+                className="mt-3 inline-flex h-8 items-center gap-1.5 rounded-lg border border-rose-200 bg-white px-3 text-xs font-semibold text-rose-800 hover:bg-rose-100 transition"
               >
                 <RefreshCw className="h-3.5 w-3.5" />
                 Tentar novamente
               </button>
             </div>
           ) : recentActivity.length === 0 ? (
-            <div className="border border-dashed border-[#c9c3b8] px-6 py-14 text-center">
-              <div className="mx-auto grid h-10 w-10 place-items-center border border-[#ded9d0]">
-                <Activity className="h-4 w-4 text-[#747b73]" />
+            <div className="rounded-2xl border border-dashed border-slate-200 bg-white px-6 py-12 text-center">
+              <div className="mx-auto grid h-10 w-10 place-items-center rounded-xl bg-slate-100 text-slate-400">
+                <Activity className="h-4 w-4" />
               </div>
 
-              <p className="mt-4 text-sm font-medium">
+              <p className="mt-3 text-xs font-bold text-slate-900">
                 Nenhuma atividade ainda
               </p>
 
-              <p className="mx-auto mt-1 max-w-sm text-xs leading-5 text-[#747b73]">
-                Execute o Marketing Agent para começar a registrar
-                as ações nesta área.
+              <p className="mx-auto mt-1 max-w-sm text-xs text-slate-500">
+                Execute o Marketing Agent para começar a registrar ações nesta área.
               </p>
             </div>
           ) : (
-            <div className="border-y border-[#ded9d0] bg-[#fffdf9]">
+            <div className="rounded-2xl border border-slate-200/80 bg-white shadow-xs overflow-hidden">
               {recentActivity.map((item, index) => {
                 const StatusIcon = statusIcon(item.status);
                 const PlatformIcon = platformIcon(item.platform);
@@ -1001,28 +992,28 @@ export default function Agents() {
                     key={item.id}
                     onClick={() => setSelectedAction(item)}
                     className={cn(
-                      "flex w-full items-start gap-3.5 px-4 py-4 text-left transition-colors hover:bg-[#f1eee7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#e36c3f] sm:px-5",
+                      "flex w-full items-start gap-3.5 px-5 py-3.5 text-left transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500",
                       index < recentActivity.length - 1 &&
-                        "border-b border-[#ded9d0]",
+                        "border-b border-slate-100",
                     )}
                   >
-                    <div className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center border border-[#ded9d0] bg-[#fffdf9]">
+                    <div className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-slate-200/80 bg-slate-50 text-slate-600 shadow-2xs">
                       <StatusIcon
-                        className="h-3.5 w-3.5 text-[#747b73]"
+                        className="h-3.5 w-3.5"
                         strokeWidth={1.8}
                       />
                     </div>
 
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <p className="text-sm font-medium text-[#202522]">
+                        <p className="text-xs font-bold text-slate-900">
                           {ACTION_LABEL[item.action] ??
                             item.action}
                         </p>
 
                         <span
                           className={cn(
-                            "inline-flex items-center rounded-[7px] border px-2 py-0.5 text-[10px] font-medium",
+                            "inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-bold",
                             actionStatusClass(item.status),
                           )}
                         >
@@ -1031,8 +1022,8 @@ export default function Agents() {
                         </span>
                       </div>
 
-                      <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[#747b73]">
-                        <span className="inline-flex items-center gap-1">
+                      <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-slate-500">
+                        <span className="inline-flex items-center gap-1 font-medium text-slate-700">
                           <PlatformIcon className="h-3 w-3" />
                           {platformLabel(item.platform)}
                         </span>
@@ -1049,13 +1040,13 @@ export default function Agents() {
                       </div>
 
                       {item.reason && (
-                        <p className="mt-2 line-clamp-1 text-xs text-[#747b73]">
+                        <p className="mt-1.5 line-clamp-1 text-xs text-slate-500">
                           {item.reason}
                         </p>
                       )}
                     </div>
 
-                    <ChevronRight className="mt-2 h-4 w-4 shrink-0 text-[#c9c3b8]" />
+                    <ChevronRight className="mt-2 h-4 w-4 shrink-0 text-slate-300" />
                   </button>
                 );
               })}
@@ -1067,7 +1058,7 @@ export default function Agents() {
       {/* RUN PANEL */}
       {showRunPanel && (
         <div
-          className="fixed inset-0 z-[70] bg-black/30"
+          className="fixed inset-0 z-[70] bg-slate-900/50 backdrop-blur-xs animate-in fade-in-50"
           role="presentation"
           onMouseDown={(event) => {
             if (event.target === event.currentTarget) {
@@ -1079,15 +1070,15 @@ export default function Agents() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="run-panel-title"
-            className="absolute inset-y-0 right-0 flex w-full max-w-md flex-col border-l border-[#ded9d0] bg-[#fffdf9] shadow-xl"
+            className="absolute inset-y-0 right-0 flex w-full max-w-md flex-col border-l border-slate-200/80 bg-white shadow-2xl animate-in slide-in-from-right duration-200"
           >
-            <div className="flex min-h-16 shrink-0 items-center justify-between border-b border-[#ded9d0] px-5 pt-[env(safe-area-inset-top)]">
+            <div className="flex min-h-16 shrink-0 items-center justify-between border-b border-slate-100 px-5 pt-[env(safe-area-inset-top)]">
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#a7aaa2]">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                   Marketing Agent
                 </p>
 
-                <h3 id="run-panel-title" className="mt-0.5 text-base font-semibold tracking-[-0.02em]">
+                <h3 id="run-panel-title" className="mt-0.5 text-base font-bold tracking-tight text-slate-900">
                   Executar agente
                 </h3>
               </div>
@@ -1096,46 +1087,45 @@ export default function Agents() {
                 type="button"
                 onClick={() => setShowRunPanel(false)}
                 aria-label="Fechar"
-                className="grid h-10 w-10 touch-manipulation place-items-center rounded-sm text-[#a7aaa2] hover:bg-[#ebe7df] hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+                className="grid h-8 w-8 place-items-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition"
               >
-                <XCircle className="h-4 w-4" />
+                <XCircle className="h-5 w-5" />
               </button>
             </div>
 
             <div className="min-h-0 flex-1 overflow-y-auto px-5 py-6">
-              <div className="space-y-7">
+              <div className="space-y-6">
                 <div>
                   <label
                     htmlFor="agent-product"
-                    className="text-sm font-medium text-[#202522]"
+                    className="text-xs font-bold text-slate-900"
                   >
                     Produto
                   </label>
 
-                  <p className="mt-1 text-xs leading-5 text-[#747b73]">
-                    O agente vai usar somente os dados reais deste
-                    produto.
+                  <p className="mt-0.5 text-xs text-slate-500">
+                    O agente vai usar somente os dados reais deste produto.
                   </p>
 
                   {productsLoading ? (
-                    <div className="mt-3 flex min-h-11 items-center gap-2 bg-[#f1eee7] px-3 text-xs text-[#747b73]">
+                    <div className="mt-3 flex min-h-10 items-center gap-2 rounded-xl bg-slate-50 border border-slate-100 px-3 text-xs text-slate-500">
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />
                       A carregar produtos...
                     </div>
                   ) : productsError ? (
-                    <div className="mt-3 bg-red-50 px-3 py-3 text-xs leading-5 text-red-700">
-                      <p>Não foi possível consultar o catálogo. A lista anterior pode estar desatualizada.</p>
+                    <div className="mt-3 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs leading-5 text-rose-700">
+                      <p>Não foi possível consultar o catálogo.</p>
                       <button
                         type="button"
                         onClick={loadData}
-                        className="mt-2 inline-flex min-h-9 items-center gap-1.5 border border-red-200 bg-white px-2.5 font-medium text-red-800 hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+                        className="mt-2 inline-flex h-8 items-center gap-1.5 rounded-lg border border-rose-200 bg-white px-2.5 font-medium text-rose-800 hover:bg-rose-100 transition"
                       >
                         <RefreshCw className="h-3.5 w-3.5" />
                         Tentar novamente
                       </button>
                     </div>
                   ) : products.length === 0 ? (
-                    <div className="mt-3 bg-[#f1eee7] px-3 py-3 text-xs leading-5 text-[#747b73]">
+                    <div className="mt-3 rounded-xl border border-slate-200/80 bg-slate-50 p-3 text-xs text-slate-500">
                       Nenhum produto disponível para uma execução manual.
                     </div>
                   ) : (
@@ -1145,7 +1135,7 @@ export default function Agents() {
                       onChange={(event) =>
                         setSelectedProductId(event.target.value)
                       }
-                      className="mt-3 h-11 w-full rounded-sm border border-[#ded9d0] bg-[#fffdf9] px-3 text-sm text-[#202522] outline-none transition focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+                      className="mt-2 h-10 w-full rounded-xl border border-slate-200/80 bg-white px-3 text-xs font-medium text-slate-900 outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900 shadow-2xs"
                     >
                       <option value="">Escolher produto...</option>
                       {products.map((product) => (
@@ -1158,13 +1148,12 @@ export default function Agents() {
                 </div>
 
                 <div>
-                  <p className="text-sm font-medium text-[#202522]">
+                  <p className="text-xs font-bold text-slate-900">
                     Canais
                   </p>
 
-                  <p className="mt-1 text-xs leading-5 text-[#747b73]">
-                    Será criado um conteúdo adaptado para cada rede
-                    selecionada.
+                  <p className="mt-0.5 text-xs text-slate-500">
+                    Será criado um conteúdo adaptado para cada rede selecionada.
                   </p>
 
                   <div className="mt-3 space-y-2">
@@ -1184,10 +1173,10 @@ export default function Agents() {
                         <label
                           key={platform.id}
                           className={cn(
-                            "flex cursor-pointer items-center gap-3 border px-3.5 py-3 transition-colors",
+                            "flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition",
                             checked
-                              ? "border-neutral-900 bg-[#f1eee7]"
-                              : "border-[#ded9d0] hover:bg-[#f1eee7]",
+                              ? "border-slate-900 bg-slate-50/80 text-slate-900 shadow-2xs"
+                              : "border-slate-200/80 bg-white text-slate-600 hover:border-slate-300",
                           )}
                         >
                           <input
@@ -1196,12 +1185,12 @@ export default function Agents() {
                             onChange={() =>
                               togglePlatform(platform.id)
                             }
-                            className="h-4 w-4 accent-black"
+                            className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
                           />
 
-                          <Icon className="h-4 w-4 text-[#747b73]" />
+                          <Icon className="h-4 w-4 text-slate-600" />
 
-                          <span className="text-sm font-medium">
+                          <span className="text-xs font-semibold">
                             {platform.label}
                           </span>
                         </label>
@@ -1210,32 +1199,21 @@ export default function Agents() {
                   </div>
                 </div>
 
-                <div className="border border-[#ded9d0] bg-[#f1eee7] p-4">
+                <div className="rounded-xl border border-slate-200/80 bg-slate-50/70 p-4">
                   <div className="flex items-start gap-2.5">
-                    <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#5f625d]" />
+                    <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
 
                     <div>
-                      <p className="text-xs font-semibold text-[#202522]">
+                      <p className="text-xs font-bold text-slate-900">
                         Regras aplicadas automaticamente
                       </p>
 
-                      <ul className="mt-2 space-y-1.5 text-xs leading-5 text-[#747b73]">
-                        <li>
-                          O produto precisa estar ativo.
-                        </li>
-                        <li>
-                          O stock precisa ser superior a zero.
-                        </li>
-                        <li>
-                          O preço precisa ser válido.
-                        </li>
-                        <li>
-                          A promoção não pode ser igual ou superior
-                          ao preço normal.
-                        </li>
-                        <li>
-                          A IA só recebe dados existentes no sistema.
-                        </li>
+                      <ul className="mt-1.5 space-y-1 text-[11px] leading-relaxed text-slate-600">
+                        <li>• O produto precisa estar ativo.</li>
+                        <li>• O stock precisa ser superior a zero.</li>
+                        <li>• O preço precisa ser válido.</li>
+                        <li>• A promoção não pode ser igual ou superior ao preço normal.</li>
+                        <li>• A IA só recebe dados existentes no sistema.</li>
                       </ul>
                     </div>
                   </div>
@@ -1243,8 +1221,8 @@ export default function Agents() {
               </div>
             </div>
 
-            <div className="shrink-0 border-t border-[#ded9d0] bg-[#fffdf9] p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
-              <div className="mb-3 flex items-center justify-between text-xs text-[#747b73]">
+            <div className="shrink-0 border-t border-slate-100 bg-white p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
+              <div className="mb-3 flex items-center justify-between text-xs text-slate-500">
                 <span>
                   {selectedPlatforms.length}{" "}
                   {selectedPlatforms.length === 1
@@ -1252,7 +1230,7 @@ export default function Agents() {
                     : "canais"}
                 </span>
 
-                <span>
+                <span className="font-semibold text-slate-900 truncate max-w-[180px]">
                   {selectedProductId
                     ? productName(selectedProductId)
                     : "Nenhum produto"}
@@ -1269,7 +1247,7 @@ export default function Agents() {
                   products.length === 0 ||
                   selectedPlatforms.length === 0
                 }
-                className="flex h-11 w-full items-center justify-center gap-2 bg-[#202522] text-sm font-medium text-white transition-colors hover:bg-neutral-800 disabled:cursor-not-allowed disabled:bg-neutral-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] focus-visible:ring-offset-2"
+                className="flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 text-xs font-semibold text-white shadow-xs transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
               >
                 {running ? (
                   <>
@@ -1291,7 +1269,7 @@ export default function Agents() {
       {/* ACTION DETAIL */}
       {selectedAction && (
         <div
-          className="fixed inset-0 z-[80] bg-black/30"
+          className="fixed inset-0 z-[80] bg-slate-900/50 backdrop-blur-xs animate-in fade-in-50"
           role="presentation"
           onMouseDown={(event) => {
             if (event.target === event.currentTarget) {
@@ -1303,26 +1281,26 @@ export default function Agents() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="action-detail-title"
-            className="absolute inset-y-0 right-0 flex w-full max-w-xl flex-col border-l border-[#ded9d0] bg-[#fffdf9] shadow-xl"
+            className="absolute inset-y-0 right-0 flex w-full max-w-xl flex-col border-l border-slate-200/80 bg-white shadow-2xl animate-in slide-in-from-right duration-200"
           >
-            <div className="flex min-h-16 shrink-0 items-center justify-between border-b border-[#ded9d0] px-5 pt-[env(safe-area-inset-top)]">
+            <div className="flex min-h-16 shrink-0 items-center justify-between border-b border-slate-100 px-5 pt-[env(safe-area-inset-top)]">
               <div className="flex min-w-0 items-center gap-3">
                 <button
                   type="button"
                   onClick={() => setSelectedAction(null)}
                   aria-label="Voltar"
-                  className="grid h-10 w-10 shrink-0 touch-manipulation place-items-center rounded-sm text-[#747b73] hover:bg-[#ebe7df] hover:text-[#202522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+                  className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition"
                 >
                   <ArrowLeft className="h-4 w-4" />
                 </button>
 
                 <div className="min-w-0">
-                  <p id="action-detail-title" className="truncate text-sm font-semibold">
+                  <p id="action-detail-title" className="truncate text-sm font-bold text-slate-900">
                     {ACTION_LABEL[selectedAction.action] ??
                       selectedAction.action}
                   </p>
 
-                  <p className="truncate text-xs text-[#747b73]">
+                  <p className="truncate text-xs text-slate-500">
                     {formatDate(selectedAction.created_at)}
                   </p>
                 </div>
@@ -1330,7 +1308,7 @@ export default function Agents() {
 
               <span
                 className={cn(
-                  "inline-flex shrink-0 rounded-[7px] border px-2.5 py-1 text-[10px] font-semibold",
+                  "inline-flex shrink-0 rounded-full border px-2.5 py-0.5 text-[10px] font-bold",
                   actionStatusClass(selectedAction.status),
                 )}
               >
@@ -1340,40 +1318,40 @@ export default function Agents() {
             </div>
 
             <div className="min-h-0 flex-1 overflow-y-auto px-5 py-6">
-              <div className="space-y-7">
-                <div className="grid grid-cols-2 border-y border-[#ded9d0]">
-                  <div className="border-r border-[#ded9d0] py-4">
-                    <p className="text-[11px] text-[#a7aaa2]">
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 rounded-xl border border-slate-200/80 bg-slate-50/70 p-4">
+                  <div className="border-r border-slate-200/80 pr-4">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                       Canal
                     </p>
 
-                    <p className="mt-1 text-sm font-medium">
+                    <p className="mt-1 text-xs font-bold text-slate-900">
                       {platformLabel(selectedAction.platform)}
                     </p>
                   </div>
 
-                  <div className="py-4 pl-4">
-                    <p className="text-[11px] text-[#a7aaa2]">
+                  <div className="pl-4">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                       Produto
                     </p>
 
-                    <p className="mt-1 truncate text-sm font-medium">
+                    <p className="mt-1 truncate text-xs font-bold text-slate-900">
                       {productName(selectedAction.product_id)}
                     </p>
                   </div>
                 </div>
 
                 {selectedAction.reason && (
-                  <div className="border border-[#ded9d0] bg-[#f1eee7] p-4">
+                  <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-4">
                     <div className="flex items-start gap-2.5">
-                      <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#747b73]" />
+                      <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
 
                       <div>
-                        <p className="text-xs font-semibold">
+                        <p className="text-xs font-bold text-amber-900">
                           Motivo
                         </p>
 
-                        <p className="mt-1 text-sm leading-6 text-[#747b73]">
+                        <p className="mt-1 text-xs leading-relaxed text-amber-800">
                           {selectedAction.reason}
                         </p>
                       </div>
@@ -1383,13 +1361,13 @@ export default function Agents() {
 
                 {selectedAction.content ? (
                   <div>
-                    <div className="mb-3 flex items-center justify-between">
+                    <div className="mb-2 flex items-center justify-between">
                       <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#a7aaa2]">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                           Conteúdo gerado
                         </p>
 
-                        <p className="mt-1 text-sm font-medium">
+                        <p className="mt-0.5 text-xs font-bold text-slate-900">
                           {platformLabel(selectedAction.platform)}
                         </p>
                       </div>
@@ -1399,26 +1377,26 @@ export default function Agents() {
                         onClick={() =>
                           copyContent(selectedAction.content!)
                         }
-                        className="inline-flex h-8 items-center gap-1.5 border border-[#ded9d0] px-2.5 text-xs font-medium text-[#5f625d] hover:bg-[#f1eee7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+                        className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-slate-200/80 bg-white px-2.5 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 transition"
                       >
                         <Copy className="h-3 w-3" />
                         Copiar
                       </button>
                     </div>
 
-                    <div className="border border-[#ded9d0] bg-[#f1eee7] p-4">
-                      <p className="whitespace-pre-wrap text-sm leading-6 text-[#5f625d]">
+                    <div className="rounded-xl border border-slate-200/80 bg-slate-50/70 p-4">
+                      <p className="whitespace-pre-wrap font-sans text-xs leading-relaxed text-slate-800">
                         {selectedAction.content}
                       </p>
                     </div>
                   </div>
                 ) : (
-                  <div className="border border-dashed border-[#c9c3b8] px-5 py-10 text-center">
-                    <p className="text-sm font-medium">
+                  <div className="rounded-xl border border-dashed border-slate-200 px-5 py-8 text-center">
+                    <p className="text-xs font-semibold text-slate-700">
                       Nenhum conteúdo disponível
                     </p>
 
-                    <p className="mt-1 text-xs text-[#747b73]">
+                    <p className="mt-1 text-[11px] text-slate-400">
                       Esta ação não possui texto associado.
                     </p>
                   </div>
@@ -1426,11 +1404,11 @@ export default function Agents() {
               </div>
             </div>
 
-            <div className="shrink-0 border-t border-[#ded9d0] px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+            <div className="shrink-0 border-t border-slate-100 p-5 pb-[max(1rem,env(safe-area-inset-bottom))]">
               <button
                 type="button"
                 onClick={() => setSelectedAction(null)}
-                className="h-10 w-full border border-[#ded9d0] text-sm font-medium text-[#5f625d] hover:bg-[#f1eee7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+                className="h-9 w-full rounded-lg border border-slate-200/80 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition"
               >
                 Fechar
               </button>

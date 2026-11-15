@@ -84,7 +84,7 @@ export function IntegrationSettings({ companyId }: { companyId?: string }) {
     finally { setBusy(false); }
   }
   return <section aria-label={companyId ? "Ligações de pagamento da loja" : "Ligações da plataforma"} className="col-span-full space-y-6 py-5 border-y border-border">
-    <h2 className="font-serif text-xl flex items-center gap-2"><LockKeyhole className="h-5 w-5" />{companyId ? "Contas de pagamento da loja" : "Contas e aplicação da plataforma"}</h2>
+    <h2 className="text-lg font-bold tracking-tight text-slate-900 flex items-center gap-2"><LockKeyhole className="h-5 w-5" />{companyId ? "Contas de pagamento da loja" : "Contas e aplicação da plataforma"}</h2>
     <form className="space-y-3" onSubmit={e => { e.preventDefault(); void save("stripe"); }}>
       <h3 className="font-semibold">Stripe · {status ? status.stripe ? "Configurado" : "Não configurado" : "Estado não verificado"}</h3>
       <label className="block text-sm">Chave secreta<Input aria-label="Chave secreta Stripe" type="password" autoComplete="off" value={stripe} onChange={e => setStripe(e.target.value)} placeholder="sk_live_… ou sk_test_…" required /></label>

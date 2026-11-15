@@ -646,7 +646,7 @@ export default function Orders() {
         {/* FILTERS */}
         <section className="flex flex-col gap-3 lg:flex-row lg:items-center">
           <div className="relative min-w-0 flex-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#a7aaa2]" />
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
 
             <input
               value={search}
@@ -654,7 +654,7 @@ export default function Orders() {
                 setSearch(event.target.value)
               }
               placeholder="Pesquisar pedido, cliente, telefone ou produto..."
-              className="h-11 w-full rounded-sm border border-[#ded9d0] bg-[#fffdf9] pl-10 pr-4 text-sm outline-none transition placeholder:text-[#a7aaa2] focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
+              className="h-10 w-full rounded-xl border border-slate-200/80 bg-white pl-10 pr-4 text-xs font-medium text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 shadow-2xs"
             />
           </div>
 
@@ -696,7 +696,7 @@ export default function Orders() {
             <button
               type="button"
               onClick={clearFilters}
-              className="h-11 shrink-0 px-3 text-sm text-[#747b73] underline underline-offset-4 hover:text-[#202522] hover:no-underline"
+              className="h-10 shrink-0 px-3 text-xs font-semibold text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition"
             >
               Limpar
             </button>
@@ -705,13 +705,13 @@ export default function Orders() {
 
         {/* BULK ACTIONS */}
         {selectedIds.length > 0 && (
-          <section className="sticky top-[72px] z-20 flex flex-col gap-3 border border-[#ded9d0] bg-[#fffdf9] px-4 py-3 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-3">
-              <div className="grid h-7 w-7 place-items-center bg-black text-xs font-semibold text-white">
+          <section className="sticky top-[72px] z-20 flex flex-col gap-3 rounded-xl bg-slate-900 text-white p-3.5 shadow-md border border-slate-800 sm:flex-row sm:items-center sm:justify-between animate-in fade-in-50">
+            <div className="flex items-center gap-2">
+              <span className="flex h-6 w-6 items-center justify-center rounded-md bg-emerald-500 text-xs font-bold text-white">
                 {selectedIds.length}
-              </div>
+              </span>
 
-              <p className="text-sm font-medium">
+              <p className="text-xs font-medium text-slate-200">
                 {selectedIds.length === 1
                   ? "pedido selecionado"
                   : "pedidos selecionados"}
@@ -725,9 +725,9 @@ export default function Orders() {
                 onClick={() =>
                   bulkUpdateStatus("confirmed")
                 }
-                className="min-h-9 border border-[#ded9d0] px-3 text-xs font-medium hover:bg-[#f1eee7] disabled:opacity-50"
+                className="h-8 rounded-lg bg-slate-800 px-3 text-xs font-semibold text-slate-200 hover:bg-slate-700 transition disabled:opacity-50"
               >
-                Marcar como confirmado
+                Confirmar
               </button>
 
               <button
@@ -736,9 +736,9 @@ export default function Orders() {
                 onClick={() =>
                   bulkUpdateStatus("shipped")
                 }
-                className="min-h-9 border border-[#ded9d0] px-3 text-xs font-medium hover:bg-[#f1eee7] disabled:opacity-50"
+                className="h-8 rounded-lg bg-slate-800 px-3 text-xs font-semibold text-slate-200 hover:bg-slate-700 transition disabled:opacity-50"
               >
-                Marcar como enviado
+                Enviar
               </button>
 
               <button
@@ -747,7 +747,7 @@ export default function Orders() {
                 onClick={() =>
                   bulkUpdateStatus("completed")
                 }
-                className="min-h-9 bg-black px-3 text-xs font-medium text-white hover:bg-neutral-800 disabled:opacity-50"
+                className="h-8 rounded-lg bg-emerald-600 px-3 text-xs font-semibold text-white shadow-xs hover:bg-emerald-500 transition disabled:opacity-50"
               >
                 Concluir
               </button>
@@ -755,7 +755,7 @@ export default function Orders() {
               <button
                 type="button"
                 onClick={() => setSelectedIds([])}
-                className="grid h-9 w-9 place-items-center text-[#a7aaa2] hover:bg-[#ebe7df] hover:text-[#202522]"
+                className="grid h-8 w-8 place-items-center rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition"
                 aria-label="Limpar seleção"
               >
                 <X className="h-4 w-4" />
@@ -766,7 +766,7 @@ export default function Orders() {
 
         {/* RESULTS */}
         <div className="flex items-center justify-between gap-4">
-          <p className="text-xs text-[#a7aaa2]">
+          <p className="text-xs text-slate-500">
             {loading
               ? "A carregar pedidos..."
               : `${filteredOrders.length} ${
@@ -780,7 +780,7 @@ export default function Orders() {
             <button
               type="button"
               onClick={toggleAllVisible}
-              className="text-xs font-medium text-[#747b73] hover:text-[#202522]"
+              className="text-xs font-semibold text-slate-600 hover:text-slate-900"
             >
               {allVisibleSelected
                 ? "Desmarcar todos"
@@ -877,55 +877,55 @@ export default function Orders() {
                           </span>
                         </td>
 
-                        <td className="max-w-[200px] px-4 py-4">
-                          <p className="truncate text-sm font-medium">
+                        <td className="max-w-[200px] px-4 py-3.5">
+                          <p className="truncate text-xs font-bold text-slate-900">
                             {order.customer_name}
                           </p>
 
-                          <p className="mt-0.5 truncate text-xs text-[#a7aaa2]">
+                          <p className="mt-0.5 truncate text-[11px] text-slate-400">
                             {order.customer_phone ||
                               order.customer_email ||
                               "Sem contacto"}
                           </p>
                         </td>
 
-                        <td className="px-4 py-4 text-xs font-medium text-[#5f625d]">
-                          <span className="inline-flex rounded-[7px] bg-[#ebe7df] px-2 py-0.5 text-[10px]">
+                        <td className="px-4 py-3.5 text-xs font-medium text-slate-600">
+                          <span className="inline-flex rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-700">
                             {PAYMENT_STATUS[order.payment_status] ?? order.payment_status}
                           </span>
                         </td>
 
-                        <td className="px-4 py-4 text-xs font-medium text-[#5f625d]">
-                          <span className="inline-flex rounded-[7px] bg-[#ebe7df] px-2 py-0.5 text-[10px]">
+                        <td className="px-4 py-3.5 text-xs font-medium text-slate-600">
+                          <span className="inline-flex rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-700">
                             {FULFILLMENT_STATUS[order.fulfillment_status] ?? order.fulfillment_status}
                           </span>
                         </td>
 
-                        <td className="px-4 py-4 text-sm text-[#747b73]">
+                        <td className="px-4 py-3.5 text-xs text-slate-600">
                           {channelLabel(order.channel)}
                         </td>
 
-                        <td className="whitespace-nowrap px-4 py-4 text-xs text-[#747b73]">
+                        <td className="whitespace-nowrap px-4 py-3.5 text-xs text-slate-500">
                           {formatShortDate(
                             order.created_at,
                           )}
                         </td>
 
-                        <td className="px-4 py-4">
+                        <td className="px-4 py-3.5">
                           <StatusBadge
                             status={order.status}
                           />
                         </td>
 
-                        <td className="whitespace-nowrap px-4 py-4 text-right text-sm font-semibold">
+                        <td className="whitespace-nowrap px-4 py-3.5 text-right text-xs font-bold text-slate-900">
                           {formatMoney(
                             order.total,
                             company.currency,
                           )}
                         </td>
 
-                        <td className="px-4 py-4">
-                          <ArrowRight className="ml-auto h-4 w-4 text-[#c9c3b8] transition-transform group-hover:translate-x-0.5 group-hover:text-[#5f625d]" />
+                        <td className="px-4 py-3.5">
+                          <ArrowRight className="ml-auto h-4 w-4 text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-slate-600" />
                         </td>
                       </tr>
                     );
@@ -935,7 +935,7 @@ export default function Orders() {
             </div>
 
             {/* MOBILE */}
-            <div className="divide-y divide-neutral-200 border-y border-[#ded9d0] lg:hidden">
+            <div className="divide-y divide-slate-100 border-y border-slate-200/80 lg:hidden">
               {filteredOrders.map((order) => {
                 const selected = selectedIds.includes(
                   order.id,
@@ -945,8 +945,8 @@ export default function Orders() {
                   <div
                     key={order.id}
                     className={cn(
-                      "flex items-start gap-3 py-4",
-                      selected && "bg-[#f1eee7]",
+                      "flex items-start gap-3 py-3.5 px-3 transition",
+                      selected && "bg-slate-50",
                     )}
                   >
                     <input
@@ -956,7 +956,7 @@ export default function Orders() {
                         toggleSelected(order.id)
                       }
                       aria-label={`Selecionar ${formatOrderId(order.id)}`}
-                      className="mt-2 h-4 w-4 shrink-0 accent-black"
+                      className="mt-1.5 h-4 w-4 shrink-0 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
                     />
 
                     <button
@@ -964,9 +964,9 @@ export default function Orders() {
                       onClick={() => openOrder(order)}
                       className="flex min-w-0 flex-1 items-start gap-3 text-left"
                     >
-                      <div className="grid h-9 w-9 shrink-0 place-items-center rounded-[7px] bg-[#ebe7df]">
+                      <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-slate-200/80 bg-slate-50 text-slate-600">
                         <ShoppingBag
-                          className="h-4 w-4 text-[#747b73]"
+                          className="h-4 w-4 text-slate-600"
                           strokeWidth={1.8}
                         />
                       </div>
@@ -974,16 +974,16 @@ export default function Orders() {
                       <div className="min-w-0 flex-1">
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
-                            <p className="truncate text-sm font-semibold">
+                            <p className="truncate text-xs font-bold text-slate-900">
                               {order.customer_name}
                             </p>
 
-                            <p className="mt-0.5 font-mono text-[10px] text-[#a7aaa2]">
+                            <p className="mt-0.5 font-mono text-[10px] text-slate-400">
                               {formatOrderId(order.id)}
                             </p>
                           </div>
 
-                          <p className="shrink-0 text-sm font-semibold">
+                          <p className="shrink-0 text-xs font-bold text-slate-900">
                             {formatMoney(
                               order.total,
                               company.currency,
@@ -991,26 +991,26 @@ export default function Orders() {
                           </p>
                         </div>
 
-                        <div className="mt-3 flex flex-wrap items-center gap-2">
+                        <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
                           <StatusBadge
                             status={order.status}
                           />
 
-                          <span className="inline-flex rounded-[7px] bg-[#ebe7df] px-2 py-1 text-[10px] font-medium text-[#5f625d]">
-                            Pagamento: {PAYMENT_STATUS[order.payment_status] ?? order.payment_status}
+                          <span className="inline-flex rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-700">
+                            Pag: {PAYMENT_STATUS[order.payment_status] ?? order.payment_status}
                           </span>
 
-                          <span className="inline-flex rounded-[7px] bg-[#ebe7df] px-2 py-1 text-[10px] font-medium text-[#5f625d]">
+                          <span className="inline-flex rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-700">
                             Envio: {FULFILLMENT_STATUS[order.fulfillment_status] ?? order.fulfillment_status}
                           </span>
 
-                          <span className="text-[11px] text-[#a7aaa2]">
+                          <span className="text-[10px] text-slate-400">
                             {channelLabel(order.channel)}
                           </span>
                         </div>
                       </div>
 
-                      <ArrowRight className="mt-2 h-4 w-4 shrink-0 text-[#c9c3b8]" />
+                      <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-slate-300" />
                     </button>
                   </div>
                 );
@@ -1240,14 +1240,14 @@ function OrderDrawer({
         {/* CONTENT */}
         <div className="min-h-0 flex-1 overflow-y-auto">
           {/* STATUS BREAKDOWN */}
-          <section className="border-b border-[#ded9d0] px-5 py-6 sm:px-7 space-y-4">
+          <section className="border-b border-slate-100 px-5 py-6 sm:px-7 space-y-4">
             <div>
               <SectionLabel>Estado do Pedido</SectionLabel>
               <select
                 value={order.status}
                 disabled={updating || order.status === "cancelled"}
                 onChange={(e) => onStatusChange(order, { status: e.target.value })}
-                className="h-10 w-full border border-[#ded9d0] px-3 text-sm font-medium outline-none bg-[#fffdf9] focus:border-black"
+                className="h-10 w-full rounded-xl border border-slate-200/80 bg-white px-3 text-xs font-semibold text-slate-900 outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900 shadow-2xs"
               >
                 {Object.entries(ORDER_STATUS).map(([key, label]) => (
                   <option key={key} value={key}>{label}</option>
@@ -1262,7 +1262,7 @@ function OrderDrawer({
                   value={order.payment_status}
                   disabled={updating}
                   onChange={(e) => onStatusChange(order, { payment_status: e.target.value })}
-                  className="h-10 w-full border border-[#ded9d0] px-3 text-xs font-medium outline-none bg-[#fffdf9] focus:border-black"
+                  className="h-10 w-full rounded-xl border border-slate-200/80 bg-white px-3 text-xs font-medium text-slate-800 outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900 shadow-2xs"
                 >
                   {Object.entries(PAYMENT_STATUS).map(([key, label]) => (
                     <option key={key} value={key}>{label}</option>
@@ -1276,7 +1276,7 @@ function OrderDrawer({
                   value={order.fulfillment_status}
                   disabled={updating}
                   onChange={(e) => onStatusChange(order, { fulfillment_status: e.target.value })}
-                  className="h-10 w-full border border-[#ded9d0] px-3 text-xs font-medium outline-none bg-[#fffdf9] focus:border-black"
+                  className="h-10 w-full rounded-xl border border-slate-200/80 bg-white px-3 text-xs font-medium text-slate-800 outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900 shadow-2xs"
                 >
                   {Object.entries(FULFILLMENT_STATUS).map(([key, label]) => (
                     <option key={key} value={key}>{label}</option>
@@ -1287,20 +1287,20 @@ function OrderDrawer({
           </section>
 
           {/* CUSTOMER */}
-          <section className="border-b border-[#ded9d0] px-5 py-6 sm:px-7">
+          <section className="border-b border-slate-100 px-5 py-6 sm:px-7">
             <SectionLabel>Cliente</SectionLabel>
 
-            <h3 className="text-lg font-semibold tracking-tight">
+            <h3 className="text-base font-bold tracking-tight text-slate-900">
               {order.customer_name}
             </h3>
 
-            <div className="mt-4 space-y-3">
+            <div className="mt-3 space-y-2.5">
               {order.customer_phone && (
                 <a
                   href={`tel:${order.customer_phone}`}
-                  className="flex items-center gap-3 text-sm text-[#747b73] hover:text-[#202522]"
+                  className="flex items-center gap-2.5 text-xs text-slate-600 hover:text-slate-900 transition"
                 >
-                  <Phone className="h-4 w-4 text-[#a7aaa2]" />
+                  <Phone className="h-3.5 w-3.5 text-slate-400" />
                   {order.customer_phone}
                 </a>
               )}
@@ -1308,28 +1308,28 @@ function OrderDrawer({
               {order.customer_email && (
                 <a
                   href={`mailto:${order.customer_email}`}
-                  className="flex items-center gap-3 break-all text-sm text-[#747b73] hover:text-[#202522]"
+                  className="flex items-center gap-2.5 break-all text-xs text-slate-600 hover:text-slate-900 transition"
                 >
-                  <Mail className="h-4 w-4 shrink-0 text-[#a7aaa2]" />
+                  <Mail className="h-3.5 w-3.5 shrink-0 text-slate-400" />
                   {order.customer_email}
                 </a>
               )}
 
-              <div className="flex items-center gap-3 text-sm text-[#747b73]">
-                <ShoppingBag className="h-4 w-4 text-[#a7aaa2]" />
+              <div className="flex items-center gap-2.5 text-xs text-slate-600">
+                <ShoppingBag className="h-3.5 w-3.5 text-slate-400" />
                 {channelLabel(order.channel)}
               </div>
             </div>
           </section>
 
           {/* ITEMS */}
-          <section className="border-b border-[#ded9d0] px-5 py-6 sm:px-7">
-            <div className="mb-4 flex items-center justify-between">
+          <section className="border-b border-slate-100 px-5 py-6 sm:px-7">
+            <div className="mb-3 flex items-center justify-between">
               <SectionLabel>
                 Itens do pedido
               </SectionLabel>
 
-              <span className="text-xs text-[#a7aaa2]">
+              <span className="text-[11px] font-medium text-slate-400">
                 {itemCount}{" "}
                 {itemCount === 1
                   ? "unidade"
@@ -1337,19 +1337,19 @@ function OrderDrawer({
               </span>
             </div>
 
-            <div className="divide-y divide-neutral-100 border-y border-[#ebe7df]">
+            <div className="divide-y divide-slate-100 border-y border-slate-100">
               {order.order_items.map(
                 (item, index) => (
                   <div
                     key={`${item.product_name}-${index}`}
-                    className="flex items-start justify-between gap-4 py-4"
+                    className="flex items-start justify-between gap-4 py-3"
                   >
                     <div className="min-w-0">
-                      <p className="text-sm font-medium">
+                      <p className="text-xs font-bold text-slate-900">
                         {item.product_name}
                       </p>
 
-                      <p className="mt-1 text-xs text-[#a7aaa2]">
+                      <p className="mt-0.5 text-[11px] text-slate-400">
                         {item.quantity} ×{" "}
                         {formatMoney(
                           item.unit_price,
@@ -1358,7 +1358,7 @@ function OrderDrawer({
                       </p>
                     </div>
 
-                    <p className="shrink-0 text-sm font-semibold">
+                    <p className="shrink-0 text-xs font-bold text-slate-900">
                       {formatMoney(
                         Number(item.quantity) *
                           Number(item.unit_price),
@@ -1370,8 +1370,8 @@ function OrderDrawer({
               )}
             </div>
 
-            <div className="mt-5 space-y-2 text-sm">
-              <div className="flex justify-between text-[#747b73]">
+            <div className="mt-4 space-y-1.5 text-xs">
+              <div className="flex justify-between text-slate-500">
                 <span>Subtotal</span>
 
                 <span>
@@ -1382,7 +1382,7 @@ function OrderDrawer({
                 </span>
               </div>
 
-              <div className="flex justify-between border-t border-[#ded9d0] pt-3 text-base font-semibold">
+              <div className="flex justify-between border-t border-slate-100 pt-2 text-sm font-bold text-slate-900">
                 <span>Total</span>
 
                 <span>
@@ -1399,30 +1399,30 @@ function OrderDrawer({
           <section className="px-5 py-6 sm:px-7">
             <SectionLabel>Order Timeline (Eventos)</SectionLabel>
 
-            <div className="mt-4 space-y-4 border-l-2 border-[#ded9d0] pl-4 text-xs text-[#747b73]">
+            <div className="mt-3 space-y-3.5 border-l-2 border-slate-200 pl-4 text-xs text-slate-600">
               {eventsLoading ? (
-                <p className="text-[#a7aaa2]">A carregar eventos...</p>
+                <p className="text-slate-400">A carregar eventos...</p>
               ) : eventsError ? (
                 <div>
-                  <p className="text-[#a44d2e]">Não foi possível carregar a timeline.</p>
+                  <p className="text-rose-600 font-medium">Não foi possível carregar a timeline.</p>
                   <button
                     type="button"
                     onClick={onRetryEvents}
-                    className="mt-2 font-semibold text-[#2c6457] underline underline-offset-4"
+                    className="mt-1 font-semibold text-emerald-700 underline underline-offset-4"
                   >
                     Tentar novamente
                   </button>
                 </div>
               ) : events.length === 0 ? (
                 <div>
-                  <p className="font-semibold text-[#202522]">Pedido criado</p>
-                  <p className="text-[#a7aaa2]">{formatDate(order.created_at)} via {channelLabel(order.channel)}</p>
+                  <p className="font-bold text-slate-900">Pedido criado</p>
+                  <p className="text-[11px] text-slate-400">{formatDate(order.created_at)} via {channelLabel(order.channel)}</p>
                 </div>
               ) : (
                 events.map((evt) => (
                   <div key={evt.id}>
-                    <p className="font-semibold text-[#202522]">{evt.description}</p>
-                    <p className="text-[10px] text-[#a7aaa2]">
+                    <p className="font-bold text-slate-900">{evt.description}</p>
+                    <p className="text-[10px] text-slate-400">
                       {formatDate(evt.created_at)} · {evt.actor_type}
                     </p>
                   </div>
@@ -1433,14 +1433,14 @@ function OrderDrawer({
         </div>
 
         {/* FOOTER */}
-        <footer className="border-t border-[#ded9d0] bg-[#fffdf9] px-5 py-4 sm:px-7">
+        <footer className="border-t border-slate-100 bg-white px-5 py-4 sm:px-7">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="text-[10px] uppercase tracking-[0.14em] text-[#a7aaa2]">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                 Total
               </p>
 
-              <p className="mt-0.5 text-lg font-semibold tracking-tight">
+              <p className="mt-0.5 text-lg font-bold tracking-tight text-slate-900">
                 {formatMoney(
                   order.total,
                   currency,
@@ -1491,7 +1491,7 @@ function SectionLabel({
   children: React.ReactNode;
 }) {
   return (
-    <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#a7aaa2]">
+    <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
       {children}
     </p>
   );
@@ -1505,22 +1505,22 @@ function EmptyOrders({
   onClear: () => void;
 }) {
   return (
-    <div className="border-y border-[#ded9d0] py-20 text-center">
-      <div className="mx-auto grid h-10 w-10 place-items-center rounded-[7px] bg-[#ebe7df]">
+    <div className="rounded-2xl border border-dashed border-slate-200 bg-white py-16 text-center">
+      <div className="mx-auto grid h-12 w-12 place-items-center rounded-xl bg-slate-100 text-slate-400">
         {hasFilters ? (
-          <Search className="h-4 w-4 text-[#a7aaa2]" />
+          <Search className="h-5 w-5" />
         ) : (
-          <ShoppingBag className="h-4 w-4 text-[#a7aaa2]" />
+          <ShoppingBag className="h-5 w-5" />
         )}
       </div>
 
-      <h3 className="mt-4 text-sm font-semibold">
+      <h3 className="mt-4 text-sm font-bold text-slate-900">
         {hasFilters
           ? "Nenhum pedido encontrado"
           : "Ainda não existem pedidos"}
       </h3>
 
-      <p className="mx-auto mt-1 max-w-sm text-xs leading-5 text-[#a7aaa2]">
+      <p className="mx-auto mt-1 max-w-sm text-xs leading-relaxed text-slate-500">
         {hasFilters
           ? "Tente alterar a pesquisa ou os filtros selecionados."
           : "Quando a sua loja começar a receber pedidos, eles aparecerão aqui."}
@@ -1530,7 +1530,7 @@ function EmptyOrders({
         <button
           type="button"
           onClick={onClear}
-          className="mt-5 text-xs font-semibold underline underline-offset-4 hover:no-underline"
+          className="mt-4 inline-flex h-8 items-center rounded-lg border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
         >
           Limpar filtros
         </button>
@@ -1541,22 +1541,22 @@ function EmptyOrders({
 
 function OrdersSkeleton() {
   return (
-    <div className="border-y border-[#ded9d0]">
+    <div className="rounded-2xl border border-slate-200/80 bg-white overflow-hidden shadow-xs">
       {Array.from({ length: 7 }).map(
         (_, index) => (
           <div
             key={index}
-            className="flex items-center gap-4 border-b border-[#ebe7df] px-4 py-5 last:border-b-0"
+            className="flex items-center gap-4 border-b border-slate-100 px-4 py-4 last:border-b-0"
           >
-            <div className="h-4 w-4 animate-pulse bg-[#ebe7df]" />
+            <div className="h-4 w-4 animate-pulse rounded bg-slate-200" />
 
-            <div className="h-3 w-20 animate-pulse bg-[#ebe7df]" />
+            <div className="h-3 w-20 animate-pulse rounded bg-slate-200" />
 
-            <div className="h-3 w-40 animate-pulse bg-[#ebe7df]" />
+            <div className="h-3 w-40 animate-pulse rounded bg-slate-200" />
 
-            <div className="h-3 w-20 animate-pulse bg-[#ebe7df]" />
+            <div className="h-3 w-20 animate-pulse rounded bg-slate-200" />
 
-            <div className="ml-auto h-3 w-24 animate-pulse bg-[#ebe7df]" />
+            <div className="ml-auto h-3 w-24 animate-pulse rounded bg-slate-200" />
           </div>
         ),
       )}
