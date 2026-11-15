@@ -1,5 +1,12 @@
-import { useEffect, useState, type ReactNode } from "react";
-import { motion, useScroll, useSpring, AnimatePresence } from "framer-motion";
+import { useEffect, useState, useRef, type ReactNode } from "react";
+import {
+  motion,
+  useScroll,
+  useSpring,
+  AnimatePresence,
+  useMotionValue,
+  useTransform,
+} from "framer-motion";
 import {
   ArrowDownRight,
   ArrowRight,
@@ -1575,6 +1582,142 @@ function InteractiveHeroPrompt() {
   );
 }
 
+function LiquidHeroCanvas({
+  mouseX,
+  mouseY,
+  isHovered,
+}: {
+  mouseX: number;
+  mouseY: number;
+  isHovered: boolean;
+}) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const ripplesRef = useRef<
+    Array<{
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      radius: number;
+      maxRadius: number;
+      alpha: number;
+      color: string;
+    }>
+  >([]);
+  const lastPosRef = useRef<{ x: number; y: number } | null>(null);
+
+  // Add new liquid droplet on mouse movement
+  useEffect(() => {
+    if (!isHovered) {
+      lastPosRef.current = null;
+      return;
+    }
+
+    const last = lastPosRef.current;
+    const dx = last ? mouseX - last.x : 0;
+    const dy = last ? mouseY - last.y : 0;
+    const dist = Math.hypot(dx, dy);
+
+    // Spawn viscous liquid droplets when moving
+    if (!last || dist > 6) {
+      lastPosRef.current = { x: mouseX, y: mouseY };
+
+      const colors = [
+        "rgba(67, 56, 202, ",   // indigo
+        "rgba(147, 51, 234, ",  // violet
+        "rgba(37, 99, 235, ",   // cobalt
+        "rgba(13, 148, 136, ",  // teal
+        "rgba(168, 85, 247, ",  // purple
+      ];
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      const speed = Math.min(dist * 0.18, 7);
+
+      ripplesRef.current.push({
+        x: mouseX,
+        y: mouseY,
+        vx: dx ? (dx / dist) * speed * 0.35 : (Math.random() - 0.5) * 1.5,
+        vy: dy ? (dy / dist) * speed * 0.35 : (Math.random() - 0.5) * 1.5,
+        radius: 45 + Math.random() * 40,
+        maxRadius: 200 + Math.random() * 90,
+        alpha: 0.7,
+        color,
+      });
+
+      if (ripplesRef.current.length > 55) {
+        ripplesRef.current.shift();
+      }
+    }
+  }, [mouseX, mouseY, isHovered]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let animId: number;
+
+    const handleResize = () => {
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    const render = () => {
+      const rect = canvas.getBoundingClientRect();
+      ctx.clearRect(0, 0, rect.width, rect.height);
+
+      const ripples = ripplesRef.current;
+      for (let i = ripples.length - 1; i >= 0; i--) {
+        const r = ripples[i];
+        r.x += r.vx;
+        r.y += r.vy;
+        r.vx *= 0.94;
+        r.vy *= 0.94;
+        r.radius += 1.3;
+        r.alpha *= 0.965;
+
+        if (r.alpha <= 0.01 || r.radius >= r.maxRadius) {
+          ripples.splice(i, 1);
+          continue;
+        }
+
+        const grad = ctx.createRadialGradient(r.x, r.y, 0, r.x, r.y, r.radius);
+        grad.addColorStop(0, `${r.color}${r.alpha})`);
+        grad.addColorStop(0.45, `${r.color}${r.alpha * 0.55})`);
+        grad.addColorStop(1, `${r.color}0)`);
+
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      animId = requestAnimationFrame(render);
+    };
+
+    animId = requestAnimationFrame(render);
+
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 h-full w-full pointer-events-none filter blur-[28px] mix-blend-multiply opacity-95 transition-opacity duration-300"
+    />
+  );
+}
+
 function HeroSection({
   startPath,
   onStart,
@@ -1582,23 +1725,115 @@ function HeroSection({
   startPath: string;
   onStart: () => void;
 }) {
-  return (
-    <section className="relative overflow-hidden border-b border-slate-200/80 bg-slate-50/40 pb-20 pt-16 sm:pb-28 sm:pt-24">
-      {/* Kraft Aurora Liquid Mesh Background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
-        {/* Pure Top Luminous Glow */}
-        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[1100px] h-[480px] bg-gradient-to-b from-white via-white/80 to-transparent blur-3xl opacity-95" />
+  const heroRef = useRef<HTMLElement>(null);
+  const [isHovered, setIsHovered] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 600, y: 300 });
 
-        {/* Fluid Organic Radial Aurora Blobs */}
-        <div className="absolute top-[6%] left-[8%] w-[580px] h-[580px] rounded-full bg-gradient-to-tr from-indigo-600/35 via-purple-600/30 to-blue-500/30 blur-[110px] animate-aurora-1 mix-blend-multiply" />
-        <div className="absolute top-[16%] right-[6%] w-[640px] h-[640px] rounded-full bg-gradient-to-br from-violet-600/35 via-indigo-700/35 to-slate-900/30 blur-[125px] animate-aurora-2 mix-blend-multiply" />
-        <div className="absolute top-[38%] left-[24%] w-[680px] h-[520px] rounded-full bg-gradient-to-tl from-emerald-500/20 via-teal-600/25 to-indigo-800/25 blur-[115px] animate-aurora-3 mix-blend-multiply" />
+  // Framer Motion spring values for silky liquid inertia
+  const mouseMotionX = useMotionValue(600);
+  const mouseMotionY = useMotionValue(300);
+
+  // Fast liquid spring for primary fluid blob (responsive & bouncy)
+  const springX = useSpring(mouseMotionX, { stiffness: 140, damping: 18, mass: 0.5 });
+  const springY = useSpring(mouseMotionY, { stiffness: 140, damping: 18, mass: 0.5 });
+
+  // Viscous trailing spring for secondary fluid blob (heavy inertia creates teardrop stretching)
+  const trailingX = useSpring(mouseMotionX, { stiffness: 60, damping: 22, mass: 1.1 });
+  const trailingY = useSpring(mouseMotionY, { stiffness: 60, damping: 22, mass: 1.1 });
+
+  // Soft ambient parallax for the background aurora blobs
+  const parallax1X = useTransform(mouseMotionX, [0, 1400], [45, -45]);
+  const parallax1Y = useTransform(mouseMotionY, [0, 900], [35, -35]);
+
+  const parallax2X = useTransform(mouseMotionX, [0, 1400], [-55, 55]);
+  const parallax2Y = useTransform(mouseMotionY, [0, 900], [-40, 40]);
+
+  const parallax3X = useTransform(mouseMotionX, [0, 1400], [40, -40]);
+  const parallax3Y = useTransform(mouseMotionY, [0, 900], [-45, 45]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    if (!heroRef.current) return;
+    const rect = heroRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    setMousePos({ x, y });
+    mouseMotionX.set(x);
+    mouseMotionY.set(y);
+    if (!isHovered) setIsHovered(true);
+  };
+
+  const handleMouseEnter = () => setIsHovered(true);
+  const handleMouseLeave = () => setIsHovered(false);
+
+  return (
+    <section
+      ref={heroRef}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      className="relative overflow-hidden border-b border-slate-200/80 bg-slate-50/40 pb-20 pt-16 sm:pb-28 sm:pt-24 cursor-default"
+    >
+      {/* Kraft Aurora Liquid Mesh Background + Interactive Liquid Mouse Surface */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
+        {/* Pure Top Luminous Glow (Diffuser matching Kraft) */}
+        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[1100px] h-[480px] bg-gradient-to-b from-white via-white/80 to-transparent blur-3xl opacity-95 z-10" />
+
+        {/* Ambient Fluid Aurora Blobs (with organic drift + subtle liquid parallax reaction) */}
+        <motion.div
+          style={{ x: parallax1X, y: parallax1Y }}
+          className="absolute top-[6%] left-[8%] w-[580px] h-[580px] rounded-full bg-gradient-to-tr from-indigo-600/35 via-purple-600/30 to-blue-500/30 blur-[110px] animate-aurora-1 mix-blend-multiply"
+        />
+        <motion.div
+          style={{ x: parallax2X, y: parallax2Y }}
+          className="absolute top-[16%] right-[6%] w-[640px] h-[640px] rounded-full bg-gradient-to-br from-violet-600/35 via-indigo-700/35 to-slate-900/30 blur-[125px] animate-aurora-2 mix-blend-multiply"
+        />
+        <motion.div
+          style={{ x: parallax3X, y: parallax3Y }}
+          className="absolute top-[38%] left-[24%] w-[680px] h-[520px] rounded-full bg-gradient-to-tl from-emerald-500/20 via-teal-600/25 to-indigo-800/25 blur-[115px] animate-aurora-3 mix-blend-multiply"
+        />
         <div className="absolute top-[4%] right-[28%] w-[500px] h-[500px] rounded-full bg-gradient-to-r from-blue-700/25 via-indigo-500/30 to-purple-800/25 blur-[105px] animate-aurora-4 mix-blend-multiply" />
 
-        {/* Frosted Glass Mesh Diffusion Layer */}
-        <div className="absolute inset-0 backdrop-blur-[65px] bg-white/20" />
+        {/* INTERACTIVE LIQUID MOUSE CANVAS (Dynamic ink/water ripples tracking mouse trajectory) */}
+        <LiquidHeroCanvas
+          mouseX={mousePos.x}
+          mouseY={mousePos.y}
+          isHovered={isHovered}
+        />
 
-        {/* Bottom soft fade */}
+        {/* PRIMARY LIQUID FOLLOWER BLOB (Elastic spring follower with rich vibrant Kraft liquid colors) */}
+        <motion.div
+          style={{
+            left: springX,
+            top: springY,
+            opacity: isHovered ? 1 : 0.45,
+          }}
+          className="absolute -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] sm:w-[760px] sm:h-[760px] rounded-full bg-[radial-gradient(circle,rgba(79,70,229,0.72)_0%,rgba(147,51,234,0.62)_35%,rgba(37,99,235,0.45)_55%,rgba(13,148,136,0.3)_70%,transparent_85%)] blur-[95px] mix-blend-multiply pointer-events-none transition-opacity duration-300"
+        />
+
+        {/* TRAILING VISCOUS LIQUID TEARDROP BLOB (Stretches fluidly along cursor trajectory) */}
+        <motion.div
+          style={{
+            left: trailingX,
+            top: trailingY,
+            opacity: isHovered ? 0.92 : 0.35,
+          }}
+          className="absolute -translate-x-1/2 -translate-y-1/2 w-[480px] h-[480px] sm:w-[600px] sm:h-[600px] rounded-full bg-[radial-gradient(circle,rgba(168,85,247,0.65)_0%,rgba(79,70,229,0.52)_35%,rgba(20,184,166,0.38)_60%,transparent_80%)] blur-[105px] mix-blend-multiply pointer-events-none transition-opacity duration-500"
+        />
+
+        {/* LIQUID SPECULAR SHEEN (Glossy water/glass reflection directly under the mouse) */}
+        <motion.div
+          style={{
+            left: springX,
+            top: springY,
+            opacity: isHovered ? 0.8 : 0,
+          }}
+          className="absolute -translate-x-1/2 -translate-y-1/2 w-[360px] h-[360px] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.5)_0%,rgba(255,255,255,0.15)_35%,transparent_70%)] blur-[50px] pointer-events-none transition-opacity duration-200"
+        />
+
+        {/* Frosted Glass Mesh Diffusion Layer */}
+        <div className="absolute inset-0 backdrop-blur-[65px] bg-white/15" />
+
+        {/* Bottom soft fade into dashboard */}
         <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-slate-50 via-slate-50/70 to-transparent" />
       </div>
 
