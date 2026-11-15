@@ -3,12 +3,12 @@ import {
   motion,
   useScroll,
   useSpring,
-  useVelocity,
   AnimatePresence,
   useMotionValue,
   useTransform,
 } from "framer-motion";
 import {
+  ArrowDown,
   ArrowRight,
   BarChart3,
   Bot,
@@ -27,9 +27,6 @@ import {
   Sparkles,
   WalletCards,
   X,
-  Zap,
-  ShieldCheck,
-  Activity,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -38,7 +35,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { WaterWakeHero } from "@/components/site/WaterWakeHero";
 
-function playTactileFeedback(freqStart = 540, freqEnd = 860) {
+function playTactileFeedback() {
   try {
     const AudioCtx =
       window.AudioContext ||
@@ -49,17 +46,46 @@ function playTactileFeedback(freqStart = 540, freqEnd = 860) {
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = "sine";
-    osc.frequency.setValueAtTime(freqStart, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(freqEnd, ctx.currentTime + 0.065);
-    gain.gain.setValueAtTime(0.035, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.065);
+    osc.frequency.setValueAtTime(540, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(820, ctx.currentTime + 0.06);
+    gain.gain.setValueAtTime(0.03, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.06);
     osc.connect(gain);
     gain.connect(ctx.destination);
     osc.start();
-    osc.stop(ctx.currentTime + 0.065);
+    osc.stop(ctx.currentTime + 0.06);
   } catch {
     // audio unavailable
   }
+}
+
+/**
+ * Scroll suave com curva de inércia (estilo Lusion / Lenis) para navegação entre secções.
+ */
+function smoothScrollToElement(targetId: string) {
+  const el = document.getElementById(targetId);
+  if (!el) return;
+  const headerOffset = 74;
+  const startY = window.scrollY;
+  const targetY =
+    el.getBoundingClientRect().top + window.scrollY - headerOffset;
+  const distance = targetY - startY;
+  const duration = Math.min(1100, Math.max(550, Math.abs(distance) * 0.45));
+  const startTime = performance.now();
+
+  const easeOutQuint = (t: number) => 1 - Math.pow(1 - t, 5);
+
+  const step = (now: number) => {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = easeOutQuint(progress);
+    window.scrollTo(0, startY + distance * eased);
+    if (progress < 1) {
+      window.requestAnimationFrame(step);
+    }
+  };
+
+  window.requestAnimationFrame(step);
 }
 
 function ScrollProgressBar() {
@@ -72,246 +98,169 @@ function ScrollProgressBar() {
 
   return (
     <motion.div
-      className="fixed top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-emerald-500 via-teal-400 to-indigo-500 origin-left z-[70] pointer-events-none shadow-[0_0_16px_rgba(16,185,129,0.65)]"
+      className="fixed top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-300 origin-left z-[70] pointer-events-none shadow-[0_0_12px_rgba(16,185,129,0.5)]"
       style={{ scaleX }}
     />
   );
 }
 
-/**
- * Cursor líquido interativo estilo Lusion com deformação elástica por velocidade
- * e rótulos contextuais ao passar sobre elementos interativos.
- */
-function LusionCursorFollower() {
-  const mouseX = useMotionValue(-100);
-  const mouseY = useMotionValue(-100);
-  const springX = useSpring(mouseX, { stiffness: 420, damping: 28, mass: 0.4 });
-  const springY = useSpring(mouseY, { stiffness: 420, damping: 28, mass: 0.4 });
-  const trailX = useSpring(mouseX, { stiffness: 150, damping: 22, mass: 0.7 });
-  const trailY = useSpring(mouseY, { stiffness: 150, damping: 22, mass: 0.7 });
+const CHAPTERS = [
+  { id: "hero-stage", number: "01", label: "Início" },
+  { id: "proof", number: "02", label: "Comunidade" },
+  { id: "whatsapp", number: "03", label: "WhatsApp IA" },
+  { id: "channels", number: "04", label: "Canais" },
+  { id: "agents", number: "05", label: "Agentes" },
+  { id: "plans", number: "06", label: "Planos" },
+  { id: "process", number: "07", label: "Processo" },
+  { id: "control-room", number: "08", label: "Comando" },
+] as const;
 
-  const [cursorLabel, setCursorLabel] = useState<string>("");
-  const [isPointer, setIsPointer] = useState(false);
+/**
+ * Dock Flutuante de Navegação entre Secções estilo Lusion.
+ * Acompanha a secção ativa em tempo real com transição líquida (`layoutId`) e permite
+ * saltar suavemente entre qualquer capítulo ou avançar para a próxima secção.
+ */
+function LusionChapterDock() {
+  const [activeId, setActiveId] = useState<string>("hero-stage");
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(pointer: fine)");
-    if (!mediaQuery.matches) return;
-
-    const handleMove = (e: MouseEvent) => {
-      mouseX.set(e.clientX);
-      mouseY.set(e.clientY);
-
-      const target = e.target as HTMLElement | null;
-      const interactive = target?.closest(
-        "button, a, input, [data-cursor]"
-      ) as HTMLElement | null;
-      if (interactive) {
-        setIsPointer(true);
-        setCursorLabel(interactive.getAttribute("data-cursor") || "");
-      } else {
-        setIsPointer(false);
-        setCursorLabel("");
+    const handleScroll = () => {
+      const viewportMiddle = window.scrollY + window.innerHeight * 0.38;
+      let current = CHAPTERS[0].id;
+      for (const ch of CHAPTERS) {
+        const el = document.getElementById(ch.id);
+        if (el) {
+          const top = el.offsetTop;
+          if (viewportMiddle >= top) {
+            current = ch.id;
+          }
+        }
       }
+      setActiveId(current);
     };
 
-    window.addEventListener("mousemove", handleMove, { passive: true });
-    return () => window.removeEventListener("mousemove", handleMove);
-  }, [mouseX, mouseY]);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const activeIndex = Math.max(
+    0,
+    CHAPTERS.findIndex((c) => c.id === activeId)
+  );
+  const nextChapter = CHAPTERS[(activeIndex + 1) % CHAPTERS.length];
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-[80] hidden lg:block overflow-hidden">
-      {/* Anel externo com física de mola líquida */}
-      <motion.div
-        style={{
-          x: trailX,
-          y: trailY,
-          translateX: "-50%",
-          translateY: "-50%",
+    <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 hidden md:flex items-center gap-1.5 rounded-full border border-slate-800/80 bg-slate-950/90 p-1.5 text-white shadow-[0_20px_50px_rgba(15,23,42,0.35)] backdrop-blur-xl">
+      <div className="flex items-center gap-0.5 px-1">
+        {CHAPTERS.map((chapter) => {
+          const isActive = chapter.id === activeId;
+          return (
+            <button
+              key={chapter.id}
+              type="button"
+              onClick={() => {
+                playTactileFeedback();
+                smoothScrollToElement(chapter.id);
+              }}
+              className={`relative rounded-full px-3 py-1.5 text-[11px] font-medium transition-colors ${
+                isActive
+                  ? "text-slate-950 font-semibold"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              {isActive && (
+                <motion.span
+                  layoutId="lusion-active-chapter-pill"
+                  transition={{
+                    type: "spring",
+                    stiffness: 380,
+                    damping: 30,
+                  }}
+                  className="absolute inset-0 rounded-full bg-emerald-400 shadow-[0_0_16px_rgba(52,211,153,0.45)]"
+                />
+              )}
+              <span className="relative z-10 flex items-center gap-1.5">
+                <span
+                  className={`font-mono text-[9px] ${
+                    isActive ? "text-slate-900" : "text-slate-500"
+                  }`}
+                >
+                  {chapter.number}
+                </span>
+                <span>{chapter.label}</span>
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="h-4 w-[1px] bg-white/15" />
+
+      <button
+        type="button"
+        onClick={() => {
+          playTactileFeedback();
+          smoothScrollToElement(nextChapter.id);
         }}
-        animate={{
-          width: cursorLabel ? 86 : isPointer ? 54 : 36,
-          height: cursorLabel ? 34 : isPointer ? 54 : 36,
-          borderRadius: cursorLabel ? 999 : 999,
-        }}
-        transition={{ type: "spring", stiffness: 320, damping: 24 }}
-        className="flex items-center justify-center border border-emerald-500/50 bg-emerald-500/10 backdrop-blur-[2px] shadow-[0_0_24px_rgba(16,185,129,0.22)]"
+        title={`Ir para ${nextChapter.label}`}
+        className="flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-emerald-300 transition hover:bg-white/20"
       >
-        {cursorLabel && (
-          <span className="font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-emerald-950 bg-emerald-400/90 px-2.5 py-1 rounded-full shadow-sm">
-            {cursorLabel}
-          </span>
-        )}
-      </motion.div>
-
-      {/* Núcleo preciso */}
-      <motion.div
-        style={{
-          x: springX,
-          y: springY,
-          translateX: "-50%",
-          translateY: "-50%",
-        }}
-        animate={{
-          scale: isPointer ? 0.4 : 1,
-          opacity: cursorLabel ? 0 : 1,
-        }}
-        className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.9)]"
-      />
+        <span>Seguinte</span>
+        <ArrowDown className="h-3 w-3" />
+      </button>
     </div>
   );
 }
 
 /**
- * HUD de Telemetria Arquitetónica ao estilo Lusion (acompanha profundidade e velocidade do scroll).
+ * Ponte de transição entre secções estilo Lusion ("Continue to Scroll")
+ * que conecta visualmente uma secção à seguinte sem quebrar as bordas do ecrã.
  */
-function ScrollTelemetryHUD() {
-  const { scrollY, scrollYProgress } = useScroll();
-  const scrollVelocity = useVelocity(scrollY);
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 25,
-  });
-  const [percent, setPercent] = useState(0);
-  const [velocity, setVelocity] = useState(0);
-
-  useEffect(() => {
-    const unsubProgress = smoothProgress.on("change", (v) => {
-      setPercent(Math.round(v * 100));
-    });
-    const unsubVel = scrollVelocity.on("change", (v) => {
-      setVelocity(Math.min(999, Math.round(Math.abs(v) * 0.25)));
-    });
-    return () => {
-      unsubProgress();
-      unsubVel();
-    };
-  }, [smoothProgress, scrollVelocity]);
-
-  const activeStage =
-    percent < 14
-      ? "00 // HERO_FLUID_STAGE"
-      : percent < 26
-        ? "01 // ORBIT_OPERATORS"
-        : percent < 38
-          ? "02 // WHATSAPP_ENGINE"
-          : percent < 52
-            ? "03 // OMNICHANNEL_SYNC"
-            : percent < 65
-              ? "04 // AGENT_GOVERNANCE"
-              : percent < 78
-                ? "05 // PLANS_AND_CASES"
-                : percent < 90
-                  ? "06 // PROCESS_PIPELINE"
-                  : "07 // CONTROL_ROOM";
-
-  return (
-    <div className="pointer-events-none fixed bottom-5 inset-x-6 z-40 hidden xl:flex items-center justify-between font-mono text-[10px] tracking-[0.16em] uppercase select-none">
-      <div className="flex items-center gap-3 rounded-full border border-slate-200/80 bg-white/80 px-3.5 py-1.5 text-slate-600 shadow-sm backdrop-blur-md">
-        <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-        <span className="font-semibold text-slate-900">{activeStage}</span>
-        <span className="text-slate-300">|</span>
-        <span className="text-emerald-700">KELVIN_WAKE: ON</span>
-      </div>
-
-      <div className="flex items-center gap-3 rounded-full border border-slate-200/80 bg-white/80 px-3.5 py-1.5 text-slate-600 shadow-sm backdrop-blur-md">
-        <span>VEL // {String(velocity).padStart(3, "0")} PX/S</span>
-        <span className="text-slate-300">|</span>
-        <span className="font-semibold text-slate-900">
-          SCROLL // {String(percent).padStart(3, "0")}%
-        </span>
-      </div>
-    </div>
-  );
-}
-
-/**
- * Wrapper magnético com física de mola estilo Lusion para botões e CTAs.
- */
-function LusionMagnetic({
-  children,
-  strength = 0.28,
-  className = "",
+function SectionBridge({
+  nextId,
+  label,
+  dark = false,
 }: {
-  children: ReactNode;
-  strength?: number;
-  className?: string;
+  nextId: string;
+  label: string;
+  dark?: boolean;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const springX = useSpring(x, { stiffness: 240, damping: 18, mass: 0.5 });
-  const springY = useSpring(y, { stiffness: 240, damping: 18, mass: 0.5 });
-
-  const handleMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
-    const dx = e.clientX - (rect.left + rect.width / 2);
-    const dy = e.clientY - (rect.top + rect.height / 2);
-    x.set(dx * strength);
-    y.set(dy * strength);
-  };
-
-  const handleLeave = () => {
-    x.set(0);
-    y.set(0);
-  };
-
   return (
-    <motion.div
-      ref={ref}
-      onMouseMove={handleMove}
-      onMouseLeave={handleLeave}
-      style={{ x: springX, y: springY }}
-      className={`inline-block ${className}`}
+    <div
+      className={`flex items-center justify-between border-t px-5 py-4 font-mono text-[10px] uppercase tracking-[0.18em] ${
+        dark
+          ? "border-white/10 bg-slate-950/40 text-slate-400"
+          : "border-slate-200/70 bg-white/60 text-slate-500"
+      }`}
     >
-      {children}
-    </motion.div>
-  );
-}
-
-/**
- * Tipografia cinética 3D palavra-por-palavra inspirada na Lusion.
- */
-function KineticWords({
-  text,
-  className = "",
-  delayOffset = 0,
-}: {
-  text: string;
-  className?: string;
-  delayOffset?: number;
-}) {
-  const words = text.split(" ");
-  return (
-    <span className={`inline-flex flex-wrap justify-center gap-x-[0.26em] ${className}`}>
-      {words.map((word, index) => (
-        <span
-          key={`${word}-${index}`}
-          className="inline-block overflow-hidden pb-1 [perspective:800px]"
-        >
-          <motion.span
-            initial={{ opacity: 0, y: "95%", rotateX: -55, filter: "blur(6px)" }}
-            whileInView={{ opacity: 1, y: "0%", rotateX: 0, filter: "blur(0px)" }}
-            viewport={{ once: false, margin: "-40px" }}
-            transition={{
-              duration: 0.72,
-              delay: delayOffset + index * 0.045,
-              ease: [0.16, 1, 0.3, 1],
-            }}
-            className="inline-block origin-bottom will-change-transform"
-          >
-            {word}
-          </motion.span>
+      <div className="mx-auto flex w-full max-w-[1240px] items-center justify-between lg:px-3">
+        <span className="flex items-center gap-2">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+          {label}
         </span>
-      ))}
-    </span>
+        <button
+          type="button"
+          onClick={() => {
+            playTactileFeedback();
+            smoothScrollToElement(nextId);
+          }}
+          className={`inline-flex items-center gap-2 transition ${
+            dark ? "hover:text-white" : "hover:text-slate-950"
+          }`}
+        >
+          <span>Continuar a explorar</span>
+          <ArrowDown className="h-3 w-3 text-emerald-500 animate-bounce" />
+        </button>
+      </div>
+    </div>
   );
 }
 
 /**
- * Secção com "Scroll com Propósito" (Scrub 3D contínuo + Inércia de Velocidade do Scroll).
- * Ao fazer scroll para baixo ou para cima, a secção desdobra-se em perspetiva 3D real,
- * inclina subtilmente com a velocidade do scroll e reage continuamente ao progresso da página.
+ * Transição de Secção Lusion-Grade:
+ * Mantém a secção 100% full-width (sem nunca encolher as laterais nem abrir buracos entre secções)
+ * e aplica movimento com propósito (paralaxe suave + revelação progressiva) ao conteúdo.
  */
 function SectionReveal({
   children,
@@ -324,57 +273,31 @@ function SectionReveal({
   delay?: number;
   id?: string;
 }) {
-  const sectionRef = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start 96%", "end 4%"],
+    target: ref,
+    offset: ["start 92%", "start 25%"],
   });
 
-  const { scrollY } = useScroll();
-  const scrollVelocity = useVelocity(scrollY);
-  const rawSkewY = useTransform(scrollVelocity, [-2400, 0, 2400], [-2.2, 0, 2.2]);
-  const smoothSkewY = useSpring(rawSkewY, { stiffness: 220, damping: 26 });
-
   const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 110,
-    damping: 26,
+    stiffness: 120,
+    damping: 28,
     restDelta: 0.001,
   });
 
-  const y = useTransform(smoothProgress, [0, 0.22, 0.78, 1], [85, 0, 0, -55]);
-  const scale = useTransform(
-    smoothProgress,
-    [0, 0.22, 0.82, 1],
-    [0.92, 1, 1, 0.95]
-  );
-  const rotateX = useTransform(
-    smoothProgress,
-    [0, 0.24, 0.8, 1],
-    [11, 0, 0, -7]
-  );
-  const opacity = useTransform(
-    smoothProgress,
-    [0, 0.14, 0.88, 1],
-    [0.12, 1, 1, 0.35]
-  );
+  const y = useTransform(smoothProgress, [0, 1], [44, 0]);
+  const opacity = useTransform(smoothProgress, [0, 0.65, 1], [0.15, 0.9, 1]);
 
   return (
-    <motion.div
-      ref={sectionRef}
-      id={id}
-      style={{
-        y,
-        scale,
-        rotateX,
-        opacity,
-        skewY: smoothSkewY,
-        transformPerspective: 1400,
-      }}
-      transition={{ delay }}
-      className={`will-change-transform ${className}`}
-    >
-      {children}
-    </motion.div>
+    <div ref={ref} id={id} className={`relative w-full overflow-hidden ${className}`}>
+      <motion.div
+        style={{ y, opacity }}
+        transition={{ delay }}
+        className="w-full will-change-transform"
+      >
+        {children}
+      </motion.div>
+    </div>
   );
 }
 
@@ -387,7 +310,7 @@ function GridCross({
 }) {
   return (
     <div
-      className={`pointer-events-none select-none font-mono text-[10px] text-emerald-600/60 flex items-center gap-1.5 z-20 ${className}`}
+      className={`pointer-events-none select-none font-mono text-[10px] text-emerald-600/50 flex items-center gap-1.5 z-20 ${className}`}
     >
       <span className="text-emerald-500 font-bold">+</span>
       {label && (
@@ -402,17 +325,13 @@ function GridCross({
 function LusionTiltCard({
   children,
   className = "",
-  cursorText,
 }: {
   children: ReactNode;
   className?: string;
-  cursorText?: string;
 }) {
   const cardRef = useRef<HTMLDivElement>(null);
-  const rotateX = useMotionValue(0);
-  const rotateY = useMotionValue(0);
-  const springRotateX = useSpring(rotateX, { stiffness: 260, damping: 22 });
-  const springRotateY = useSpring(rotateY, { stiffness: 260, damping: 22 });
+  const [rotateX, setRotateX] = useState(0);
+  const [rotateY, setRotateY] = useState(0);
   const [glowPos, setGlowPos] = useState({ x: 50, y: 50 });
   const [isHovered, setIsHovered] = useState(false);
 
@@ -423,117 +342,92 @@ function LusionTiltCard({
     const y = e.clientY - rect.top;
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
-    const rX = ((y - centerY) / Math.max(centerY, 1)) * -10;
-    const rY = ((x - centerX) / Math.max(centerX, 1)) * 10;
-    rotateX.set(rX);
-    rotateY.set(rY);
+    const rX = ((y - centerY) / centerY) * -5;
+    const rY = ((x - centerX) / centerX) * 5;
+    setRotateX(rX);
+    setRotateY(rY);
     setGlowPos({ x: (x / rect.width) * 100, y: (y / rect.height) * 100 });
   };
 
   const handleMouseLeave = () => {
     setIsHovered(false);
-    rotateX.set(0);
-    rotateY.set(0);
+    setRotateX(0);
+    setRotateY(0);
   };
 
   return (
-    <motion.div
+    <div
       ref={cardRef}
-      data-cursor={cursorText}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
       style={{
-        rotateX: springRotateX,
-        rotateY: springRotateY,
-        transformPerspective: 1100,
+        transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
+        transition: isHovered
+          ? "transform 0.08s ease-out"
+          : "transform 0.45s ease-out",
       }}
-      className={`relative will-change-transform transition-shadow duration-300 ${className}`}
+      className={`relative transition-all ${className}`}
     >
       {isHovered && (
         <div
           className="pointer-events-none absolute inset-0 rounded-[inherit] z-20"
           style={{
-            background: `radial-gradient(520px circle at ${glowPos.x}% ${glowPos.y}%, rgba(16, 185, 129, 0.14), rgba(99, 102, 241, 0.06) 42%, transparent 70%)`,
+            background: `radial-gradient(450px circle at ${glowPos.x}% ${glowPos.y}%, rgba(16, 185, 129, 0.08), transparent 65%)`,
           }}
         />
       )}
       {children}
-    </motion.div>
+    </div>
   );
 }
 
 /**
- * Fita de dados 3D animada pelo scroll (Lusion Flowing Path).
- * Desenha continuamente o conduto energético luminoso à medida que o utilizador faz scroll.
+ * Linha de fluxo estilo Lusion sincronizada com o scroll (`pathLength`).
  */
 function DataStreamRibbon() {
   const { scrollYProgress } = useScroll();
   const pathLength = useSpring(scrollYProgress, {
-    stiffness: 75,
-    damping: 22,
+    stiffness: 80,
+    damping: 24,
     restDelta: 0.001,
   });
-  const secondaryLength = useTransform(pathLength, (v) =>
-    Math.min(1, v * 1.08)
-  );
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-[4] overflow-hidden opacity-65 select-none">
+    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden opacity-30 select-none">
       <svg
         className="w-full h-full"
         viewBox="0 0 1440 3200"
         fill="none"
         preserveAspectRatio="none"
       >
+        <path
+          d="M 720 0 C 880 400, 1150 700, 720 1100 C 350 1500, 1050 1900, 720 2300 C 450 2700, 850 3000, 720 3200"
+          stroke="rgba(16, 185, 129, 0.16)"
+          strokeWidth="1.5"
+          strokeDasharray="6 8"
+        />
+        <motion.path
+          d="M 720 0 C 880 400, 1150 700, 720 1100 C 350 1500, 1050 1900, 720 2300 C 450 2700, 850 3000, 720 3200"
+          stroke="url(#ribbon-gradient)"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          style={{ pathLength }}
+        />
         <defs>
           <linearGradient
-            id="ribbon-gradient-main"
+            id="ribbon-gradient"
             x1="0%"
             y1="0%"
             x2="0%"
             y2="100%"
           >
-            <stop offset="0%" stopColor="#10b981" stopOpacity="0.65" />
-            <stop offset="35%" stopColor="#06b6d4" stopOpacity="0.85" />
-            <stop offset="70%" stopColor="#6366f1" stopOpacity="0.75" />
-            <stop offset="100%" stopColor="#10b981" stopOpacity="0.7" />
+            <stop offset="0%" stopColor="#10b981" stopOpacity="0.45" />
+            <stop offset="35%" stopColor="#14b8a6" stopOpacity="0.65" />
+            <stop offset="70%" stopColor="#6366f1" stopOpacity="0.55" />
+            <stop offset="100%" stopColor="#10b981" stopOpacity="0.45" />
           </linearGradient>
-          <filter id="lusion-ribbon-glow" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="8" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
         </defs>
-
-        {/* Trilho guia arquitetónico de fundo */}
-        <path
-          d="M 720 0 C 960 380, 1220 720, 720 1120 C 220 1520, 1180 1920, 720 2320 C 310 2720, 960 3010, 720 3200"
-          stroke="rgba(16, 185, 129, 0.14)"
-          strokeWidth="1.5"
-          strokeDasharray="6 8"
-        />
-
-        {/* Feixe secundário harmónico */}
-        <motion.path
-          d="M 760 0 C 520 420, 260 760, 720 1120 C 1140 1500, 320 1920, 720 2320 C 1080 2700, 520 3000, 720 3200"
-          stroke="url(#ribbon-gradient-main)"
-          strokeWidth="1.5"
-          strokeOpacity="0.35"
-          style={{ pathLength: secondaryLength }}
-        />
-
-        {/* Conduto principal Lusion sincronizado com o scroll */}
-        <motion.path
-          d="M 720 0 C 960 380, 1220 720, 720 1120 C 220 1520, 1180 1920, 720 2320 C 310 2720, 960 3010, 720 3200"
-          stroke="url(#ribbon-gradient-main)"
-          strokeWidth="3.5"
-          strokeLinecap="round"
-          filter="url(#lusion-ribbon-glow)"
-          style={{ pathLength }}
-        />
       </svg>
     </div>
   );
@@ -547,7 +441,7 @@ function Eyebrow({ children, light = false }: EyebrowProps) {
       className={`mb-5 inline-flex items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] ${light ? "text-emerald-400" : "text-emerald-700"}`}
     >
       <span
-        className={`h-1.5 w-1.5 rounded-full animate-pulse ${light ? "bg-emerald-400" : "bg-emerald-600"}`}
+        className={`h-1.5 w-1.5 rounded-full ${light ? "bg-emerald-400" : "bg-emerald-600"}`}
       />
       {children}
     </div>
@@ -566,10 +460,7 @@ function Metric({
   icon: typeof WalletCards;
 }) {
   return (
-    <LusionTiltCard
-      cursorText="MÉTRICA"
-      className="rounded-2xl border border-slate-200/80 bg-white/95 p-4 shadow-sm hover:shadow-md"
-    >
+    <LusionTiltCard className="rounded-2xl border border-slate-200/80 bg-white/95 p-4 shadow-sm hover:shadow-md">
       <div className="flex items-center justify-between">
         <span className="font-mono text-[10px] uppercase tracking-wider text-slate-500">
           {label}
@@ -586,24 +477,18 @@ function Metric({
 
 function ProductFrame() {
   return (
-    <LusionTiltCard
-      cursorText="PAINEL 3D"
-      className="relative mx-auto max-w-[1160px]"
-    >
-      <div className="overflow-hidden rounded-3xl border border-slate-200/90 bg-slate-50 shadow-[0_40px_110px_rgba(15,23,42,0.16)]">
+    <div className="relative mx-auto max-w-[1160px]">
+      <div className="overflow-hidden rounded-3xl border border-slate-200/90 bg-slate-50 shadow-[0_32px_90px_rgba(15,23,42,0.12)]">
         <div className="flex h-11 items-center justify-between rounded-t-3xl border-b border-slate-200 bg-white px-4">
           <div className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-rose-400/80" />
-            <span className="h-2.5 w-2.5 rounded-full bg-amber-400/80" />
-            <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/80" />
+            <span className="h-2.5 w-2.5 rounded-full bg-slate-300" />
+            <span className="h-2.5 w-2.5 rounded-full bg-slate-300" />
+            <span className="h-2.5 w-2.5 rounded-full bg-slate-300" />
           </div>
           <div className="font-mono text-[10px] text-slate-500 font-medium">
             app.vendora.co / overview
           </div>
-          <div className="flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 font-mono text-[9px] font-semibold text-emerald-700">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            LIVE SYNC
-          </div>
+          <div className="h-5 w-16 rounded-full border border-slate-200 bg-slate-100" />
         </div>
         <div className="grid min-h-[420px] md:grid-cols-[180px_1fr]">
           <aside className="hidden border-r border-slate-800 bg-slate-950 p-4 text-slate-100 md:block">
@@ -710,17 +595,10 @@ function ProductFrame() {
                   {[
                     32, 46, 38, 62, 54, 78, 66, 88, 75, 94, 81, 100, 86, 97,
                   ].map((height, i) => (
-                    <motion.div
+                    <div
                       key={i}
-                      initial={{ height: 0 }}
-                      whileInView={{ height: `${height}%` }}
-                      viewport={{ once: false }}
-                      transition={{
-                        duration: 0.65,
-                        delay: i * 0.03,
-                        ease: [0.16, 1, 0.3, 1],
-                      }}
-                      className={`flex-1 rounded-t-full transition hover:opacity-80 ${i === 11 ? "bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.5)]" : "bg-slate-300"}`}
+                      className={`flex-1 rounded-t-full transition hover:opacity-80 ${i === 11 ? "bg-emerald-500" : "bg-slate-300"}`}
+                      style={{ height: `${height}%` }}
                     />
                   ))}
                 </div>
@@ -768,7 +646,7 @@ function ProductFrame() {
           </div>
         </div>
       </div>
-    </LusionTiltCard>
+    </div>
   );
 }
 
@@ -796,14 +674,8 @@ function ProofSection() {
     offset: ["start end", "end start"],
   });
 
-  // Órbita 3D guiada pelo scroll (Lusion Orbital Mechanics)
-  const outerRingRotate = useTransform(scrollYProgress, [0, 1], [-35, 65]);
-  const innerRingRotate = useTransform(scrollYProgress, [0, 1], [45, -75]);
-  const centerScale = useTransform(
-    scrollYProgress,
-    [0, 0.5, 1],
-    [0.88, 1.04, 0.94]
-  );
+  const outerRingRotate = useTransform(scrollYProgress, [0, 1], [-25, 45]);
+  const innerRingRotate = useTransform(scrollYProgress, [0, 1], [30, -50]);
 
   const profiles = [
     {
@@ -813,7 +685,6 @@ function ProofSection() {
       position: "left-[2%] top-[13%]",
       delay: "0ms",
       size: "h-28 w-28 sm:h-40 sm:w-40",
-      parallax: -45,
     },
     {
       src: "/media/optimized/profile-05.webp",
@@ -822,7 +693,6 @@ function ProofSection() {
       position: "left-[18%] top-[4%]",
       delay: "180ms",
       size: "h-20 w-20 sm:h-28 sm:w-28",
-      parallax: 35,
     },
     {
       src: "/media/optimized/profile-06.webp",
@@ -831,7 +701,6 @@ function ProofSection() {
       position: "right-[18%] top-[5%]",
       delay: "360ms",
       size: "h-24 w-24 sm:h-32 sm:w-32",
-      parallax: -30,
     },
     {
       src: "/media/optimized/profile-04.webp",
@@ -840,7 +709,6 @@ function ProofSection() {
       position: "right-[2%] top-[18%]",
       delay: "540ms",
       size: "h-32 w-32 sm:h-44 sm:w-44",
-      parallax: 50,
     },
     {
       src: "/media/optimized/profile-07.webp",
@@ -849,7 +717,6 @@ function ProofSection() {
       position: "left-[7%] bottom-[12%]",
       delay: "720ms",
       size: "h-20 w-20 sm:h-28 sm:w-28",
-      parallax: 40,
     },
     {
       src: "/media/optimized/profile-09.webp",
@@ -858,7 +725,6 @@ function ProofSection() {
       position: "left-[27%] bottom-[4%]",
       delay: "900ms",
       size: "h-24 w-24 sm:h-32 sm:w-32",
-      parallax: -35,
     },
     {
       src: "/media/optimized/profile-10.webp",
@@ -867,7 +733,6 @@ function ProofSection() {
       position: "right-[27%] bottom-[5%]",
       delay: "1080ms",
       size: "h-20 w-20 sm:h-28 sm:w-28",
-      parallax: 30,
     },
     {
       src: "/media/optimized/profile-12.webp",
@@ -876,31 +741,27 @@ function ProofSection() {
       position: "right-[7%] bottom-[13%]",
       delay: "1260ms",
       size: "h-28 w-28 sm:h-40 sm:w-40",
-      parallax: -50,
     },
   ];
-
   return (
     <section
       ref={sectionRef}
-      className="reveal-up reveal-delay-2 relative min-h-[650px] overflow-hidden border-b border-[#37423b] bg-[#202522] text-[#f6f3ed] sm:min-h-[820px]"
+      className="reveal-up reveal-delay-2 relative min-h-[650px] overflow-hidden border-b border-[#37423b] bg-[#202522] text-[#f6f3ed] sm:min-h-[800px]"
     >
       <div className="absolute inset-0 bg-[#2c6457]/20" />
       <motion.div
         style={{ rotate: outerRingRotate }}
-        className="absolute left-1/2 top-1/2 hidden h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-emerald-400/25 sm:block sm:h-[680px] sm:w-[680px]"
+        className="absolute left-1/2 top-1/2 hidden h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10 sm:block sm:h-[680px] sm:w-[680px]"
       />
       <motion.div
         style={{ rotate: innerRingRotate }}
-        className="absolute left-1/2 top-1/2 hidden h-[300px] w-[300px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#e36c3f]/35 sm:block sm:h-[430px] sm:w-[430px]"
+        className="absolute left-1/2 top-1/2 hidden h-[300px] w-[300px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#e36c3f]/20 sm:block sm:h-[430px] sm:w-[430px]"
       />
       <div className="absolute inset-0 hidden sm:block" aria-hidden="true">
         {profiles.map((profile, index) => (
           <button
             key={`${profile.name}-${profile.channel}`}
             type="button"
-            data-cursor={profile.channel}
-            onClick={() => playTactileFeedback(600, 920)}
             aria-label={`${profile.name}, ${profile.channel}`}
             style={{ animationDelay: profile.delay }}
             className={`people-profile group absolute ${profile.position} z-10 transition duration-300 hover:scale-110 focus-visible:scale-110 focus-visible:outline-none`}
@@ -910,22 +771,19 @@ function ProofSection() {
                 src={profile.src}
                 alt={`${profile.name} customer profile`}
                 loading="lazy"
-                className={`${profile.size} rounded-full border-4 border-[#29322d] object-cover shadow-[0_20px_50px_rgba(0,0,0,0.4)] transition group-hover:border-emerald-400`}
+                className={`${profile.size} rounded-full border-4 border-[#29322d] object-cover shadow-[0_20px_50px_rgba(0,0,0,0.3)]`}
               />
               <span className="absolute -right-1 top-1 grid h-6 w-6 place-items-center rounded-full border-2 border-[#29322d] bg-[#e36c3f] text-[9px] font-bold text-white">
                 {index + 1}
               </span>
             </span>
-            <span className="pointer-events-none absolute left-1/2 top-full mt-3 -translate-x-1/2 whitespace-nowrap rounded-full border border-white/15 bg-[#29322d]/95 px-3 py-1.5 text-[10px] font-medium text-white opacity-0 shadow-lg transition group-hover:opacity-100 group-focus-visible:opacity-100">
+            <span className="pointer-events-none absolute left-1/2 top-full mt-3 -translate-x-1/2 whitespace-nowrap border border-white/15 bg-[#29322d] px-3 py-1.5 text-[10px] font-medium text-white opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100">
               {profile.name} · {profile.channel}
             </span>
           </button>
         ))}
       </div>
-      <motion.div
-        style={{ scale: centerScale }}
-        className="relative z-20 mx-auto flex min-h-[650px] max-w-[1240px] flex-col items-center justify-center px-5 py-16 text-center sm:min-h-[820px] sm:py-24 lg:px-8"
-      >
+      <div className="relative z-20 mx-auto flex min-h-[650px] max-w-[1240px] flex-col items-center justify-center px-5 py-16 text-center sm:min-h-[800px] sm:py-24 lg:px-8">
         <div
           className="mb-7 flex items-center justify-center gap-3 sm:hidden"
           aria-label="Real commerce teams"
@@ -946,23 +804,23 @@ function ProofSection() {
         <div className="max-w-4xl">
           <Eyebrow light>More demand, less tab switching</Eyebrow>
           <h2 className="text-balance text-[clamp(2.25rem,9.5vw,3rem)] font-semibold leading-[0.98] tracking-[-0.075em] sm:text-7xl sm:leading-[0.94] lg:text-[88px]">
-            <KineticWords text="The platform behind the people who keep selling." />
+            The platform behind the people who keep selling.
           </h2>
-          <p className="mx-auto mt-7 max-w-xl text-base leading-7 text-white/65 sm:text-lg">
+          <p className="mx-auto mt-7 max-w-xl text-base leading-7 text-white/60 sm:text-lg">
             From an independent shop to a growing brand, Vendora gives every
             team the same clear operating rhythm.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-6 sm:flex-row">
-            <LusionMagnetic>
-              <a
-                href="#process"
-                data-cursor="FLUXO"
-                onClick={() => playTactileFeedback()}
-                className="inline-flex items-center gap-2 rounded-full bg-[#e36c3f] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#e36c3f]/25 transition hover:bg-[#f08055]"
-              >
-                See how it works <ArrowRight className="h-4 w-4" />
-              </a>
-            </LusionMagnetic>
+            <button
+              type="button"
+              onClick={() => {
+                playTactileFeedback();
+                smoothScrollToElement("process");
+              }}
+              className="inline-flex items-center gap-2 rounded-full bg-[#e36c3f] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#f08055]"
+            >
+              See how it works <ArrowRight className="h-4 w-4" />
+            </button>
             <div className="text-left sm:border-l sm:border-white/20 sm:pl-6">
               <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/45">
                 Orders moved this month
@@ -976,7 +834,7 @@ function ProofSection() {
         <div className="absolute bottom-5 left-0 w-full px-4 text-center font-mono text-[8px] uppercase tracking-[0.1em] text-white/45 sm:bottom-8 sm:text-[10px] sm:tracking-[0.16em]">
           Operators like you · independent teams · real commerce
         </div>
-      </motion.div>
+      </div>
     </section>
   );
 }
@@ -1027,13 +885,6 @@ function WhatsAppFlow() {
     ],
   ];
   const [active, setActive] = useState(0);
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      setActive((c) => (c + 1) % states.length);
-    }, 4200);
-    return () => window.clearInterval(timer);
-  }, [states.length]);
-
   const [src, label, detail, story, time] = states[active];
   return (
     <div className="relative mx-auto max-w-[500px]">
@@ -1043,36 +894,26 @@ function WhatsAppFlow() {
           Live sequence · {active + 1}/{states.length}
         </span>
       </div>
-      <LusionTiltCard
-        cursorText="WHATSAPP IA"
-        className="relative mx-auto max-w-[370px] overflow-hidden rounded-[30px] border-[10px] border-[#202522] bg-[#202522] shadow-[0_32px_80px_rgba(32,37,34,0.28)]"
-      >
+      <LusionTiltCard className="relative mx-auto max-w-[370px] overflow-hidden rounded-[30px] border-[10px] border-[#202522] bg-[#202522] shadow-[0_24px_60px_rgba(32,37,34,0.22)]">
         <div className="absolute inset-x-3 top-3 z-20 flex gap-1">
           {states.map((_, index) => (
             <span
               key={index}
-              className="h-1 flex-1 overflow-hidden rounded-full bg-white/35"
+              className="h-1 flex-1 overflow-hidden bg-white/35"
             >
               <span
-                className={`block h-full bg-emerald-400 transition-all duration-500 ${index === active ? "w-full" : index < active ? "w-full" : "w-0"}`}
+                className={`block h-full bg-white ${index === active ? "w-full" : index < active ? "w-full" : "w-0"}`}
               />
             </span>
           ))}
         </div>
-        <AnimatePresence mode="wait">
-          <motion.img
-            key={src}
-            src={src}
-            alt={detail}
-            initial={{ opacity: 0, scale: 1.06 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.96 }}
-            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-            className="aspect-[9/16] w-full object-cover"
-            loading="lazy"
-          />
-        </AnimatePresence>
-        <div className="absolute inset-x-0 bottom-0 border-t border-white/15 bg-[#202522]/90 p-4 text-white backdrop-blur-md">
+        <img
+          src={src}
+          alt={detail}
+          className="aspect-[9/16] w-full object-cover"
+          loading="lazy"
+        />
+        <div className="absolute inset-x-0 bottom-0 border-t border-white/15 bg-[#202522]/90 p-4 text-white">
           <div className="flex items-center gap-2">
             <span className="h-8 w-8 overflow-hidden rounded-full border border-white/40">
               <img
@@ -1100,13 +941,12 @@ function WhatsAppFlow() {
         <button
           type="button"
           aria-label="Previous WhatsApp status"
-          onClick={() => {
-            playTactileFeedback();
+          onClick={() =>
             setActive(
               (current) => (current - 1 + states.length) % states.length
-            );
-          }}
-          className="grid h-9 w-9 place-items-center rounded-full border border-[#b9cabe] bg-[#d9e7de] text-[#2c6457] transition hover:bg-[#fffdf9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+            )
+          }
+          className="grid h-9 w-9 place-items-center border border-[#b9cabe] bg-[#d9e7de] text-[#2c6457] transition hover:bg-[#fffdf9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
@@ -1116,21 +956,15 @@ function WhatsAppFlow() {
             type="button"
             aria-label={`Show ${item[1]} status`}
             aria-pressed={index === active}
-            onClick={() => {
-              playTactileFeedback();
-              setActive(index);
-            }}
-            className={`h-2.5 w-2.5 rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] ${index === active ? "bg-[#e36c3f] scale-125" : "bg-[#8bad9d]"}`}
+            onClick={() => setActive(index)}
+            className={`h-2.5 w-2.5 rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] ${index === active ? "bg-[#e36c3f]" : "bg-[#8bad9d]"}`}
           />
         ))}
         <button
           type="button"
           aria-label="Next WhatsApp status"
-          onClick={() => {
-            playTactileFeedback();
-            setActive((current) => (current + 1) % states.length);
-          }}
-          className="grid h-9 w-9 place-items-center rounded-full border border-[#b9cabe] bg-[#d9e7de] text-[#2c6457] transition hover:bg-[#fffdf9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+          onClick={() => setActive((current) => (current + 1) % states.length)}
+          className="grid h-9 w-9 place-items-center border border-[#b9cabe] bg-[#d9e7de] text-[#2c6457] transition hover:bg-[#fffdf9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
         >
           <ChevronRight className="h-4 w-4" />
         </button>
@@ -1187,7 +1021,7 @@ function ChannelShowcase() {
         <div className="max-w-3xl">
           <Eyebrow>Every channel, in its own language</Eyebrow>
           <h2 className="text-5xl font-semibold leading-[0.96] tracking-[-0.07em] sm:text-6xl">
-            <KineticWords text="The sale changes shape. Your operation stays clear." />
+            The sale changes shape. Your operation stays clear.
           </h2>
           <p className="mt-6 max-w-xl text-base leading-7 text-[#5f625d]">
             Facebook and Instagram each get their own space, their own visual
@@ -1195,12 +1029,11 @@ function ChannelShowcase() {
             switch modes to understand the system.
           </p>
         </div>
-        <div className="mt-14 space-y-6">
+        <div className="mt-14 space-y-5">
           {channels.map((channel, channelIndex) => (
-            <LusionTiltCard
+            <article
               key={channel.name}
-              cursorText={channel.name.toUpperCase()}
-              className={`${channel.tone} overflow-hidden rounded-3xl p-5 sm:p-8 shadow-xl ${channelIndex === 1 ? "text-[#202522]" : "text-white"}`}
+              className={`${channel.tone} overflow-hidden rounded-2xl p-5 sm:p-7 ${channelIndex === 1 ? "text-[#202522]" : "text-white"}`}
             >
               <div className="grid gap-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-center">
                 <div>
@@ -1226,15 +1059,13 @@ function ChannelShowcase() {
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-[1fr_0.3fr] gap-3">
-                  <div className="group overflow-hidden rounded-2xl border border-white/20 bg-[#f6f3ed] p-2 sm:p-3">
-                    <div className="overflow-hidden rounded-xl">
-                      <img
-                        src={channel.assets[0]}
-                        alt={channel.alt[0]}
-                        loading="lazy"
-                        className={`w-full object-cover transition duration-700 group-hover:scale-105 ${channelIndex === 0 ? "aspect-[16/9]" : "aspect-[4/5]"}`}
-                      />
-                    </div>
+                  <div className="overflow-hidden rounded-xl border border-white/20 bg-[#f6f3ed] p-2 sm:p-3">
+                    <img
+                      src={channel.assets[0]}
+                      alt={channel.alt[0]}
+                      loading="lazy"
+                      className={`w-full object-cover ${channelIndex === 0 ? "aspect-[16/9]" : "aspect-[4/5]"}`}
+                    />
                     <div className="flex items-center justify-between px-1 pt-3 font-mono text-[9px] uppercase tracking-[0.14em] text-[#8f8a80]">
                       <span>{channel.name} campaign</span>
                       <span className="text-[#2c6457]">Ready to publish</span>
@@ -1244,20 +1075,20 @@ function ChannelShowcase() {
                     {channel.assets.slice(1).map((asset, index) => (
                       <div
                         key={asset}
-                        className="group overflow-hidden rounded-2xl border border-white/20 bg-[#29322d] p-1"
+                        className="overflow-hidden rounded-xl border border-white/20 bg-[#29322d] p-1"
                       >
                         <img
                           src={asset}
                           alt={channel.alt[index + 1]}
                           loading="lazy"
-                          className={`w-full rounded-xl object-cover transition duration-700 group-hover:scale-105 ${channelIndex === 0 ? "aspect-[16/9]" : "aspect-[4/5]"}`}
+                          className={`w-full object-cover ${channelIndex === 0 ? "aspect-[16/9]" : "aspect-[4/5]"}`}
                         />
                       </div>
                     ))}
                   </div>
                 </div>
               </div>
-            </LusionTiltCard>
+            </article>
           ))}
         </div>
       </div>
@@ -1364,7 +1195,7 @@ function CaseStudiesSection() {
           <div className="max-w-2xl">
             <Eyebrow>Proof from the operating floor</Eyebrow>
             <h2 className="text-5xl font-semibold leading-[0.95] tracking-[-0.07em] sm:text-6xl">
-              <KineticWords text="When the system carries the work, the team sees the next move." />
+              When the system carries the work, the team sees the next move.
             </h2>
             <p className="mt-6 max-w-xl text-base leading-7 text-[#6e716b]">
               A live story at a time: see how connected channels, governed
@@ -1375,13 +1206,12 @@ function CaseStudiesSection() {
             <button
               type="button"
               aria-label="Previous case study"
-              onClick={() => {
-                playTactileFeedback();
+              onClick={() =>
                 setActive(
                   (index) =>
                     (index - 1 + CASE_STUDIES.length) % CASE_STUDIES.length
-                );
-              }}
+                )
+              }
               className="grid h-11 w-11 place-items-center rounded-full border border-[#a9976c]/70 bg-[#fffdf9]/50 text-[#2c6457] transition hover:border-[#e36c3f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
             >
               <ChevronLeft className="h-4 w-4" />
@@ -1392,10 +1222,9 @@ function CaseStudiesSection() {
             <button
               type="button"
               aria-label="Next case study"
-              onClick={() => {
-                playTactileFeedback();
-                setActive((index) => (index + 1) % CASE_STUDIES.length);
-              }}
+              onClick={() =>
+                setActive((index) => (index + 1) % CASE_STUDIES.length)
+              }
               className="grid h-11 w-11 place-items-center rounded-full border border-[#a9976c]/70 bg-[#fffdf9]/50 text-[#2c6457] transition hover:border-[#e36c3f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
             >
               <ChevronRight className="h-4 w-4" />
@@ -1403,8 +1232,8 @@ function CaseStudiesSection() {
           </div>
         </div>
         <div className="mt-12 grid gap-4 lg:grid-cols-2">
-          <LusionTiltCard
-            cursorText="HISTÓRIA"
+          <article
+            aria-live="polite"
             className="flex min-h-[420px] flex-col justify-between rounded-2xl bg-[#202522] p-6 text-[#f6f3ed] shadow-[0_18px_48px_rgba(32,37,34,0.12)] sm:p-9"
           >
             <div>
@@ -1433,11 +1262,8 @@ function CaseStudiesSection() {
               <div className="text-sm font-semibold">{current.person}</div>
               <div className="mt-1 text-xs text-white/50">{current.role}</div>
             </div>
-          </LusionTiltCard>
-          <LusionTiltCard
-            cursorText="IMPACTO"
-            className="flex min-h-[420px] flex-col justify-between rounded-2xl bg-[#fffdf9] p-6 shadow-[0_18px_48px_rgba(32,37,34,0.07)] sm:p-9"
-          >
+          </article>
+          <article className="flex min-h-[420px] flex-col justify-between rounded-2xl bg-[#fffdf9] p-6 shadow-[0_18px_48px_rgba(32,37,34,0.07)] sm:p-9">
             <div>
               <div className="flex items-center justify-between">
                 <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#2c6457]">
@@ -1482,7 +1308,7 @@ function CaseStudiesSection() {
                 />
               </div>
             </div>
-          </LusionTiltCard>
+          </article>
         </div>
         <div className="mt-12">
           <h3
@@ -1794,7 +1620,6 @@ function InteractiveHeroPrompt() {
   const [isSimulating, setIsSimulating] = useState(false);
 
   const handleSelect = (id: SuggestionId) => {
-    playTactileFeedback(580, 900);
     if (activeId === id) return;
     setIsSimulating(true);
     setActiveId(id);
@@ -1805,7 +1630,6 @@ function InteractiveHeroPrompt() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    playTactileFeedback(620, 960);
     if (!inputValue.trim()) return;
     setIsSimulating(true);
     const lower = inputValue.toLowerCase();
@@ -1837,11 +1661,8 @@ function InteractiveHeroPrompt() {
     PROMPT_SUGGESTIONS.find((s) => s.id === activeId) || PROMPT_SUGGESTIONS[0];
 
   return (
-    <LusionTiltCard
-      cursorText="IA AO VIVO"
-      className="relative mx-auto mt-12 max-w-4xl px-2 sm:px-0"
-    >
-      <div className="overflow-hidden rounded-3xl border border-slate-200/90 bg-white/95 shadow-[0_28px_80px_rgba(15,23,42,0.14)] backdrop-blur-2xl transition duration-300 hover:shadow-[0_36px_110px_rgba(16,185,129,0.18)]">
+    <div className="relative mx-auto mt-12 max-w-4xl px-2 sm:px-0">
+      <div className="overflow-hidden rounded-3xl border border-slate-200/90 bg-white/95 shadow-[0_28px_80px_rgba(15,23,42,0.12)] backdrop-blur-2xl transition duration-300 hover:shadow-[0_36px_100px_rgba(15,23,42,0.16)]">
         {/* Top Control Bar */}
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 bg-slate-50/70 px-5 py-3 sm:px-6">
           <div className="flex items-center gap-2.5">
@@ -1872,8 +1693,7 @@ function InteractiveHeroPrompt() {
             />
             <button
               type="submit"
-              data-cursor="EXECUTAR"
-              className="absolute right-2 inline-flex items-center gap-1.5 rounded-xl bg-slate-950 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-emerald-600 transition"
+              className="absolute right-2 inline-flex items-center gap-1.5 rounded-xl bg-slate-950 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-slate-800 transition"
             >
               Executar
               <Send className="h-3 w-3" />
@@ -1891,7 +1711,6 @@ function InteractiveHeroPrompt() {
                 <button
                   key={s.id}
                   type="button"
-                  data-cursor="SIMULAR"
                   onClick={() => handleSelect(s.id)}
                   className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium transition ${
                     isSelected
@@ -2236,7 +2055,7 @@ function InteractiveHeroPrompt() {
           </AnimatePresence>
         </div>
       </div>
-    </LusionTiltCard>
+    </div>
   );
 }
 
@@ -2252,104 +2071,50 @@ function HeroSection({
     offset: ["start start", "end start"],
   });
 
-  const smoothHeroScroll = useSpring(scrollYProgress, {
+  const smoothScroll = useSpring(scrollYProgress, {
     stiffness: 110,
     damping: 26,
     restDelta: 0.001,
   });
 
-  // Coreografia de Scroll com Propósito em 3 Camadas (Headline -> Prompt IA -> Palco 3D do Produto)
-  const headlineY = useTransform(smoothHeroScroll, [0, 0.55], [0, -85]);
-  const headlineOpacity = useTransform(
-    smoothHeroScroll,
-    [0, 0.42, 0.68],
-    [1, 0.92, 0]
-  );
-  const headlineScale = useTransform(smoothHeroScroll, [0, 0.55], [1, 0.91]);
-  const headlineRotateX = useTransform(smoothHeroScroll, [0, 0.55], [0, 16]);
+  // Movimento de scroll limpo e fluido (sem apagar o título cedo demais)
+  const headlineY = useTransform(smoothScroll, [0, 0.5], [0, -35]);
+  const promptY = useTransform(smoothScroll, [0, 0.5], [0, -18]);
 
-  const promptY = useTransform(smoothHeroScroll, [0, 0.55], [0, -45]);
-  const promptScale = useTransform(
-    smoothHeroScroll,
-    [0, 0.25, 0.65],
-    [0.97, 1.02, 0.94]
-  );
-  const promptRotateX = useTransform(
-    smoothHeroScroll,
-    [0, 0.35, 0.7],
-    [6, 0, -8]
-  );
-
-  // Desdobramento 3D isométrico estilo Lusion + satélites de telemetria em paralaxe Z
-  const productRotateX = useTransform(
-    smoothHeroScroll,
-    [0, 0.48, 0.85],
-    [22, 0, -6]
-  );
-  const productRotateY = useTransform(
-    smoothHeroScroll,
-    [0, 0.48, 0.85],
-    [-6, 0, 3]
-  );
-  const productScale = useTransform(
-    smoothHeroScroll,
-    [0, 0.48, 0.85],
-    [0.86, 1.02, 0.98]
-  );
-  const productY = useTransform(smoothHeroScroll, [0, 0.48], [90, 0]);
-
-  const floatBadgeLeftY = useTransform(smoothHeroScroll, [0, 0.7], [65, -75]);
-  const floatBadgeRightY = useTransform(smoothHeroScroll, [0, 0.7], [95, -90]);
+  // Product frame unfolds from 3D isometric perspective to full-fidelity flat view
+  const productRotateX = useTransform(smoothScroll, [0.05, 0.55], [12, 0]);
+  const productScale = useTransform(smoothScroll, [0.05, 0.55], [0.93, 1.0]);
+  const productY = useTransform(smoothScroll, [0.05, 0.55], [45, 0]);
 
   return (
     <section
+      id="hero-stage"
       ref={heroRef}
       className="relative overflow-hidden border-b border-slate-200/80 bg-[#fcfdfd] cursor-default"
     >
-      {/* Malha Aurora Luminosa (Kraft + Lusion Atmosphere) */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 overflow-hidden z-0"
-      >
-        <div className="animate-aurora-1 absolute -top-28 left-[8%] h-[420px] w-[520px] rounded-full bg-emerald-400/20 blur-[110px]" />
-        <div className="animate-aurora-2 absolute top-16 right-[6%] h-[460px] w-[540px] rounded-full bg-cyan-400/20 blur-[120px]" />
-        <div className="animate-aurora-3 absolute bottom-24 left-[22%] h-[380px] w-[480px] rounded-full bg-indigo-400/15 blur-[115px]" />
-        {/* Diffuser superior luminoso */}
-        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[1200px] h-[480px] bg-gradient-to-b from-white via-white/75 to-transparent blur-3xl opacity-90" />
-      </div>
-
-      {/* Architectural Grid Crosses (Lusion editorial signature) */}
+      {/* Architectural Grid Crosses */}
       <GridCross
         label="SYS // 00.HERO_NEXUS"
         className="absolute top-6 left-6"
       />
       <GridCross
-        label="FLUID // KELVIN_WAKE_GPU"
+        label="FLUID // KELVIN_WAKE"
         className="absolute top-6 right-6"
       />
-
       <WaterWakeHero
-        variant="hero"
-        damping={0.994}
-        dropRadius={0.034}
-        className="pb-24 pt-16 sm:pb-36 sm:pt-24 min-h-[980px] flex flex-col justify-center"
+        damping={0.991}
+        dropRadius={0.024}
+        className="pb-24 pt-16 sm:pb-32 sm:pt-24 min-h-[960px] flex flex-col justify-center"
       >
-        {/* Transição suave para a secção seguinte */}
+        {/* Transição suave para a secção clara do preview, mantendo o fundo branco. */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-slate-50 via-slate-50/70 to-transparent z-10" />
 
         <div className="relative z-20 mx-auto max-w-[1240px] px-5 lg:px-8">
-          {/* Headline 3D com tipografia cinética e recuo em perspetiva guiado pelo scroll */}
           <motion.div
-            style={{
-              y: headlineY,
-              opacity: headlineOpacity,
-              scale: headlineScale,
-              rotateX: headlineRotateX,
-              transformPerspective: 1200,
-            }}
-            className="mx-auto max-w-4xl text-center will-change-transform"
+            style={{ y: headlineY }}
+            className="mx-auto max-w-4xl text-center"
           >
-            <div className="pointer-events-auto mb-6 inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-white/90 px-4 py-1.5 shadow-[0_8px_30px_rgba(16,185,129,0.12)] backdrop-blur-md">
+            <div className="pointer-events-auto mb-6 inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/85 px-4 py-1.5 shadow-sm backdrop-blur-md">
               <Sparkles className="h-3.5 w-3.5 text-emerald-600" />
               <span className="text-xs font-semibold text-slate-800 tracking-wide">
                 Commerce OS com Inteligência Artificial
@@ -2357,15 +2122,15 @@ function HeroSection({
               <span className="flex h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
             </div>
 
-            <h1 className="text-balance text-[clamp(2.6rem,7.6vw,5.7rem)] font-bold tracking-tight text-slate-950 leading-[0.98] sm:leading-[0.95]">
-              <KineticWords text="Vender com IA –" />
+            <h1 className="text-balance text-[clamp(2.5rem,7.5vw,5.6rem)] font-bold tracking-tight text-slate-950 leading-[0.98] sm:leading-[0.96]">
+              Vender com IA –
               <br />
               <span className="text-slate-900">
                 o{" "}
-                <span className="font-serif italic font-normal bg-gradient-to-r from-emerald-700 via-teal-600 to-indigo-700 bg-clip-text text-transparent tracking-tight">
+                <span className="font-serif italic font-normal text-slate-800 tracking-tight">
                   futuro
                 </span>{" "}
-                <KineticWords text="do comércio" delayOffset={0.18} />
+                do comércio
               </span>
             </h1>
 
@@ -2376,32 +2141,28 @@ function HeroSection({
             </p>
 
             <div className="pointer-events-auto mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5">
-              <LusionMagnetic>
-                <button
-                  type="button"
-                  data-cursor="COMEÇAR"
-                  onClick={() => {
-                    playTactileFeedback();
-                    onStart();
-                  }}
-                  className="inline-flex h-12 w-full sm:w-auto items-center justify-center gap-2.5 rounded-full bg-slate-950 px-7 text-sm font-semibold text-white shadow-[0_14px_34px_rgba(15,23,42,0.22)] transition-all hover:bg-emerald-600 hover:shadow-[0_18px_40px_rgba(16,185,129,0.32)] hover:scale-[1.03] active:scale-[0.98]"
-                >
-                  Começar Gratuitamente
-                  <ArrowRight className="h-4 w-4" />
-                </button>
-              </LusionMagnetic>
-
-              <LusionMagnetic>
-                <a
-                  href="#whatsapp"
-                  data-cursor="DEMO"
-                  onClick={() => playTactileFeedback(480, 760)}
-                  className="inline-flex h-12 w-full sm:w-auto items-center justify-center gap-2 rounded-full border border-slate-300/80 bg-white/90 px-6 text-sm font-semibold text-slate-700 shadow-sm backdrop-blur-md transition-all hover:bg-white hover:text-slate-950 hover:border-emerald-400"
-                >
-                  <Play className="h-3.5 w-3.5 fill-current text-emerald-600" />
-                  Ver Demonstração
-                </a>
-              </LusionMagnetic>
+              <button
+                type="button"
+                onClick={() => {
+                  playTactileFeedback();
+                  onStart();
+                }}
+                className="inline-flex h-12 w-full sm:w-auto items-center justify-center gap-2.5 rounded-full bg-slate-950 px-7 text-sm font-semibold text-white shadow-lg shadow-slate-950/15 transition-all hover:bg-slate-800 hover:scale-[1.02] active:scale-[0.98]"
+              >
+                Começar Gratuitamente
+                <ArrowRight className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  playTactileFeedback();
+                  smoothScrollToElement("whatsapp");
+                }}
+                className="inline-flex h-12 w-full sm:w-auto items-center justify-center gap-2 rounded-full border border-slate-300/80 bg-white/85 px-6 text-sm font-semibold text-slate-700 shadow-sm backdrop-blur-md transition-all hover:bg-white hover:text-slate-900 hover:border-slate-400"
+              >
+                <Play className="h-3.5 w-3.5 fill-current text-slate-500" />
+                Ver Demonstração
+              </button>
             </div>
 
             <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-slate-500 font-medium">
@@ -2420,66 +2181,21 @@ function HeroSection({
             </div>
           </motion.div>
 
-          {/* Prompt Interativo com perspetiva 3D sincronizada ao scroll */}
-          <motion.div
-            style={{
-              y: promptY,
-              scale: promptScale,
-              rotateX: promptRotateX,
-              transformPerspective: 1200,
-            }}
-            className="pointer-events-auto will-change-transform"
-          >
+          {/* Prompt Interativo */}
+          <motion.div style={{ y: promptY }} className="pointer-events-auto">
             <InteractiveHeroPrompt />
           </motion.div>
 
-          {/* Desdobramento Isométrico 3D do Dashboard pelo Scroll + Nós Flutuantes de Telemetria */}
+          {/* Desdobramento e Expansão 3D do Dashboard pelo Scroll */}
           <motion.div
             style={{
               rotateX: productRotateX,
-              rotateY: productRotateY,
               scale: productScale,
               y: productY,
-              transformPerspective: 1400,
+              transformPerspective: 1200,
             }}
-            className="pointer-events-auto relative mt-20 will-change-transform"
+            className="pointer-events-auto mt-20"
           >
-            {/* Satélite 3D Esquerdo (Paralaxe de Scroll Independente) */}
-            <motion.div
-              style={{ y: floatBadgeLeftY }}
-              className="pointer-events-none absolute -left-4 top-20 z-30 hidden xl:flex items-center gap-3 rounded-2xl border border-emerald-500/30 bg-slate-950/90 px-4 py-3 text-white shadow-[0_20px_50px_rgba(16,185,129,0.25)] backdrop-blur-xl"
-            >
-              <span className="grid h-8 w-8 place-items-center rounded-xl bg-emerald-500/20 text-emerald-400">
-                <Zap className="h-4 w-4" />
-              </span>
-              <div>
-                <div className="font-mono text-[9px] uppercase tracking-wider text-emerald-400">
-                  RPC // PLACE_ORDER
-                </div>
-                <div className="text-xs font-bold">
-                  Estoque Atômico Sincronizado
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Satélite 3D Direito (Paralaxe de Scroll Independente) */}
-            <motion.div
-              style={{ y: floatBadgeRightY }}
-              className="pointer-events-none absolute -right-4 bottom-24 z-30 hidden xl:flex items-center gap-3 rounded-2xl border border-indigo-500/30 bg-slate-950/90 px-4 py-3 text-white shadow-[0_20px_50px_rgba(99,102,241,0.25)] backdrop-blur-xl"
-            >
-              <span className="grid h-8 w-8 place-items-center rounded-xl bg-indigo-500/20 text-indigo-400">
-                <ShieldCheck className="h-4 w-4" />
-              </span>
-              <div>
-                <div className="font-mono text-[9px] uppercase tracking-wider text-indigo-400">
-                  WABA // CLOUD API v25
-                </div>
-                <div className="text-xs font-bold">
-                  +24% Conversão Automática
-                </div>
-              </div>
-            </motion.div>
-
             <div className="mb-6 flex flex-col items-center justify-center text-center">
               <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3.5 py-1 mb-2 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-800">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -2494,6 +2210,7 @@ function HeroSection({
           </motion.div>
         </div>
       </WaterWakeHero>
+      <SectionBridge nextId="proof" label="01 // Comunidade & Operadores Reais" />
     </section>
   );
 }
@@ -2533,57 +2250,39 @@ function FAQSection() {
         <div>
           <Eyebrow>Questions before you connect</Eyebrow>
           <h2 className="max-w-xl text-5xl font-semibold leading-[0.95] tracking-[-0.07em] sm:text-6xl">
-            <KineticWords text="Security, permissions and CRM – answered clearly." />
+            Security, permissions and CRM – answered clearly.
           </h2>
           <p className="mt-6 max-w-md text-base leading-7 text-[#6e716b]">
             The fastest way to trust an AI system is to understand what it can
             access, what it can change and where your existing customer data
             fits.
           </p>
-          <LusionMagnetic>
-            <Link
-              to="/signup"
-              data-cursor="CONECTAR"
-              onClick={() => playTactileFeedback()}
-              className="mt-9 inline-flex items-center gap-2 rounded-full bg-[#202522] px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-[#2c6457]"
-            >
-              Connect your operation <ArrowRight className="h-4 w-4" />
-            </Link>
-          </LusionMagnetic>
+          <Link
+            to="/signup"
+            className="mt-9 inline-flex items-center gap-2 bg-[#202522] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#2c6457]"
+          >
+            Connect your operation <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
         <div className="border-t border-[#c8c1b4]">
           {FAQ_ITEMS.map(([question, answer], index) => (
             <div key={question} className="border-b border-[#c8c1b4]">
               <button
                 type="button"
-                data-cursor={open === index ? "FECHAR" : "ABRIR"}
-                onClick={() => {
-                  playTactileFeedback();
-                  setOpen(open === index ? -1 : index);
-                }}
+                onClick={() => setOpen(open === index ? -1 : index)}
                 aria-expanded={open === index}
                 className="flex w-full items-center justify-between gap-6 py-5 text-left text-base font-semibold text-[#202522] transition hover:text-[#2c6457]"
               >
                 <span>{question}</span>
-                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-[#b9b2a5] font-mono text-lg font-normal text-[#2c6457]">
+                <span className="grid h-7 w-7 shrink-0 place-items-center border border-[#b9b2a5] font-mono text-lg font-normal text-[#2c6457]">
                   {open === index ? "-" : "+"}
                 </span>
               </button>
-              <AnimatePresence initial={false}>
-                {open === index && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                    className="overflow-hidden"
-                  >
-                    <div className="max-w-2xl pb-6 pr-10 text-sm leading-6 text-[#6e716b]">
-                      {answer}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              {open === index && (
+                <div className="max-w-2xl pb-6 pr-10 text-sm leading-6 text-[#6e716b]">
+                  {answer}
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -2617,7 +2316,7 @@ function ProcessSection() {
               </div>
             </div>
           </div>
-          <div className="mt-5 ml-auto max-w-[250px] rounded-xl bg-[#d9e7de] p-3 text-sm leading-5 text-[#202522]">
+          <div className="mt-5 ml-auto max-w-[250px] bg-[#d9e7de] p-3 text-sm leading-5 text-[#202522]">
             Hi – is the linen shirt available in olive?
           </div>
           <div className="mt-4 flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.14em] text-[#2c6457]">
@@ -2664,7 +2363,7 @@ function ProcessSection() {
               </div>
             ))}
           </div>
-          <div className="mt-5 rounded-lg border border-[#b9cabe] bg-[#d9e7de] px-3 py-2 text-center font-mono text-[9px] uppercase tracking-[0.14em] text-[#2c6457]">
+          <div className="mt-5 border border-[#b9cabe] bg-[#d9e7de] px-3 py-2 text-center font-mono text-[9px] uppercase tracking-[0.14em] text-[#2c6457]">
             Safe to answer
           </div>
         </div>
@@ -2689,7 +2388,7 @@ function ProcessSection() {
             </span>
           </div>
           <div className="mt-6 flex items-center gap-3 border-b border-white/10 pb-5">
-            <span className="grid h-10 w-10 place-items-center rounded-lg bg-[#e36c3f] text-white">
+            <span className="grid h-10 w-10 place-items-center bg-[#e36c3f] text-white">
               <Package className="h-4 w-4" />
             </span>
             <div>
@@ -2733,7 +2432,7 @@ function ProcessSection() {
           <div>
             <Eyebrow>The work behind the reply</Eyebrow>
             <h2 className="max-w-xl text-5xl font-semibold leading-[0.94] tracking-[-0.07em] sm:text-6xl">
-              <KineticWords text="One question in. A complete operation out." />
+              One question in. A complete operation out.
             </h2>
             <p className="mt-6 max-w-md text-base leading-7 text-[#6e716b]">
               The intelligence is not a chatbot layer floating above the
@@ -2757,13 +2456,9 @@ function ProcessSection() {
               <button
                 key={step.number}
                 type="button"
-                data-cursor={`ETAPA 0${index + 1}`}
                 aria-pressed={active === index}
-                onClick={() => {
-                  playTactileFeedback();
-                  setActive(index);
-                }}
-                className={`w-full rounded-2xl border p-5 text-left transition ${active === index ? "border-[#2c6457] bg-[#d9e7de] shadow-md" : "border-[#d8d3c8] bg-[#fffdf9] hover:border-[#8bad9d]"}`}
+                onClick={() => setActive(index)}
+                className={`w-full rounded-2xl border p-5 text-left transition ${active === index ? "border-[#2c6457] bg-[#d9e7de]" : "border-[#d8d3c8] bg-[#fffdf9] hover:border-[#8bad9d]"}`}
               >
                 <div className="flex items-start gap-4">
                   <span
@@ -2786,9 +2481,8 @@ function ProcessSection() {
               </button>
             ))}
           </div>
-          <LusionTiltCard
-            cursorText="INSPECIONAR"
-            className={`min-h-[430px] rounded-2xl ${current.tone} flex flex-col justify-between p-5 sm:p-8 shadow-xl`}
+          <div
+            className={`min-h-[430px] rounded-2xl ${current.tone} flex flex-col justify-between p-5 sm:p-8`}
           >
             <div
               className={`flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.16em] ${active === 2 ? "text-white/45" : "text-[#8f8a80]"}`}
@@ -2800,24 +2494,13 @@ function ProcessSection() {
                 {current.status}
               </span>
             </div>
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={active}
-                initial={{ opacity: 0, y: 18, rotateX: 12 }}
-                animate={{ opacity: 1, y: 0, rotateX: 0 }}
-                exit={{ opacity: 0, y: -18, rotateX: -12 }}
-                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                className="py-10"
-              >
-                {current.visual}
-              </motion.div>
-            </AnimatePresence>
+            <div className="py-10">{current.visual}</div>
             <div
               className={`max-w-2xl border-t pt-5 ${active === 2 ? "border-white/15 text-white/60" : "border-black/10 text-[#6e716b]"}`}
             >
               <p className="text-sm leading-6">{current.detail}</p>
             </div>
-          </LusionTiltCard>
+          </div>
         </div>
         <div className="mt-7 flex items-center justify-between border-t border-[#d8d3c8] pt-5 font-mono text-[9px] uppercase tracking-[0.14em] text-[#8f8a80]">
           <span>Click a step to inspect the handoff</span>
@@ -2835,33 +2518,28 @@ export default function Index() {
   return (
     <div className="landing-page min-h-screen overflow-x-hidden bg-slate-50/50 text-slate-900 selection:bg-emerald-500/20 selection:text-emerald-950 relative">
       <ScrollProgressBar />
-      <LusionCursorFollower />
-      <ScrollTelemetryHUD />
-
-      {/* Campo Hidrodinâmico WebGL Global — o efeito de água acompanha todo o scroll e o cursor pela página inteira */}
-      <WaterWakeHero variant="global" damping={0.992} dropRadius={0.03} />
-
-      {/* Conduto energético contínuo animado pelo scroll (estilo Lusion) */}
+      <LusionChapterDock />
+      {/* Guia de fluxo e fita de dados conectiva contínua (estilo Lusion) */}
       <DataStreamRibbon />
-
       <SiteHeader
         ctaHref={startPath}
         onCtaClick={() => setOnboardingOpen(true)}
       />
       <main className="pt-[72px] sm:pt-[76px] relative z-10">
-        {/* Section 1: Hero com malha Aurora refratada, água contínua e desdobramento 3D pelo scroll */}
+        {/* Section 1: White hero with interactive liquid-water cursor wake */}
         <HeroSection
           startPath={startPath}
           onStart={() => setOnboardingOpen(true)}
         />
 
-        {/* Section 2: Proof & Real Operators in 3D Scroll Orbit */}
+        {/* Section 2: Proof & Real Operators in Orbit */}
         <SectionReveal id="proof" delay={0.04} className="relative">
           <GridCross
             label="SYS // 01.REAL_OPERATORS"
             className="absolute top-4 left-6 hidden sm:flex"
           />
           <ProofSection />
+          <SectionBridge nextId="whatsapp" label="02 // Comércio Conversacional WhatsApp" dark />
         </SectionReveal>
 
         {/* Section 3: WhatsApp Conversational Commerce */}
@@ -2875,7 +2553,8 @@ export default function Index() {
               <div>
                 <Eyebrow>Comércio dentro da conversa</Eyebrow>
                 <h2 className="max-w-xl text-5xl font-bold leading-[0.96] tracking-[-0.07em] text-slate-950 sm:text-6xl">
-                  <KineticWords text="A IA vende no canal que os seus clientes já usam todos os dias." />
+                  A IA vende no canal que os seus clientes já usam todos os
+                  dias.
                 </h2>
                 <p className="mt-6 max-w-md text-base leading-7 text-slate-600">
                   Responde a dúvidas sobre produto, verifica estoque em tempo
@@ -2900,6 +2579,7 @@ export default function Index() {
               <WhatsAppFlow />
             </div>
           </section>
+          <SectionBridge nextId="channels" label="03 // Publicação Multi-Canal" />
         </SectionReveal>
 
         {/* Section 4: Omni-channel feed showcase */}
@@ -2909,6 +2589,7 @@ export default function Index() {
             className="absolute top-4 left-6 hidden sm:flex"
           />
           <ChannelShowcase />
+          <SectionBridge nextId="agents" label="04 // Orquestração de Agentes IA" />
         </SectionReveal>
 
         {/* Section 5: AI Specialized Agents & Guardrails */}
@@ -2917,16 +2598,13 @@ export default function Index() {
             label="SYS // 04.AGENT_GOVERNANCE"
             className="absolute top-4 right-6 hidden sm:flex text-emerald-400/50"
           />
-          <section
-            id="agents"
-            className="overflow-hidden border-b border-slate-800 bg-slate-950 text-slate-100 py-24 sm:py-32"
-          >
+          <section className="overflow-hidden border-b border-slate-800 bg-slate-950 text-slate-100 py-24 sm:py-32">
             <div className="mx-auto max-w-[1240px] px-5 lg:px-8">
               <div className="grid gap-14 lg:grid-cols-[0.78fr_1.22fr] lg:items-start">
                 <div>
                   <Eyebrow light>Inteligência com Governança</Eyebrow>
                   <h2 className="max-w-xl text-5xl font-bold leading-[0.94] tracking-[-0.07em] sm:text-6xl text-white">
-                    <KineticWords text="Um orquestrador. Três especialistas. Toda ação protegida." />
+                    Um orquestrador. Três especialistas. Toda ação protegida.
                   </h2>
                   <p className="mt-6 max-w-md text-base leading-7 text-slate-400">
                     A Vendora não entrega o seu negócio a um chatbot genérico.
@@ -2934,10 +2612,7 @@ export default function Index() {
                     reais e permissões invioláveis.
                   </p>
                   <div className="mt-10 space-y-3">
-                    <LusionTiltCard
-                      cursorText="MARKETING AI"
-                      className="rounded-2xl border border-white/10 bg-slate-900/80 p-4 shadow-sm backdrop-blur-sm"
-                    >
+                    <LusionTiltCard className="rounded-2xl border border-white/10 bg-slate-900/80 p-4 shadow-sm backdrop-blur-sm">
                       <div className="flex items-center justify-between gap-4">
                         <div>
                           <div className="font-bold text-white text-base">
@@ -2953,10 +2628,7 @@ export default function Index() {
                         </span>
                       </div>
                     </LusionTiltCard>
-                    <LusionTiltCard
-                      cursorText="SALES AI"
-                      className="rounded-2xl border border-white/10 bg-slate-900/80 p-4 shadow-sm backdrop-blur-sm"
-                    >
+                    <LusionTiltCard className="rounded-2xl border border-white/10 bg-slate-900/80 p-4 shadow-sm backdrop-blur-sm">
                       <div className="flex items-center justify-between gap-4">
                         <div>
                           <div className="font-bold text-white text-base">
@@ -2972,10 +2644,7 @@ export default function Index() {
                         </span>
                       </div>
                     </LusionTiltCard>
-                    <LusionTiltCard
-                      cursorText="ANALYTICS AI"
-                      className="rounded-2xl border border-white/10 bg-slate-900/80 p-4 shadow-sm backdrop-blur-sm"
-                    >
+                    <LusionTiltCard className="rounded-2xl border border-white/10 bg-slate-900/80 p-4 shadow-sm backdrop-blur-sm">
                       <div className="flex items-center justify-between gap-4">
                         <div>
                           <div className="font-bold text-white text-base">
@@ -2994,10 +2663,7 @@ export default function Index() {
                   </div>
                 </div>
                 <div>
-                  <LusionTiltCard
-                    cursorText="ARQUITETURA"
-                    className="overflow-hidden rounded-3xl border border-white/15 bg-black/60 p-2.5 shadow-[0_24px_70px_rgba(0,0,0,0.5)]"
-                  >
+                  <div className="overflow-hidden rounded-3xl border border-white/15 bg-black/60 p-2.5 shadow-[0_24px_70px_rgba(0,0,0,0.5)]">
                     <video
                       className="aspect-video w-full rounded-2xl object-cover"
                       src="/media/agent-architecture.mp4"
@@ -3013,32 +2679,32 @@ export default function Index() {
                         ● Controlado por Regras RLS
                       </span>
                     </div>
-                  </LusionTiltCard>
+                  </div>
                   <div className="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-3">
-                    <LusionTiltCard className="rounded-2xl border border-white/10 bg-slate-900/60 p-3.5">
+                    <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-3.5">
                       <div className="font-mono text-[10px] uppercase tracking-wider text-emerald-400 font-semibold">
                         Canais
                       </div>
                       <div className="mt-1.5 text-base font-bold text-white">
                         4 conectados
                       </div>
-                    </LusionTiltCard>
-                    <LusionTiltCard className="rounded-2xl border border-white/10 bg-slate-900/60 p-3.5">
+                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-3.5">
                       <div className="font-mono text-[10px] uppercase tracking-wider text-emerald-400 font-semibold">
                         Agentes
                       </div>
                       <div className="mt-1.5 text-base font-bold text-white">
                         3 especializados
                       </div>
-                    </LusionTiltCard>
-                    <LusionTiltCard className="rounded-2xl border border-white/10 bg-slate-900/60 p-3.5">
+                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-3.5">
                       <div className="font-mono text-[10px] uppercase tracking-wider text-emerald-400 font-semibold">
                         Fonte Única
                       </div>
                       <div className="mt-1.5 text-base font-bold text-white">
                         1 base transacional
                       </div>
-                    </LusionTiltCard>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -3074,11 +2740,13 @@ export default function Index() {
               </div>
             </div>
           </section>
+          <SectionBridge nextId="plans" label="05 // Planos & Escala" dark />
         </SectionReveal>
 
         {/* Section 6: Plans & Pricing */}
         <SectionReveal id="plans" delay={0.04}>
           <PlansSection />
+          <SectionBridge nextId="proof-cases" label="06 // Resultados Reais" />
         </SectionReveal>
 
         {/* Section 7: Case Studies & Testimonials */}
@@ -3093,23 +2761,19 @@ export default function Index() {
 
         {/* Section 9: Operating Rhythm & How it works */}
         <SectionReveal id="process" delay={0.04}>
-          <section id="process">
-            <ProcessSection />
-          </section>
+          <ProcessSection />
+          <SectionBridge nextId="control-room" label="07 // Visão de Comando" />
         </SectionReveal>
 
         {/* Section 10: Control Room */}
         <SectionReveal id="control-room" delay={0.04}>
-          <section
-            id="control-room"
-            className="border-b border-slate-800 bg-slate-900 text-slate-100 py-24 sm:py-32"
-          >
+          <section className="border-b border-slate-800 bg-slate-900 text-slate-100 py-24 sm:py-32">
             <div className="mx-auto max-w-[1240px] px-5 lg:px-8">
               <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
                 <div>
                   <Eyebrow light>Visão de Comando</Eyebrow>
                   <h2 className="max-w-2xl text-5xl font-bold leading-[0.96] tracking-[-0.07em] sm:text-6xl text-white">
-                    <KineticWords text="Toda a sua operação sem troca de telas." />
+                    Toda a sua operação sem troca de telas.
                   </h2>
                   <p className="mt-6 max-w-xl text-base leading-7 text-slate-400">
                     Pedidos, catálogo, canais e trabalho diário residem no mesmo
@@ -3117,22 +2781,15 @@ export default function Index() {
                     negócio.
                   </p>
                 </div>
-                <LusionMagnetic>
-                  <Link
-                    to={startPath}
-                    data-cursor="PAINEL"
-                    onClick={() => playTactileFeedback()}
-                    className="inline-flex shrink-0 items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-emerald-500 hover:text-slate-950 hover:border-emerald-400"
-                  >
-                    Explorar plataforma <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </LusionMagnetic>
+                <Link
+                  to={startPath}
+                  className="inline-flex shrink-0 items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/20"
+                >
+                  Explorar plataforma <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
               <div className="mt-14 grid gap-6 lg:grid-cols-2">
-                <LusionTiltCard
-                  cursorText="AUDITORIA"
-                  className="overflow-hidden rounded-3xl border border-white/10 bg-slate-950 p-2 sm:p-3 shadow-xl"
-                >
+                <LusionTiltCard className="overflow-hidden rounded-3xl border border-white/10 bg-slate-950 p-2 sm:p-3 shadow-xl">
                   <img
                     src="/media/optimized/operations-audit.webp"
                     alt="Visão de operações da Vendora"
@@ -3146,10 +2803,7 @@ export default function Index() {
                     </span>
                   </div>
                 </LusionTiltCard>
-                <LusionTiltCard
-                  cursorText="CATÁLOGO"
-                  className="overflow-hidden rounded-3xl border border-white/10 bg-slate-950 p-2 sm:p-3 shadow-xl"
-                >
+                <LusionTiltCard className="overflow-hidden rounded-3xl border border-white/10 bg-slate-950 p-2 sm:p-3 shadow-xl">
                   <img
                     src="/media/optimized/storefront-commerce.webp"
                     alt="Loja virtual da Vendora com estoque em tempo real"
@@ -3183,33 +2837,25 @@ export default function Index() {
             <div className="absolute inset-0 bg-gradient-to-tr from-emerald-950/40 via-slate-900/50 to-indigo-950/40" />
             <div className="relative mx-auto grid max-w-[1240px] gap-12 px-5 lg:grid-cols-[0.85fr_1.15fr] lg:items-center lg:px-8">
               <div>
-                <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-400 flex items-center gap-2">
-                  <Activity className="h-3.5 w-3.5 text-emerald-400" />
+                <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-400">
                   Pronto para começar
                 </div>
                 <h2 className="mt-4 max-w-xl text-5xl font-bold leading-[0.96] tracking-[-0.07em] sm:text-6xl text-white">
-                  <KineticWords text="Opere o momento com inteligência e controle." />
+                  Opere o momento com inteligência e controle.
                 </h2>
                 <p className="mt-6 max-w-md text-base leading-7 text-slate-300">
                   Dê à sua equipe uma plataforma unificada para captar
                   intenções, fechar vendas no WhatsApp e manter seu estoque
                   perfeitamente alinhado.
                 </p>
-                <LusionMagnetic>
-                  <Link
-                    to={startPath}
-                    data-cursor="INICIAR"
-                    onClick={() => playTactileFeedback()}
-                    className="mt-9 inline-flex items-center gap-2 rounded-full bg-emerald-500 px-7 py-3.5 text-sm font-bold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:bg-emerald-400 hover:scale-[1.03]"
-                  >
-                    Começar Gratuitamente <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </LusionMagnetic>
+                <Link
+                  to={startPath}
+                  className="mt-9 inline-flex items-center gap-2 rounded-full bg-emerald-500 px-7 py-3.5 text-sm font-bold text-slate-950 shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-400 hover:scale-[1.02]"
+                >
+                  Começar Gratuitamente <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
-              <LusionTiltCard
-                cursorText="VENDORA OS"
-                className="relative overflow-hidden rounded-3xl border border-white/15 bg-white/5 p-2.5 sm:p-3 shadow-2xl backdrop-blur-sm"
-              >
+              <div className="relative overflow-hidden rounded-3xl border border-white/15 bg-white/5 p-2.5 sm:p-3 shadow-2xl backdrop-blur-sm">
                 <img
                   src="/media/optimized/cta-merchant-at-work.webp"
                   alt="Comerciante operando calmamente com o celular"
@@ -3223,7 +2869,7 @@ export default function Index() {
                     Controle Total
                   </span>
                 </div>
-              </LusionTiltCard>
+              </div>
             </div>
           </section>
         </SectionReveal>
