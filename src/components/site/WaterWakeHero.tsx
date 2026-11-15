@@ -333,61 +333,66 @@ export const WaterWakeHero: React.FC<WaterWakeHeroProps> = ({
       draw();
     };
 
-    const injectWake = (
-      x: number,
-      y: number,
-      directionX: number,
-      directionY: number,
-      strength: number,
-    ) => {
-      const centerX = x * (simWidth - 1);
-      const centerY = y * (simHeight - 1);
-      const wakeLength = Math.max(6, Math.min(simWidth, simHeight) * 0.045);
-      const maxSpread = 1.3 + wakeLength * 0.22;
-      const extent = wakeLength + maxSpread;
-      const coreRadius = Math.max(0.7, dropRadius * Math.min(simWidth, simHeight) * 0.42);
-      const startX = Math.max(1, Math.floor(centerX - extent));
-      const endX = Math.min(simWidth - 2, Math.ceil(centerX + extent));
-      const startY = Math.max(1, Math.floor(centerY - extent));
-      const endY = Math.min(simHeight - 2, Math.ceil(centerY + extent));
+// Injeta perturbação (wake) na textura de água.
+// Agora a força pode ser aumentada dinamicamente pelo scroll da página.
+const injectWake = (
+  x: number,
+  y: number,
+  directionX: number,
+  directionY: number,
+  strength: number,
+) => {
+  // Ajuste de força baseado no scroll vertical (0‑1).
+  const scrollFactor = window.scrollY / Math.max(document.body.scrollHeight - window.innerHeight, 1);
+  const boostedStrength = strength * (1 + scrollFactor * 0.5); // até +50% de força ao chegar ao fim da página
+  const centerX = x * (simWidth - 1);
+  const centerY = y * (simHeight - 1);
+  const wakeLength = Math.max(6, Math.min(simWidth, simHeight) * 0.045);
+  const maxSpread = 1.3 + wakeLength * 0.22;
+  const extent = wakeLength + maxSpread;
+  const coreRadius = Math.max(0.7, dropRadius * Math.min(simWidth, simHeight) * 0.42);
+  const startX = Math.max(1, Math.floor(centerX - extent));
+  const endX = Math.min(simWidth - 2, Math.ceil(centerX + extent));
+  const startY = Math.max(1, Math.floor(centerY - extent));
+  const endY = Math.min(simHeight - 2, Math.ceil(centerY + extent));
 
-      for (let py = startY; py <= endY; py += 1) {
-        for (let px = startX; px <= endX; px += 1) {
-          const dx = px - centerX;
-          const dy = py - centerY;
-          const along = dx * directionX + dy * directionY;
-          const across = -dx * directionY + dy * directionX;
-          const behind = -along;
-          const index = py * simWidth + px;
+  for (let py = startY; py <= endY; py += 1) {
+    for (let px = startX; px <= endX; px += 1) {
+      const dx = px - centerX;
+      const dy = py - centerY;
+      const along = dx * directionX + dy * directionY;
+      const across = -dx * directionY + dy * directionX;
+      const behind = -along;
+      const index = py * simWidth + px;
 
-          const center = Math.exp(
-            -((along * along) / (coreRadius * coreRadius * 2) +
-              (across * across) / (coreRadius * coreRadius * 0.72)),
-          );
+      const center = Math.exp(
+        -((along * along) / (coreRadius * coreRadius * 2) +
+          (across * across) / (coreRadius * coreRadius * 0.72)),
+      );
 
-          let wings = 0;
-          if (behind > 0 && behind < wakeLength) {
-            const spread = 0.5 + behind * 0.12;
-            const wingWidth = 0.34 + behind * 0.01;
-            const wingDistance = Math.abs(across) - spread;
-            const widthFalloff = Math.exp(
-              -(wingDistance * wingDistance) / (wingWidth * wingWidth * 1.8),
-            );
-            const lengthFalloff = Math.exp(-behind / (wakeLength * 0.8));
-            wings = widthFalloff * lengthFalloff;
-          }
-
-          current[index] = Math.max(
-            -0.22,
-            Math.min(0.22, current[index] + strength * (wings * 0.95 - center * 1.2)),
-          );
-          mistCurrent[index] = Math.min(
-            0.38,
-            mistCurrent[index] + strength * 1.25 * (wings * 0.7 + center * 0.25),
-          );
-        }
+      let wings = 0;
+      if (behind > 0 && behind < wakeLength) {
+        const spread = 0.5 + behind * 0.12;
+        const wingWidth = 0.34 + behind * 0.01;
+        const wingDistance = Math.abs(across) - spread;
+        const widthFalloff = Math.exp(
+          -(wingDistance * wingDistance) / (wingWidth * wingWidth * 1.8),
+        );
+        const lengthFalloff = Math.exp(-behind / (wakeLength * 0.8));
+        wings = widthFalloff * lengthFalloff;
       }
-    };
+
+      current[index] = Math.max(
+        -0.22,
+        Math.min(0.22, current[index] + boostedStrength * (wings * 0.95 - center * 1.2)),
+      );
+      mistCurrent[index] = Math.min(
+        0.38,
+        mistCurrent[index] + boostedStrength * 1.25 * (wings * 0.7 + center * 0.25),
+      );
+    }
+  }
+};
 
     const stepSimulation = () => {
       next.fill(0);
