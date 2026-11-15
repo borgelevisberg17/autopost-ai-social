@@ -1592,62 +1592,58 @@ function LiquidHeroCanvas({
   isHovered: boolean;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const ripplesRef = useRef<
+
+  // Boat physics state (hull position, velocity, heading, bobbing)
+  const boatRef = useRef({
+    x: 600,
+    y: 300,
+    vx: 0,
+    vy: 0,
+    angle: 0,
+    speed: 0,
+    bobbing: 0,
+  });
+
+  // Kelvin Wake nodes (V-pattern expanding wake arms)
+  const wakePointsRef = useRef<
+    Array<{
+      x: number;
+      y: number;
+      angle: number;
+      speed: number;
+      age: number;
+      maxAge: number;
+      spread: number;
+    }>
+  >([]);
+
+  // Concentric propagating water ripples
+  const waterWavesRef = useRef<
+    Array<{
+      x: number;
+      y: number;
+      radius: number;
+      maxRadius: number;
+      speed: number;
+      alpha: number;
+    }>
+  >([]);
+
+  // Churning seafoam bubbles behind the stern
+  const foamRef = useRef<
     Array<{
       x: number;
       y: number;
       vx: number;
       vy: number;
       radius: number;
-      maxRadius: number;
       alpha: number;
-      color: string;
+      age: number;
+      maxAge: number;
     }>
   >([]);
-  const lastPosRef = useRef<{ x: number; y: number } | null>(null);
 
-  // Add new liquid droplet on mouse movement
-  useEffect(() => {
-    if (!isHovered) {
-      lastPosRef.current = null;
-      return;
-    }
-
-    const last = lastPosRef.current;
-    const dx = last ? mouseX - last.x : 0;
-    const dy = last ? mouseY - last.y : 0;
-    const dist = Math.hypot(dx, dy);
-
-    // Spawn viscous liquid droplets when moving
-    if (!last || dist > 6) {
-      lastPosRef.current = { x: mouseX, y: mouseY };
-
-      const colors = [
-        "rgba(67, 56, 202, ",   // indigo
-        "rgba(147, 51, 234, ",  // violet
-        "rgba(37, 99, 235, ",   // cobalt
-        "rgba(13, 148, 136, ",  // teal
-        "rgba(168, 85, 247, ",  // purple
-      ];
-      const color = colors[Math.floor(Math.random() * colors.length)];
-      const speed = Math.min(dist * 0.18, 7);
-
-      ripplesRef.current.push({
-        x: mouseX,
-        y: mouseY,
-        vx: dx ? (dx / dist) * speed * 0.35 : (Math.random() - 0.5) * 1.5,
-        vy: dy ? (dy / dist) * speed * 0.35 : (Math.random() - 0.5) * 1.5,
-        radius: 45 + Math.random() * 40,
-        maxRadius: 200 + Math.random() * 90,
-        alpha: 0.7,
-        color,
-      });
-
-      if (ripplesRef.current.length > 55) {
-        ripplesRef.current.shift();
-      }
-    }
-  }, [mouseX, mouseY, isHovered]);
+  const frameCountRef = useRef(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -1671,33 +1667,334 @@ function LiquidHeroCanvas({
 
     const render = () => {
       const rect = canvas.getBoundingClientRect();
-      ctx.clearRect(0, 0, rect.width, rect.height);
+      const width = rect.width;
+      const height = rect.height;
+      frameCountRef.current++;
+      const time = frameCountRef.current * 0.025;
 
-      const ripples = ripplesRef.current;
-      for (let i = ripples.length - 1; i >= 0; i--) {
-        const r = ripples[i];
-        r.x += r.vx;
-        r.y += r.vy;
-        r.vx *= 0.94;
-        r.vy *= 0.94;
-        r.radius += 1.3;
-        r.alpha *= 0.965;
+      ctx.clearRect(0, 0, width, height);
 
-        if (r.alpha <= 0.01 || r.radius >= r.maxRadius) {
-          ripples.splice(i, 1);
+      const boat = boatRef.current;
+
+      // 1. Boat physics: glide smoothly toward cursor with water resistance
+      const targetX = isHovered ? mouseX : width * 0.5 + Math.sin(time * 0.5) * 80;
+      const targetY = isHovered ? mouseY : height * 0.35 + Math.cos(time * 0.4) * 50;
+
+      const dx = targetX - boat.x;
+      const dy = targetY - boat.y;
+
+      // Hydrodynamic acceleration and ocean water drag
+      boat.vx += dx * 0.09;
+      boat.vy += dy * 0.09;
+      boat.vx *= 0.81; // water drag
+      boat.vy *= 0.81;
+      boat.x += boat.vx;
+      boat.y += boat.vy;
+      boat.speed = Math.hypot(boat.vx, boat.vy);
+
+      // Smooth turning angle (slerp towards movement direction)
+      if (boat.speed > 0.5) {
+        const targetAngle = Math.atan2(boat.vy, boat.vx);
+        let diff = targetAngle - boat.angle;
+        while (diff < -Math.PI) diff += Math.PI * 2;
+        while (diff > Math.PI) diff -= Math.PI * 2;
+        boat.angle += diff * 0.22;
+      }
+
+      // Vertical buoyancy bobbing on the ocean surface
+      boat.bobbing += 0.045;
+      const bobY = Math.sin(boat.bobbing) * 3.5;
+
+      // 2. Generate Boat Wake & Oceanic Wave pulses
+      if (boat.speed > 0.8) {
+        // Emit Kelvin Wake node every 2 frames
+        if (frameCountRef.current % 2 === 0) {
+          const sternX = boat.x - Math.cos(boat.angle) * 16;
+          const sternY = boat.y - Math.sin(boat.angle) * 16;
+
+          wakePointsRef.current.push({
+            x: sternX,
+            y: sternY,
+            angle: boat.angle,
+            speed: boat.speed,
+            age: 0,
+            maxAge: 75,
+            spread: 5,
+          });
+
+          if (wakePointsRef.current.length > 55) {
+            wakePointsRef.current.shift();
+          }
+        }
+
+        // Spawn stern foam bubbles (effervescent churning wake)
+        const foamCount = Math.min(Math.floor(boat.speed * 0.8), 4);
+        for (let i = 0; i < foamCount; i++) {
+          const sternDist = 14 + Math.random() * 12;
+          const spreadAngle = boat.angle + Math.PI + (Math.random() - 0.5) * 0.85;
+          foamRef.current.push({
+            x: boat.x + Math.cos(spreadAngle) * sternDist,
+            y: boat.y + Math.sin(spreadAngle) * sternDist,
+            vx: -Math.cos(boat.angle) * (boat.speed * 0.15) + (Math.random() - 0.5) * 1.3,
+            vy: -Math.sin(boat.angle) * (boat.speed * 0.15) + (Math.random() - 0.5) * 1.3,
+            radius: 2 + Math.random() * 4.5,
+            alpha: 0.9,
+            age: 0,
+            maxAge: 45 + Math.random() * 30,
+          });
+        }
+        if (foamRef.current.length > 95) foamRef.current.shift();
+
+        // Spawn concentric dispersion water waves periodically
+        if (frameCountRef.current % 8 === 0) {
+          waterWavesRef.current.push({
+            x: boat.x,
+            y: boat.y,
+            radius: 12,
+            maxRadius: 170 + boat.speed * 14,
+            speed: 2.4 + boat.speed * 0.28,
+            alpha: 0.85,
+          });
+
+          if (waterWavesRef.current.length > 25) {
+            waterWavesRef.current.shift();
+          }
+        }
+      }
+
+      // 3. Render Ambient Ocean Swells (Mar Aberto)
+      ctx.save();
+      for (let s = 0; s < 3; s++) {
+        ctx.beginPath();
+        const swellPhase = time * (0.6 + s * 0.3) + s * 2.1;
+        const swellY = height * (0.22 + s * 0.26);
+        ctx.moveTo(0, swellY + Math.sin(swellPhase) * 16);
+        for (let x = 0; x <= width; x += 40) {
+          const waveH =
+            Math.sin(x * 0.003 + swellPhase) * 16 +
+            Math.cos(x * 0.002 - swellPhase * 0.8) * 10;
+          ctx.lineTo(x, swellY + waveH);
+        }
+        ctx.strokeStyle = `rgba(59, 130, 246, ${0.12 + s * 0.04})`;
+        ctx.lineWidth = 20;
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // 4. Render Concentric Circular Waves (Expansão de ondas na água)
+      const waves = waterWavesRef.current;
+      for (let i = waves.length - 1; i >= 0; i--) {
+        const w = waves[i];
+        w.radius += w.speed;
+        w.alpha *= 0.962;
+
+        if (w.alpha <= 0.01 || w.radius >= w.maxRadius) {
+          waves.splice(i, 1);
           continue;
         }
 
-        const grad = ctx.createRadialGradient(r.x, r.y, 0, r.x, r.y, r.radius);
-        grad.addColorStop(0, `${r.color}${r.alpha})`);
-        grad.addColorStop(0.45, `${r.color}${r.alpha * 0.55})`);
-        grad.addColorStop(1, `${r.color}0)`);
-
-        ctx.fillStyle = grad;
+        ctx.save();
+        // Wave crest (bright electric cyan highlight)
         ctx.beginPath();
-        ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.arc(w.x, w.y, w.radius, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(103, 232, 249, ${w.alpha * 0.8})`;
+        ctx.lineWidth = 2.8;
+        ctx.stroke();
+
+        // Wave trough (deep ocean shadow inside the crest)
+        ctx.beginPath();
+        ctx.arc(w.x, w.y, Math.max(0, w.radius - 6), 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(30, 27, 75, ${w.alpha * 0.5})`;
+        ctx.lineWidth = 3.5;
+        ctx.stroke();
+
+        // Outer secondary refraction ripple
+        ctx.beginPath();
+        ctx.arc(w.x, w.y, w.radius + 8, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(168, 85, 247, ${w.alpha * 0.35})`;
+        ctx.lineWidth = 1.8;
+        ctx.stroke();
+        ctx.restore();
       }
+
+      // 5. Render Kelvin Wake (Linhas em V da esteira do barco)
+      const wake = wakePointsRef.current;
+      if (wake.length >= 2) {
+        ctx.save();
+        // Update ages
+        for (let i = wake.length - 1; i >= 0; i--) {
+          wake[i].age++;
+          wake[i].spread += 2.2 + wake[i].speed * 0.38;
+          if (wake[i].age > wake[i].maxAge) {
+            wake.splice(i, 1);
+          }
+        }
+
+        // Draw Left Wake Arm (Bombordo)
+        ctx.beginPath();
+        let startedLeft = false;
+        for (let i = 0; i < wake.length; i++) {
+          const pt = wake[i];
+          const perpAngle = pt.angle + Math.PI / 2;
+          const leftX =
+            pt.x + Math.cos(perpAngle) * pt.spread - Math.cos(pt.angle) * (pt.age * 0.8);
+          const leftY =
+            pt.y + Math.sin(perpAngle) * pt.spread - Math.sin(pt.angle) * (pt.age * 0.8);
+
+          if (!startedLeft) {
+            ctx.moveTo(leftX, leftY);
+            startedLeft = true;
+          } else {
+            ctx.lineTo(leftX, leftY);
+          }
+        }
+        ctx.strokeStyle = "rgba(103, 232, 249, 0.85)";
+        ctx.lineWidth = 3.5;
+        ctx.shadowColor = "rgba(103, 232, 249, 0.9)";
+        ctx.shadowBlur = 8;
+        ctx.stroke();
+
+        // Draw Right Wake Arm (Estibordo)
+        ctx.beginPath();
+        let startedRight = false;
+        for (let i = 0; i < wake.length; i++) {
+          const pt = wake[i];
+          const perpAngle = pt.angle - Math.PI / 2;
+          const rightX =
+            pt.x + Math.cos(perpAngle) * pt.spread - Math.cos(pt.angle) * (pt.age * 0.8);
+          const rightY =
+            pt.y + Math.sin(perpAngle) * pt.spread - Math.sin(pt.angle) * (pt.age * 0.8);
+
+          if (!startedRight) {
+            ctx.moveTo(rightX, rightY);
+            startedRight = true;
+          } else {
+            ctx.lineTo(rightX, rightY);
+          }
+        }
+        ctx.strokeStyle = "rgba(103, 232, 249, 0.85)";
+        ctx.lineWidth = 3.5;
+        ctx.shadowColor = "rgba(103, 232, 249, 0.9)";
+        ctx.shadowBlur = 8;
+        ctx.stroke();
+
+        // Transverse cross-waves connecting the V-wake
+        for (let i = 2; i < wake.length; i += 3) {
+          const pt = wake[i];
+          const alpha = (1 - pt.age / pt.maxAge) * 0.6;
+          const perpAngle = pt.angle + Math.PI / 2;
+
+          const lx = pt.x + Math.cos(perpAngle) * (pt.spread * 0.85);
+          const ly = pt.y + Math.sin(perpAngle) * (pt.spread * 0.85);
+          const rx = pt.x - Math.cos(perpAngle) * (pt.spread * 0.85);
+          const ry = pt.y - Math.sin(perpAngle) * (pt.spread * 0.85);
+
+          const midX = pt.x - Math.cos(pt.angle) * (pt.spread * 0.35);
+          const midY = pt.y - Math.sin(pt.angle) * (pt.spread * 0.35);
+
+          ctx.beginPath();
+          ctx.moveTo(lx, ly);
+          ctx.quadraticCurveTo(midX, midY, rx, ry);
+          ctx.strokeStyle = `rgba(165, 243, 252, ${alpha})`;
+          ctx.lineWidth = 2.2;
+          ctx.stroke();
+        }
+
+        ctx.restore();
+      }
+
+      // 6. Render Stern Foam & Churn (Espuma efervescente e borbulhante)
+      const foam = foamRef.current;
+      for (let i = foam.length - 1; i >= 0; i--) {
+        const f = foam[i];
+        f.x += f.vx;
+        f.y += f.vy;
+        f.vx *= 0.92;
+        f.vy *= 0.92;
+        f.age++;
+        f.alpha *= 0.96;
+
+        if (f.alpha <= 0.02 || f.age >= f.maxAge) {
+          foam.splice(i, 1);
+          continue;
+        }
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, f.radius * (1 + f.age * 0.025), 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${f.alpha * 0.92})`;
+        ctx.shadowColor = "rgba(103, 232, 249, 0.9)";
+        ctx.shadowBlur = 6;
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // 7. Render Bow Wave Crescent (Onda de proa do barco cortando a água)
+      if (boat.speed > 0.8) {
+        ctx.save();
+        const bowDist = 20;
+        const bowX = boat.x + Math.cos(boat.angle) * bowDist;
+        const bowY = boat.y + Math.sin(boat.angle) * bowDist;
+        const bowRadius = 26 + boat.speed * 2.8;
+
+        // Front spray crescent
+        ctx.beginPath();
+        ctx.arc(
+          bowX,
+          bowY,
+          bowRadius,
+          boat.angle - Math.PI * 0.45,
+          boat.angle + Math.PI * 0.45
+        );
+        ctx.strokeStyle = `rgba(255, 255, 255, ${Math.min(0.9, boat.speed * 0.16)})`;
+        ctx.lineWidth = 3.5;
+        ctx.shadowColor = "rgba(255, 255, 255, 0.9)";
+        ctx.shadowBlur = 8;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(
+          bowX,
+          bowY,
+          bowRadius + 9,
+          boat.angle - Math.PI * 0.35,
+          boat.angle + Math.PI * 0.35
+        );
+        ctx.strokeStyle = `rgba(103, 232, 249, ${Math.min(0.75, boat.speed * 0.13)})`;
+        ctx.lineWidth = 2.2;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // 8. Render Boat Hull Glow (Casco do barco flutuando com linha de quilha)
+      ctx.save();
+      ctx.translate(boat.x, boat.y + bobY);
+      ctx.rotate(boat.angle);
+
+      // Hydrodynamic hull aura
+      const hullGrad = ctx.createRadialGradient(0, 0, 4, 0, 0, 52);
+      hullGrad.addColorStop(0, "rgba(255, 255, 255, 0.75)");
+      hullGrad.addColorStop(0.35, "rgba(103, 232, 249, 0.6)");
+      hullGrad.addColorStop(0.7, "rgba(79, 70, 229, 0.3)");
+      hullGrad.addColorStop(1, "transparent");
+
+      ctx.fillStyle = hullGrad;
+      ctx.beginPath();
+      // Streamlined boat hull silhouette
+      ctx.ellipse(6, 0, 32 + Math.min(boat.speed * 1.6, 14), 14, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Sharp keel light line
+      ctx.beginPath();
+      ctx.moveTo(-18, 0);
+      ctx.lineTo(28, 0);
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.95)";
+      ctx.lineWidth = 2.2;
+      ctx.shadowColor = "rgba(255, 255, 255, 0.9)";
+      ctx.shadowBlur = 6;
+      ctx.stroke();
+
+      ctx.restore();
 
       animId = requestAnimationFrame(render);
     };
@@ -1708,12 +2005,12 @@ function LiquidHeroCanvas({
       cancelAnimationFrame(animId);
       window.removeEventListener("resize", handleResize);
     };
-  }, []);
+  }, [mouseX, mouseY, isHovered]);
 
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 h-full w-full pointer-events-none filter blur-[28px] mix-blend-multiply opacity-95 transition-opacity duration-300"
+      className="absolute inset-0 h-full w-full pointer-events-none filter blur-[1.5px] mix-blend-screen opacity-95 transition-opacity duration-300 z-[15]"
     />
   );
 }
@@ -1773,12 +2070,12 @@ function HeroSection({
       onMouseLeave={handleMouseLeave}
       className="relative overflow-hidden border-b border-slate-200/80 bg-slate-50/40 pb-20 pt-16 sm:pb-28 sm:pt-24 cursor-default"
     >
-      {/* Kraft Aurora Liquid Mesh Background + Interactive Liquid Mouse Surface */}
+      {/* Kraft Aurora Liquid Mesh Background + Interactive Ocean Boat Wake Surface */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
         {/* Pure Top Luminous Glow (Diffuser matching Kraft) */}
         <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[1100px] h-[480px] bg-gradient-to-b from-white via-white/80 to-transparent blur-3xl opacity-95 z-10" />
 
-        {/* Ambient Fluid Aurora Blobs (with organic drift + subtle liquid parallax reaction) */}
+        {/* Ambient Fluid Aurora Blobs (with organic drift + subtle ocean parallax reaction) */}
         <motion.div
           style={{ x: parallax1X, y: parallax1Y }}
           className="absolute top-[6%] left-[8%] w-[580px] h-[580px] rounded-full bg-gradient-to-tr from-indigo-600/35 via-purple-600/30 to-blue-500/30 blur-[110px] animate-aurora-1 mix-blend-multiply"
@@ -1793,14 +2090,7 @@ function HeroSection({
         />
         <div className="absolute top-[4%] right-[28%] w-[500px] h-[500px] rounded-full bg-gradient-to-r from-blue-700/25 via-indigo-500/30 to-purple-800/25 blur-[105px] animate-aurora-4 mix-blend-multiply" />
 
-        {/* INTERACTIVE LIQUID MOUSE CANVAS (Dynamic ink/water ripples tracking mouse trajectory) */}
-        <LiquidHeroCanvas
-          mouseX={mousePos.x}
-          mouseY={mousePos.y}
-          isHovered={isHovered}
-        />
-
-        {/* PRIMARY LIQUID FOLLOWER BLOB (Elastic spring follower with rich vibrant Kraft liquid colors) */}
+        {/* PRIMARY LIQUID OCEAN VOLUME (Follower blob under the surface) */}
         <motion.div
           style={{
             left: springX,
@@ -1810,7 +2100,7 @@ function HeroSection({
           className="absolute -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] sm:w-[760px] sm:h-[760px] rounded-full bg-[radial-gradient(circle,rgba(79,70,229,0.72)_0%,rgba(147,51,234,0.62)_35%,rgba(37,99,235,0.45)_55%,rgba(13,148,136,0.3)_70%,transparent_85%)] blur-[95px] mix-blend-multiply pointer-events-none transition-opacity duration-300"
         />
 
-        {/* TRAILING VISCOUS LIQUID TEARDROP BLOB (Stretches fluidly along cursor trajectory) */}
+        {/* TRAILING VISCOUS LIQUID TEARDROP BLOB (Stretches fluidly along boat trajectory) */}
         <motion.div
           style={{
             left: trailingX,
@@ -1820,21 +2110,18 @@ function HeroSection({
           className="absolute -translate-x-1/2 -translate-y-1/2 w-[480px] h-[480px] sm:w-[600px] sm:h-[600px] rounded-full bg-[radial-gradient(circle,rgba(168,85,247,0.65)_0%,rgba(79,70,229,0.52)_35%,rgba(20,184,166,0.38)_60%,transparent_80%)] blur-[105px] mix-blend-multiply pointer-events-none transition-opacity duration-500"
         />
 
-        {/* LIQUID SPECULAR SHEEN (Glossy water/glass reflection directly under the mouse) */}
-        <motion.div
-          style={{
-            left: springX,
-            top: springY,
-            opacity: isHovered ? 0.8 : 0,
-          }}
-          className="absolute -translate-x-1/2 -translate-y-1/2 w-[360px] h-[360px] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.5)_0%,rgba(255,255,255,0.15)_35%,transparent_70%)] blur-[50px] pointer-events-none transition-opacity duration-200"
+        {/* Frosted Glass Ocean Diffusion Layer */}
+        <div className="absolute inset-0 backdrop-blur-[24px] sm:backdrop-blur-[28px] bg-white/10" />
+
+        {/* INTERACTIVE OCEAN BOAT WAKE CANVAS (Kelvin V-Wake, Bow Waves, Foam & Ripples) */}
+        <LiquidHeroCanvas
+          mouseX={mousePos.x}
+          mouseY={mousePos.y}
+          isHovered={isHovered}
         />
 
-        {/* Frosted Glass Mesh Diffusion Layer */}
-        <div className="absolute inset-0 backdrop-blur-[65px] bg-white/15" />
-
         {/* Bottom soft fade into dashboard */}
-        <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-slate-50 via-slate-50/70 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-slate-50 via-slate-50/70 to-transparent z-[16]" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-[1240px] px-5 lg:px-8">
