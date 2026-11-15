@@ -49,7 +49,7 @@ function ScrollProgressBar() {
 
   return (
     <motion.div
-      className="fixed top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-emerald-500 via-teal-400 to-indigo-600 origin-left z-[70] pointer-events-none shadow-[0_0_12px_rgba(16,185,129,0.5)]"
+      className="fixed top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-300 origin-left z-[70] pointer-events-none shadow-[0_0_12px_rgba(16,185,129,0.5)]"
       style={{ scaleX }}
     />
   );
@@ -1597,14 +1597,11 @@ function HeroSection({
         dropRadius={0.024}
         className="pb-20 pt-16 sm:pb-28 sm:pt-24 min-h-[920px] flex flex-col justify-center"
       >
-        {/* Diffuser superior luminoso (estilo Kraft) */}
-        <div className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 w-[1200px] h-[480px] bg-gradient-to-b from-white via-white/80 to-transparent blur-3xl opacity-90 z-10" />
-
-        {/* Soft atmospheric fade into the product section */}
+        {/* Transição suave para a secção clara do preview, mantendo o fundo branco. */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-slate-50 via-slate-50/70 to-transparent z-10" />
 
         <div className="relative z-20 mx-auto max-w-[1240px] px-5 lg:px-8">
-          {/* Hero Editorial Headline (Kraft Inspired) */}
+          {/* Headline editorial sobre o fundo branco actual da landing. */}
           <div className="mx-auto max-w-4xl text-center">
             <div className="pointer-events-auto mb-6 inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/85 px-4 py-1.5 shadow-sm backdrop-blur-md">
               <Sparkles className="h-3.5 w-3.5 text-emerald-600" />
@@ -1992,7 +1989,7 @@ export default function Index() {
         onCtaClick={() => setOnboardingOpen(true)}
       />
       <main className="pt-[72px] sm:pt-[76px]">
-        {/* Section 1: Kraft Hero with Interactive AI Command Prompt */}
+        {/* Section 1: White hero with interactive liquid-water cursor wake */}
         <HeroSection
           startPath={startPath}
           onStart={() => setOnboardingOpen(true)}

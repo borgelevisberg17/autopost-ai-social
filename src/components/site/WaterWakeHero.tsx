@@ -1,443 +1,541 @@
 import React, { useEffect, useRef } from "react";
 
 interface WaterWakeHeroProps {
-  imageUrl?: string;
   children?: React.ReactNode;
-  damping?: number; // Quão rápido a onda desaparece (0.97 a 0.995)
-  dropRadius?: number; // Largura do "casco do barco" / cursor
+  damping?: number;
+  dropRadius?: number;
   className?: string;
 }
 
+const VERTEX_SHADER = `
+  attribute vec2 a_pos;
+  varying vec2 v_uv;
+
+  void main() {
+    v_uv = a_pos * 0.5 + 0.5;
+    gl_Position = vec4(a_pos, 0.0, 1.0);
+  }
+`;
+
+const FRAGMENT_SHADER = `
+  precision highp float;
+
+  uniform sampler2D u_water;
+  uniform vec2 u_waterTexel;
+  varying vec2 v_uv;
+
+  float readHeight(vec2 uv) {
+    float encoded = texture2D(u_water, clamp(uv, 0.001, 0.999)).r;
+    return (encoded - 0.5019608) * 0.796875;
+  }
+
+  void main() {
+    float height = readHeight(v_uv);
+    float hL = readHeight(v_uv - vec2(u_waterTexel.x, 0.0));
+    float hR = readHeight(v_uv + vec2(u_waterTexel.x, 0.0));
+    float hD = readHeight(v_uv - vec2(0.0, u_waterTexel.y));
+    float hU = readHeight(v_uv + vec2(0.0, u_waterTexel.y));
+
+    vec2 slope = vec2(
+      (hR - hL) / max(2.0 * u_waterTexel.x, 0.0001),
+      (hU - hD) / max(2.0 * u_waterTexel.y, 0.0001)
+    );
+
+    float mist = texture2D(u_water, v_uv).g;
+    float slopeStrength = length(slope);
+    float waterEdge = smoothstep(0.025, 0.34, slopeStrength);
+    float softBody = smoothstep(0.014, 0.11, mist) * 0.065;
+    float trough = smoothstep(0.0015, 0.02, max(-height, 0.0)) * 0.18;
+    float crest = smoothstep(0.0015, 0.02, max(height, 0.0)) * 0.15;
+
+    vec3 normal = normalize(vec3(-slope * 0.085, 1.0));
+    vec3 lightDirection = normalize(vec3(-0.10, 0.20, 0.97));
+    float specular = pow(max(dot(normal, lightDirection), 0.0), 20.0) * waterEdge;
+
+    // Sulco aqua estreito; a névoa é apenas um halo leve em redor das cristas.
+    vec3 color = vec3(0.34, 0.68, 0.65);
+    color = mix(color, vec3(0.74, 0.95, 0.92), smoothstep(0.005, 0.03, max(height, 0.0)));
+    color = mix(color, vec3(0.04, 0.24, 0.25), smoothstep(0.003, 0.028, max(-height, 0.0)) * 0.72);
+    color = mix(color, vec3(0.97, 1.0, 0.99), clamp(specular * 2.0, 0.0, 0.85));
+
+    float alpha = clamp(softBody + trough + crest + specular * 0.22, 0.0, 0.17);
+    gl_FragColor = vec4(color * alpha, alpha);
+  }
+`;
+
 export const WaterWakeHero: React.FC<WaterWakeHeroProps> = ({
-  imageUrl,
   children,
   damping = 0.991,
   dropRadius = 0.024,
   className = "",
 }) => {
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
+    const container = containerRef.current;
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!container || !canvas) return;
 
-    // WebGL context setup (supports WebGL2 or WebGL1 with extensions)
-    const gl =
-      (canvas.getContext("webgl2", {
-        alpha: true,
-        antialias: false,
-        depth: false,
-      }) as WebGLRenderingContext | null) ||
-      (canvas.getContext("webgl", {
-        alpha: true,
-        antialias: false,
-        depth: false,
-      }) as WebGLRenderingContext | null);
+    const gl = canvas.getContext("webgl", {
+      alpha: true,
+      antialias: false,
+      depth: false,
+      premultipliedAlpha: true,
+      preserveDrawingBuffer: false,
+    });
 
+    // O fundo branco permanece intacto se WebGL não estiver disponível.
     if (!gl) return;
 
-    // Habilita texturas de ponto flutuante para precisão na física da água
-    const extFloat = gl.getExtension("OES_texture_float");
-    const extHalfFloat = gl.getExtension("OES_texture_half_float");
-    gl.getExtension("OES_texture_float_linear");
-    gl.getExtension("OES_texture_half_float_linear");
+    let disposed = false;
+    const simWidth = 160;
+    let simHeight = 128;
+    let previous = new Float32Array(simWidth * simHeight);
+    let current = new Float32Array(simWidth * simHeight);
+    let next = new Float32Array(simWidth * simHeight);
+    let mistCurrent = new Float32Array(simWidth * simHeight);
+    let mistNext = new Float32Array(simWidth * simHeight);
+    let encodedField = new Uint8Array(simWidth * simHeight * 4);
+    let lastPointer: { x: number; y: number } | null = null;
+    let animationFrame = 0;
+    let activeFrames = 0;
+    let lastFrameTime = 0;
 
-    const texType = extFloat
-      ? gl.FLOAT
-      : extHalfFloat
-      ? (extHalfFloat as unknown as { HALF_FLOAT_OES: number }).HALF_FLOAT_OES
-      : gl.UNSIGNED_BYTE;
+    const reducedMotionQuery = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    );
+    let reducedMotion = reducedMotionQuery.matches;
+    const dampingFactor = Math.max(0.94, Math.min(0.999, damping));
+    const encodeScale = 320;
 
-    const SIM_RES = 256; // Resolução da grade física (256x256 é ultra fluida a 60fps)
+    const compileShader = (
+      type: number,
+      source: string,
+    ): WebGLShader | null => {
+      const shader = gl.createShader(type);
+      if (!shader) return null;
 
-    // Vertex Shader padrão para quad em tela cheia
-    const quadVS = `
-      attribute vec2 a_pos;
-      varying vec2 v_uv;
-      void main() {
-        v_uv = a_pos * 0.5 + 0.5;
-        gl_Position = vec4(a_pos, 0.0, 1.0);
+      gl.shaderSource(shader, source);
+      gl.compileShader(shader);
+
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        console.warn("WaterWakeHero shader compilation failed:", gl.getShaderInfoLog(shader));
+        gl.deleteShader(shader);
+        return null;
       }
-    `;
 
-    // 1. Shader de "Drop": Injeta perturbação onde o barco/cursor passa
-    const dropFS = `
-      precision highp float;
-      uniform sampler2D u_texture;
-      uniform vec2 u_center;
-      uniform float u_radius;
-      uniform float u_strength;
-      varying vec2 v_uv;
-
-      void main() {
-        vec4 info = texture2D(u_texture, v_uv);
-        float drop = max(0.0, 1.0 - length(u_center - v_uv) / u_radius);
-        drop = 0.5 - cos(drop * 3.14159265) * 0.5;
-        info.r += drop * u_strength;
-        gl_FragColor = info;
-      }
-    `;
-
-    // 2. Shader de Propagação: Calcula física da onda (média dos vizinhos + velocidade)
-    const updateFS = `
-      precision highp float;
-      uniform sampler2D u_texture;
-      uniform vec2 u_delta;
-      uniform float u_damping;
-      varying vec2 v_uv;
-
-      void main() {
-        vec4 info = texture2D(u_texture, v_uv);
-        vec2 dx = vec2(u_delta.x, 0.0);
-        vec2 dy = vec2(0.0, u_delta.y);
-
-        // Média da altura dos 4 pixels vizinhos
-        float average = (
-          texture2D(u_texture, v_uv - dx).r +
-          texture2D(u_texture, v_uv - dy).r +
-          texture2D(u_texture, v_uv + dx).r +
-          texture2D(u_texture, v_uv + dy).r
-        ) * 0.25;
-
-        // Atualiza velocidade (canal G) e altura (canal R)
-        info.g += (average - info.r) * 2.0;
-        info.g *= u_damping;
-        info.r += info.g;
-
-        gl_FragColor = info;
-      }
-    `;
-
-    // 3. Shader de Renderização Final: Distorce a imagem de fundo + reflexo de luz especular
-    const renderFS = `
-      precision highp float;
-      uniform sampler2D u_water;
-      uniform sampler2D u_image;
-      uniform vec2 u_delta;
-      varying vec2 v_uv;
-
-      void main() {
-        vec2 uv = vec2(v_uv.x, 1.0 - v_uv.y);
-        
-        // Calcula inclinação (normal) da superfície da água
-        float hR = texture2D(u_water, v_uv + vec2(u_delta.x, 0.0)).r;
-        float hL = texture2D(u_water, v_uv - vec2(u_delta.x, 0.0)).r;
-        float hU = texture2D(u_water, v_uv + vec2(0.0, u_delta.y)).r;
-        float hD = texture2D(u_water, v_uv - vec2(0.0, u_delta.y)).r;
-
-        vec2 normal = vec2(hL - hR, hD - hU);
-
-        // Refração física da imagem de fundo
-        vec2 distortedUV = clamp(uv + normal * 0.45, 0.001, 0.999);
-        vec4 color = texture2D(u_image, distortedUV);
-
-        // Brilho especular (luz do sol batendo na crista do rastro da água)
-        vec3 lightDir = normalize(vec3(0.4, 0.6, 1.0));
-        vec3 surfNormal = normalize(vec3(normal.x * 14.0, normal.y * 14.0, 1.0));
-        float specular = pow(max(dot(surfNormal, lightDir), 0.0), 32.0);
-        
-        // Adiciona o brilho reluzente da água
-        color.rgb += vec3(specular * 0.55);
-
-        gl_FragColor = color;
-      }
-    `;
-
-    const createProgram = (fsSource: string) => {
-      const vs = gl.createShader(gl.VERTEX_SHADER)!;
-      gl.shaderSource(vs, quadVS);
-      gl.compileShader(vs);
-
-      const fs = gl.createShader(gl.FRAGMENT_SHADER)!;
-      gl.shaderSource(fs, fsSource);
-      gl.compileShader(fs);
-
-      const prog = gl.createProgram()!;
-      gl.attachShader(prog, vs);
-      gl.attachShader(prog, fs);
-      gl.linkProgram(prog);
-      return prog;
+      return shader;
     };
 
-    const dropProgram = createProgram(dropFS);
-    const updateProgram = createProgram(updateFS);
-    const renderProgram = createProgram(renderFS);
+    const vertexShader = compileShader(gl.VERTEX_SHADER, VERTEX_SHADER);
+    const fragmentShader = compileShader(gl.FRAGMENT_SHADER, FRAGMENT_SHADER);
+    if (!vertexShader || !fragmentShader) {
+      if (vertexShader) gl.deleteShader(vertexShader);
+      if (fragmentShader) gl.deleteShader(fragmentShader);
+      return;
+    }
 
-    // Geometria do plano quad
+    const program = gl.createProgram();
+    if (!program) {
+      gl.deleteShader(vertexShader);
+      gl.deleteShader(fragmentShader);
+      return;
+    }
+
+    gl.attachShader(program, vertexShader);
+    gl.attachShader(program, fragmentShader);
+    gl.bindAttribLocation(program, 0, "a_pos");
+    gl.linkProgram(program);
+    gl.deleteShader(vertexShader);
+    gl.deleteShader(fragmentShader);
+
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      console.warn("WaterWakeHero program link failed:", gl.getProgramInfoLog(program));
+      gl.deleteProgram(program);
+      return;
+    }
+
     const quadBuffer = gl.createBuffer();
+    const waterTexture = gl.createTexture();
+    if (!quadBuffer || !waterTexture) {
+      if (quadBuffer) gl.deleteBuffer(quadBuffer);
+      if (waterTexture) gl.deleteTexture(waterTexture);
+      gl.deleteProgram(program);
+      return;
+    }
+
     gl.bindBuffer(gl.ARRAY_BUFFER, quadBuffer);
     gl.bufferData(
       gl.ARRAY_BUFFER,
       new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]),
-      gl.STATIC_DRAW
+      gl.STATIC_DRAW,
     );
 
-    const bindQuad = (prog: WebGLProgram) => {
-      gl.useProgram(prog);
-      const loc = gl.getAttribLocation(prog, "a_pos");
-      gl.enableVertexAttribArray(loc);
-      gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, waterTexture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+    const uniforms = {
+      water: gl.getUniformLocation(program, "u_water"),
+      waterTexel: gl.getUniformLocation(program, "u_waterTexel"),
     };
 
-    // Criação dos dois Framebuffers para Ping-Pong FBO
-    const createFBO = () => {
-      const tex = gl.createTexture()!;
-      gl.bindTexture(gl.TEXTURE_2D, tex);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      gl.texImage2D(
+    const uploadWaterField = () => {
+      const pixelCount = simWidth * simHeight;
+      for (let i = 0; i < pixelCount; i += 1) {
+        const value = Math.max(-0.22, Math.min(0.22, current[i]));
+        const offset = i * 4;
+        encodedField[offset] = Math.max(
+          0,
+          Math.min(255, Math.round(128 + value * encodeScale)),
+        );
+        encodedField[offset + 1] = Math.max(
+          0,
+          Math.min(255, Math.round(mistCurrent[i] * 255)),
+        );
+        encodedField[offset + 2] = 0;
+        encodedField[offset + 3] = 255;
+      }
+
+      gl.activeTexture(gl.TEXTURE1);
+      gl.bindTexture(gl.TEXTURE_2D, waterTexture);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 0);
+      gl.texSubImage2D(
         gl.TEXTURE_2D,
         0,
-        gl.RGBA,
-        SIM_RES,
-        SIM_RES,
         0,
+        0,
+        simWidth,
+        simHeight,
         gl.RGBA,
-        texType,
-        null
+        gl.UNSIGNED_BYTE,
+        encodedField,
       );
-
-      const fbo = gl.createFramebuffer()!;
-      gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
-      gl.framebufferTexture2D(
-        gl.FRAMEBUFFER,
-        gl.COLOR_ATTACHMENT0,
-        gl.TEXTURE_2D,
-        tex,
-        0
-      );
-      return { tex, fbo };
     };
 
-    let fboA = createFBO();
-    let fboB = createFBO();
+    const draw = () => {
+      if (disposed || canvas.width === 0 || canvas.height === 0) return;
 
-    const swapFBO = () => {
-      const temp = fboA;
-      fboA = fboB;
-      fboB = temp;
-    };
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.clearColor(0, 0, 0, 0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.useProgram(program);
+      gl.bindBuffer(gl.ARRAY_BUFFER, quadBuffer);
+      gl.enableVertexAttribArray(0);
+      gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
 
-    // Textura da imagem de fundo (Gera a névoa líquida Kraft proceduralmente com alta fidelidade)
-    const bgTex = gl.createTexture()!;
-    const generateKraftAurora = () => {
-      const c = document.createElement("canvas");
-      c.width = 1920;
-      c.height = 1080;
-      const ctx = c.getContext("2d");
-      if (!ctx) return;
-
-      // 1. Fundo etéreo luminoso suave
-      ctx.fillStyle = "#fcfdfd";
-      ctx.fillRect(0, 0, 1920, 1080);
-
-      // 2. Nebulosa violeta/índigo esquerda (Kraft)
-      const g1 = ctx.createRadialGradient(420, 440, 0, 420, 440, 720);
-      g1.addColorStop(0, "rgba(55, 48, 163, 0.95)");
-      g1.addColorStop(0.35, "rgba(88, 28, 135, 0.8)");
-      g1.addColorStop(0.7, "rgba(30, 27, 75, 0.45)");
-      g1.addColorStop(1, "transparent");
-      ctx.fillStyle = g1;
-      ctx.fillRect(0, 0, 1920, 1080);
-
-      // 3. Nebulosa púrpura/ardósia direita (Kraft)
-      const g2 = ctx.createRadialGradient(1540, 380, 0, 1540, 380, 680);
-      g2.addColorStop(0, "rgba(109, 40, 217, 0.9)");
-      g2.addColorStop(0.35, "rgba(67, 56, 202, 0.75)");
-      g2.addColorStop(0.7, "rgba(15, 23, 42, 0.4)");
-      g2.addColorStop(1, "transparent");
-      ctx.fillStyle = g2;
-      ctx.fillRect(0, 0, 1920, 1080);
-
-      // 4. Fluxo oceânico profundo na base
-      const g3 = ctx.createRadialGradient(960, 920, 0, 960, 920, 760);
-      g3.addColorStop(0, "rgba(30, 58, 138, 0.92)");
-      g3.addColorStop(0.4, "rgba(79, 70, 229, 0.72)");
-      g3.addColorStop(0.75, "rgba(13, 148, 136, 0.35)");
-      g3.addColorStop(1, "transparent");
-      ctx.fillStyle = g3;
-      ctx.fillRect(0, 0, 1920, 1080);
-
-      // 5. Difusor branco superior do topo Kraft
-      const gTop = ctx.createLinearGradient(0, 0, 0, 520);
-      gTop.addColorStop(0, "rgba(255, 255, 255, 0.98)");
-      gTop.addColorStop(0.5, "rgba(255, 255, 255, 0.8)");
-      gTop.addColorStop(1, "transparent");
-      ctx.fillStyle = gTop;
-      ctx.fillRect(0, 0, 1920, 1080);
-
-      gl.bindTexture(gl.TEXTURE_2D, bgTex);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, c);
-    };
-
-    // Inicializa imediatamente com a textura de névoa Kraft
-    generateKraftAurora();
-
-    // Se uma URL externa for fornecida, carrega por cima
-    if (imageUrl) {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.src = imageUrl;
-      img.onload = () => {
-        gl.bindTexture(gl.TEXTURE_2D, bgTex);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-      };
-    }
-
-    // Função para injetar onda em uma coordenada normalizada (0..1)
-    const addDrop = (x: number, y: number, radius: number, strength: number) => {
-      gl.viewport(0, 0, SIM_RES, SIM_RES);
-      gl.bindFramebuffer(gl.FRAMEBUFFER, fboB.fbo);
-      bindQuad(dropProgram);
-
-      gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, fboA.tex);
-      gl.uniform1i(gl.getUniformLocation(dropProgram, "u_texture"), 0);
-      gl.uniform2f(gl.getUniformLocation(dropProgram, "u_center"), x, y);
-      gl.uniform1f(gl.getUniformLocation(dropProgram, "u_radius"), radius);
-      gl.uniform1f(gl.getUniformLocation(dropProgram, "u_strength"), strength);
-
+      gl.activeTexture(gl.TEXTURE1);
+      gl.bindTexture(gl.TEXTURE_2D, waterTexture);
+      gl.uniform1i(uniforms.water, 1);
+      gl.uniform2f(uniforms.waterTexel, 1 / simWidth, 1 / simHeight);
       gl.drawArrays(gl.TRIANGLES, 0, 6);
-      swapFBO();
     };
 
-    // Interpolação contínua entre o ponto anterior e atual do mouse (esteira ininterrupta como barco cortando água)
-    let lastMouse: { x: number; y: number } | null = null;
+    const resize = () => {
+      const rect = container.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) return;
 
-    const handlePointerMove = (clientX: number, clientY: number) => {
-      const rect = canvas.getBoundingClientRect();
-      const x = (clientX - rect.left) / rect.width;
-      const y = 1.0 - (clientY - rect.top) / rect.height;
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
+      const width = Math.max(1, Math.round(rect.width * pixelRatio));
+      const height = Math.max(1, Math.round(rect.height * pixelRatio));
+      if (canvas.width !== width || canvas.height !== height) {
+        canvas.width = width;
+        canvas.height = height;
+      }
 
-      if (x < 0 || x > 1 || y < 0 || y > 1) {
-        lastMouse = null;
+      const newSimHeight = Math.max(
+        96,
+        Math.min(256, Math.round(simWidth * (rect.height / rect.width))),
+      );
+
+      if (newSimHeight !== simHeight) {
+        simHeight = newSimHeight;
+        previous = new Float32Array(simWidth * simHeight);
+        current = new Float32Array(simWidth * simHeight);
+        next = new Float32Array(simWidth * simHeight);
+        mistCurrent = new Float32Array(simWidth * simHeight);
+        mistNext = new Float32Array(simWidth * simHeight);
+        encodedField = new Uint8Array(simWidth * simHeight * 4);
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, waterTexture);
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 0);
+        gl.texImage2D(
+          gl.TEXTURE_2D,
+          0,
+          gl.RGBA,
+          simWidth,
+          simHeight,
+          0,
+          gl.RGBA,
+          gl.UNSIGNED_BYTE,
+          encodedField,
+        );
+        uploadWaterField();
+      }
+
+      draw();
+    };
+
+    const injectWake = (
+      x: number,
+      y: number,
+      directionX: number,
+      directionY: number,
+      strength: number,
+    ) => {
+      const centerX = x * (simWidth - 1);
+      const centerY = y * (simHeight - 1);
+      const wakeLength = Math.max(6, Math.min(simWidth, simHeight) * 0.045);
+      const maxSpread = 1.3 + wakeLength * 0.22;
+      const extent = wakeLength + maxSpread;
+      const coreRadius = Math.max(0.7, dropRadius * Math.min(simWidth, simHeight) * 0.42);
+      const startX = Math.max(1, Math.floor(centerX - extent));
+      const endX = Math.min(simWidth - 2, Math.ceil(centerX + extent));
+      const startY = Math.max(1, Math.floor(centerY - extent));
+      const endY = Math.min(simHeight - 2, Math.ceil(centerY + extent));
+
+      for (let py = startY; py <= endY; py += 1) {
+        for (let px = startX; px <= endX; px += 1) {
+          const dx = px - centerX;
+          const dy = py - centerY;
+          const along = dx * directionX + dy * directionY;
+          const across = -dx * directionY + dy * directionX;
+          const behind = -along;
+          const index = py * simWidth + px;
+
+          const center = Math.exp(
+            -((along * along) / (coreRadius * coreRadius * 2) +
+              (across * across) / (coreRadius * coreRadius * 0.72)),
+          );
+
+          let wings = 0;
+          if (behind > 0 && behind < wakeLength) {
+            const spread = 0.5 + behind * 0.12;
+            const wingWidth = 0.34 + behind * 0.01;
+            const wingDistance = Math.abs(across) - spread;
+            const widthFalloff = Math.exp(
+              -(wingDistance * wingDistance) / (wingWidth * wingWidth * 1.8),
+            );
+            const lengthFalloff = Math.exp(-behind / (wakeLength * 0.8));
+            wings = widthFalloff * lengthFalloff;
+          }
+
+          current[index] = Math.max(
+            -0.22,
+            Math.min(0.22, current[index] + strength * (wings * 0.95 - center * 1.2)),
+          );
+          mistCurrent[index] = Math.min(
+            0.38,
+            mistCurrent[index] + strength * 1.25 * (wings * 0.7 + center * 0.25),
+          );
+        }
+      }
+    };
+
+    const stepSimulation = () => {
+      next.fill(0);
+      mistNext.fill(0);
+      const waveStrength = 0.28;
+
+      for (let y = 1; y < simHeight - 1; y += 1) {
+        for (let x = 1; x < simWidth - 1; x += 1) {
+          const index = y * simWidth + x;
+          const laplacian =
+            current[index - 1] +
+            current[index + 1] +
+            current[index - simWidth] +
+            current[index + simWidth] -
+            4 * current[index];
+          next[index] =
+            (2 * current[index] - previous[index] + waveStrength * laplacian) *
+            dampingFactor;
+
+          const mistAverage =
+            (mistCurrent[index - 1] +
+              mistCurrent[index + 1] +
+              mistCurrent[index - simWidth] +
+              mistCurrent[index + simWidth]) *
+            0.25;
+          mistNext[index] =
+            (mistCurrent[index] * 0.78 + mistAverage * 0.22) * 0.965;
+        }
+      }
+
+      const oldPrevious = previous;
+      previous = current;
+      current = next;
+      next = oldPrevious;
+
+      const oldMist = mistCurrent;
+      mistCurrent = mistNext;
+      mistNext = oldMist;
+    };
+
+    const animate = (time: number) => {
+      animationFrame = 0;
+      if (disposed || reducedMotion || document.hidden) return;
+
+      if (time - lastFrameTime < 15) {
+        animationFrame = window.requestAnimationFrame(animate);
         return;
       }
 
-      if (lastMouse) {
-        const dx = x - lastMouse.x;
-        const dy = y - lastMouse.y;
-        const dist = Math.hypot(dx, dy);
-        // Divide o trajeto em passos finos para formar uma esteira contínua em V sem falhas
-        const steps = Math.max(1, Math.floor(dist / 0.007));
+      lastFrameTime = time;
+      stepSimulation();
+      uploadWaterField();
+      draw();
+      activeFrames -= 1;
 
-        for (let i = 1; i <= steps; i++) {
-          const ix = lastMouse.x + (dx * i) / steps;
-          const iy = lastMouse.y + (dy * i) / steps;
-          addDrop(ix, iy, dropRadius, 0.045);
-        }
-      } else {
-        addDrop(x, y, dropRadius, 0.065);
+      if (activeFrames > 0) {
+        animationFrame = window.requestAnimationFrame(animate);
+      }
+    };
+
+    const startAnimation = () => {
+      activeFrames = 210;
+      if (!reducedMotion && !document.hidden && !animationFrame) {
+        animationFrame = window.requestAnimationFrame(animate);
+      }
+    };
+
+    const onPointerMove = (event: PointerEvent) => {
+      if (reducedMotion) return;
+
+      const rect = container.getBoundingClientRect();
+      const inside =
+        event.clientX >= rect.left &&
+        event.clientX <= rect.right &&
+        event.clientY >= rect.top &&
+        event.clientY <= rect.bottom;
+
+      if (!inside) {
+        lastPointer = null;
+        return;
       }
 
-      lastMouse = { x, y };
-    };
+      const x = (event.clientX - rect.left) / rect.width;
+      const y = 1 - (event.clientY - rect.top) / rect.height;
+      if (!lastPointer) {
+        lastPointer = { x, y };
+        return;
+      }
 
-    const onMouseMove = (e: MouseEvent) =>
-      handlePointerMove(e.clientX, e.clientY);
-    const onTouchMove = (e: TouchEvent) => {
-      if (e.touches[0])
-        handlePointerMove(e.touches[0].clientX, e.touches[0].clientY);
-    };
-    const onMouseLeave = () => {
-      lastMouse = null;
-    };
+      const deltaX = (x - lastPointer.x) * simWidth;
+      const deltaY = (y - lastPointer.y) * simHeight;
+      const distance = Math.hypot(deltaX, deltaY);
+      if (distance < 0.8) return;
 
-    const handleResize = () => {
-      if (!canvas) return;
-      canvas.width = canvas.clientWidth;
-      canvas.height = canvas.clientHeight;
-    };
+      const directionX = deltaX / distance;
+      const directionY = deltaY / distance;
+      const steps = Math.min(14, Math.max(1, Math.ceil(distance / 4)));
+      const strength = Math.min(0.021, 0.008 + distance * 0.00014);
 
-    window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("touchmove", onTouchMove, { passive: true });
-    window.addEventListener("mouseleave", onMouseLeave);
-    window.addEventListener("resize", handleResize);
-    handleResize();
-
-    // Gotas de água iniciais para dar vida ao carregar a página
-    setTimeout(() => addDrop(0.5, 0.5, 0.04, 0.09), 300);
-    setTimeout(() => addDrop(0.35, 0.6, 0.035, 0.07), 600);
-    setTimeout(() => addDrop(0.65, 0.45, 0.035, 0.07), 900);
-
-    let animId: number;
-    const step = () => {
-      // Passo 1: Atualiza a física da água (2 iterações por frame deixam a onda veloz e fluida)
-      for (let i = 0; i < 2; i++) {
-        gl.viewport(0, 0, SIM_RES, SIM_RES);
-        gl.bindFramebuffer(gl.FRAMEBUFFER, fboB.fbo);
-        bindQuad(updateProgram);
-
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, fboA.tex);
-        gl.uniform1i(gl.getUniformLocation(updateProgram, "u_texture"), 0);
-        gl.uniform2f(
-          gl.getUniformLocation(updateProgram, "u_delta"),
-          1 / SIM_RES,
-          1 / SIM_RES
+      for (let step = 1; step <= steps; step += 1) {
+        const fraction = step / steps;
+        injectWake(
+          lastPointer.x + (x - lastPointer.x) * fraction,
+          lastPointer.y + (y - lastPointer.y) * fraction,
+          directionX,
+          directionY,
+          strength / Math.sqrt(steps),
         );
-        gl.uniform1f(gl.getUniformLocation(updateProgram, "u_damping"), damping);
-
-        gl.drawArrays(gl.TRIANGLES, 0, 6);
-        swapFBO();
       }
 
-      // Passo 2: Renderiza na tela com refração e brilho especular nas cristas
-      gl.viewport(0, 0, canvas.width, canvas.height);
-      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-      bindQuad(renderProgram);
-
-      gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, fboA.tex);
-      gl.uniform1i(gl.getUniformLocation(renderProgram, "u_water"), 0);
-
-      gl.activeTexture(gl.TEXTURE1);
-      gl.bindTexture(gl.TEXTURE_2D, bgTex);
-      gl.uniform1i(gl.getUniformLocation(renderProgram, "u_image"), 1);
-
-      gl.uniform2f(
-        gl.getUniformLocation(renderProgram, "u_delta"),
-        1 / SIM_RES,
-        1 / SIM_RES
-      );
-      gl.drawArrays(gl.TRIANGLES, 0, 6);
-
-      animId = requestAnimationFrame(step);
+      lastPointer = { x, y };
+      startAnimation();
     };
 
-    step();
+    const onBlur = () => {
+      lastPointer = null;
+    };
+
+    const onVisibilityChange = () => {
+      if (document.hidden && animationFrame) {
+        window.cancelAnimationFrame(animationFrame);
+        animationFrame = 0;
+      } else if (!document.hidden && activeFrames > 0 && !reducedMotion) {
+        animationFrame = window.requestAnimationFrame(animate);
+      }
+    };
+
+    const onMotionPreferenceChange = (event: MediaQueryListEvent) => {
+      reducedMotion = event.matches;
+      if (reducedMotion) {
+        if (animationFrame) window.cancelAnimationFrame(animationFrame);
+        animationFrame = 0;
+        activeFrames = 0;
+        previous.fill(0);
+        current.fill(0);
+        next.fill(0);
+        mistCurrent.fill(0);
+        mistNext.fill(0);
+        uploadWaterField();
+        draw();
+      }
+    };
+
+    const resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(container);
+
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 0);
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, waterTexture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.RGBA,
+      simWidth,
+      simHeight,
+      0,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      encodedField,
+    );
+
+    uploadWaterField();
+    resize();
+    draw();
+    window.addEventListener("resize", resize, { passive: true });
+    window.addEventListener("pointermove", onPointerMove, { passive: true });
+    window.addEventListener("blur", onBlur);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    reducedMotionQuery.addEventListener?.("change", onMotionPreferenceChange);
 
     return () => {
-      cancelAnimationFrame(animId);
-      window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("touchmove", onTouchMove);
-      window.removeEventListener("mouseleave", onMouseLeave);
-      window.removeEventListener("resize", handleResize);
+      disposed = true;
+      if (animationFrame) window.cancelAnimationFrame(animationFrame);
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", resize);
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("blur", onBlur);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      reducedMotionQuery.removeEventListener?.("change", onMotionPreferenceChange);
+      gl.deleteTexture(waterTexture);
+      gl.deleteBuffer(quadBuffer);
+      gl.deleteProgram(program);
     };
-  }, [imageUrl, damping, dropRadius]);
+  }, [damping, dropRadius]);
 
   return (
     <div
-      className={`relative w-full overflow-hidden select-none ${className}`}
+      ref={containerRef}
+      className={`relative isolate w-full overflow-hidden select-none ${className}`}
     >
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 h-full w-full object-cover pointer-events-none z-0"
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-0 h-full w-full"
       />
-      {/* O container z-10 pointer-events-none garante que o mouse corta a água livremente */}
-      <div className="relative z-10 pointer-events-none w-full">
-        {children}
-      </div>
+      <div className="relative z-10 pointer-events-none w-full">{children}</div>
     </div>
   );
 };
