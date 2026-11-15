@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Autorizar grupos específicos por empresa, respostas por chamada e marketing agendado — aguarda decisão entre grupos oficiais Meta (OBA, até 8 participantes) e exigência dos grupos comuns existentes, sem acesso pela API oficial
+
 - [x] Reconciliar e aplicar alterações pendentes sem alterar o formato dos pedidos
 - [x] Unificar estado WhatsApp entre Conversas e Definições e verificar com sessão real
 
