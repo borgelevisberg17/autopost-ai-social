@@ -80,6 +80,145 @@ function SectionReveal({
   );
 }
 
+function GridCross({
+  label,
+  className = "",
+}: {
+  label?: string;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`pointer-events-none select-none font-mono text-[10px] text-emerald-600/50 flex items-center gap-1.5 z-20 ${className}`}
+    >
+      <span className="text-emerald-500 font-bold">+</span>
+      {label && (
+        <span className="text-[9px] uppercase tracking-wider text-slate-400 font-mono font-medium">
+          {label}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function LusionTiltCard({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [rotateX, setRotateX] = useState(0);
+  const [rotateY, setRotateY] = useState(0);
+  const [glowPos, setGlowPos] = useState({ x: 50, y: 50 });
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rX = ((y - centerY) / centerY) * -6;
+    const rY = ((x - centerX) / centerX) * 6;
+    setRotateX(rX);
+    setRotateY(rY);
+    setGlowPos({ x: (x / rect.width) * 100, y: (y / rect.height) * 100 });
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    setRotateX(0);
+    setRotateY(0);
+  };
+
+  return (
+    <div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
+        transition: isHovered
+          ? "transform 0.08s ease-out"
+          : "transform 0.45s ease-out",
+      }}
+      className={`relative transition-all ${className}`}
+    >
+      {isHovered && (
+        <div
+          className="pointer-events-none absolute inset-0 rounded-[inherit] z-20"
+          style={{
+            background: `radial-gradient(450px circle at ${glowPos.x}% ${glowPos.y}%, rgba(16, 185, 129, 0.08), transparent 65%)`,
+          }}
+        />
+      )}
+      {children}
+    </div>
+  );
+}
+
+function playTactileFeedback() {
+  try {
+    const AudioCtx =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext })
+        .webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(540, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(820, ctx.currentTime + 0.06);
+    gain.gain.setValueAtTime(0.035, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.06);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.06);
+  } catch {
+    // audio unavailable
+  }
+}
+
+function DataStreamRibbon() {
+  return (
+    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden opacity-25 select-none">
+      <svg
+        className="w-full h-full"
+        viewBox="0 0 1440 3200"
+        fill="none"
+        preserveAspectRatio="none"
+      >
+        <path
+          d="M 720 0 C 880 400, 1150 700, 720 1100 C 350 1500, 1050 1900, 720 2300 C 450 2700, 850 3000, 720 3200"
+          stroke="url(#ribbon-gradient)"
+          strokeWidth="2"
+          strokeDasharray="6 8"
+        />
+        <defs>
+          <linearGradient
+            id="ribbon-gradient"
+            x1="0%"
+            y1="0%"
+            x2="0%"
+            y2="100%"
+          >
+            <stop offset="0%" stopColor="#10b981" stopOpacity="0.3" />
+            <stop offset="35%" stopColor="#14b8a6" stopOpacity="0.5" />
+            <stop offset="70%" stopColor="#6366f1" stopOpacity="0.4" />
+            <stop offset="100%" stopColor="#10b981" stopOpacity="0.3" />
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+  );
+}
+
 type EyebrowProps = { children: ReactNode; light?: boolean };
 
 function Eyebrow({ children, light = false }: EyebrowProps) {
@@ -107,7 +246,7 @@ function Metric({
   icon: typeof WalletCards;
 }) {
   return (
-    <div className="rounded-2xl border border-slate-200/80 bg-white/95 p-4 shadow-sm transition hover:shadow-md">
+    <LusionTiltCard className="rounded-2xl border border-slate-200/80 bg-white/95 p-4 shadow-sm hover:shadow-md">
       <div className="flex items-center justify-between">
         <span className="font-mono text-[10px] uppercase tracking-wider text-slate-500">
           {label}
@@ -118,7 +257,7 @@ function Metric({
         {value}
       </div>
       <div className="mt-1 text-xs text-slate-500">{note}</div>
-    </div>
+    </LusionTiltCard>
   );
 }
 
@@ -1590,19 +1729,58 @@ function HeroSection({
   startPath: string;
   onStart: () => void;
 }) {
+  const heroRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+
+  // Hero scroll-driven dynamics (Lusion-grade purposeful scrub)
+  const headlineY = useTransform(scrollYProgress, [0, 0.45], [0, -50]);
+  const headlineOpacity = useTransform(scrollYProgress, [0, 0.35], [1, 0]);
+  const headlineScale = useTransform(scrollYProgress, [0, 0.35], [1, 0.94]);
+
+  const promptY = useTransform(scrollYProgress, [0.05, 0.45], [0, -25]);
+  const promptOpacity = useTransform(scrollYProgress, [0.15, 0.45], [1, 0.25]);
+
+  // Product frame unfolds from 3D isometric perspective to full-fidelity flat view (Lusion signature)
+  const productRotateX = useTransform(scrollYProgress, [0.08, 0.65], [14, 0]);
+  const productScale = useTransform(scrollYProgress, [0.08, 0.65], [0.91, 1.0]);
+  const productY = useTransform(scrollYProgress, [0.08, 0.65], [60, 0]);
+
   return (
-    <section className="relative overflow-hidden border-b border-slate-200/80 bg-[#fcfdfd] cursor-default">
+    <section
+      ref={heroRef}
+      className="relative overflow-hidden border-b border-slate-200/80 bg-[#fcfdfd] cursor-default"
+    >
+      {/* Architectural Grid Crosses (Lusion editorial signature) */}
+      <GridCross
+        label="SYS // 00.HERO_NEXUS"
+        className="absolute top-6 left-6"
+      />
+      <GridCross
+        label="FLUID // KELVIN_WAKE"
+        className="absolute top-6 right-6"
+      />
+
       <WaterWakeHero
         damping={0.991}
         dropRadius={0.024}
-        className="pb-20 pt-16 sm:pb-28 sm:pt-24 min-h-[920px] flex flex-col justify-center"
+        className="pb-24 pt-16 sm:pb-36 sm:pt-24 min-h-[960px] flex flex-col justify-center"
       >
         {/* Transição suave para a secção clara do preview, mantendo o fundo branco. */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-slate-50 via-slate-50/70 to-transparent z-10" />
 
         <div className="relative z-20 mx-auto max-w-[1240px] px-5 lg:px-8">
-          {/* Headline editorial sobre o fundo branco actual da landing. */}
-          <div className="mx-auto max-w-4xl text-center">
+          {/* Headline com movimento e recuo em 3D guiado por scroll */}
+          <motion.div
+            style={{
+              y: headlineY,
+              opacity: headlineOpacity,
+              scale: headlineScale,
+            }}
+            className="mx-auto max-w-4xl text-center"
+          >
             <div className="pointer-events-auto mb-6 inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/85 px-4 py-1.5 shadow-sm backdrop-blur-md">
               <Sparkles className="h-3.5 w-3.5 text-emerald-600" />
               <span className="text-xs font-semibold text-slate-800 tracking-wide">
@@ -1630,7 +1808,10 @@ function HeroSection({
             <div className="pointer-events-auto mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5">
               <button
                 type="button"
-                onClick={onStart}
+                onClick={() => {
+                  playTactileFeedback();
+                  onStart();
+                }}
                 className="inline-flex h-12 w-full sm:w-auto items-center justify-center gap-2.5 rounded-full bg-slate-950 px-7 text-sm font-semibold text-white shadow-lg shadow-slate-950/15 transition-all hover:bg-slate-800 hover:scale-[1.02] active:scale-[0.98]"
               >
                 Começar Gratuitamente
@@ -1638,6 +1819,7 @@ function HeroSection({
               </button>
               <a
                 href="#whatsapp"
+                onClick={playTactileFeedback}
                 className="inline-flex h-12 w-full sm:w-auto items-center justify-center gap-2 rounded-full border border-slate-300/80 bg-white/85 px-6 text-sm font-semibold text-slate-700 shadow-sm backdrop-blur-md transition-all hover:bg-white hover:text-slate-900 hover:border-slate-400"
               >
                 <Play className="h-3.5 w-3.5 fill-current text-slate-500" />
@@ -1656,25 +1838,37 @@ function HeroSection({
                 <Check className="h-3.5 w-3.5 text-emerald-600" /> Conexão oficial WhatsApp
               </span>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Kraft Floating Interactive Command/Prompt Card */}
-          <div className="pointer-events-auto">
+          {/* Prompt Interativo */}
+          <motion.div
+            style={{ y: promptY, opacity: promptOpacity }}
+            className="pointer-events-auto"
+          >
             <InteractiveHeroPrompt />
-          </div>
+          </motion.div>
 
-          {/* Seamless Bridge & Live Dashboard Preview */}
-          <div className="pointer-events-auto mt-20">
+          {/* Desdobramento e Expansão 3D do Dashboard pelo Scroll (Lusion Keynote Reveal) */}
+          <motion.div
+            style={{
+              rotateX: productRotateX,
+              scale: productScale,
+              y: productY,
+              transformPerspective: 1200,
+            }}
+            className="pointer-events-auto mt-20"
+          >
             <div className="mb-6 flex flex-col items-center justify-center text-center">
-              <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-600">
+              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3.5 py-1 mb-2 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-800">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 Visão Unificada da Operação
-              </span>
+              </div>
               <p className="mt-1 text-xs text-slate-600">
                 Tudo o que sua equipe precisa para acompanhar pedidos, canais e receita em um só lugar.
               </p>
             </div>
             <ProductFrame />
-          </div>
+          </motion.div>
         </div>
       </WaterWakeHero>
     </section>
@@ -1982,13 +2176,15 @@ export default function Index() {
   const startPath = user ? "/dashboard" : "/signup";
   const [onboardingOpen, setOnboardingOpen] = useState(false);
   return (
-    <div className="landing-page min-h-screen overflow-x-hidden bg-slate-50/50 text-slate-900 selection:bg-emerald-500/20 selection:text-emerald-950">
+    <div className="landing-page min-h-screen overflow-x-hidden bg-slate-50/50 text-slate-900 selection:bg-emerald-500/20 selection:text-emerald-950 relative">
       <ScrollProgressBar />
+      {/* Guia de fluxo e fita de dados conectiva contínua (estilo Lusion) */}
+      <DataStreamRibbon />
       <SiteHeader
         ctaHref={startPath}
         onCtaClick={() => setOnboardingOpen(true)}
       />
-      <main className="pt-[72px] sm:pt-[76px]">
+      <main className="pt-[72px] sm:pt-[76px] relative z-10">
         {/* Section 1: White hero with interactive liquid-water cursor wake */}
         <HeroSection
           startPath={startPath}
@@ -1996,12 +2192,20 @@ export default function Index() {
         />
 
         {/* Section 2: Proof & Real Operators in Orbit */}
-        <SectionReveal id="proof" delay={0.08}>
+        <SectionReveal id="proof" delay={0.08} className="relative">
+          <GridCross
+            label="SYS // 01.REAL_OPERATORS"
+            className="absolute top-4 left-6 hidden sm:flex"
+          />
           <ProofSection />
         </SectionReveal>
 
         {/* Section 3: WhatsApp Conversational Commerce */}
-        <SectionReveal id="whatsapp" delay={0.08}>
+        <SectionReveal id="whatsapp" delay={0.08} className="relative">
+          <GridCross
+            label="SYS // 02.WHATSAPP_AI"
+            className="absolute top-4 right-6 hidden sm:flex"
+          />
           <section
             className="overflow-hidden border-b border-slate-200/80 bg-gradient-to-b from-white to-slate-50 py-24 sm:py-32"
           >
@@ -2035,12 +2239,20 @@ export default function Index() {
         </SectionReveal>
 
         {/* Section 4: Omni-channel feed showcase */}
-        <SectionReveal id="channels" delay={0.08}>
+        <SectionReveal id="channels" delay={0.08} className="relative">
+          <GridCross
+            label="SYS // 03.OMNICHANNEL_FEED"
+            className="absolute top-4 left-6 hidden sm:flex"
+          />
           <ChannelShowcase />
         </SectionReveal>
 
         {/* Section 5: AI Specialized Agents & Guardrails */}
-        <SectionReveal id="agents" delay={0.08}>
+        <SectionReveal id="agents" delay={0.08} className="relative">
+          <GridCross
+            label="SYS // 04.AGENT_GOVERNANCE"
+            className="absolute top-4 right-6 hidden sm:flex text-emerald-400/50"
+          />
           <section
             id="agents"
             className="overflow-hidden border-b border-slate-800 bg-slate-950 text-slate-100 py-24 sm:py-32"

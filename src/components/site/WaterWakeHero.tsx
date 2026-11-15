@@ -29,6 +29,10 @@ const FRAGMENT_SHADER = `
     return (encoded - 0.5019608) * 0.796875;
   }
 
+  float causticHighlight(float c) {
+    return pow(c, 1.8) * 0.85;
+  }
+
   void main() {
     float height = readHeight(v_uv);
     float hL = readHeight(v_uv - vec2(u_waterTexel.x, 0.0));
@@ -36,6 +40,7 @@ const FRAGMENT_SHADER = `
     float hD = readHeight(v_uv - vec2(0.0, u_waterTexel.y));
     float hU = readHeight(v_uv + vec2(0.0, u_waterTexel.y));
 
+    // Vetor de inclinação (slope / gradiente de superfície)
     vec2 slope = vec2(
       (hR - hL) / max(2.0 * u_waterTexel.x, 0.0001),
       (hU - hD) / max(2.0 * u_waterTexel.y, 0.0001)
@@ -43,23 +48,70 @@ const FRAGMENT_SHADER = `
 
     float mist = texture2D(u_water, v_uv).g;
     float slopeStrength = length(slope);
-    float waterEdge = smoothstep(0.025, 0.34, slopeStrength);
-    float softBody = smoothstep(0.014, 0.11, mist) * 0.065;
-    float trough = smoothstep(0.0015, 0.02, max(-height, 0.0)) * 0.18;
-    float crest = smoothstep(0.0015, 0.02, max(height, 0.0)) * 0.15;
+    
+    // Normal com amplitude aumentada para reflexão tridimensional rica (estilo Lusion)
+    vec3 normal = normalize(vec3(-slope * 0.165, 1.0));
+    vec3 viewDir = vec3(0.0, 0.0, 1.0);
 
-    vec3 normal = normalize(vec3(-slope * 0.085, 1.0));
-    vec3 lightDirection = normalize(vec3(-0.10, 0.20, 0.97));
-    float specular = pow(max(dot(normal, lightDirection), 0.0), 20.0) * waterEdge;
+    // 1. Dispersão Cromática / Refração RGB (Prisma óptico do Lusion)
+    float dispersion = 0.032 * smoothstep(0.012, 0.45, slopeStrength);
+    float dispR = readHeight(v_uv + slope * dispersion * 1.8);
+    float dispB = readHeight(v_uv - slope * dispersion * 1.8);
 
-    // Sulco aqua estreito; a névoa é apenas um halo leve em redor das cristas.
-    vec3 color = vec3(0.34, 0.68, 0.65);
-    color = mix(color, vec3(0.74, 0.95, 0.92), smoothstep(0.005, 0.03, max(height, 0.0)));
-    color = mix(color, vec3(0.04, 0.24, 0.25), smoothstep(0.003, 0.028, max(-height, 0.0)) * 0.72);
-    color = mix(color, vec3(0.97, 1.0, 0.99), clamp(specular * 2.0, 0.0, 0.85));
+    // 2. Curvatura de crista e Cáusticas (Laplaciano)
+    float laplacian = (hR + hL + hU + hD - 4.0 * height);
+    float caustics = clamp(-laplacian * 46.0, 0.0, 1.0) * smoothstep(0.015, 0.32, slopeStrength);
 
-    float alpha = clamp(softBody + trough + crest + specular * 0.22, 0.0, 0.17);
-    gl_FragColor = vec4(color * alpha, alpha);
+    // 3. Iluminação Especular (Luz solar chave + luz secundária de preenchimento)
+    vec3 keyLight = normalize(vec3(-0.35, 0.52, 0.78));
+    vec3 rimLight = normalize(vec3(0.42, -0.38, 0.82));
+    
+    vec3 halfKey = normalize(keyLight + viewDir);
+    vec3 halfRim = normalize(rimLight + viewDir);
+    
+    float waterEdge = smoothstep(0.018, 0.38, slopeStrength);
+    float specKey = pow(max(dot(normal, halfKey), 0.0), 36.0) * waterEdge;
+    float specRim = pow(max(dot(normal, halfRim), 0.0), 18.0) * waterEdge;
+    float fresnel = pow(1.0 - max(dot(normal, viewDir), 0.0), 2.8);
+
+    // 4. Componentes de corpo líquido (Cristas, Vales e Halo de névoa)
+    float crest = smoothstep(0.0018, 0.024, max(height, 0.0));
+    float trough = smoothstep(0.0018, 0.028, max(-height, 0.0));
+    float softBody = smoothstep(0.012, 0.14, mist);
+
+    // 5. Paleta Lusion: Oceano Turquesa, Cobalto Profundo, Violeta Prismático e Diamante Especular
+    vec3 baseColor = vec3(0.08, 0.62, 0.58); // Aqua/Esmeralda luminosa Vendora
+    vec3 deepTrough = vec3(0.03, 0.18, 0.34); // Cobalto oceânico profundo
+    vec3 crestColor = vec3(0.55, 0.94, 0.90); // Crista turquesa cintilante
+    vec3 prismViolet = vec3(0.58, 0.32, 0.92); // Borda cromática violeta
+    vec3 specularColor = vec3(0.98, 1.0, 1.0); // Brilho de sol puro
+
+    vec3 finalColor = baseColor;
+    finalColor = mix(finalColor, deepTrough, trough * 0.78);
+    finalColor = mix(finalColor, crestColor, crest * 0.82);
+    
+    // Injeção da dispersão cromática nas bordas de alta velocidade
+    finalColor.r += smoothstep(0.002, 0.03, max(dispR, 0.0)) * 0.28;
+    finalColor.b += smoothstep(0.002, 0.03, max(-dispB, 0.0)) * 0.35;
+    finalColor = mix(finalColor, prismViolet, smoothstep(0.12, 0.45, slopeStrength) * 0.35);
+
+    // Adiciona cáusticas e reflexos de crista
+    finalColor += causticHighlight(caustics) * vec3(0.5, 0.95, 0.88);
+    finalColor = mix(finalColor, specularColor, clamp((specKey * 2.2 + specRim * 1.2), 0.0, 0.95));
+
+    // Alpha volumétrico: visível, tátil e de alto impacto (até 0.68 em picos)
+    float alpha = clamp(
+      softBody * 0.22 + 
+      trough * 0.38 + 
+      crest * 0.42 + 
+      caustics * 0.35 + 
+      (specKey + specRim) * 0.55 + 
+      fresnel * 0.25, 
+      0.0, 
+      0.68
+    );
+
+    gl_FragColor = vec4(finalColor * alpha, alpha);
   }
 `;
 
@@ -433,7 +485,7 @@ export const WaterWakeHero: React.FC<WaterWakeHeroProps> = ({
       const directionX = deltaX / distance;
       const directionY = deltaY / distance;
       const steps = Math.min(14, Math.max(1, Math.ceil(distance / 4)));
-      const strength = Math.min(0.021, 0.008 + distance * 0.00014);
+      const strength = Math.min(0.065, 0.022 + distance * 0.00038);
 
       for (let step = 1; step <= steps; step += 1) {
         const fraction = step / steps;
@@ -448,6 +500,42 @@ export const WaterWakeHero: React.FC<WaterWakeHeroProps> = ({
 
       lastPointer = { x, y };
       startAnimation();
+    };
+
+    const onPointerDown = (event: PointerEvent) => {
+      if (reducedMotion) return;
+      const rect = container.getBoundingClientRect();
+      const x = (event.clientX - rect.left) / rect.width;
+      const y = 1 - (event.clientY - rect.top) / rect.height;
+      if (x >= 0 && x <= 1 && y >= 0 && y <= 1) {
+        for (let i = 0; i < 8; i += 1) {
+          const ang = (i / 8) * Math.PI * 2;
+          injectWake(x, y, Math.cos(ang), Math.sin(ang), 0.052);
+        }
+        startAnimation();
+      }
+    };
+
+    let lastScrollY = window.scrollY;
+    const onScroll = () => {
+      if (reducedMotion) return;
+      const currentScrollY = window.scrollY;
+      const deltaScroll = currentScrollY - lastScrollY;
+      lastScrollY = currentScrollY;
+
+      const rect = container.getBoundingClientRect();
+      if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+
+      if (Math.abs(deltaScroll) > 1.0) {
+        const scrollStrength = Math.min(0.048, Math.abs(deltaScroll) * 0.0016);
+        const dirY = deltaScroll > 0 ? -1 : 1;
+        for (let k = 0; k < 3; k += 1) {
+          const px = 0.2 + k * 0.3 + (Math.random() - 0.5) * 0.12;
+          const py = deltaScroll > 0 ? 0.8 : 0.2;
+          injectWake(px, py, (Math.random() - 0.5) * 0.4, dirY, scrollStrength);
+        }
+        startAnimation();
+      }
     };
 
     const onBlur = () => {
@@ -506,6 +594,8 @@ export const WaterWakeHero: React.FC<WaterWakeHeroProps> = ({
     draw();
     window.addEventListener("resize", resize, { passive: true });
     window.addEventListener("pointermove", onPointerMove, { passive: true });
+    window.addEventListener("pointerdown", onPointerDown, { passive: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("blur", onBlur);
     document.addEventListener("visibilitychange", onVisibilityChange);
     reducedMotionQuery.addEventListener?.("change", onMotionPreferenceChange);
@@ -516,6 +606,8 @@ export const WaterWakeHero: React.FC<WaterWakeHeroProps> = ({
       resizeObserver.disconnect();
       window.removeEventListener("resize", resize);
       window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("scroll", onScroll);
       window.removeEventListener("blur", onBlur);
       document.removeEventListener("visibilitychange", onVisibilityChange);
       reducedMotionQuery.removeEventListener?.("change", onMotionPreferenceChange);
