@@ -1,18 +1,26 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { motion, useScroll, useSpring, AnimatePresence } from "framer-motion";
 import {
   ArrowDownRight,
   ArrowRight,
+  ArrowUpRight,
   BarChart3,
+  Bot,
   Check,
+  CheckCircle2,
   ChevronLeft,
   ChevronRight,
   Circle,
   Globe2,
   Instagram,
   MessageCircle,
+  MessageSquare,
   Package,
   Play,
+  RefreshCw,
+  Send,
   ShoppingBag,
+  Sparkles,
   Users,
   WalletCards,
   X,
@@ -23,15 +31,56 @@ import { PlansSection } from "@/components/site/PlansSection";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 
+function ScrollProgressBar() {
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 120,
+    damping: 28,
+    restDelta: 0.001,
+  });
+
+  return (
+    <motion.div
+      className="fixed top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-emerald-500 via-teal-400 to-indigo-600 origin-left z-[70] pointer-events-none shadow-[0_0_12px_rgba(16,185,129,0.5)]"
+      style={{ scaleX }}
+    />
+  );
+}
+
+function SectionReveal({
+  children,
+  className = "",
+  delay = 0,
+  id,
+}: {
+  children: ReactNode;
+  className?: string;
+  delay?: number;
+  id?: string;
+}) {
+  return (
+    <motion.div
+      id={id}
+      initial={{ opacity: 0, y: 36 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 type EyebrowProps = { children: ReactNode; light?: boolean };
 
 function Eyebrow({ children, light = false }: EyebrowProps) {
   return (
     <div
-      className={`mb-6 inline-flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[0.2em] ${light ? "text-[#e36c3f]" : "text-[#2c6457]"}`}
+      className={`mb-5 inline-flex items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] ${light ? "text-emerald-400" : "text-emerald-700"}`}
     >
       <span
-        className={`h-1.5 w-1.5 rounded-full ${light ? "bg-[#e36c3f]" : "bg-[#2c6457]"}`}
+        className={`h-1.5 w-1.5 rounded-full ${light ? "bg-emerald-400" : "bg-emerald-600"}`}
       />
       {children}
     </div>
@@ -50,17 +99,17 @@ function Metric({
   icon: typeof WalletCards;
 }) {
   return (
-    <div className="rounded-2xl border border-[#e2ded5] bg-[#fffdf9] p-4">
+    <div className="rounded-2xl border border-slate-200/80 bg-white/95 p-4 shadow-sm transition hover:shadow-md">
       <div className="flex items-center justify-between">
-        <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#8f8a80]">
+        <span className="font-mono text-[10px] uppercase tracking-wider text-slate-500">
           {label}
         </span>
-        <Icon className="h-3.5 w-3.5 text-[#2c6457]" />
+        <Icon className="h-4 w-4 text-emerald-600" />
       </div>
-      <div className="mt-3 text-[23px] font-semibold tracking-[-0.05em] text-[#202522]">
+      <div className="mt-3 text-2xl font-bold tracking-tight text-slate-900">
         {value}
       </div>
-      <div className="mt-1 text-[10px] text-[#8f8a80]">{note}</div>
+      <div className="mt-1 text-xs text-slate-500">{note}</div>
     </div>
   );
 }
@@ -68,35 +117,35 @@ function Metric({
 function ProductFrame() {
   return (
     <div className="relative mx-auto max-w-[1160px]">
-      <div className="overflow-hidden rounded-2xl border border-[#d9d5cc] bg-[#f1eee7] shadow-[0_28px_80px_rgba(32,37,34,0.14)]">
-        <div className="flex h-11 items-center justify-between rounded-t-2xl border-b border-[#ded9d0] bg-[#fffdf9] px-4">
+      <div className="overflow-hidden rounded-3xl border border-slate-200/90 bg-slate-50 shadow-[0_32px_90px_rgba(15,23,42,0.12)]">
+        <div className="flex h-11 items-center justify-between rounded-t-3xl border-b border-slate-200 bg-white px-4">
           <div className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-[#d9d5cc]" />
-            <span className="h-2 w-2 rounded-full bg-[#d9d5cc]" />
-            <span className="h-2 w-2 rounded-full bg-[#d9d5cc]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-slate-300" />
+            <span className="h-2.5 w-2.5 rounded-full bg-slate-300" />
+            <span className="h-2.5 w-2.5 rounded-full bg-slate-300" />
           </div>
-          <div className="font-mono text-[9px] text-[#8f8a80]">
+          <div className="font-mono text-[10px] text-slate-500 font-medium">
             app.vendora.co / overview
           </div>
-          <div className="h-5 w-14 rounded-full border border-[#e2ded5] bg-[#f6f3ed]" />
+          <div className="h-5 w-16 rounded-full border border-slate-200 bg-slate-100" />
         </div>
         <div className="grid min-h-[420px] md:grid-cols-[180px_1fr]">
-          <aside className="hidden border-r border-[#ded9d0] bg-[#202522] p-4 text-[#f6f3ed] md:block">
+          <aside className="hidden border-r border-slate-800 bg-slate-950 p-4 text-slate-100 md:block">
             <div className="mb-8 flex items-center gap-2">
-              <span className="grid h-6 w-6 place-items-center rounded-md bg-[#e36c3f] text-white">
+              <span className="grid h-6 w-6 place-items-center rounded-md bg-emerald-600 text-white">
                 <Circle className="h-2.5 w-2.5 fill-current" />
               </span>
-              <span className="text-[11px] font-bold">Vendora</span>
+              <span className="text-[12px] font-bold tracking-tight">Vendora OS</span>
             </div>
             <div className="space-y-1">
-              {["Overview", "Orders", "Products", "Customers", "Agents"].map(
+              {["Visão Geral", "Pedidos", "Produtos", "Clientes", "Agentes"].map(
                 (item, i) => (
                   <div
                     key={item}
-                    className={`flex items-center gap-2 rounded-lg px-2 py-2 text-[10px] ${i === 0 ? "bg-white/10 text-white" : "text-white/50"}`}
+                    className={`flex items-center gap-2 rounded-lg px-2.5 py-2 text-[11px] font-medium ${i === 0 ? "bg-white/10 text-white" : "text-white/50"}`}
                   >
                     <span
-                      className={`h-1.5 w-1.5 rounded-full ${i === 0 ? "bg-[#e36c3f]" : "bg-white/30"}`}
+                      className={`h-1.5 w-1.5 rounded-full ${i === 0 ? "bg-emerald-400" : "bg-white/30"}`}
                     />
                     {item}
                   </div>
@@ -104,108 +153,114 @@ function ProductFrame() {
               )}
             </div>
             <div className="mt-8 border-t border-white/10 pt-4">
-              <div className="font-mono text-[8px] uppercase tracking-[0.16em] text-white/35">
-                Channels
+              <div className="font-mono text-[9px] uppercase tracking-[0.16em] text-white/40 font-semibold">
+                Canais Ativos
               </div>
-              <div className="mt-3 space-y-2 text-[10px] text-white/55">
-                <div>● Website</div>
-                <div>● Instagram</div>
-                <div>● WhatsApp</div>
+              <div className="mt-3 space-y-2 text-[11px] text-white/60">
+                <div className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /> Loja Online
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-pink-400" /> Instagram
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> WhatsApp
+                </div>
               </div>
             </div>
           </aside>
-          <div className="min-w-0 bg-[#f6f3ed] p-4 sm:p-6">
+          <div className="min-w-0 bg-slate-50/80 p-4 sm:p-6">
             <div className="mb-5 flex items-end justify-between">
               <div>
-                <div className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#8f8a80]">
-                  Monday, 14 October
+                <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-slate-500">
+                  Segunda-feira · Tempo Real
                 </div>
-                <div className="mt-1 text-xl font-semibold tracking-[-0.05em] text-[#202522]">
-                  Good morning, Amina.
+                <div className="mt-1 text-xl font-bold tracking-tight text-slate-900">
+                  Bom dia, Amina.
                 </div>
               </div>
-              <div className="hidden rounded-full border border-[#ded9d0] bg-[#fffdf9] px-3 py-2 font-mono text-[9px] text-[#8f8a80] sm:block">
-                Last 30 days
+              <div className="hidden rounded-full border border-slate-200 bg-white px-3 py-1.5 font-mono text-[10px] text-slate-600 sm:block">
+                Últimos 30 dias
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
               <Metric
-                label="Revenue"
-                value="$48,290"
-                note="↑ 12.8% vs previous"
+                label="Faturamento"
+                value="48.290 $"
+                note="↑ 12.8% vs período anterior"
                 icon={WalletCards}
               />
               <Metric
-                label="Orders"
+                label="Pedidos"
                 value="684"
-                note="Across 3 channels"
+                note="Em 3 canais sincronizados"
                 icon={ShoppingBag}
               />
               <Metric
-                label="Products"
+                label="Produtos"
                 value="128"
-                note="7 need attention"
+                note="7 com estoque baixo"
                 icon={Package}
               />
               <Metric
-                label="Conversion"
+                label="Conversão"
                 value="4.8%"
-                note="Storefront"
+                note="Loja & WhatsApp"
                 icon={BarChart3}
               />
             </div>
             <div className="mt-3 grid gap-3 lg:grid-cols-[1.5fr_1fr]">
-              <div className="rounded-2xl border border-[#ded9d0] bg-[#fffdf9] p-4">
+              <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm">
                 <div className="flex items-center justify-between">
                   <div>
-                    <div className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#8f8a80]">
-                      Performance
+                    <div className="font-mono text-[10px] uppercase tracking-wider text-slate-500">
+                      Performance Diária
                     </div>
-                    <div className="mt-1 text-sm font-semibold text-[#202522]">
-                      Revenue by day
+                    <div className="mt-1 text-sm font-bold text-slate-900">
+                      Receita por dia (US$)
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 text-[9px] text-[#2c6457]">
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#2c6457]" />
-                    Revenue
+                  <div className="flex items-center gap-1.5 text-[10px] font-semibold text-emerald-700">
+                    <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                    Vendas Concluídas
                   </div>
                 </div>
-                <div className="mt-7 flex h-28 items-end gap-1.5 border-b border-[#e8e3da] px-1">
+                <div className="mt-6 flex h-28 items-end gap-1.5 border-b border-slate-100 px-1">
                   {[
                     32, 46, 38, 62, 54, 78, 66, 88, 75, 94, 81, 100, 86, 97,
                   ].map((height, i) => (
                     <div
                       key={i}
-                      className={`flex-1 rounded-t-full ${i === 11 ? "bg-[#e36c3f]" : "bg-[#9ab5ab]"}`}
+                      className={`flex-1 rounded-t-full transition hover:opacity-80 ${i === 11 ? "bg-emerald-500" : "bg-slate-300"}`}
                       style={{ height: `${height}%` }}
                     />
                   ))}
                 </div>
-                <div className="mt-2 flex justify-between font-mono text-[8px] text-[#aaa49a]">
-                  <span>01 OCT</span>
-                  <span>14 OCT</span>
+                <div className="mt-2 flex justify-between font-mono text-[9px] text-slate-400">
+                  <span>01 OUT</span>
+                  <span>14 OUT</span>
                 </div>
               </div>
-              <div className="rounded-2xl border border-[#ded9d0] bg-[#fffdf9] p-4">
-                <div className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#8f8a80]">
-                  Activity
+              <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm">
+                <div className="font-mono text-[10px] uppercase tracking-wider text-slate-500">
+                  Atividade Recente
                 </div>
                 <div className="mt-3 space-y-3">
                   {[
-                    ["New order", "#VD-1048 · Website", "2m"],
-                    ["Stock alert", "Linen shirt · 4 left", "18m"],
-                    ["Agent completed", "Campaign brief ready", "1h"],
+                    ["Novo pedido", "Sapato Nike #D2CC2E82 · WhatsApp", "2m"],
+                    ["Alerta de estoque", "Sapato Nike tam 40 · 6 un restantes", "18m"],
+                    ["Agente finalizou", "Campanha Instagram Drop agendada", "1h"],
                   ].map(([title, detail, time]) => (
                     <div key={title} className="flex items-start gap-2.5">
-                      <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#e36c3f]" />
+                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" />
                       <div className="min-w-0 flex-1">
-                        <div className="flex justify-between gap-2 text-[10px] font-semibold text-[#202522]">
+                        <div className="flex justify-between gap-2 text-[11px] font-semibold text-slate-900">
                           <span>{title}</span>
-                          <span className="font-mono text-[8px] font-normal text-[#aaa49a]">
+                          <span className="font-mono text-[9px] font-normal text-slate-400">
                             {time}
                           </span>
                         </div>
-                        <div className="mt-0.5 truncate text-[9px] text-[#8f8a80]">
+                        <div className="mt-0.5 truncate text-[10px] text-slate-500">
                           {detail}
                         </div>
                       </div>
@@ -1143,6 +1198,383 @@ function OnboardingModal({
   );
 }
 
+type SuggestionId = "stock" | "whatsapp" | "post" | "metrics";
+
+const PROMPT_SUGGESTIONS: Array<{
+  id: SuggestionId;
+  label: string;
+  prompt: string;
+  badge: string;
+  tag: string;
+}> = [
+  {
+    id: "stock",
+    label: "👟 Estoque Sapato Nike",
+    prompt: "Verificar estoque atual e tamanhos de Sapato Nike",
+    badge: "Estoque em Tempo Real",
+    tag: "Catálogo",
+  },
+  {
+    id: "whatsapp",
+    label: "💬 Venda no WhatsApp",
+    prompt: "Simular conversa de cliente interessado no WhatsApp",
+    badge: "Sales AI · WhatsApp",
+    tag: "Atendimento",
+  },
+  {
+    id: "post",
+    label: "🚀 Post Instagram & Facebook",
+    prompt: "Gerar post de lançamento para o drop do Sapato Nike",
+    badge: "Marketing AI",
+    tag: "Campanhas",
+  },
+  {
+    id: "metrics",
+    label: "📊 Vendas de Hoje",
+    prompt: "Como estão as vendas e pedidos consolidados de hoje?",
+    badge: "Analytics AI",
+    tag: "Operação",
+  },
+];
+
+function InteractiveHeroPrompt() {
+  const [activeId, setActiveId] = useState<SuggestionId>("stock");
+  const [inputValue, setInputValue] = useState("");
+  const [isSimulating, setIsSimulating] = useState(false);
+
+  const handleSelect = (id: SuggestionId) => {
+    if (activeId === id) return;
+    setIsSimulating(true);
+    setActiveId(id);
+    const suggestion = PROMPT_SUGGESTIONS.find((s) => s.id === id);
+    if (suggestion) setInputValue(suggestion.prompt);
+    setTimeout(() => setIsSimulating(false), 260);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputValue.trim()) return;
+    setIsSimulating(true);
+    const lower = inputValue.toLowerCase();
+    if (lower.includes("whatsapp") || lower.includes("conversa") || lower.includes("cliente")) {
+      setActiveId("whatsapp");
+    } else if (lower.includes("post") || lower.includes("insta") || lower.includes("face")) {
+      setActiveId("post");
+    } else if (lower.includes("venda") || lower.includes("metrica") || lower.includes("fatur")) {
+      setActiveId("metrics");
+    } else {
+      setActiveId("stock");
+    }
+    setTimeout(() => setIsSimulating(false), 300);
+  };
+
+  const current = PROMPT_SUGGESTIONS.find((s) => s.id === activeId) || PROMPT_SUGGESTIONS[0];
+
+  return (
+    <div className="relative mx-auto mt-12 max-w-4xl px-2 sm:px-0">
+      <div className="overflow-hidden rounded-3xl border border-slate-200/90 bg-white/95 shadow-[0_28px_80px_rgba(15,23,42,0.12)] backdrop-blur-2xl transition duration-300 hover:shadow-[0_36px_100px_rgba(15,23,42,0.16)]">
+        {/* Top Control Bar */}
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 bg-slate-50/70 px-5 py-3 sm:px-6">
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-700">
+              Vendora Commerce AI
+            </span>
+            <span className="rounded-full bg-emerald-100 px-2 py-0.5 font-mono text-[9px] font-medium text-emerald-800">
+              Catálogo sincronizado
+            </span>
+          </div>
+          <div className="flex items-center gap-2 font-mono text-[10px] text-slate-500">
+            <Bot className="h-3.5 w-3.5 text-slate-400" />
+            <span>Vendora OS v2.4</span>
+          </div>
+        </div>
+
+        {/* Input Bar */}
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 pb-3">
+          <div className="relative flex items-center">
+            <Sparkles className="absolute left-4 h-5 w-5 text-emerald-600 shrink-0 pointer-events-none" />
+            <input
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              placeholder="Pergunte ao Vendora AI... (ex: estoque Sapato Nike, simular venda WhatsApp)"
+              className="w-full rounded-2xl border border-slate-200 bg-slate-50/60 py-3.5 pl-12 pr-28 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-600 focus:bg-white focus:outline-none focus:ring-4 focus:ring-emerald-500/10 transition"
+            />
+            <button
+              type="submit"
+              className="absolute right-2 inline-flex items-center gap-1.5 rounded-xl bg-slate-950 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-slate-800 transition"
+            >
+              Executar
+              <Send className="h-3 w-3" />
+            </button>
+          </div>
+
+          {/* Quick Prompt Suggestion Chips */}
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <span className="font-mono text-[10px] uppercase tracking-wider text-slate-600 mr-1">
+              Sugestões:
+            </span>
+            {PROMPT_SUGGESTIONS.map((s) => {
+              const isSelected = activeId === s.id;
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => handleSelect(s.id)}
+                  className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium transition ${
+                    isSelected
+                      ? "bg-slate-900 text-white shadow-sm"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200/80 hover:text-slate-900"
+                  }`}
+                >
+                  {s.label}
+                </button>
+              );
+            })}
+          </div>
+        </form>
+
+        {/* Interactive Response Area */}
+        <div className="border-t border-slate-100 bg-slate-50/40 p-5 sm:p-6">
+          <AnimatePresence mode="wait">
+            {isSimulating ? (
+              <motion.div
+                key="loading"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex h-32 items-center justify-center gap-3 text-slate-500"
+              >
+                <RefreshCw className="h-4 w-4 animate-spin text-emerald-600" />
+                <span className="font-mono text-xs">Consultando banco de dados e agentes...</span>
+              </motion.div>
+            ) : (
+              <motion.div
+                key={activeId}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.25 }}
+              >
+                <div className="mb-3 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-md bg-emerald-100 px-2 py-0.5 font-mono text-[10px] font-semibold text-emerald-800">
+                      {current.badge}
+                    </span>
+                    <span className="text-xs text-slate-500">
+                      Resultado para: <strong className="text-slate-800">"{current.prompt}"</strong>
+                    </span>
+                  </div>
+                  <span className="font-mono text-[10px] text-slate-400">Tempo de resposta: 0.18s</span>
+                </div>
+
+                {/* Stock Response */}
+                {activeId === "stock" && (
+                  <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                      <div className="flex items-center gap-3.5">
+                        <div className="grid h-12 w-12 place-items-center rounded-xl bg-slate-100 font-bold text-slate-800">
+                          👟
+                        </div>
+                        <div>
+                          <div className="font-bold text-slate-900 text-base">Sapato Nike Air Street</div>
+                          <div className="font-mono text-xs text-slate-500">SKU: NK-STREET-01 · Categoria: Calçados</div>
+                        </div>
+                      </div>
+                      <div className="text-right sm:border-l sm:border-slate-100 sm:pl-5">
+                        <div className="text-xs text-slate-500">Preço Oficial</div>
+                        <div className="text-xl font-bold text-slate-900">3.600 US$</div>
+                      </div>
+                    </div>
+
+                    <div className="mt-4">
+                      <div className="mb-2 flex items-center justify-between font-mono text-[10px] uppercase tracking-wider text-slate-500">
+                        <span>Disponibilidade por Tamanho (14 pares em estoque total)</span>
+                        <span className="text-emerald-700">● Conexão Atômica com Pedidos</span>
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                        <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-2.5">
+                          <div className="text-xs font-medium text-slate-600">Tamanho 39</div>
+                          <div className="mt-1 flex items-baseline justify-between">
+                            <span className="text-base font-bold text-slate-900">2 pares</span>
+                            <span className="font-mono text-[9px] font-semibold text-amber-700">Estoque Baixo</span>
+                          </div>
+                        </div>
+                        <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 p-2.5">
+                          <div className="text-xs font-medium text-slate-600">Tamanho 40</div>
+                          <div className="mt-1 flex items-baseline justify-between">
+                            <span className="text-base font-bold text-emerald-950">6 pares</span>
+                            <span className="font-mono text-[9px] font-semibold text-emerald-700">Disponível</span>
+                          </div>
+                        </div>
+                        <div className="rounded-xl border border-slate-200 bg-slate-50 p-2.5 opacity-60">
+                          <div className="text-xs font-medium text-slate-600">Tamanho 41</div>
+                          <div className="mt-1 flex items-baseline justify-between">
+                            <span className="text-base font-bold text-slate-500">0 pares</span>
+                            <span className="font-mono text-[9px] font-semibold text-rose-700">Esgotado</span>
+                          </div>
+                        </div>
+                        <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 p-2.5">
+                          <div className="text-xs font-medium text-slate-600">Tamanho 42</div>
+                          <div className="mt-1 flex items-baseline justify-between">
+                            <span className="text-base font-bold text-emerald-950">6 pares</span>
+                            <span className="font-mono text-[9px] font-semibold text-emerald-700">Disponível</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* WhatsApp Chat Simulation */}
+                {activeId === "whatsapp" && (
+                  <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm">
+                    <div className="mb-3 flex items-center justify-between border-b border-slate-100 pb-2.5">
+                      <div className="flex items-center gap-2">
+                        <span className="grid h-7 w-7 place-items-center rounded-full bg-emerald-500 text-xs text-white">
+                          V
+                        </span>
+                        <div>
+                          <div className="text-xs font-bold text-slate-900">Vitoria Catchiluvia</div>
+                          <div className="text-[10px] text-emerald-600">WhatsApp oficial · +244 936 370 703</div>
+                        </div>
+                      </div>
+                      <span className="rounded-full bg-emerald-100 px-2 py-0.5 font-mono text-[9px] font-semibold text-emerald-800">
+                        Atendimento IA Ativo
+                      </span>
+                    </div>
+
+                    <div className="space-y-2.5 max-h-52 overflow-y-auto pr-1">
+                      <div className="flex justify-start">
+                        <div className="max-w-[80%] rounded-2xl rounded-tl-sm bg-slate-100 p-3 text-xs text-slate-800">
+                          Olá! Ainda têm o Sapato Nike no tamanho 40 disponível?
+                          <span className="mt-1 block text-right font-mono text-[9px] text-slate-400">10:14</span>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end">
+                        <div className="max-w-[80%] rounded-2xl rounded-tr-sm bg-emerald-700 p-3 text-xs text-white shadow-sm">
+                          Olá Vitoria! Sim, temos 6 pares do Sapato Nike no tamanho 40 a 3.600 US$. Gostaria de reservar agora com entrega grátis em Luanda?
+                          <span className="mt-1 block text-right font-mono text-[9px] text-emerald-200">10:14 · IA</span>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-start">
+                        <div className="max-w-[80%] rounded-2xl rounded-tl-sm bg-slate-100 p-3 text-xs text-slate-800">
+                          Sim por favor! Como posso efetuar o pagamento?
+                          <span className="mt-1 block text-right font-mono text-[9px] text-slate-400">10:15</span>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end">
+                        <div className="max-w-[80%] rounded-2xl rounded-tr-sm bg-emerald-700 p-3 text-xs text-white shadow-sm">
+                          Perfeito! Já reservei o seu par por 15 min. Pode pagar via Multicaixa Express pelo link seguro abaixo:
+                          <div className="mt-2 rounded-lg bg-emerald-800/80 p-2 font-mono text-[10px] text-emerald-100">
+                            🔗 vendora.co/pedidos/D2CC2E82
+                          </div>
+                          <span className="mt-1 block text-right font-mono text-[9px] text-emerald-200">10:15 · IA</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-3 text-xs text-emerald-700 font-medium">
+                      <span className="flex items-center gap-1.5">
+                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+                        Pedido #D2CC2E82 criado e estoque atualizado atomicamente
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Marketing Post Generator */}
+                {activeId === "post" && (
+                  <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm">
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <div className="flex-1 space-y-2.5">
+                        <div className="flex items-center gap-2">
+                          <Instagram className="h-4 w-4 text-pink-600" />
+                          <span className="text-xs font-bold text-slate-900">Post de Lançamento (Instagram & Facebook)</span>
+                        </div>
+                        <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3 text-xs text-slate-700 space-y-2">
+                          <p className="font-semibold text-slate-900">
+                            👟 O drop mais aguardado acabou de aterrissar na Sapataria Shop!
+                          </p>
+                          <p>
+                            Conforto lendário para o seu dia a dia e um design que destaca qualquer visual. O Sapato Nike já está disponível com estoque limitado nos tamanhos 39 a 42 por 3.600 US$.
+                          </p>
+                          <p className="font-mono text-[11px] text-emerald-700">
+                            👉 Compre direto no link da bio ou chame no WhatsApp para atendimento imediato com entrega em Luanda!
+                          </p>
+                          <p className="font-mono text-[10px] text-slate-400">
+                            #SapatariaShop #SneakersLuanda #ModaAngola #SapatoNike #Vendora
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="w-full sm:w-48 shrink-0 rounded-xl border border-slate-200 bg-slate-100 p-3 flex flex-col justify-between">
+                        <div>
+                          <div className="font-mono text-[10px] uppercase text-slate-500 font-semibold">Canais Prontos</div>
+                          <div className="mt-2 space-y-1.5 text-xs text-slate-700">
+                            <div className="flex items-center gap-1.5">
+                              <Check className="h-3 w-3 text-emerald-600" /> Feed Instagram
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <Check className="h-3 w-3 text-emerald-600" /> Stories Instagram
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <Check className="h-3 w-3 text-emerald-600" /> Página Facebook
+                            </div>
+                          </div>
+                        </div>
+                        <div className="mt-3 rounded-lg bg-emerald-600 text-white text-center py-1.5 text-xs font-semibold">
+                          Agendar Post
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Metrics Analytics */}
+                {activeId === "metrics" && (
+                  <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3">
+                        <div className="text-xs text-slate-500">Faturamento Hoje</div>
+                        <div className="mt-1 text-xl font-bold text-slate-900">3.600 US$</div>
+                        <div className="mt-1 font-mono text-[10px] font-semibold text-emerald-700">↑ +24% vs ontem</div>
+                      </div>
+                      <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3">
+                        <div className="text-xs text-slate-500">Pedidos Concluídos</div>
+                        <div className="mt-1 text-xl font-bold text-slate-900">18 pedidos</div>
+                        <div className="mt-1 font-mono text-[10px] text-slate-500">2 pendentes</div>
+                      </div>
+                      <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3">
+                        <div className="text-xs text-slate-500">Canal Líder</div>
+                        <div className="mt-1 text-xl font-bold text-emerald-700">WhatsApp</div>
+                        <div className="mt-1 font-mono text-[10px] text-slate-500">68% das vendas</div>
+                      </div>
+                      <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3">
+                        <div className="text-xs text-slate-500">Tempo de Resposta</div>
+                        <div className="mt-1 text-xl font-bold text-slate-900">1.2s</div>
+                        <div className="mt-1 font-mono text-[10px] text-emerald-700">100% por IA</div>
+                      </div>
+                    </div>
+                    <div className="mt-3 rounded-xl border border-emerald-100 bg-emerald-50/60 p-3 text-xs text-emerald-900 flex items-center justify-between">
+                      <span>💡 <strong>Insight da IA:</strong> O Sapato Nike gerou 72% das conversões hoje após a publicação programada.</span>
+                      <ArrowRight className="h-4 w-4 text-emerald-600 shrink-0" />
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function HeroSection({
   startPath,
   onStart,
@@ -1150,69 +1582,99 @@ function HeroSection({
   startPath: string;
   onStart: () => void;
 }) {
-  const [variant, setVariant] = useState<keyof typeof HERO_VARIANTS>(() => {
-    if (typeof window === "undefined") return "a";
-    const forced = new URLSearchParams(window.location.search).get("hero");
-    if (forced === "a" || forced === "b") return forced;
-    const saved = window.localStorage.getItem("vendora-hero-variant");
-    if (saved === "a" || saved === "b") return saved;
-    const assigned = Math.random() < 0.5 ? "a" : "b";
-    window.localStorage.setItem("vendora-hero-variant", assigned);
-    return assigned;
-  });
-  const copy = HERO_VARIANTS[variant];
   return (
-    <section
-      data-hero-variant={variant}
-      className="reveal-up border-b border-[#e2ded5] bg-[#fffdf9]"
-    >
-      <div className="mx-auto max-w-[1240px] px-5 pb-20 pt-20 lg:px-8 lg:pb-24 lg:pt-28">
+    <section className="relative overflow-hidden border-b border-slate-200/80 bg-slate-50/40 pb-20 pt-16 sm:pb-28 sm:pt-24">
+      {/* Kraft Aurora Liquid Mesh Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
+        {/* Pure Top Luminous Glow */}
+        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[1100px] h-[480px] bg-gradient-to-b from-white via-white/80 to-transparent blur-3xl opacity-95" />
+
+        {/* Fluid Organic Radial Aurora Blobs */}
+        <div className="absolute top-[6%] left-[8%] w-[580px] h-[580px] rounded-full bg-gradient-to-tr from-indigo-600/35 via-purple-600/30 to-blue-500/30 blur-[110px] animate-aurora-1 mix-blend-multiply" />
+        <div className="absolute top-[16%] right-[6%] w-[640px] h-[640px] rounded-full bg-gradient-to-br from-violet-600/35 via-indigo-700/35 to-slate-900/30 blur-[125px] animate-aurora-2 mix-blend-multiply" />
+        <div className="absolute top-[38%] left-[24%] w-[680px] h-[520px] rounded-full bg-gradient-to-tl from-emerald-500/20 via-teal-600/25 to-indigo-800/25 blur-[115px] animate-aurora-3 mix-blend-multiply" />
+        <div className="absolute top-[4%] right-[28%] w-[500px] h-[500px] rounded-full bg-gradient-to-r from-blue-700/25 via-indigo-500/30 to-purple-800/25 blur-[105px] animate-aurora-4 mix-blend-multiply" />
+
+        {/* Frosted Glass Mesh Diffusion Layer */}
+        <div className="absolute inset-0 backdrop-blur-[65px] bg-white/20" />
+
+        {/* Bottom soft fade */}
+        <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-slate-50 via-slate-50/70 to-transparent" />
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-[1240px] px-5 lg:px-8">
+        {/* Hero Editorial Headline (Kraft Inspired) */}
         <div className="mx-auto max-w-4xl text-center">
-          <Eyebrow>{copy.eyebrow}</Eyebrow>
-          <h1 className="text-balance text-[52px] font-semibold leading-[0.95] tracking-[-0.075em] text-[#202522] sm:text-[72px] lg:text-[92px]">
-            {copy.title[0]}
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/80 px-4 py-1.5 shadow-sm backdrop-blur-md">
+            <Sparkles className="h-3.5 w-3.5 text-emerald-600" />
+            <span className="text-xs font-semibold text-slate-800 tracking-wide">
+              Commerce OS com Inteligência Artificial
+            </span>
+            <span className="flex h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          </div>
+
+          <h1 className="text-balance text-[clamp(2.5rem,7.5vw,5.6rem)] font-bold tracking-tight text-slate-950 leading-[0.98] sm:leading-[0.96]">
+            Vender com IA —
             <br />
-            <span className="text-[#2c6457]">{copy.title[1]}</span>
+            <span className="text-slate-900">
+              o{" "}
+              <span className="font-serif italic font-normal text-slate-800 tracking-tight">
+                futuro
+              </span>{" "}
+              do comércio
+            </span>
           </h1>
-          <p className="mx-auto mt-7 max-w-2xl text-base leading-7 text-[#6e716b] sm:text-lg">
-            {copy.description}
+
+          <p className="mx-auto mt-6 max-w-2xl text-base sm:text-lg leading-relaxed text-slate-600">
+            A plataforma inteligente que unifica o seu site, WhatsApp, Instagram e Facebook. Opere catálogo, pedidos e atendimento com agentes de IA conscientes de estoque em tempo real.
           </p>
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5">
             <button
               type="button"
               onClick={onStart}
-              className="inline-flex h-12 w-full items-center justify-center gap-2 bg-[#202522] px-6 text-sm font-semibold text-[#fffdf9] transition hover:bg-[#2c6457] sm:w-auto"
+              className="inline-flex h-12 w-full sm:w-auto items-center justify-center gap-2.5 rounded-full bg-slate-950 px-7 text-sm font-semibold text-white shadow-lg shadow-slate-950/15 transition-all hover:bg-slate-800 hover:scale-[1.02] active:scale-[0.98]"
             >
-              {copy.primary}
+              Começar Gratuitamente
               <ArrowRight className="h-4 w-4" />
             </button>
             <a
-              href={copy.secondaryHref}
-              className="inline-flex h-12 w-full items-center justify-center gap-2 border border-[#d9d5cc] bg-[#fffdf9] px-6 text-sm font-semibold text-[#5f625d] transition hover:border-[#a9a39a] sm:w-auto"
+              href="#whatsapp"
+              className="inline-flex h-12 w-full sm:w-auto items-center justify-center gap-2 rounded-full border border-slate-300/80 bg-white/80 px-6 text-sm font-semibold text-slate-700 shadow-sm backdrop-blur-md transition-all hover:bg-white hover:text-slate-900 hover:border-slate-400"
             >
-              <Play className="h-3.5 w-3.5 fill-current" />
-              {copy.secondary}
+              <Play className="h-3.5 w-3.5 fill-current text-slate-500" />
+              Ver Demonstração
             </a>
           </div>
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 font-mono text-[9px] uppercase tracking-[0.14em] text-[#8f8a80]">
-            {copy.proof.map((item, index) => (
-              <span key={item} className={index === 0 ? "text-[#2c6457]" : ""}>
-                {item}
-              </span>
-            ))}
+
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-slate-500 font-medium">
+            <span className="flex items-center gap-1.5">
+              <Check className="h-3.5 w-3.5 text-emerald-600" /> Sem cartão de crédito
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Check className="h-3.5 w-3.5 text-emerald-600" /> Configuração em 2 min
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Check className="h-3.5 w-3.5 text-emerald-600" /> Conexão oficial WhatsApp
+            </span>
           </div>
         </div>
-        <Link
-          to="/#plans"
-          className="mt-4 inline-flex items-center gap-2 border border-[#e6d4aa] bg-[#fbf3dd] px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-[#8b6b36] transition hover:border-[#e36c3f]"
-        >
-          <span className="h-1.5 w-1.5 rounded-full bg-[#e36c3f]" />
-          Launch offer · save 30% for 3 months{" "}
-          <ArrowRight className="h-3.5 w-3.5" />
-        </Link>
-      </div>
-      <div className="reveal-up reveal-delay-1 mt-16">
-        <ProductFrame />
+
+        {/* Kraft Floating Interactive Command/Prompt Card */}
+        <InteractiveHeroPrompt />
+
+        {/* Seamless Bridge & Live Dashboard Preview */}
+        <div className="mt-20">
+          <div className="mb-6 flex flex-col items-center justify-center text-center">
+            <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-600">
+              Visão Unificada da Operação
+            </span>
+            <p className="mt-1 text-xs text-slate-600">
+              Tudo o que sua equipe precisa para acompanhar pedidos, canais e receita em um só lugar.
+            </p>
+          </div>
+          <ProductFrame />
+        </div>
       </div>
     </section>
   );
@@ -1519,289 +1981,318 @@ export default function Index() {
   const startPath = user ? "/dashboard" : "/signup";
   const [onboardingOpen, setOnboardingOpen] = useState(false);
   return (
-    <div className="landing-page min-h-screen overflow-x-hidden bg-[#f6f3ed] text-[#202522]">
+    <div className="landing-page min-h-screen overflow-x-hidden bg-slate-50/50 text-slate-900 selection:bg-emerald-500/20 selection:text-emerald-950">
+      <ScrollProgressBar />
       <SiteHeader
         ctaHref={startPath}
         onCtaClick={() => setOnboardingOpen(true)}
       />
       <main className="pt-[72px] sm:pt-[76px]">
+        {/* Section 1: Kraft Hero with Interactive AI Command Prompt */}
         <HeroSection
           startPath={startPath}
           onStart={() => setOnboardingOpen(true)}
         />
-        <div id="proof">
+
+        {/* Section 2: Proof & Real Operators in Orbit */}
+        <SectionReveal id="proof" delay={0.08}>
           <ProofSection />
-        </div>
-        <section
-          id="whatsapp"
-          className="overflow-hidden border-b border-[#b9cabe] bg-[#d9e7de]"
-        >
-          <div className="mx-auto grid max-w-[1240px] gap-10 px-5 py-24 lg:grid-cols-[0.82fr_1.18fr] lg:items-center lg:px-8 lg:py-32">
-            <div>
-              <Eyebrow>Commerce in the conversation</Eyebrow>
-              <h2 className="max-w-xl text-5xl font-semibold leading-[0.96] tracking-[-0.07em] sm:text-6xl">
-                AI sells in the channel your customers already use.
-              </h2>
-              <p className="mt-6 max-w-md text-base leading-7 text-[#5f625d]">
-                It answers the question, checks the stock, creates the order and
-                leaves your team with a clear record of what happened.
-              </p>
-              <div className="mt-9 space-y-4 border-t border-[#b9cabe] pt-5 text-sm text-[#5f625d]">
-                <div className="flex items-center gap-3">
-                  <MessageCircle className="h-4 w-4 text-[#2c6457]" />
-                  Natural conversations, not another inbox
-                </div>
-                <div className="flex items-center gap-3">
-                  <Check className="h-4 w-4 text-[#2c6457]" />
-                  Catalog and inventory checked before the reply
-                </div>
-                <div className="flex items-center gap-3">
-                  <Check className="h-4 w-4 text-[#2c6457]" />
-                  Every outcome closes back into the platform
-                </div>
-              </div>
-            </div>
-            <WhatsAppFlow />
-          </div>
-        </section>
-        <ChannelShowcase />
-        <section
-          id="agents"
-          className="overflow-hidden border-b border-[#37423b] bg-[#202522] text-[#f6f3ed]"
-        >
-          <div className="mx-auto max-w-[1240px] px-5 py-24 lg:px-8 lg:py-32">
-            <div className="grid gap-14 lg:grid-cols-[0.78fr_1.22fr] lg:items-start">
+        </SectionReveal>
+
+        {/* Section 3: WhatsApp Conversational Commerce */}
+        <SectionReveal id="whatsapp" delay={0.08}>
+          <section
+            className="overflow-hidden border-b border-slate-200/80 bg-gradient-to-b from-white to-slate-50 py-24 sm:py-32"
+          >
+            <div className="mx-auto grid max-w-[1240px] gap-10 px-5 lg:grid-cols-[0.82fr_1.18fr] lg:items-center lg:px-8">
               <div>
-                <Eyebrow light>The intelligence behind the feed</Eyebrow>
-                <h2 className="max-w-xl text-5xl font-semibold leading-[0.94] tracking-[-0.07em] sm:text-6xl">
-                  One orchestrator. Three specialists. Every action controlled.
+                <Eyebrow>Comércio dentro da conversa</Eyebrow>
+                <h2 className="max-w-xl text-5xl font-bold leading-[0.96] tracking-[-0.07em] text-slate-950 sm:text-6xl">
+                  A IA vende no canal que os seus clientes já usam todos os dias.
                 </h2>
-                <p className="mt-6 max-w-md text-base leading-7 text-white/60">
-                  Vendora does not hand your business to one generic chatbot. It
-                  coordinates focused agents that share your real operating data
-                  and stay inside clear permissions.
+                <p className="mt-6 max-w-md text-base leading-7 text-slate-600">
+                  Responde a dúvidas sobre produto, verifica estoque em tempo real, gera o pedido e atualiza a equipe com clareza e precisão.
                 </p>
-                <div className="mt-10 space-y-3">
-                  <div className="rounded-xl border border-white/15 bg-[#29322d] p-4">
-                    <div className="flex items-center justify-between gap-4">
-                      <div>
-                        <div className="font-semibold">Marketing AI</div>
-                        <div className="mt-1 text-sm text-white/55">
-                          Adapts the product story to each channel.
-                        </div>
-                      </div>
-                      <span className="border border-[#e36c3f]/50 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-[#e36c3f]">
-                        Can publish
-                      </span>
-                    </div>
+                <div className="mt-9 space-y-4 border-t border-slate-200/80 pt-6 text-sm text-slate-700">
+                  <div className="flex items-center gap-3">
+                    <MessageCircle className="h-4 w-4 text-emerald-600" />
+                    Conversas naturais com contexto de catálogo
                   </div>
-                  <div className="rounded-xl border border-white/15 bg-[#29322d] p-4">
-                    <div className="flex items-center justify-between gap-4">
-                      <div>
-                        <div className="font-semibold">Sales AI</div>
-                        <div className="mt-1 text-sm text-white/55">
-                          Checks stock, price and customer intent.
-                        </div>
-                      </div>
-                      <span className="border border-[#8bad9d]/60 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-[#b9cabe]">
-                        Can query
-                      </span>
-                    </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="h-4 w-4 text-emerald-600" />
+                    Estoque conferido antes de qualquer confirmação
                   </div>
-                  <div className="rounded-xl border border-white/15 bg-[#29322d] p-4">
-                    <div className="flex items-center justify-between gap-4">
-                      <div>
-                        <div className="font-semibold">Analytics AI</div>
-                        <div className="mt-1 text-sm text-white/55">
-                          Turns signals into the next clear decision.
-                        </div>
-                      </div>
-                      <span className="border border-[#8bad9d]/60 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-[#b9cabe]">
-                        Can read
-                      </span>
-                    </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="h-4 w-4 text-emerald-600" />
+                    Pedidos e pagamentos sincronizados com o painel central
                   </div>
                 </div>
               </div>
-              <div>
-                <div className="overflow-hidden rounded-2xl border border-white/20 bg-[#151a17] p-2 shadow-[0_24px_70px_rgba(0,0,0,0.3)] sm:p-3">
-                  <video
-                    className="aspect-video w-full object-cover"
-                    src="/media/agent-architecture.mp4"
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    aria-label="Animated diagram showing Vendora's AI orchestrator connecting specialized agents to Facebook, Instagram, WhatsApp, Website and shared business data"
-                  />
-                  <div className="flex flex-wrap items-center justify-between gap-3 px-2 pt-3 font-mono text-[9px] uppercase tracking-[0.14em] text-white/45">
-                    <span>Agent system / live map</span>
-                    <span className="text-[#e36c3f]">Controlled by rules</span>
-                  </div>
-                </div>
-                <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
-                  <div className="border border-white/15 px-3 py-3">
-                    <div className="font-mono text-[9px] uppercase tracking-[0.12em] text-[#e36c3f]">
-                      Channels
-                    </div>
-                    <div className="mt-2 text-sm font-semibold">
-                      4 connected
-                    </div>
-                  </div>
-                  <div className="border border-white/15 px-3 py-3">
-                    <div className="font-mono text-[9px] uppercase tracking-[0.12em] text-[#e36c3f]">
-                      Agents
-                    </div>
-                    <div className="mt-2 text-sm font-semibold">
-                      3 specialized
-                    </div>
-                  </div>
-                  <div className="border border-white/15 px-3 py-3">
-                    <div className="font-mono text-[9px] uppercase tracking-[0.12em] text-[#e36c3f]">
-                      Source
-                    </div>
-                    <div className="mt-2 text-sm font-semibold">
-                      1 shared data layer
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <WhatsAppFlow />
             </div>
-            <div className="mt-14 border-t border-white/15 pt-7">
-              <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+          </section>
+        </SectionReveal>
+
+        {/* Section 4: Omni-channel feed showcase */}
+        <SectionReveal id="channels" delay={0.08}>
+          <ChannelShowcase />
+        </SectionReveal>
+
+        {/* Section 5: AI Specialized Agents & Guardrails */}
+        <SectionReveal id="agents" delay={0.08}>
+          <section
+            id="agents"
+            className="overflow-hidden border-b border-slate-800 bg-slate-950 text-slate-100 py-24 sm:py-32"
+          >
+            <div className="mx-auto max-w-[1240px] px-5 lg:px-8">
+              <div className="grid gap-14 lg:grid-cols-[0.78fr_1.22fr] lg:items-start">
                 <div>
-                  <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#e36c3f]">
-                    Guardrails before action
-                  </div>
-                  <div className="mt-2 text-xl font-semibold tracking-[-0.04em]">
-                    The agent earns the right to publish.
+                  <Eyebrow light>Inteligência com Governança</Eyebrow>
+                  <h2 className="max-w-xl text-5xl font-bold leading-[0.94] tracking-[-0.07em] sm:text-6xl text-white">
+                    Um orquestrador. Três especialistas. Toda ação protegida.
+                  </h2>
+                  <p className="mt-6 max-w-md text-base leading-7 text-slate-400">
+                    A Vendora não entrega o seu negócio a um chatbot genérico. Ela coordena agentes focados com acesso estrito a dados reais e permissões invioláveis.
+                  </p>
+                  <div className="mt-10 space-y-3">
+                    <div className="rounded-2xl border border-white/10 bg-slate-900/80 p-4 shadow-sm backdrop-blur-sm">
+                      <div className="flex items-center justify-between gap-4">
+                        <div>
+                          <div className="font-bold text-white text-base">Marketing AI</div>
+                          <div className="mt-0.5 text-xs text-slate-400">
+                            Adapta fotos, ganchos e campanhas para cada canal (Feed, Stories, Reels).
+                          </div>
+                        </div>
+                        <span className="rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-1 font-mono text-[9px] uppercase tracking-wider text-emerald-400 font-semibold">
+                          Pode Publicar
+                        </span>
+                      </div>
+                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-slate-900/80 p-4 shadow-sm backdrop-blur-sm">
+                      <div className="flex items-center justify-between gap-4">
+                        <div>
+                          <div className="font-bold text-white text-base">Sales AI</div>
+                          <div className="mt-0.5 text-xs text-slate-400">
+                            Verifica estoque, reserva pedidos e orienta pagamentos seguros.
+                          </div>
+                        </div>
+                        <span className="rounded-full border border-teal-500/40 bg-teal-500/10 px-2.5 py-1 font-mono text-[9px] uppercase tracking-wider text-teal-400 font-semibold">
+                          Pode Consultar
+                        </span>
+                      </div>
+                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-slate-900/80 p-4 shadow-sm backdrop-blur-sm">
+                      <div className="flex items-center justify-between gap-4">
+                        <div>
+                          <div className="font-bold text-white text-base">Analytics AI</div>
+                          <div className="mt-0.5 text-xs text-slate-400">
+                            Transforma conversões e sinais em recomendações práticas semanais.
+                          </div>
+                        </div>
+                        <span className="rounded-full border border-indigo-500/40 bg-indigo-500/10 px-2.5 py-1 font-mono text-[9px] uppercase tracking-wider text-indigo-400 font-semibold">
+                          Pode Ler
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div className="flex flex-wrap items-center gap-2 text-[10px] font-medium text-white/65">
-                  {[
-                    "Product exists",
-                    "Stock available",
-                    "Price valid",
-                    "Content approved",
-                    "Timing allowed",
-                  ].map((step, index) => (
-                    <span key={step} className="flex items-center gap-2">
-                      <span className="border border-white/20 px-3 py-2">
-                        {step}
+                <div>
+                  <div className="overflow-hidden rounded-3xl border border-white/15 bg-black/60 p-2.5 shadow-[0_24px_70px_rgba(0,0,0,0.5)]">
+                    <video
+                      className="aspect-video w-full rounded-2xl object-cover"
+                      src="/media/agent-architecture.mp4"
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      aria-label="Diagrama da arquitetura de agentes Vendora"
+                    />
+                    <div className="flex flex-wrap items-center justify-between gap-3 px-3 pt-3 font-mono text-[10px] uppercase tracking-wider text-slate-400">
+                      <span>Sistema de Agentes / Mapa Ativo</span>
+                      <span className="text-emerald-400 font-semibold">● Controlado por Regras RLS</span>
+                    </div>
+                  </div>
+                  <div className="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+                    <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-3.5">
+                      <div className="font-mono text-[10px] uppercase tracking-wider text-emerald-400 font-semibold">
+                        Canais
+                      </div>
+                      <div className="mt-1.5 text-base font-bold text-white">4 conectados</div>
+                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-3.5">
+                      <div className="font-mono text-[10px] uppercase tracking-wider text-emerald-400 font-semibold">
+                        Agentes
+                      </div>
+                      <div className="mt-1.5 text-base font-bold text-white">3 especializados</div>
+                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-3.5">
+                      <div className="font-mono text-[10px] uppercase tracking-wider text-emerald-400 font-semibold">
+                        Fonte Única
+                      </div>
+                      <div className="mt-1.5 text-base font-bold text-white">1 base transacional</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-14 border-t border-white/10 pt-8">
+                <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                  <div>
+                    <div className="font-mono text-[10px] uppercase tracking-wider text-emerald-400 font-semibold">
+                      Guardrails Antes de Qualquer Ação
+                    </div>
+                    <div className="mt-1 text-xl font-bold tracking-tight text-white">
+                      O agente só age com validação total.
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-slate-300">
+                    {[
+                      "Produto existe",
+                      "Estoque conferido",
+                      "Preço validado",
+                      "Conteúdo verificado",
+                      "Regra cumprida",
+                    ].map((step, index) => (
+                      <span key={step} className="flex items-center gap-2">
+                        <span className="rounded-full border border-white/15 bg-white/5 px-3 py-1.5">
+                          {step}
+                        </span>
+                        {index < 4 && (
+                          <ArrowRight className="h-3.5 w-3.5 text-emerald-400" />
+                        )}
                       </span>
-                      {index < 4 && (
-                        <ArrowRight className="h-3.5 w-3.5 text-[#e36c3f]" />
-                      )}
-                    </span>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </section>
-        <PlansSection />
-        <CaseStudiesSection />
-        <FAQSection />
-        <section id="process">
-          <ProcessSection />
-        </section>
-        <section
-          id="control-room"
-          className="border-b border-[#35453d] bg-[#27352e] text-[#f6f3ed]"
-        >
-          <div className="mx-auto max-w-[1240px] px-5 py-24 lg:px-8 lg:py-32">
-            <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          </section>
+        </SectionReveal>
+
+        {/* Section 6: Plans & Pricing */}
+        <SectionReveal id="plans" delay={0.08}>
+          <PlansSection />
+        </SectionReveal>
+
+        {/* Section 7: Case Studies & Testimonials */}
+        <SectionReveal id="proof-cases" delay={0.08}>
+          <CaseStudiesSection />
+        </SectionReveal>
+
+        {/* Section 8: FAQ Accordion */}
+        <SectionReveal id="faq" delay={0.08}>
+          <FAQSection />
+        </SectionReveal>
+
+        {/* Section 9: Operating Rhythm & How it works */}
+        <SectionReveal id="process" delay={0.08}>
+          <section id="process">
+            <ProcessSection />
+          </section>
+        </SectionReveal>
+
+        {/* Section 10: Control Room */}
+        <SectionReveal id="control-room" delay={0.08}>
+          <section
+            id="control-room"
+            className="border-b border-slate-800 bg-slate-900 text-slate-100 py-24 sm:py-32"
+          >
+            <div className="mx-auto max-w-[1240px] px-5 lg:px-8">
+              <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+                <div>
+                  <Eyebrow light>Visão de Comando</Eyebrow>
+                  <h2 className="max-w-2xl text-5xl font-bold leading-[0.96] tracking-[-0.07em] sm:text-6xl text-white">
+                    Toda a sua operação sem troca de telas.
+                  </h2>
+                  <p className="mt-6 max-w-xl text-base leading-7 text-slate-400">
+                    Pedidos, catálogo, canais e trabalho diário residem no mesmo ecossistema — clareza total para cada decisão do seu negócio.
+                  </p>
+                </div>
+                <Link
+                  to={startPath}
+                  className="inline-flex shrink-0 items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/20"
+                >
+                  Explorar plataforma <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+              <div className="mt-14 grid gap-6 lg:grid-cols-2">
+                <div className="overflow-hidden rounded-3xl border border-white/10 bg-slate-950 p-2 sm:p-3 shadow-xl">
+                  <img
+                    src="/media/optimized/operations-audit.webp"
+                    alt="Visão de operações da Vendora"
+                    loading="lazy"
+                    className="w-full rounded-2xl object-cover"
+                  />
+                  <div className="flex flex-wrap items-center justify-between gap-3 px-3 pt-3 font-mono text-[10px] uppercase tracking-wider text-slate-400">
+                    <span>Operações em Tempo Real</span>
+                    <span className="text-emerald-400 font-semibold">● Auditoria Conectada</span>
+                  </div>
+                </div>
+                <div className="overflow-hidden rounded-3xl border border-white/10 bg-slate-950 p-2 sm:p-3 shadow-xl">
+                  <img
+                    src="/media/optimized/storefront-commerce.webp"
+                    alt="Loja virtual da Vendora com estoque em tempo real"
+                    loading="lazy"
+                    className="w-full rounded-2xl object-cover"
+                  />
+                  <div className="flex flex-wrap items-center justify-between gap-3 px-3 pt-3 font-mono text-[10px] uppercase tracking-wider text-slate-400">
+                    <span>Fonte do Catálogo</span>
+                    <span className="text-emerald-400 font-semibold">● Sincronização 100%</span>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-8 flex flex-wrap items-center gap-3 border-t border-white/10 pt-6 font-mono text-[10px] uppercase tracking-wider text-slate-400 font-medium">
+                <span className="text-emerald-400 font-bold">Pedidos</span>
+                <span>·</span>
+                <span>Estoque Atômico</span>
+                <span>·</span>
+                <span>Contexto de Clientes</span>
+                <span>·</span>
+                <span>Publicação Multi-canal</span>
+              </div>
+            </div>
+          </section>
+        </SectionReveal>
+
+        {/* Section 11: Final Call to Action */}
+        <SectionReveal delay={0.08}>
+          <section className="relative overflow-hidden bg-slate-950 text-white py-24 sm:py-32">
+            <div className="absolute inset-0 bg-gradient-to-tr from-emerald-950/40 via-slate-900/50 to-indigo-950/40" />
+            <div className="relative mx-auto grid max-w-[1240px] gap-12 px-5 lg:grid-cols-[0.85fr_1.15fr] lg:items-center lg:px-8">
               <div>
-                <Eyebrow light>One source of truth</Eyebrow>
-                <h2 className="max-w-2xl text-5xl font-semibold leading-[0.96] tracking-[-0.07em] sm:text-6xl">
-                  See the whole operation without switching modes.
+                <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-400">
+                  Pronto para começar
+                </div>
+                <h2 className="mt-4 max-w-xl text-5xl font-bold leading-[0.96] tracking-[-0.07em] sm:text-6xl text-white">
+                  Opere o momento com inteligência e controle.
                 </h2>
-                <p className="mt-6 max-w-xl text-base leading-7 text-white/55">
-                  Orders, catalogue, channel status and daily activity live in
-                  the same operating language — so the next decision is obvious.
+                <p className="mt-6 max-w-md text-base leading-7 text-slate-300">
+                  Dê à sua equipe uma plataforma unificada para captar intenções, fechar vendas no WhatsApp e manter seu estoque perfeitamente alinhado.
                 </p>
+                <Link
+                  to={startPath}
+                  className="mt-9 inline-flex items-center gap-2 rounded-full bg-emerald-500 px-7 py-3.5 text-sm font-bold text-slate-950 shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-400 hover:scale-[1.02]"
+                >
+                  Começar Gratuitamente <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
-              <Link
-                to={startPath}
-                className="inline-flex shrink-0 items-center gap-2 text-sm font-semibold text-[#f6f3ed]"
-              >
-                Explore the platform <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-            <div className="mt-14 grid gap-5 lg:grid-cols-2">
-              <div className="overflow-hidden rounded-2xl border border-white/15 bg-[#f6f3ed] p-2 sm:p-3">
+              <div className="relative overflow-hidden rounded-3xl border border-white/15 bg-white/5 p-2.5 sm:p-3 shadow-2xl backdrop-blur-sm">
                 <img
-                  src="/media/optimized/operations-audit.webp"
-                  alt="Vendora operations view with orders, activity, audit and channel status"
+                  src="/media/optimized/cta-merchant-at-work.webp"
+                  alt="Comerciante operando calmamente com o celular"
                   loading="lazy"
-                  className="w-full object-cover"
+                  className="aspect-[3/2] w-full rounded-2xl object-cover"
                 />
-                <div className="flex flex-wrap items-center justify-between gap-3 px-2 pt-3 font-mono text-[9px] uppercase tracking-[0.14em] text-[#8f8a80]">
-                  <span>Live operations</span>
-                </div>
-              </div>
-              <div className="overflow-hidden rounded-2xl border border-white/15 bg-[#f6f3ed] p-2 sm:p-3">
-                <img
-                  src="/media/optimized/storefront-commerce.webp"
-                  alt="Vendora connected storefront product detail with live inventory"
-                  loading="lazy"
-                  className="w-full object-cover"
-                />
-                <div className="flex flex-wrap items-center justify-between gap-3 px-2 pt-3 font-mono text-[9px] uppercase tracking-[0.14em] text-[#8f8a80]">
-                  <span>Catalogue source</span>
-                  <span className="text-[#2c6457]">Sync complete</span>
+                <div className="flex items-center justify-between px-3 pt-3 font-mono text-[10px] uppercase tracking-wider text-slate-300">
+                  <span>Comércio em Movimento</span>
+                  <span className="flex items-center gap-2 text-emerald-400 font-semibold">
+                    <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                    Controle Total
+                  </span>
                 </div>
               </div>
             </div>
-            <div className="mt-8 flex flex-wrap items-center gap-2 border-t border-white/15 pt-5 font-mono text-[9px] uppercase tracking-[0.14em] text-white/45">
-              <span className="text-[#e36c3f]">Orders</span>
-              <span>·</span>
-              <span>Inventory</span>
-              <span>·</span>
-              <span>Customer context</span>
-              <span>·</span>
-              <span>Channel publishing</span>
-            </div>
-          </div>
-        </section>
-        <section className="relative overflow-hidden bg-[#e36c3f] text-white">
-          <div className="absolute inset-0 bg-[#202522]/15" />
-          <div className="relative mx-auto grid max-w-[1240px] gap-10 px-5 py-20 lg:grid-cols-[0.85fr_1.15fr] lg:items-center lg:px-8 lg:py-24">
-            <div>
-              <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/70">
-                Ready when you are
-              </div>
-              <h2 className="mt-4 max-w-xl text-5xl font-semibold leading-[0.96] tracking-[-0.07em] sm:text-6xl">
-                Operate the moment, not the mess.
-              </h2>
-              <p className="mt-6 max-w-md text-base leading-7 text-white/80">
-                Give your team one place to see the signal, make the decision
-                and keep the sale moving.
-              </p>
-              <Link
-                to={startPath}
-                className="mt-9 inline-flex items-center gap-2 rounded-full bg-[#202522] px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-[#2c6457]"
-              >
-                Build your operation <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-            <div className="relative overflow-hidden border border-white/25 bg-[#c95735] p-2 sm:p-3">
-              <img
-                src="/media/optimized/cta-merchant-at-work.webp"
-                alt="Merchant working calmly with phone and orders in a real shop"
-                loading="lazy"
-                className="aspect-[3/2] w-full object-cover"
-              />
-              <div className="flex items-center justify-between px-2 pt-3 font-mono text-[9px] uppercase tracking-[0.14em] text-white/65">
-                <span>Commerce in motion</span>
-                <span className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-white" />
-                  In control
-                </span>
-              </div>
-            </div>
-          </div>
-        </section>
+          </section>
+        </SectionReveal>
       </main>
       <OnboardingModal
         open={onboardingOpen}

@@ -148,6 +148,51 @@
   animation: process-step-in 4.8s ease-in-out infinite;
 }
 
+@keyframes aurora-1 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  50% {
+    transform: translate(60px, -35px) scale(1.12);
+  }
+}
+@keyframes aurora-2 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  50% {
+    transform: translate(-50px, 40px) scale(0.92);
+  }
+}
+@keyframes aurora-3 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  50% {
+    transform: translate(-40px, -45px) scale(1.08);
+  }
+}
+@keyframes aurora-4 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  50% {
+    transform: translate(45px, 30px) scale(1.06);
+  }
+}
+.animate-aurora-1 {
+  animation: aurora-1 16s ease-in-out infinite;
+}
+.animate-aurora-2 {
+  animation: aurora-2 20s ease-in-out infinite;
+}
+.animate-aurora-3 {
+  animation: aurora-3 18s ease-in-out infinite;
+}
+.animate-aurora-4 {
+  animation: aurora-4 22s ease-in-out infinite;
+}
+
 @keyframes people-profile-in {
   0% {
     opacity: 0;

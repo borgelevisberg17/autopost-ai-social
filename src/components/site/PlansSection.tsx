@@ -1,16 +1,188 @@
 import { useEffect, useState } from "react";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { formatMoney } from "@/lib/format";
+import { cn } from "@/lib/utils";
 
-type Plan = { id: string; name: string; monthly_price: number | null; currency: string; product_limit: number; monthly_ai_limit: number; features: string[] };
+type Plan = {
+  id: string;
+  name: string;
+  monthly_price: number | null;
+  currency: string;
+  product_limit: number;
+  monthly_ai_limit: number;
+  features: string[];
+};
 
 export function PlansSection() {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [error, setError] = useState(false);
-  useEffect(() => { void supabase.from("subscription_plans").select("*").eq("enabled", true).order("product_limit").then(({ data, error }) => { setPlans(data ?? []); setError(Boolean(error)); }); }, []);
-  const names: Record<string, string> = { marketing: "Agente de marketing", analytics: "Agente de análise", sales: "Agente de vendas", whatsapp: "WhatsApp" };
-  return <section id="plans" className="border-y border-border bg-secondary"><div className="mx-auto max-w-6xl px-5 py-16 space-y-8"><h2 className="font-serif text-3xl text-foreground">Planos Vendora</h2>{error && <p role="alert">Não foi possível carregar os planos.</p>}<div className="grid gap-4 lg:grid-cols-3">{plans.map(plan => <article key={plan.id} className="rounded border border-border bg-card text-card-foreground p-6 flex flex-col gap-5"><h3 className="text-xl font-semibold">{plan.name}</h3><p className="text-2xl font-semibold tabular-nums">{plan.monthly_price === null ? "Preço por definir" : formatMoney(plan.monthly_price, plan.currency)}<span className="text-sm font-normal text-muted-foreground"> / mês</span></p><ul className="flex-1 space-y-3 text-sm"><li>Até {plan.product_limit} produtos</li><li>{plan.monthly_ai_limit} pedidos de IA por mês</li>{plan.features.map(f => <li className="flex gap-2" key={f}><Check className="h-4 w-4 text-primary" />{names[f] ?? f}</li>)}</ul><Button asChild variant="outline"><Link to="/signup">Criar empresa<ArrowRight className="ml-2 h-4 w-4" /></Link></Button></article>)}</div></div></section>;
+  const [billing, setBilling] = useState<"monthly" | "annual">("monthly");
+
+  useEffect(() => {
+    void supabase
+      .from("subscription_plans")
+      .select("*")
+      .eq("enabled", true)
+      .order("product_limit")
+      .then(({ data, error }) => {
+        setPlans(data ?? []);
+        setError(Boolean(error));
+      });
+  }, []);
+
+  const names: Record<string, string> = {
+    marketing: "Agente de Marketing com IA",
+    analytics: "Relatórios & Analytics IA",
+    sales: "Agente de Vendas Automatizado",
+    whatsapp: "WhatsApp Business Integrado",
+  };
+
+  return (
+    <section id="plans" className="border-y border-slate-200/80 bg-slate-50/50 py-20 lg:py-28">
+      <div className="mx-auto max-w-6xl px-5 sm:px-6">
+        <div className="mx-auto max-w-3xl text-center mb-12">
+          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800 mb-3 shadow-2xs">
+            <Sparkles className="h-3.5 w-3.5 text-emerald-600" />
+            PLANOS TRANSPARENTES
+          </div>
+          <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-slate-900">
+            Comece simples, escale quando precisar
+          </h2>
+          <p className="mt-3 text-base text-slate-500 max-w-xl mx-auto">
+            Sem custos ocultos. Conecte os seus produtos, automatize o WhatsApp e venda mais a cada dia.
+          </p>
+
+          {/* Billing Toggle */}
+          <div className="mt-7 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white p-1 shadow-2xs">
+            <button
+              type="button"
+              onClick={() => setBilling("monthly")}
+              className={cn(
+                "rounded-full px-4 py-1.5 text-xs font-semibold transition",
+                billing === "monthly"
+                  ? "bg-slate-900 text-white shadow-xs"
+                  : "text-slate-600 hover:text-slate-900"
+              )}
+            >
+              Mensal
+            </button>
+            <button
+              type="button"
+              onClick={() => setBilling("annual")}
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold transition",
+                billing === "annual"
+                  ? "bg-slate-900 text-white shadow-xs"
+                  : "text-slate-600 hover:text-slate-900"
+              )}
+            >
+              Anual
+              <span className="rounded-full bg-emerald-100 px-1.5 py-0.2 text-[10px] font-bold text-emerald-800">
+                −20%
+              </span>
+            </button>
+          </div>
+        </div>
+
+        {error && (
+          <p role="alert" className="text-center text-sm font-semibold text-rose-600">
+            Não foi possível carregar os planos da loja.
+          </p>
+        )}
+
+        <div className="grid gap-6 lg:grid-cols-3">
+          {plans.map((plan, index) => {
+            const isPopular = index === 1 || plan.name.toLowerCase().includes("pro");
+            const price =
+              plan.monthly_price === null
+                ? null
+                : billing === "annual"
+                ? Math.round(plan.monthly_price * 0.8)
+                : plan.monthly_price;
+
+            return (
+              <article
+                key={plan.id}
+                className={cn(
+                  "relative flex flex-col justify-between rounded-3xl border bg-white p-7 transition shadow-xs hover:shadow-xl",
+                  isPopular
+                    ? "border-emerald-500/80 ring-2 ring-emerald-500/20 shadow-md lg:-translate-y-2"
+                    : "border-slate-200/80 hover:border-slate-300"
+                )}
+              >
+                {isPopular && (
+                  <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-emerald-600 px-3.5 py-1 text-[11px] font-bold uppercase tracking-wider text-white shadow-xs">
+                    Mais Popular
+                  </span>
+                )}
+
+                <div>
+                  <h3 className="text-xl font-bold text-slate-900">{plan.name}</h3>
+                  <div className="mt-4 flex items-baseline gap-1">
+                    <span className="text-3xl sm:text-4xl font-extrabold text-slate-900">
+                      {price === null ? "Sob consulta" : formatMoney(price, plan.currency)}
+                    </span>
+                    {price !== null && (
+                      <span className="text-xs font-medium text-slate-500">/ mês</span>
+                    )}
+                  </div>
+
+                  <p className="mt-2 text-xs text-slate-500">
+                    {billing === "annual" && price !== null
+                      ? "Faturado anualmente com 20% de desconto"
+                      : "Faturado mensalmente sem fidelização"}
+                  </p>
+
+                  <div className="my-6 border-t border-slate-100" />
+
+                  <ul className="space-y-3 text-xs sm:text-sm text-slate-700">
+                    <li className="flex items-center gap-2.5">
+                      <div className="grid h-5 w-5 place-items-center rounded-full bg-emerald-50 text-emerald-600 shrink-0">
+                        <Check className="h-3.5 w-3.5" />
+                      </div>
+                      <span>Até <strong>{plan.product_limit}</strong> produtos sincronizados</span>
+                    </li>
+                    <li className="flex items-center gap-2.5">
+                      <div className="grid h-5 w-5 place-items-center rounded-full bg-emerald-50 text-emerald-600 shrink-0">
+                        <Check className="h-3.5 w-3.5" />
+                      </div>
+                      <span><strong>{plan.monthly_ai_limit}</strong> pedidos de IA por mês</span>
+                    </li>
+                    {plan.features.map((f) => (
+                      <li className="flex items-center gap-2.5" key={f}>
+                        <div className="grid h-5 w-5 place-items-center rounded-full bg-emerald-50 text-emerald-600 shrink-0">
+                          <Check className="h-3.5 w-3.5" />
+                        </div>
+                        <span>{names[f] ?? f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="mt-8">
+                  <Button
+                    asChild
+                    className={cn(
+                      "w-full rounded-xl py-5 text-xs font-bold transition shadow-xs",
+                      isPopular
+                        ? "bg-slate-900 text-white hover:bg-slate-800"
+                        : "bg-slate-100 text-slate-800 hover:bg-slate-200"
+                    )}
+                  >
+                    <Link to="/signup">
+                      Criar conta com este plano
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
 }
