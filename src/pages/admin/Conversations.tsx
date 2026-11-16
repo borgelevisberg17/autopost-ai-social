@@ -555,7 +555,7 @@ export default function Conversations() {
     accountQuery.isLoading || !company,
     accountQuery.isError,
   );
-  const isConnected = connectionState === "connected";
+  const isConnected = connectionState === "active";
 
   const isDark = theme === "dark";
 

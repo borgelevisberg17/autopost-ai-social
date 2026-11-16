@@ -1,9 +1,9 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+const corsHeaders = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version" };
 import { z } from "npm:zod@3";
 import { encryptCredentials, metaCredentials, readCredentials, serviceDb } from "../_shared/credentials.ts";
 const json = (data: unknown, status = 200) => new Response(JSON.stringify(data), { status, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-const schema = z.object({ action: z.enum(["status", "save", "activate_meta", "check_meta"]), company_id: z.string().uuid().optional(), provider: z.enum(["stripe", "meta"]).optional(), credentials: z.record(z.string().max(8000)).optional() });
+const schema = z.object({ action: z.enum(["status", "save", "activate_meta", "check_meta"]), company_id: z.string().uuid().optional(), provider: z.enum(["stripe", "meta", "social", "marketing_email"]).optional(), credentials: z.record(z.string().max(8000)).optional() });
 Deno.serve(async req => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "Método não permitido" }, 405);
@@ -18,7 +18,7 @@ Deno.serve(async req => {
     const body = parsed.data;
     const company = body.company_id;
     const { data: allowed } = company ? await db.rpc("is_company_admin", { _company: company, _user: user.id }) : await db.rpc("has_platform_admin", { _user: user.id });
-    if (!allowed || company && body.provider === "meta") return json({ error: "Sem permissão" }, 403);
+    if (!allowed || company && (body.provider === "meta" || body.provider === "marketing_email") || !company && body.provider === "social") return json({ error: "Sem permissão" }, 403);
     const scope = company ?? "platform";
     if (body.action === "status") {
       const { data, error } = await serviceDb().from("integration_credentials").select("provider,updated_at").eq("scope_key", scope);
@@ -28,7 +28,7 @@ Deno.serve(async req => {
       if (company) numberQuery = numberQuery.eq("company_id", company);
       const { data: numbers, error: numbersError } = await numberQuery;
       if (numbersError) return json({ error: "Não foi possível consultar o número WhatsApp da loja" }, 500);
-      return json({ stripe: data?.some(r => r.provider === "stripe") ?? false, paypal: false, meta: !!meta?.access_token && !!meta?.app_secret && !!meta?.verify_token, meta_token: !!meta?.access_token, meta_app: !!meta?.app_id, meta_missing: Object.entries({ access_token: meta.access_token, app_secret: meta.app_secret, verify_token: meta.verify_token }).filter(([, value]) => !value).map(([key]) => key), numbers: numbers ?? [], updated_at: data?.map(r => ({ provider: r.provider, updated_at: r.updated_at })) ?? [] });
+      return json({ stripe: data?.some(r => r.provider === "stripe") ?? false, social: data?.some(r => r.provider === "social") ?? false, marketing_email: data?.some(r => r.provider === "marketing_email") ?? false, paypal: false, meta: !!meta?.access_token && !!meta?.app_secret && !!meta?.verify_token, meta_token: !!meta?.access_token, meta_app: !!meta?.app_id, meta_missing: Object.entries({ access_token: meta.access_token, app_secret: meta.app_secret, verify_token: meta.verify_token }).filter(([, value]) => !value).map(([key]) => key), numbers: numbers ?? [], updated_at: data?.map(r => ({ provider: r.provider, updated_at: r.updated_at })) ?? [] });
     }
     if (body.action === "check_meta") {
       if (company) return json({ error: "Reservado à plataforma" }, 403);
@@ -59,7 +59,7 @@ Deno.serve(async req => {
       return json({ ok: true, message: "Callback subscrito. Ligue o número Business de cada loja em Conversas." });
     }
     const submitted = body.credentials ?? {};
-    const previous = body.provider === "meta" ? await metaCredentials() : await readCredentials(scope, "stripe") ?? {};
+    const previous = body.provider === "meta" ? await metaCredentials() : await readCredentials(scope, body.provider!) ?? {};
     const values = { ...previous, ...Object.fromEntries(Object.entries(submitted).filter(([, value]) => value.trim() !== "")) };
     if (body.provider === "stripe") {
       if (!/^sk_(test|live)_\S+$/.test(values.secret_key ?? "")) return json({ error: "Chave Stripe inválida" }, 400);
@@ -67,8 +67,14 @@ Deno.serve(async req => {
       if (!check.ok) return json({ error: "O Stripe recusou a chave. Verifique a conta e as permissões.", status: check.status }, 400);
     } else if (body.provider === "meta") {
       if (!/^\d{5,30}$/.test(values.app_id ?? "") || !values.access_token || !values.app_secret || !values.verify_token) return json({ error: "Preencha ID da aplicação, token, segredo e código de verificação" }, 400);
+    } else if (body.provider === "social") {
+      if (!values.page_token || !(values.page_id || values.ig_user_id)) return json({ error: "Indique o token da Página e o ID da Página ou da conta Instagram" }, 400);
+      const check = await fetch(`https://graph.facebook.com/v21.0/me?access_token=${encodeURIComponent(values.page_token)}`);
+      if (!check.ok) return json({ error: "A Meta recusou o token da Página" }, 400);
+    } else if (body.provider === "marketing_email") {
+      if (!values.api_key || !/^[^@\s]+@[^@\s]+$/.test(values.from_email ?? "")) return json({ error: "Indique a chave e o email remetente" }, 400);
     } else return json({ error: "Fornecedor inválido" }, 400);
-    const safeValues = body.provider === "stripe" ? { secret_key: values.secret_key } : { app_id: values.app_id, access_token: values.access_token, app_secret: values.app_secret, verify_token: values.verify_token };
+    const safeValues = body.provider === "stripe" ? { secret_key: values.secret_key } : body.provider === "social" ? { page_id: values.page_id ?? "", ig_user_id: values.ig_user_id ?? "", page_token: values.page_token } : body.provider === "marketing_email" ? { api_key: values.api_key, from_email: values.from_email } : { app_id: values.app_id, access_token: values.access_token, app_secret: values.app_secret, verify_token: values.verify_token };
     const ciphertext = await encryptCredentials(safeValues, scope, body.provider);
     const { error } = await serviceDb().from("integration_credentials").upsert({ scope_key: scope, company_id: company ?? null, provider: body.provider, ciphertext, updated_at: new Date().toISOString() }, { onConflict: "scope_key,provider" });
     if (error) return json({ error: "Não foi possível guardar a ligação" }, 500);

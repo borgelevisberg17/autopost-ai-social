@@ -347,6 +347,176 @@ export type Database = {
           },
         ]
       }
+      campaign_deliveries: {
+        Row: {
+          company_id: string
+          created_at: string
+          error: string | null
+          external_id: string | null
+          id: string
+          recipient: string
+          status: string
+          step_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          error?: string | null
+          external_id?: string | null
+          id?: string
+          recipient: string
+          status?: string
+          step_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          error?: string | null
+          external_id?: string | null
+          id?: string
+          recipient?: string
+          status?: string
+          step_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_deliveries_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaign_deliveries_step_id_fkey"
+            columns: ["step_id"]
+            isOneToOne: false
+            referencedRelation: "campaign_steps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      campaign_steps: {
+        Row: {
+          approved: boolean
+          campaign_id: string
+          channel: string
+          company_id: string
+          content: string | null
+          created_at: string
+          delay_minutes: number
+          due_at: string | null
+          end_hour: number
+          id: string
+          position: number
+          processed_at: string | null
+          requires_approval: boolean
+          result: Json | null
+          start_hour: number
+          status: string
+        }
+        Insert: {
+          approved?: boolean
+          campaign_id: string
+          channel: string
+          company_id: string
+          content?: string | null
+          created_at?: string
+          delay_minutes?: number
+          due_at?: string | null
+          end_hour?: number
+          id?: string
+          position?: number
+          processed_at?: string | null
+          requires_approval?: boolean
+          result?: Json | null
+          start_hour?: number
+          status?: string
+        }
+        Update: {
+          approved?: boolean
+          campaign_id?: string
+          channel?: string
+          company_id?: string
+          content?: string | null
+          created_at?: string
+          delay_minutes?: number
+          due_at?: string | null
+          end_hour?: number
+          id?: string
+          position?: number
+          processed_at?: string | null
+          requires_approval?: boolean
+          result?: Json | null
+          start_hour?: number
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_steps_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaign_steps_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      campaigns: {
+        Row: {
+          auto_products: boolean
+          company_id: string
+          created_at: string
+          created_by: string | null
+          goal: string | null
+          id: string
+          name: string
+          product_ids: string[]
+          starts_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          auto_products?: boolean
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          goal?: string | null
+          id?: string
+          name: string
+          product_ids?: string[]
+          starts_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          auto_products?: boolean
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          goal?: string | null
+          id?: string
+          name?: string
+          product_ids?: string[]
+          starts_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaigns_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       companies: {
         Row: {
           created_at: string
@@ -909,6 +1079,50 @@ export type Database = {
             columns: ["conversation_id"]
             isOneToOne: false
             referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      newsletter_subscribers: {
+        Row: {
+          company_id: string
+          consent_at: string
+          created_at: string
+          email: string
+          id: string
+          name: string | null
+          status: string
+          unsubscribe_token: string
+          unsubscribed_at: string | null
+        }
+        Insert: {
+          company_id: string
+          consent_at?: string
+          created_at?: string
+          email: string
+          id?: string
+          name?: string | null
+          status?: string
+          unsubscribe_token?: string
+          unsubscribed_at?: string | null
+        }
+        Update: {
+          company_id?: string
+          consent_at?: string
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string | null
+          status?: string
+          unsubscribe_token?: string
+          unsubscribed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "newsletter_subscribers_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
             referencedColumns: ["id"]
           },
         ]
@@ -1749,6 +1963,11 @@ export type Database = {
         Args: { _company: string; _user: string }
         Returns: boolean
       }
+      newsletter_subscribe: {
+        Args: { _email: string; _name: string; _slug: string }
+        Returns: boolean
+      }
+      newsletter_unsubscribe: { Args: { _token: string }; Returns: boolean }
       place_order: {
         Args: {
           _company_slug: string

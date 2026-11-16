@@ -131,7 +131,7 @@ function LusionChapterDock() {
   useEffect(() => {
     const handleScroll = () => {
       const viewportMiddle = window.scrollY + window.innerHeight * 0.38;
-      let current = CHAPTERS[0].id;
+      let current: string = CHAPTERS[0].id;
       for (const ch of CHAPTERS) {
         const el = document.getElementById(ch.id);
         if (el) {

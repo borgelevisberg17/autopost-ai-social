@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/admin/PageHeader";
 import { EmptyState, ErrorState, LoadingState } from "@/components/ui/data-state";
 import { useCompany } from "@/hooks/useCompany";
 import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
 
 type Profile = {
   user_id: string;

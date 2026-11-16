@@ -508,8 +508,6 @@ export default function Store() {
         quantity: item.quantity,
         unit_price: item.product.price,
         image: item.product.images?.[0],
-        size: item.size,
-        color: item.color,
       })),
     );
     closeCart();

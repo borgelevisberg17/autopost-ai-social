@@ -56,7 +56,7 @@ type CatalogProduct = {
 };
 
 type Company = {
-  id?: string;
+  id: string;
   name: string;
   slug: string;
   currency?: string;
