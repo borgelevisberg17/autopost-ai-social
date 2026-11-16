@@ -37,6 +37,7 @@ import { WaterWakeHero } from "@/components/site/WaterWakeHero";
 import { LusionCursor } from "@/components/lusion/LusionCursor";
 import { useInertiaScroll } from "@/components/lusion/useInertiaScroll";
 import { lusionSound } from "@/components/lusion/LusionAudio";
+import { TactileGrain } from "@/components/lusion/TactileGrain";
 
 function playTactileFeedback() {
   lusionSound.playClick();
@@ -254,7 +255,7 @@ function SectionBridge({
           }`}
         >
           <span>Continuar a explorar</span>
-          <ArrowDown className="h-3 w-3 text-emerald-500 animate-bounce" />
+          <ArrowDown className="h-3 w-3 text-slate-400 group-hover:text-emerald-500 transition-transform group-hover:translate-y-0.5" />
         </button>
       </div>
     </div>
@@ -406,7 +407,7 @@ function DataStreamRibbon() {
   });
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden opacity-30 select-none">
+    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden opacity-20 select-none">
       <svg
         className="w-full h-full"
         viewBox="0 0 1440 3200"
@@ -415,14 +416,14 @@ function DataStreamRibbon() {
       >
         <path
           d="M 720 0 C 880 400, 1150 700, 720 1100 C 350 1500, 1050 1900, 720 2300 C 450 2700, 850 3000, 720 3200"
-          stroke="rgba(16, 185, 129, 0.16)"
-          strokeWidth="1.5"
-          strokeDasharray="6 8"
+          stroke="rgba(16, 185, 129, 0.12)"
+          strokeWidth="1"
+          strokeDasharray="4 6"
         />
         <motion.path
           d="M 720 0 C 880 400, 1150 700, 720 1100 C 350 1500, 1050 1900, 720 2300 C 450 2700, 850 3000, 720 3200"
           stroke="url(#ribbon-gradient)"
-          strokeWidth="2.5"
+          strokeWidth="1.75"
           strokeLinecap="round"
           style={{ pathLength }}
         />
@@ -450,10 +451,14 @@ type EyebrowProps = { children: ReactNode; light?: boolean };
 function Eyebrow({ children, light = false }: EyebrowProps) {
   return (
     <div
-      className={`mb-5 inline-flex items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] ${light ? "text-emerald-400" : "text-emerald-700"}`}
+      className={`mb-5 inline-flex items-center gap-2 rounded-full border px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] ${
+        light
+          ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-400"
+          : "border-slate-200/90 bg-white/80 text-slate-700 shadow-[0_1px_2px_rgba(0,0,0,0.02)]"
+      }`}
     >
       <span
-        className={`h-1.5 w-1.5 rounded-full ${light ? "bg-emerald-400" : "bg-emerald-600"}`}
+        className={`h-1.5 w-1.5 rounded-full ${light ? "bg-emerald-400" : "bg-emerald-500"}`}
       />
       {children}
     </div>
@@ -1674,21 +1679,21 @@ function InteractiveHeroPrompt() {
 
   return (
     <div className="relative mx-auto mt-12 max-w-4xl px-2 sm:px-0">
-      <div className="overflow-hidden rounded-3xl border border-slate-200/90 bg-white/95 shadow-[0_28px_80px_rgba(15,23,42,0.12)] backdrop-blur-2xl transition duration-300 hover:shadow-[0_36px_100px_rgba(15,23,42,0.16)]">
+      <div className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white/95 shadow-[0_25px_65px_-15px_rgba(15,23,42,0.08),0_1px_3px_rgba(0,0,0,0.03)] ring-1 ring-slate-900/5 backdrop-blur-2xl transition duration-300 hover:shadow-[0_32px_80px_-15px_rgba(15,23,42,0.12)]">
         {/* Top Control Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 bg-slate-50/70 px-5 py-3 sm:px-6">
-          <div className="flex items-center gap-2.5">
-            <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-700">
-              Vendora Commerce AI
-            </span>
-            <span className="rounded-full bg-emerald-100 px-2 py-0.5 font-mono text-[9px] font-medium text-emerald-800">
-              Catálogo sincronizado
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 bg-slate-50/50 px-5 py-3 sm:px-6">
+          <div className="flex items-center gap-2">
+            <span className="h-2.5 w-2.5 rounded-full bg-slate-200" />
+            <span className="h-2.5 w-2.5 rounded-full bg-slate-200" />
+            <span className="h-2.5 w-2.5 rounded-full bg-slate-200" />
+            <span className="ml-3 font-mono text-[11px] font-medium text-slate-600 uppercase tracking-wider">
+              Terminal Operacional · Simulação em Tempo Real
             </span>
           </div>
-          <div className="flex items-center gap-2 font-mono text-[10px] text-slate-500">
-            <Bot className="h-3.5 w-3.5 text-slate-400" />
-            <span>Vendora OS v2.4</span>
+          <div className="flex items-center gap-2 font-mono text-[10px] text-slate-400">
+            <span>Latência: 42ms</span>
+            <span className="text-slate-300">/</span>
+            <span className="text-emerald-600 font-medium">● Conectado</span>
           </div>
         </div>
 
@@ -2126,42 +2131,42 @@ function HeroSection({
             style={{ y: headlineY }}
             className="mx-auto max-w-4xl text-center"
           >
-            <div className="pointer-events-auto mb-6 inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/85 px-4 py-1.5 shadow-sm backdrop-blur-md">
-              <Sparkles className="h-3.5 w-3.5 text-emerald-600" />
-              <span className="text-xs font-semibold text-slate-800 tracking-wide">
-                Commerce OS com Inteligência Artificial
+            <div className="pointer-events-auto mb-8 inline-flex items-center gap-2.5 rounded-full border border-slate-200/80 bg-white/90 px-4 py-1.5 shadow-[0_1px_3px_rgba(0,0,0,0.03)] backdrop-blur-md">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              <span className="font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-slate-700">
+                Operating System para Comércio
               </span>
-              <span className="flex h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-slate-300">·</span>
+              <span className="font-mono text-[10px] text-slate-400">Multi-Canal & IA</span>
             </div>
 
-            <h1 className="text-balance text-[clamp(2.5rem,7.5vw,5.6rem)] font-bold tracking-tight text-slate-950 leading-[0.98] sm:leading-[0.96]">
-              Vender com IA –
+            <h1 className="text-balance text-[clamp(2.75rem,7.5vw,5.75rem)] font-bold tracking-[-0.045em] text-slate-950 leading-[0.96] sm:leading-[0.93]">
+              Vender com inteligência.
               <br />
-              <span className="text-slate-900">
-                o{" "}
-                <span className="font-serif italic font-normal text-slate-800 tracking-tight">
-                  futuro
-                </span>{" "}
-                do comércio
+              <span className="text-slate-900 font-medium">
+                Operar com{" "}
+                <span className="font-serif italic font-normal text-slate-800">
+                  precisão absoluta.
+                </span>
               </span>
             </h1>
 
-            <p className="mx-auto mt-6 max-w-2xl text-base sm:text-lg leading-relaxed text-slate-600">
-              A plataforma inteligente que unifica o seu site, WhatsApp,
-              Instagram e Facebook. Opere catálogo, pedidos e atendimento com
-              agentes de IA conscientes de estoque em tempo real.
+            <p className="mx-auto mt-7 max-w-2xl text-base sm:text-lg leading-relaxed text-slate-600 font-normal">
+              A infraestrutura transacional que unifica o seu site, WhatsApp,
+              Instagram e catálogo em tempo real. Cada conversa fecha vendas com
+              estoque verificado e rastreabilidade total.
             </p>
 
-            <div className="pointer-events-auto mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5">
+            <div className="pointer-events-auto mt-9 flex flex-col sm:flex-row items-center justify-center gap-3.5">
               <button
                 type="button"
                 onClick={() => {
                   playTactileFeedback();
                   onStart();
                 }}
-                className="inline-flex h-12 w-full sm:w-auto items-center justify-center gap-2.5 rounded-full bg-slate-950 px-7 text-sm font-semibold text-white shadow-lg shadow-slate-950/15 transition-all hover:bg-slate-800 hover:scale-[1.02] active:scale-[0.98]"
+                className="inline-flex h-12 w-full sm:w-auto items-center justify-center gap-2.5 rounded-full bg-slate-950 px-8 text-sm font-semibold text-white shadow-[0_10px_25px_rgba(15,23,42,0.18)] transition-all hover:bg-slate-800 active:scale-[0.98]"
               >
-                Começar Gratuitamente
+                Iniciar Demonstração
                 <ArrowRight className="h-4 w-4" />
               </button>
               <button
@@ -2170,26 +2175,19 @@ function HeroSection({
                   playTactileFeedback();
                   smoothScrollToElement("whatsapp");
                 }}
-                className="inline-flex h-12 w-full sm:w-auto items-center justify-center gap-2 rounded-full border border-slate-300/80 bg-white/85 px-6 text-sm font-semibold text-slate-700 shadow-sm backdrop-blur-md transition-all hover:bg-white hover:text-slate-900 hover:border-slate-400"
+                className="inline-flex h-12 w-full sm:w-auto items-center justify-center gap-2 rounded-full border border-slate-300/80 bg-white/90 px-7 text-sm font-semibold text-slate-800 shadow-[0_1px_3px_rgba(0,0,0,0.04)] backdrop-blur-md transition-all hover:bg-white hover:text-slate-950 hover:border-slate-400 active:scale-[0.98]"
               >
-                <Play className="h-3.5 w-3.5 fill-current text-slate-500" />
-                Ver Demonstração
+                <Play className="h-3.5 w-3.5 fill-current text-slate-600" />
+                Ver em Ação
               </button>
             </div>
 
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-slate-500 font-medium">
-              <span className="flex items-center gap-1.5">
-                <Check className="h-3.5 w-3.5 text-emerald-600" /> Sem cartão de
-                crédito
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Check className="h-3.5 w-3.5 text-emerald-600" /> Configuração
-                em 2 min
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Check className="h-3.5 w-3.5 text-emerald-600" /> Conexão
-                oficial WhatsApp
-              </span>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-mono text-[11px] text-slate-500 uppercase tracking-wider">
+              <span>● WhatsApp Cloud API Nativa</span>
+              <span className="text-slate-300">/</span>
+              <span>● Estoque Atômico RLS</span>
+              <span className="text-slate-300">/</span>
+              <span>● Auditoria Completa</span>
             </div>
           </motion.div>
 
@@ -2209,14 +2207,13 @@ function HeroSection({
             data-cursor="EXPLORAR OS"
             className="pointer-events-auto mt-20"
           >
-            <div className="mb-6 flex flex-col items-center justify-center text-center">
-              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3.5 py-1 mb-2 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-800">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                Visão Unificada da Operação
+            <div className="mb-8 flex flex-col items-center justify-center text-center">
+              <div className="inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/90 px-3.5 py-1 mb-2.5 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-slate-700 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                Plataforma em Tempo Real · Visão Unificada
               </div>
-              <p className="mt-1 text-xs text-slate-600">
-                Tudo o que sua equipe precisa para acompanhar pedidos, canais e
-                receita em um só lugar.
+              <p className="mt-1 max-w-lg text-sm text-slate-500 font-normal">
+                Acompanhe pedidos, estoque compartilhado e conversas em uma única interface transacional.
               </p>
             </div>
             <ProductFrame />
@@ -2534,6 +2531,7 @@ export default function Index() {
 
   return (
     <div className="landing-page min-h-screen overflow-x-hidden bg-slate-50/50 text-slate-900 selection:bg-emerald-500/20 selection:text-emerald-950 relative">
+      <TactileGrain />
       <LusionCursor />
       <ScrollProgressBar />
       {/* Guia de fluxo e fita de dados conectiva contínua (estilo Lusion) */}

@@ -94,28 +94,30 @@ const FRAGMENT_SHADER = `
     float trough = smoothstep(0.0012, 0.028, max(-height, 0.0));
     float softBody = smoothstep(0.006, 0.14, mist);
 
-    vec3 baseColor = vec3(0.10, 0.66, 0.60);
-    vec3 deepTrough = vec3(0.04, 0.24, 0.40);
-    vec3 crestColor = vec3(0.62, 0.96, 0.92);
-    vec3 specularColor = vec3(0.99, 1.0, 1.0);
+    // Optical crystalline liquid with subtle chromatic refraction
+    vec3 baseColor = vec3(0.12, 0.68, 0.60);
+    vec3 prismRim = vec3(0.45, 0.40, 0.82); // Chromatic prism refraction on Fresnel rim
+    vec3 deepTrough = vec3(0.06, 0.24, 0.32);
+    vec3 crestColor = vec3(0.88, 0.98, 0.96); // Crystalline highlight
+    vec3 specularColor = vec3(1.0, 1.0, 1.0);
 
-    vec3 finalColor = baseColor;
-    finalColor = mix(finalColor, deepTrough, trough * 0.74);
-    finalColor = mix(finalColor, crestColor, crest * 0.80);
+    vec3 finalColor = mix(baseColor, prismRim, fresnel * 0.65);
+    finalColor = mix(finalColor, deepTrough, trough * 0.55);
+    finalColor = mix(finalColor, crestColor, crest * 0.70);
     finalColor = mix(
       finalColor,
       specularColor,
-      clamp(specKey * 2.1 + specRim * 1.15, 0.0, 0.95)
+      clamp(specKey * 2.4 + specRim * 1.3, 0.0, 0.98)
     );
 
     float alpha = clamp(
-      softBody * 0.20 +
-      trough * 0.34 +
-      crest * 0.38 +
-      (specKey + specRim) * 0.52 +
-      fresnel * 0.22,
+      softBody * 0.12 +
+      trough * 0.20 +
+      crest * 0.26 +
+      (specKey + specRim) * 0.46 +
+      fresnel * 0.16,
       0.0,
-      0.64
+      0.46
     );
 
     // Fade suave a zero para nunca deixar resíduos quando a onda termina
