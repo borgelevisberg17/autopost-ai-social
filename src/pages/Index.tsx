@@ -88,6 +88,55 @@ function smoothScrollToElement(targetId: string) {
   window.requestAnimationFrame(step);
 }
 
+import React, { useEffect, useState, useRef, type ReactNode } from "react";
+import {
+  motion,
+  useScroll,
+  useSpring,
+  AnimatePresence,
+  useTransform,
+} from "framer-motion";
+import { ArrowDownRight, ArrowRight, ArrowUpRight, BarChart3, Bot, Check, CheckCircle2, ChevronLeft, ChevronRight, Circle, Globe2, Instagram, MessageCircle, MessageSquare, Package, Play, RefreshCw, Send, ShoppingBag, Sparkles, Users, WalletCards, X } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { PlansSection } from "@/components/site/PlansSection";
+import { SiteHeader } from "@/components/site/SiteHeader";
+import { SiteFooter } from "@/components/site/SiteFooter";
+import { WaterWakeHero } from "@/components/site/WaterWakeHero";
+
+// ----- NEW COMPONENTS ----------------------------------------------------
+function NavDrawer({open, setOpen}: {open: boolean; setOpen: (v:boolean)=>void}) {
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50"
+          onClick={() => setOpen(false)}
+        >
+          <motion.nav
+            initial={{ scale: 0.9 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0.9 }}
+            className="absolute top-4 left-4 w-64 bg-white rounded-xl shadow-xl p-5"
+            onClick={e => e.stopPropagation()}
+          >
+            <ul className="space-y-3">
+              <li><Link to="/" className="block text-lg font-medium hover:text-emerald-600">Home</Link></li>
+              <li><Link to="/about" className="block text-lg font-medium hover:text-emerald-600">About</Link></li>
+              <li><Link to="/projects" className="block text-lg font-medium hover:text-emerald-600">Projects</Link></li>
+              <li><Link to="/contact" className="block text-lg font-medium hover:text-emerald-600">Contact</Link></li>
+            </ul>
+          </motion.nav>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+// -----------------------------------------------------------------------
 function ScrollProgressBar() {
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
@@ -101,6 +150,228 @@ function ScrollProgressBar() {
       className="fixed top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-300 origin-left z-[70] pointer-events-none shadow-[0_0_12px_rgba(16,185,129,0.5)]"
       style={{ scaleX }}
     />
+  );
+}
+
+// -----------------------------------------------------------------------
+function SectionReveal({
+  children,
+  className = "",
+  delay = 0,
+  id,
+}: { children: ReactNode; className?: string; delay?: number; id?: string }) {
+  return (
+    <motion.div
+      id={id}
+      initial={{ opacity: 0, y: 36 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+// -----------------------------------------------------------------------
+function GridCross({ label, className = "" }: { label?: string; className?: string }) {
+  return (
+    <div className={`pointer-events-none select-none font-mono text-[10px] text-emerald-600/50 flex items-center gap-1.5 z-20 ${className}`}>
+      <span className="text-emerald-500 font-bold">+</span>
+      {label && (
+        <span className="text-[9px] uppercase tracking-wider text-slate-400 font-mono font-medium">{label}</span>
+      )}
+    </div>
+  );
+}
+
+// -----------------------------------------------------------------------
+function LusionTiltCard({ children, className = "" }: { children: ReactNode; className?: string }) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [rotateX, setRotateX] = useState(0);
+  const [rotateY, setRotateY] = useState(0);
+  const [glowPos, setGlowPos] = useState({ x: 50, y: 50 });
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rX = ((y - centerY) / centerY) * -6;
+    const rY = ((x - centerX) / centerX) * 6;
+    setRotateX(rX);
+    setRotateY(rY);
+    setGlowPos({ x: (x / rect.width) * 100, y: (y / rect.height) * 100 });
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    setRotateX(0);
+    setRotateY(0);
+  };
+
+  return (
+    <div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
+        transition: isHovered ? "transform 0.08s ease-out" : "transform 0.45s ease-out",
+      }}
+      className={`relative transition-all ${className}`}
+    >
+      {isHovered && (
+        <div
+          className="pointer-events-none absolute inset-0 rounded-[inherit] z-20"
+          style={{
+            background: `radial-gradient(450px circle at ${glowPos.x}% ${glowPos.y}%, rgba(16, 185, 129, 0.08), transparent 65%)`,
+          }}
+        />
+      )}
+      {children}
+    </div>
+  );
+}
+
+// -----------------------------------------------------------------------
+function playTactileFeedback() {
+  try {
+    const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(540, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(820, ctx.currentTime + 0.06);
+    gain.gain.setValueAtTime(0.035, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.06);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.06);
+  } catch {}
+}
+
+// -----------------------------------------------------------------------
+function DataStreamRibbon() {
+  const [pathLength, setPathLength] = useState(0);
+  useEffect(() => {
+    const length = document.querySelector('#ribbon-path')?.getTotalLength() || 0;
+    setPathLength(length);
+  }, []);
+  return (
+    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden opacity-25 select-none">
+      <svg className="w-full h-full" viewBox="0 0 1440 3200" fill="none" preserveAspectRatio="none">
+        <path
+          id="ribbon-path"
+          d="M 720 0 C 880 400, 1150 700, 720 1100 C 350 1500, 1050 1900, 720 2300 C 450 2700, 850 3000, 720 3200"
+          stroke="url(#ribbon-gradient)"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+        />
+        <defs>
+          <linearGradient id="ribbon-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#002BFF" stopOpacity="0.45" />
+            <stop offset="35%" stopColor="#0044FF" stopOpacity="0.65" />
+            <stop offset="70%" stopColor="#0066FF" stopOpacity="0.55" />
+            <stop offset="100%" stopColor="#002BFF" stopOpacity="0.45" />
+          </linearGradient>
+        </defs>
+        <motion.path
+          d="M 720 0 C 880 400, 1150 700, 720 1100 C 350 1500, 1050 1900, 720 2300 C 450 2700, 850 3000, 720 3200"
+          stroke="url(#ribbon-gradient)"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          style={{ pathLength, opacity: 0.7 }}
+          animate={{ pathLength: 1, opacity: [0.7, 1, 0.7] }}
+          transition={{ repeat: Infinity, duration: 8, ease: "linear" }}
+        />
+      </svg>
+    </div>
+  );
+}
+
+// -----------------------------------------------------------------------
+function HeroSection() {
+  const { scrollYProgress } = useScroll();
+  const rotate = useTransform(scrollYProgress, [0, 0.4], [0, -15]);
+  const scale = useTransform(scrollYProgress, [0, 0.4], [1, 0.85]);
+  const [navOpen, setNavOpen] = useState(false);
+
+  return (
+    <section className="relative h-screen overflow-hidden" style={{ perspective: "1200px" }}>
+      <NavDrawer open={navOpen} setOpen={setNavOpen} />
+      {/* Hamburger */}
+      <button
+        className="absolute top-4 left-4 z-30 text-emerald-600 hover:text-emerald-800"
+        onClick={() => setNavOpen(true)}
+        aria-label="Open navigation menu"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+
+      <motion.div
+        className="absolute inset-0 flex items-center justify-center"
+        style={{ rotate, scale }}
+      >
+        {/* Rounded container with grid crosses */}
+        <div className="relative w-[90%] max-w-4xl h-[80%] bg-white/5 backdrop-blur-lg rounded-3xl border border-emerald-600/30 p-8 overflow-hidden">
+          <GridCross label="Hero" className="absolute top-4 left-4" />
+          <GridCross label="Hero" className="absolute top-4 right-4" />
+          <GridCross label="Hero" className="absolute bottom-4 left-4" />
+          <GridCross label="Hero" className="absolute bottom-4 right-4" />
+          <WaterWakeHero />
+          <motion.h1
+            className="absolute inset-0 flex items-center justify-center text-5xl lg:text-7xl font-extrabold text-emerald-300 tracking-wider"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0, transition: { delay: 0.5 } }}
+          >
+            Vendora AI Sales Engine
+          </motion.h1>
+        </div>
+      </motion.div>
+      <div className="absolute bottom-8 inset-x-0 flex justify-center">
+        <motion.span
+          animate={{ y: [0, 10, 0] }}
+          transition={{ repeat: Infinity, duration: 1.5 }}
+          className="text-emerald-400 text-sm"
+        >
+          Scroll to explore →
+        </motion.span>
+      </div>
+    </section>
+  );
+}
+
+// -----------------------------------------------------------------------
+export default function IndexPage() {
+  return (
+    <>
+      <ScrollProgressBar />
+      <DataStreamRibbon />
+      <HeroSection />
+      {/* Section examples – you can duplicate and adapt */}
+      <SectionReveal id="features" className="py-20 bg-gray-50">
+        <div className="max-w-5xl mx-auto px-4 lg:px-0">
+          <h2 className="text-4xl font-bold text-center text-emerald-800 mb-8">Bold Ideas, Brought to Life</h2>
+          <p className="text-center text-lg text-gray-600 mb-12">
+            With AI‑powered insights, real‑time analytics, and hyper‑responsive UI, your sales pipeline becomes a living organism.
+          </p>
+          <LusionTiltCard className="rounded-2xl border border-slate-200/80 bg-white/95 p-6 shadow-sm hover:shadow-md">
+            <Metric label="Faturamento" value="48.290 $" note="↑ 12.8% vs período anterior" icon={WalletCards} />
+          </LusionTiltCard>
+        </div>
+      </SectionReveal>
+      {/* More sections can be added here following the same pattern */}
+      <SiteFooter />
+    </>
   );
 }
 
