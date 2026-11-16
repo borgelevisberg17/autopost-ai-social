@@ -106,6 +106,7 @@ export function PlansSection() {
             return (
               <article
                 key={plan.id}
+                data-cursor="ESCOLHER PLANO"
                 className={cn(
                   "relative flex flex-col justify-between rounded-3xl border bg-white p-7 transition shadow-xs hover:shadow-xl",
                   isPopular

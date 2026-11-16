@@ -3,6 +3,9 @@ import { ArrowRight, Menu, X } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { BrandMark } from "./BrandMark";
+import { LusionAudioToggle } from "@/components/lusion/LusionAudioToggle";
+import { lusionSound } from "@/components/lusion/LusionAudio";
+import { useTextScramble } from "@/components/lusion/useTextScramble";
 
 type SiteHeaderProps = {
   ctaHref: string;
@@ -16,6 +19,35 @@ const navItems = [
   { label: "Perguntas", href: "/#faq" },
   { label: "Planos", href: "/#plans", emphasis: true },
 ];
+
+function NavLinkItem({
+  item,
+  active,
+}: {
+  item: (typeof navItems)[number];
+  active: boolean;
+}) {
+  const { displayText, scramble } = useTextScramble(item.label);
+
+  return (
+    <Link
+      to={item.href}
+      aria-current={active ? "page" : undefined}
+      onMouseEnter={() => {
+        scramble();
+        lusionSound.playHover();
+      }}
+      onClick={() => lusionSound.playClick()}
+      className={`relative whitespace-nowrap py-2 text-[14px] font-medium transition hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-4 ${
+        active || item.emphasis
+          ? "font-semibold text-slate-900"
+          : "text-slate-600"
+      } ${active ? "after:absolute after:inset-x-0 after:-bottom-[10px] after:h-0.5 after:bg-slate-900" : ""}`}
+    >
+      {displayText}
+    </Link>
+  );
+}
 
 export function SiteHeader({ ctaHref, onCtaClick }: SiteHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -64,26 +96,19 @@ export function SiteHeader({ ctaHref, onCtaClick }: SiteHeaderProps) {
           aria-label="Navegação principal"
           className="hidden items-center gap-6 lg:flex 2xl:gap-8"
         >
-          {navItems.map((item) => {
-            const active = isActive(item.href);
-            return (
-              <Link
-                key={item.href}
-                to={item.href}
-                aria-current={active ? "page" : undefined}
-                className={`relative whitespace-nowrap py-2 text-[14px] font-medium transition hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-4 ${
-                  active || item.emphasis
-                    ? "font-semibold text-slate-900"
-                    : "text-slate-600"
-                } ${active ? "after:absolute after:inset-x-0 after:-bottom-[10px] after:h-0.5 after:bg-slate-900" : ""}`}
-              >
-                {item.label}
-              </Link>
-            );
-          })}
+          {navItems.map((item) => (
+            <NavLinkItem
+              key={item.href}
+              item={item}
+              active={isActive(item.href)}
+            />
+          ))}
         </nav>
 
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          <div className="hidden sm:block">
+            <LusionAudioToggle />
+          </div>
           {authLoading ? (
             <div aria-hidden="true" className="flex items-center gap-2">
               <span className="hidden h-10 w-14 animate-pulse rounded-full bg-slate-100 sm:block" />

@@ -34,8 +34,12 @@ import { PlansSection } from "@/components/site/PlansSection";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { WaterWakeHero } from "@/components/site/WaterWakeHero";
+import { LusionCursor } from "@/components/lusion/LusionCursor";
+import { useInertiaScroll } from "@/components/lusion/useInertiaScroll";
+import { lusionSound } from "@/components/lusion/LusionAudio";
 
 function playTactileFeedback() {
+  lusionSound.playClick();
   try {
     const AudioCtx =
       window.AudioContext ||
@@ -325,9 +329,11 @@ function GridCross({
 function LusionTiltCard({
   children,
   className = "",
+  cursorText = "INTERAGIR",
 }: {
   children: ReactNode;
   className?: string;
+  cursorText?: string;
 }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [rotateX, setRotateX] = useState(0);
@@ -349,6 +355,11 @@ function LusionTiltCard({
     setGlowPos({ x: (x / rect.width) * 100, y: (y / rect.height) * 100 });
   };
 
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+    lusionSound.playHover();
+  };
+
   const handleMouseLeave = () => {
     setIsHovered(false);
     setRotateX(0);
@@ -358,8 +369,9 @@ function LusionTiltCard({
   return (
     <div
       ref={cardRef}
+      data-cursor={cursorText}
       onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
+      onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       style={{
         transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
@@ -2182,7 +2194,7 @@ function HeroSection({
           </motion.div>
 
           {/* Prompt Interativo */}
-          <motion.div style={{ y: promptY }} className="pointer-events-auto">
+          <motion.div style={{ y: promptY }} className="pointer-events-auto" data-cursor="TESTAR IA">
             <InteractiveHeroPrompt />
           </motion.div>
 
@@ -2194,6 +2206,7 @@ function HeroSection({
               y: productY,
               transformPerspective: 1200,
             }}
+            data-cursor="EXPLORAR OS"
             className="pointer-events-auto mt-20"
           >
             <div className="mb-6 flex flex-col items-center justify-center text-center">
@@ -2515,8 +2528,13 @@ export default function Index() {
   const { user } = useAuth();
   const startPath = user ? "/dashboard" : "/signup";
   const [onboardingOpen, setOnboardingOpen] = useState(false);
+
+  // Lusion-grade smooth inertia scroll
+  useInertiaScroll();
+
   return (
     <div className="landing-page min-h-screen overflow-x-hidden bg-slate-50/50 text-slate-900 selection:bg-emerald-500/20 selection:text-emerald-950 relative">
+      <LusionCursor />
       <ScrollProgressBar />
       {/* Guia de fluxo e fita de dados conectiva contínua (estilo Lusion) */}
       <DataStreamRibbon />
@@ -2575,7 +2593,9 @@ export default function Index() {
                   </div>
                 </div>
               </div>
-              <WhatsAppFlow />
+              <div data-cursor="SIMULAR PEDIDO">
+                <WhatsAppFlow />
+              </div>
             </div>
           </section>
           <SectionBridge nextId="channels" label="03 // Publicação Multi-Canal" />
