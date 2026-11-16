@@ -2518,7 +2518,6 @@ export default function Index() {
   return (
     <div className="landing-page min-h-screen overflow-x-hidden bg-slate-50/50 text-slate-900 selection:bg-emerald-500/20 selection:text-emerald-950 relative">
       <ScrollProgressBar />
-      <LusionChapterDock />
       {/* Guia de fluxo e fita de dados conectiva contínua (estilo Lusion) */}
       <DataStreamRibbon />
       <SiteHeader

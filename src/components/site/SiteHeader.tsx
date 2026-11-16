@@ -10,11 +10,11 @@ type SiteHeaderProps = {
 };
 
 const navItems = [
-  { label: "Product", href: "/#channels" },
-  { label: "Proof", href: "/#proof" },
-  { label: "How it works", href: "/#process" },
-  { label: "FAQ", href: "/#faq" },
-  { label: "Plans", href: "/#plans", emphasis: true },
+  { label: "Produto", href: "/#channels" },
+  { label: "Resultados", href: "/#proof" },
+  { label: "Como funciona", href: "/#process" },
+  { label: "Perguntas", href: "/#faq" },
+  { label: "Planos", href: "/#plans", emphasis: true },
 ];
 
 export function SiteHeader({ ctaHref, onCtaClick }: SiteHeaderProps) {
