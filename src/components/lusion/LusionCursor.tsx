@@ -2,6 +2,50 @@ import { useEffect, useState } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 
 export function LusionCursor() {
+  // Custom ecommerce cursor: a shopping bag SVG with subtle glow
+  const cursorSvg = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23fff'%3E%3Cpath d='M6 2a2 2 0 0 0-2 2v2h1V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v2h1V4a2 2 0 0 0-2-2H6zM4 8v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8H4zm5 5h6v5H9v-5z'/%3E%3C/svg%3E`;
+  const [enabled, setEnabled] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
+  const mouseX = useMotionValue(-100);
+  const mouseY = useMotionValue(-100);
+  const springConfig = { damping: 28, stiffness: 350, mass: 0.5 };
+  const smoothX = useSpring(mouseX, springConfig);
+  const smoothY = useSpring(mouseY, springConfig);
+
+  useEffect(() => {
+    const isFinePointer = window.matchMedia('(pointer: fine)').matches;
+    if (!isFinePointer) return;
+    setEnabled(true);
+    const onMouseMove = (e: MouseEvent) => {
+      mouseX.set(e.clientX);
+      mouseY.set(e.clientY);
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      const isClickable = target.closest('a, button, [role="button"], input, textarea');
+      setIsHovering(!!isClickable);
+    };
+    window.addEventListener('mousemove', onMouseMove, { passive: true });
+    return () => window.removeEventListener('mousemove', onMouseMove);
+  }, [mouseX, mouseY]);
+
+  if (!enabled) return null;
+
+  return (
+    <motion.div
+      className="pointer-events-none fixed top-0 left-0 z-[100] -translate-x-1/2 -translate-y-1/2"
+      style={{ x: smoothX, y: smoothY }}
+    >
+      <motion.div
+        animate={{ scale: isHovering ? 1.4 : 1, opacity: 1 }}
+        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+        className="flex items-center justify-center"
+      >
+        <img src={cursorSvg} alt="cursor" className="w-8 h-8" />
+      </motion.div>
+    </motion.div>
+  );
+}
+
   const [enabled, setEnabled] = useState(false);
   const [cursorText, setCursorText] = useState<string | null>(null);
   const [isHovering, setIsHovering] = useState(false);

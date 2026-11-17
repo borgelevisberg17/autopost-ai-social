@@ -34,7 +34,7 @@ import { PlansSection } from "@/components/site/PlansSection";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { WaterWakeHero } from "@/components/site/WaterWakeHero";
-import { LusionCursor } from "@/components/lusion/LusionCursor";
+import { EcommerceCursor } from "@/components/lusion/LusionCursor";
 import { useInertiaScroll } from "@/components/lusion/useInertiaScroll";
 import { lusionSound } from "@/components/lusion/LusionAudio";
 import { TactileGrain } from "@/components/lusion/TactileGrain";
