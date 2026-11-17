@@ -38,6 +38,7 @@ import { rememberOrder, saveOrderItems } from "@/lib/myOrders";
 import { MyOrders } from "@/components/store/MyOrders";
 import { StoreFooter } from "@/components/store/StoreFooter";
 import { StoreFAQ } from "@/components/store/StoreFAQ";
+import { NewsletterSignup } from "@/components/store/NewsletterSignup";
 
 type Company = {
   id: string;
@@ -1610,6 +1611,7 @@ export default function Store() {
       </AnimatePresence>
 
       {/* FOOTER */}
+      <section className="mx-auto max-w-xl px-4 py-10 space-y-3"><h2 className="text-lg font-semibold">Receba novidades e promoções</h2><NewsletterSignup slug={company.slug} /></section>
 
       <StoreFooter
         company={company}

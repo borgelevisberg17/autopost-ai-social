@@ -1,5 +1,8 @@
 # Roadmap
 
+- [x] Campanhas com pipeline por canal, contactos WhatsApp guardados como clientes, newsletter com cancelamento
+- [ ] Envio de email marketing — precisa de um serviço próprio de email marketing (o email da app só permite emails individuais)
+- [ ] Envio WhatsApp a contactos com mais de 24h — precisa de modelo de mensagem aprovado pela Meta
 - [ ] Autorizar grupos específicos por empresa, respostas por chamada e marketing agendado — aguarda decisão entre grupos oficiais Meta (OBA, até 8 participantes) e exigência dos grupos comuns existentes, sem acesso pela API oficial
 
 - [x] Reconciliar e aplicar alterações pendentes sem alterar o formato dos pedidos

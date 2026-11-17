@@ -38,10 +38,12 @@ const Content = lazy(() => import("./pages/admin/Content"));
 const Automations = lazy(() => import("./pages/admin/Automations"));
 const Payments = lazy(() => import("./pages/admin/Payments"));
 const Conversations = lazy(() => import("./pages/admin/Conversations"));
+const Campaigns = lazy(() => import("./pages/admin/Campaigns"));
 const Platform = lazy(() => import("./pages/admin/Platform"));
 const Store = lazy(() => import("./pages/store/Store"));
 const ProductDetail = lazy(() => import("./pages/store/ProductDetail"));
 const OrderStatus = lazy(() => import("./pages/store/OrderStatus"));
+const Unsubscribe = lazy(() => import("./pages/store/Unsubscribe"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const LazyCookieBanner = lazy(() =>
   import("@/components/CookieBanner").then(({ CookieBanner }) => ({
@@ -106,6 +108,7 @@ const App = () => (
                 <Route path="/reset-password" element={<ResetPassword />} />
 
                 {/* Public Store */}
+                <Route path="/newsletter/cancelar" element={<Unsubscribe />} />
                 <Route path="/loja/:slug" element={<Store />} />
                 <Route path="/loja/:slug/produto/:productId" element={<ProductDetail />} />
                 <Route path="/loja/:slug/pedido/:id" element={<OrderStatus />} />
@@ -164,6 +167,14 @@ const App = () => (
                   element={
                     <P>
                       <PlanRoute><Agents /></PlanRoute>
+                    </P>
+                  }
+                />
+                <Route
+                  path="/admin/campanhas"
+                  element={
+                    <P>
+                      <PlanRoute><Campaigns /></PlanRoute>
                     </P>
                   }
                 />

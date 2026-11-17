@@ -127,6 +127,11 @@ const navSections = [
         label: "Conteúdo",
       },
       {
+        to: "/admin/campanhas",
+        icon: Megaphone,
+        label: "Campanhas",
+      },
+      {
         to: "/admin/automacoes",
         icon: ListChecks,
         label: "Automações",

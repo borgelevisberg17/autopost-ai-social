@@ -1,6 +1,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { z } from "npm:zod@3";
 import { metaCredentials, readCredentials, serviceDb } from "../_shared/credentials.ts";
+import { authenticateCronRequest } from "../_shared/cron-auth.ts";
 import { buildStepContent, channelFeature, stepWindowOpen } from "../_shared/campaign-rules.ts";
 
 const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version" };
@@ -111,8 +112,7 @@ Deno.serve(async (req) => {
     const body = parsed.data;
     const svc = serviceDb();
     const auth = req.headers.get("Authorization") ?? "";
-    const cronSecret = Deno.env.get("LOVABLE_CRON_SECRET");
-    if (body.action === "run_due" && cronSecret && auth === `Bearer ${cronSecret}`) return json({ processed: await runDue(svc) });
+    if (body.action === "run_due") { const fail = authenticateCronRequest(req); if (fail) return fail; return json({ processed: await runDue(svc) }); }
     const user = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!, { global: { headers: { Authorization: auth } } });
     const { data: { user: u } } = await user.auth.getUser();
     if (!u) return json({ error: "Inicie sessão" }, 401);

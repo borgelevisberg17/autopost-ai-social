@@ -7,6 +7,7 @@ export function routeAllowed(path: string, access: PlanAccess | null): boolean {
     "/admin/conteudo": ["marketing"],
     "/admin/aprovacoes": ["marketing"],
     "/admin/automacoes": ["marketing"],
+    "/admin/campanhas": ["marketing"],
   };
   const features = required[path];
   return !features || !!access && access.company_status === "active" && features.some(f => access.features.includes(f));
