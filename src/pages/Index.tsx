@@ -34,7 +34,7 @@ import { PlansSection } from "@/components/site/PlansSection";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { WaterWakeHero } from "@/components/site/WaterWakeHero";
-import { EcommerceCursor } from "@/components/lusion/LusionCursor";
+import { LusionCursor } from "@/components/lusion/LusionCursor";
 import { useInertiaScroll } from "@/components/lusion/useInertiaScroll";
 import { lusionSound } from "@/components/lusion/LusionAudio";
 import { TactileGrain } from "@/components/lusion/TactileGrain";
@@ -2160,22 +2160,24 @@ function HeroSection({
             <div className="pointer-events-auto mt-9 flex flex-col sm:flex-row items-center justify-center gap-3.5">
               <button
                 type="button"
+                data-cursor="COMEÇAR AGORA"
                 onClick={() => {
                   playTactileFeedback();
                   onStart();
                 }}
-                className="inline-flex h-12 w-full sm:w-auto items-center justify-center gap-2.5 rounded-full bg-slate-950 px-8 text-sm font-semibold text-white shadow-[0_10px_25px_rgba(15,23,42,0.18)] transition-all hover:bg-slate-800 active:scale-[0.98]"
+                className="inline-flex h-12 w-full sm:w-auto items-center justify-center gap-2.5 rounded-full bg-slate-950 px-8 text-sm font-semibold text-white shadow-[0_10px_25px_rgba(15,23,42,0.18)] transition-all hover:bg-slate-800 hover:scale-[1.04] active:scale-[0.98]"
               >
-                Iniciar Demonstração
+                Começar Gratuitamente
                 <ArrowRight className="h-4 w-4" />
               </button>
               <button
                 type="button"
+                data-cursor="VER DEMO"
                 onClick={() => {
                   playTactileFeedback();
                   smoothScrollToElement("whatsapp");
                 }}
-                className="inline-flex h-12 w-full sm:w-auto items-center justify-center gap-2 rounded-full border border-slate-300/80 bg-white/90 px-7 text-sm font-semibold text-slate-800 shadow-[0_1px_3px_rgba(0,0,0,0.04)] backdrop-blur-md transition-all hover:bg-white hover:text-slate-950 hover:border-slate-400 active:scale-[0.98]"
+                className="inline-flex h-12 w-full sm:w-auto items-center justify-center gap-2 rounded-full border border-slate-300/80 bg-white/90 px-7 text-sm font-semibold text-slate-800 shadow-[0_1px_3px_rgba(0,0,0,0.04)] backdrop-blur-md transition-all hover:bg-white hover:text-slate-950 hover:border-slate-400 hover:scale-[1.04] active:scale-[0.98]"
               >
                 <Play className="h-3.5 w-3.5 fill-current text-slate-600" />
                 Ver em Ação
@@ -2850,7 +2852,7 @@ export default function Index() {
 
         {/* Section 11: Final Call to Action */}
         <SectionReveal delay={0.04}>
-          <section className="relative overflow-hidden bg-slate-950 text-white py-24 sm:py-32">
+          <section className="relative overflow-hidden bg-slate-950 text-white py-24 sm:py-32" data-cursor="COMEÇAR">
             <div className="absolute inset-0 bg-gradient-to-tr from-emerald-950/40 via-slate-900/50 to-indigo-950/40" />
             <div className="relative mx-auto grid max-w-[1240px] gap-12 px-5 lg:grid-cols-[0.85fr_1.15fr] lg:items-center lg:px-8">
               <div>
@@ -2865,12 +2867,15 @@ export default function Index() {
                   intenções, fechar vendas no WhatsApp e manter seu estoque
                   perfeitamente alinhado.
                 </p>
-                <Link
-                  to={startPath}
-                  className="mt-9 inline-flex items-center gap-2 rounded-full bg-emerald-500 px-7 py-3.5 text-sm font-bold text-slate-950 shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-400 hover:scale-[1.02]"
-                >
-                  Começar Gratuitamente <ArrowRight className="h-4 w-4" />
-                </Link>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }} className="inline-block">
+                  <Link
+                    to={startPath}
+                    data-cursor="CRIAR CONTA"
+                    className="mt-9 inline-flex items-center gap-2 rounded-full bg-emerald-500 px-7 py-3.5 text-sm font-bold text-slate-950 shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-400"
+                  >
+                    Criar conta grátis <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </motion.div>
               </div>
               <div className="relative overflow-hidden rounded-3xl border border-white/15 bg-white/5 p-2.5 sm:p-3 shadow-2xl backdrop-blur-sm">
                 <img

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { ArrowRight, Check, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -104,12 +105,9 @@ export function PlansSection() {
                 : plan.monthly_price;
 
             return (
-              <motion.article whileHover={{ scale: 1.02 }} transition={{ type: "spring", stiffness: 300 }} key={plan.id} data-cursor="COMPRAR" className={cn(
-                  "relative flex flex-col justify-between rounded-3xl border bg-white p-7 transition shadow-xs hover:shadow-xl",
-                  isPopular
-                    ? "border-emerald-500/80 ring-2 ring-emerald-500/20 shadow-md lg:-translate-y-2"
-                    : "border-slate-200/80 hover:border-slate-300"
-                )}>
+              <motion.article
+                whileHover={{ scale: 1.02 }}
+                transition={{ type: "spring", stiffness: 300 }}
                 key={plan.id}
                 data-cursor="ESCOLHER PLANO"
                 className={cn(
@@ -184,7 +182,7 @@ export function PlansSection() {
                     </Link>
                   </Button>
                 </div>
-              </article>
+              </motion.article>
             );
           })}
         </div>
