@@ -103,14 +103,62 @@ function ChannelStory() {
 
 function AgentStory() {
  const [active,setActive]=useState(0);
- const agents=[{name:"Marketing",role:"Criação e publicação",detail:"Prepara campanhas adaptadas aos canais, respeitando o catálogo e as regras da marca.",icon:Sparkles,permission:"Preparar conteúdo"},{name:"Vendas",role:"Atendimento e pedidos",detail:"Consulta produtos, preço e disponibilidade antes de responder ou encaminhar um pedido.",icon:ShoppingBag,permission:"Consultar e organizar"},{name:"Analytics",role:"Leitura e recomendações",detail:"Organiza sinais de desempenho para ajudar a equipa a decidir o que merece atenção.",icon:BarChart3,permission:"Analisar dados"}];
- const current=agents[active];const Icon=current.icon;
- return <section id="agents" className="overflow-hidden bg-slate-950 py-20 text-white sm:py-28"><div className={wrap}>
-  <div className="grid gap-10 lg:grid-cols-[.8fr_1.2fr] lg:items-end"><div><div className="mb-5 inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[.18em] text-slate-400"><span className="h-1.5 w-1.5 rounded-full bg-white"/>IA especializada, não genérica</div><h2 className="text-balance text-4xl font-semibold leading-[.98] tracking-[-.065em] sm:text-5xl lg:text-[64px]">Três especialistas. <span className="text-slate-500">Um negócio sob controlo.</span></h2></div><p className="max-w-lg text-sm leading-7 text-slate-400">Cada agente tem uma função e um limite claro. A automação acelera o trabalho sem retirar à equipa a visibilidade sobre o que está a acontecer.</p></div>
-  <div className="mt-14 grid gap-4 lg:grid-cols-[.8fr_1.2fr]"><div className="space-y-2">{agents.map((a,i)=>{const A=a.icon;return <button key={a.name} onClick={()=>setActive(i)} className={`flex w-full items-center gap-4 rounded-xl border p-4 text-left transition ${active===i?"border-white/30 bg-white text-slate-950":"border-white/10 bg-white/[.04] text-white hover:bg-white/[.08]"}`}><span className={`grid h-10 w-10 place-items-center rounded-lg ${active===i?"bg-slate-950 text-white":"bg-white/10 text-white"}`}><A className="h-5 w-5"/></span><span className="min-w-0 flex-1"><span className="block text-sm font-semibold">{a.name} AI</span><span className={`mt-1 block text-xs ${active===i?"text-slate-500":"text-slate-400"}`}>{a.role}</span></span><ArrowUpRight className="h-4 w-4"/></button>})}</div>
-   <div className="relative min-h-[300px] overflow-hidden rounded-2xl border border-white/10 bg-[#17191d] p-6 sm:p-9"><div className="absolute -right-12 -top-20 h-64 w-64 rounded-full border border-white/10"/><div className="absolute -right-4 -top-12 h-48 w-48 rounded-full border border-white/10"/><AnimatePresence mode="wait"><motion.div key={active} initial={{opacity:0,y:12}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-8}} transition={{duration:.25}} className="relative"><div className="flex items-center justify-between"><span className="font-mono text-[9px] uppercase tracking-[.16em] text-slate-500">Agente / 0{active+1}</span><span className="rounded-full border border-white/15 px-3 py-1 text-[9px] text-slate-300">Permissões definidas</span></div><div className="mt-12 flex items-center gap-4"><div className="grid h-14 w-14 place-items-center rounded-2xl bg-white text-slate-950"><Icon className="h-7 w-7"/></div><div><h3 className="text-2xl font-semibold tracking-tight">{current.name} AI</h3><p className="mt-1 text-xs text-slate-400">{current.role}</p></div></div><p className="mt-7 max-w-lg text-sm leading-7 text-slate-300">{current.detail}</p><div className="mt-8 flex flex-wrap items-center gap-2 border-t border-white/10 pt-5"><span className="font-mono text-[9px] uppercase tracking-wider text-slate-500">Capacidade</span><span className="rounded-full bg-white px-3 py-1.5 text-[10px] font-semibold text-slate-950">{current.permission}</span><span className="rounded-full border border-white/15 px-3 py-1.5 text-[10px] text-slate-300">Auditoria e contexto</span></div></motion.div></AnimatePresence></div>
+ const agents=[
+  {name:"Marketing",role:"Criação e publicação",detail:"Prepara campanhas adaptadas aos canais, respeitando o catálogo, a identidade da marca e as regras definidas pela equipa.",permission:"Preparar conteúdo"},
+  {name:"Vendas",role:"Atendimento e pedidos",detail:"Consulta produtos, preço e disponibilidade antes de responder, organizar pedidos ou encaminhar situações para a equipa.",permission:"Consultar e organizar"},
+  {name:"Analytics",role:"Leitura e recomendações",detail:"Transforma sinais de desempenho em informação clara para ajudar a equipa a decidir onde agir a seguir.",permission:"Analisar dados"}
+ ];
+ const current=agents[active];
+ return <section id="agents" className="overflow-hidden bg-white py-24 sm:py-32">
+  <div className={wrap}>
+   <div className="mb-12 max-w-3xl"><Label>Especialistas Vendora</Label><h2 className={h2}>Uma equipa digital. <span className="text-slate-400">Cada especialista sabe o que fazer.</span></h2></div>
+   <div className="grid gap-10 lg:grid-cols-[1.15fr_.85fr] lg:items-center">
+    <div className="overflow-hidden rounded-[24px] bg-slate-950 p-2 shadow-[0_28px_80px_rgba(15,23,42,.14)]">
+     <video className="aspect-video w-full rounded-[18px] bg-black object-cover" src="/media/agent-architecture.mp4" autoPlay muted loop playsInline preload="metadata" aria-label="Demonstração visual da arquitetura de agentes especializados da Vendora" />
+     <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-3 text-[9px] font-mono uppercase tracking-[.16em] text-slate-400"><span>Arquitetura de agentes / Vendora</span><span className="text-white">Permissões e contexto ativos</span></div>
+    </div>
+    <div className="lg:pl-4">
+     <div className="font-mono text-[10px] uppercase tracking-[.16em] text-slate-400">Especialista 0{active+1} / 03</div>
+     <AnimatePresence mode="wait"><motion.div key={active} initial={{opacity:0,y:12}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-8}} transition={{duration:.25}}>
+      <h3 className="mt-4 text-3xl font-semibold tracking-[-.055em] text-slate-950 sm:text-4xl">{current.name} AI</h3>
+      <p className="mt-3 text-sm font-medium text-slate-500">{current.role}</p>
+      <p className="mt-6 max-w-md text-[15px] leading-7 text-slate-600">{current.detail}</p>
+      <div className="mt-7 border-t border-slate-200 pt-5"><span className="font-mono text-[9px] uppercase tracking-[.15em] text-slate-400">Capacidade principal</span><p className="mt-2 text-sm font-semibold text-slate-950">{current.permission}</p></div>
+     </motion.div></AnimatePresence>
+     <div className="mt-8 flex flex-wrap gap-2">{agents.map((a,i)=><button key={a.name} onClick={()=>setActive(i)} aria-pressed={active===i} className={`rounded-full border px-4 py-2 text-xs font-semibold transition ${active===i?"border-slate-950 bg-slate-950 text-white":"border-slate-200 bg-white text-slate-500 hover:border-slate-400 hover:text-slate-950"}`}>{a.name}</button>)}</div>
+    </div>
+   </div>
   </div>
- </div></section>;
+ </section>;
+}
+
+function AtmosphereStory() {
+ const chapters=[
+  {eyebrow:"Menos dispersão",title:"Uma visão mais calma do que acontece no negócio.",text:"Pedidos, conversas e catálogo deixam de competir pela sua atenção. A informação importante passa a estar organizada num só lugar."},
+  {eyebrow:"Mais contexto",title:"Cada conversa continua de onde a anterior terminou.",text:"A equipa não precisa reconstruir o histórico a cada contacto. O contexto acompanha o cliente e ajuda a dar respostas consistentes."},
+  {eyebrow:"Mais controlo",title:"A tecnologia trabalha. A equipa mantém a direção.",text:"Automatize tarefas repetitivas sem abdicar de regras, permissões e visibilidade sobre as decisões."}
+ ];
+ return <section className="bg-[#f5f5f4] py-20 sm:py-28">
+  <div className={wrap}>
+   <div className="mb-12 max-w-2xl"><Label>Uma forma mais simples de operar</Label><h2 className={h2}>Menos ruído. <span className="text-slate-400">Mais espaço para fazer crescer.</span></h2></div>
+   <div className="grid gap-10 lg:grid-cols-[1.05fr_.95fr] lg:items-start">
+    <div className="lg:sticky lg:top-24">
+     <div className="relative min-h-[420px] overflow-hidden rounded-[24px] bg-slate-300 sm:min-h-[620px]">
+      <img src="/media/optimized/storefront-commerce.webp" alt="Ambiente de comércio e operação de uma loja" loading="lazy" className="absolute inset-0 h-full w-full object-cover"/>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/5 to-transparent"/>
+      <div className="absolute bottom-6 left-6 right-6 text-white"><span className="font-mono text-[9px] uppercase tracking-[.18em] text-white/70">Vendora / Everyday commerce</span><p className="mt-2 max-w-md text-2xl font-semibold leading-tight tracking-[-.04em]">O trabalho flui melhor quando tudo está ligado.</p></div>
+     </div>
+    </div>
+    <div className="space-y-0">
+     {chapters.map((chapter,i)=><article key={chapter.eyebrow} className="flex min-h-[300px] flex-col justify-center border-b border-slate-300/80 py-12 first:pt-4 last:border-0 sm:min-h-[390px]">
+      <span className="font-mono text-[10px] uppercase tracking-[.16em] text-slate-400">0{i+1} / {chapter.eyebrow}</span>
+      <h3 className="mt-5 max-w-lg text-3xl font-semibold leading-[1.02] tracking-[-.055em] text-slate-950 sm:text-4xl">{chapter.title}</h3>
+      <p className="mt-5 max-w-md text-sm leading-7 text-slate-600">{chapter.text}</p>
+     </article>)}
+    </div>
+   </div>
+  </div>
+ </section>;
 }
 
 function WorkflowStory() {
@@ -131,9 +179,16 @@ function FAQStory() {
 }
 
 function FinalCTA({startPath}:{startPath:string}) {
- return <section className="relative overflow-hidden bg-slate-950 py-20 text-white sm:py-28"><div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_75%_15%,rgba(255,255,255,.12),transparent_38%),radial-gradient(ellipse_at_10%_100%,rgba(148,163,184,.13),transparent_35%)]"/><div className={`${wrap} relative grid gap-10 lg:grid-cols-[1fr_auto] lg:items-end`}><div><div className="mb-5 font-mono text-[10px] uppercase tracking-[.18em] text-slate-400">Pronto para simplificar?</div><h2 className="max-w-3xl text-balance text-4xl font-semibold leading-[.98] tracking-[-.065em] sm:text-6xl">Deixe de gerir ferramentas. <span className="text-slate-500">Comece a gerir o negócio.</span></h2><p className="mt-6 max-w-xl text-sm leading-7 text-slate-400">Traga os seus canais, catálogo e equipa para uma operação mais clara.</p></div><Link to={startPath} className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-white px-7 text-sm font-semibold text-slate-950 transition hover:bg-slate-200">Começar gratuitamente <ArrowUpRight className="h-4 w-4"/></Link></div></section>;
+ return <section className="relative isolate overflow-hidden bg-slate-950 py-28 text-white sm:py-36" data-cursor="COMEÇAR">
+  <img src="/media/optimized/cta-merchant-at-work.webp" alt="" aria-hidden="true" loading="lazy" className="absolute inset-0 -z-20 h-full w-full object-cover"/>
+  <div className="absolute inset-0 -z-10 bg-gradient-to-r from-black/90 via-black/75 to-black/35"/>
+  <div className="absolute inset-0 -z-10 bg-gradient-to-t from-black/35 via-transparent to-black/15"/>
+  <div className={`${wrap} relative`}>
+   <div className="max-w-3xl"><span className="font-mono text-[10px] uppercase tracking-[.2em] text-white/65">O próximo passo começa aqui</span><h2 className="mt-6 text-balance text-5xl font-semibold leading-[.96] tracking-[-.07em] sm:text-7xl">Dê ao seu negócio <span className="text-white/55">uma forma melhor de trabalhar.</span></h2><p className="mt-7 max-w-xl text-base leading-7 text-white/75">Ligue os seus canais, organize a operação e deixe a Vendora tratar do trabalho repetitivo — com a sua equipa sempre no controlo.</p><Link to={startPath} className="mt-10 inline-flex h-12 items-center gap-3 rounded-full bg-white px-7 text-sm font-semibold text-slate-950 transition hover:bg-slate-200">Começar gratuitamente <ArrowUpRight className="h-4 w-4"/></Link></div>
+  </div>
+ </section>;
 }
 
 export function HomeExperience({startPath,onStart}:{startPath:string;onStart:()=>void}) {
- return <><Hero startPath={startPath} onStart={onStart}/><ValueStory/><WhatsAppStory/><ChannelStory/><AgentStory/><section id="plans" className="bg-white"><PlansSection/></section><WorkflowStory/><CommandStory startPath={startPath}/><FAQStory/><FinalCTA startPath={startPath}/></>;
+ return <><Hero startPath={startPath} onStart={onStart}/><ValueStory/><WhatsAppStory/><ChannelStory/><AtmosphereStory/><AgentStory/><section id="plans" className="bg-white"><PlansSection/></section><WorkflowStory/><CommandStory startPath={startPath}/><FAQStory/><FinalCTA startPath={startPath}/></>;
 }
