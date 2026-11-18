@@ -41,7 +41,7 @@ export function SiteFooter() {
             <Link to="/signup" className="inline-flex items-center gap-1 text-sm text-white/65 transition hover:text-white">Criar conta <ArrowUpRight className="h-3 w-3"/></Link>
           </nav>
         </div>
-        <div className="flex flex-col gap-5 border-t border-white/10 pt-7 text-[11px] text-white/40 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-5 pt-7 text-[11px] text-white/40 sm:flex-row sm:items-center sm:justify-between">
           <span>© {new Date().getFullYear()} Vendora. Todos os direitos reservados.</span>
           <nav aria-label="Informações legais" className="flex flex-wrap gap-x-5 gap-y-2">
             {legalLinks.map((item)=><Link key={item.to} to={item.to} className="transition hover:text-white/80">{item.label}</Link>)}
