@@ -1053,39 +1053,52 @@ html {
   .product-detail-footer { align-items: flex-start; flex-direction: column; padding: 14px 16px; }
 }
 
-/* Vendora editorial stack: each chapter naturally rises over the previous one. */
+/* Editorial page stack: only panels that fit are pinned; tall panels scroll fully in normal flow. */
+.vendora-scroll-stack > section { position: relative; min-height: 100svh; height: auto; }
 @media (min-width: 1024px) {
-  .vendora-scroll-stack > section {
+  .vendora-scroll-stack > section[data-scroll-fit="fit"] {
     position: sticky;
-    top: 76px;
-    min-height: calc(100svh - 76px);
+    top: 0;
+    min-height: 100svh;
+    z-index: 1;
     isolation: isolate;
-    box-shadow: 0 -18px 42px rgba(15, 23, 42, 0.045);
+    box-shadow: 0 -14px 38px rgba(15, 23, 42, 0.035);
   }
-  .vendora-scroll-stack > section { z-index: 1; }
-}
-@supports (animation-timeline: view()) and (animation-range: exit 0% exit 100%) {
-  @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
-    @keyframes vendora-stack-under {
-      from { transform: translateY(0) scale(1); opacity: 1; }
-      to { transform: translateY(-0.35rem) scale(0.985); opacity: 0.94; }
-    }
-    .vendora-scroll-stack > section:not(:last-child) {
-      animation: vendora-stack-under linear both;
-      animation-timeline: view();
-      animation-range: exit 0% exit 100%;
-      transform-origin: center top;
-    }
+  .vendora-scroll-stack > section[data-scroll-fit="tall"] {
+    position: relative;
+    min-height: 100svh;
+    z-index: 1;
+    box-shadow: none;
   }
 }
 @media (max-width: 1023px) {
-  .vendora-scroll-stack > section { position: relative; min-height: 0; }
-}
-@media (prefers-reduced-motion: reduce) {
   .vendora-scroll-stack > section {
-    animation: none !important;
-    transform: none !important;
-    opacity: 1 !important;
+    position: relative;
+    min-height: 0;
+    height: auto;
   }
 }
 
+/* True scroll parallax: the image moves at a slower rate than the section. */
+@supports (view-timeline-name: --vendora-parallax) and (animation-timeline: view()) and (animation-range: entry 0% exit 100%) {
+  @media (prefers-reduced-motion: no-preference) {
+    .vendora-parallax {
+      view-timeline-name: --vendora-parallax;
+      view-timeline-axis: block;
+    }
+    @keyframes vendora-parallax-drift {
+      from { transform: translate3d(0, -6%, 0); }
+      to { transform: translate3d(0, 6%, 0); }
+    }
+    .vendora-parallax__image {
+      animation: vendora-parallax-drift linear both;
+      animation-timeline: --vendora-parallax;
+      animation-range: entry 0% exit 100%;
+      will-change: transform;
+    }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vendora-parallax__image { animation: none !important; transform: none !important; }
+  .vendora-scroll-stack > section { animation: none !important; transform: none !important; opacity: 1 !important; }
+}
