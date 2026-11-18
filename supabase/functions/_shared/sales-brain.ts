@@ -1,7 +1,7 @@
 // deno-lint-ignore-file no-explicit-any
 // Shared WhatsApp sales agent: answers only from real catalogue/order data.
 type DB = any;
-import { metaCredentials } from "./credentials.ts";
+import { metaCredentials, companyWhatsAppToken } from "./credentials.ts";
 
 export type Turn = { role: "client" | "agent"; text: string };
 
@@ -76,8 +76,8 @@ export async function salesReply(db: DB, companyId: string, message: string, his
   return { reply, handoff, code };
 }
 
-export async function sendWhatsApp(phoneNumberId: string, to: string, body: string) {
-  const token = (await metaCredentials()).access_token;
+export async function sendWhatsApp(phoneNumberId: string, to: string, body: string, companyId?: string) {
+  const token = companyId ? await companyWhatsAppToken(companyId) : (await metaCredentials()).access_token;
   if (!token) return { ok: false, error: "WhatsApp não configurado" };
   const r = await fetch(`https://graph.facebook.com/v25.0/${encodeURIComponent(phoneNumberId)}/messages`, {
     method: "POST",

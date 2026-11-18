@@ -74,7 +74,7 @@ Deno.serve(async req => {
     } else if (body.provider === "marketing_email") {
       if (!values.api_key || !/^[^@\s]+@[^@\s]+$/.test(values.from_email ?? "")) return json({ error: "Indique a chave e o email remetente" }, 400);
     } else return json({ error: "Fornecedor inválido" }, 400);
-    const safeValues = body.provider === "stripe" ? { secret_key: values.secret_key } : body.provider === "social" ? { page_id: values.page_id ?? "", ig_user_id: values.ig_user_id ?? "", page_token: values.page_token } : body.provider === "marketing_email" ? { api_key: values.api_key, from_email: values.from_email } : { app_id: values.app_id, access_token: values.access_token, app_secret: values.app_secret, verify_token: values.verify_token };
+    const safeValues = body.provider === "stripe" ? { secret_key: values.secret_key } : body.provider === "social" ? { page_id: values.page_id ?? "", ig_user_id: values.ig_user_id ?? "", page_token: values.page_token } : body.provider === "marketing_email" ? { api_key: values.api_key, from_email: values.from_email } : { app_id: values.app_id, access_token: values.access_token, app_secret: values.app_secret, verify_token: values.verify_token, whatsapp_config_id: values.whatsapp_config_id ?? "", social_config_id: values.social_config_id ?? "" };
     const ciphertext = await encryptCredentials(safeValues, scope, body.provider);
     const { error } = await serviceDb().from("integration_credentials").upsert({ scope_key: scope, company_id: company ?? null, provider: body.provider, ciphertext, updated_at: new Date().toISOString() }, { onConflict: "scope_key,provider" });
     if (error) return json({ error: "Não foi possível guardar a ligação" }, 500);

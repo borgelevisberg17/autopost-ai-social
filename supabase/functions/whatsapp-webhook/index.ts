@@ -62,7 +62,7 @@ async function handleMessage(db: any, account: any, contactName: string | undefi
       trigger: "whatsapp", completed_at: now, summary: r.error, metadata: { pergunta: text, conversa: convo.id } });
     return;
   }
-  const sent = await sendWhatsApp(account.phone_number_id, from, r.reply);
+  const sent = await sendWhatsApp(account.phone_number_id, from, r.reply, account.company_id);
   await db.from("messages").insert({
     conversation_id: convo.id, company_id: account.company_id, direction: "out", sender: "agent",
     body: r.reply, external_id: sent.id ?? null, status: sent.ok ? "sent" : "failed", error: sent.error ?? null,

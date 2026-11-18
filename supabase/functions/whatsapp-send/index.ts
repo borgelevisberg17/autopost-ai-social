@@ -33,7 +33,7 @@ Deno.serve(async (req) => {
     const { data: account } = await userDb.from("whatsapp_accounts").select("phone_number_id").eq("company_id", convo.company_id).limit(1).maybeSingle();
     if (!account) return json({ error: "Número WhatsApp não ligado" }, 400);
 
-    const sent = await sendWhatsApp(account.phone_number_id, convo.customer_phone, text);
+    const sent = await sendWhatsApp(account.phone_number_id, convo.customer_phone, text, convo.company_id);
     const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
     await admin.from("messages").insert({
       conversation_id: convo.id, company_id: convo.company_id, direction: "out", sender: "staff",

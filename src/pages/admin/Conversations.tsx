@@ -1,3 +1,4 @@
+import { MetaConnect } from "@/components/admin/MetaConnect";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FunctionsHttpError } from "@supabase/supabase-js";
 import { motion, AnimatePresence } from "framer-motion";
@@ -1555,6 +1556,13 @@ export default function Conversations() {
               </p>
             </div>
 
+            {company && (
+              <div className="space-y-2">
+                <h3 className="text-sm font-semibold">Ligação automática (recomendado)</h3>
+                <MetaConnect companyId={company.id} kind="whatsapp" onConnected={() => void accountQuery.refetch()} />
+              </div>
+            )}
+            <p className="text-xs font-semibold text-neutral-500">Ou ligue manualmente com os IDs da Meta:</p>
             <div className="space-y-4">
               <div>
                 <label className="text-xs font-bold text-neutral-700 block mb-1.5">

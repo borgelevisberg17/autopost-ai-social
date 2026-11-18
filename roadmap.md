@@ -1,5 +1,6 @@
 # Roadmap
 
+- [ ] Ligação automática Meta — ativa quando a plataforma guardar o ID da aplicação e os IDs de configuração (Embedded Signup e Facebook Login for Business) e a Vendora for Tech Provider aprovado pela Meta
 - [x] Campanhas com pipeline por canal, contactos WhatsApp guardados como clientes, newsletter com cancelamento
 - [ ] Envio de email marketing — precisa de um serviço próprio de email marketing (o email da app só permite emails individuais)
 - [ ] Envio WhatsApp a contactos com mais de 24h — precisa de modelo de mensagem aprovado pela Meta

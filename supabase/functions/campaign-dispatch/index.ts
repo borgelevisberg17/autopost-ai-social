@@ -1,6 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { z } from "npm:zod@3";
-import { metaCredentials, readCredentials, serviceDb } from "../_shared/credentials.ts";
+import { companyWhatsAppToken, readCredentials, serviceDb } from "../_shared/credentials.ts";
 import { authenticateCronRequest } from "../_shared/cron-auth.ts";
 import { buildStepContent, channelFeature, stepWindowOpen } from "../_shared/campaign-rules.ts";
 
@@ -59,10 +59,10 @@ async function processStep(db: Db, step: any) {
   }
 
   if (step.channel === "whatsapp") {
-    const meta = await metaCredentials();
+    const waToken = await companyWhatsAppToken(step.company_id);
     const { data: acc } = await db.from("whatsapp_accounts").select("phone_number_id").eq("company_id", step.company_id).maybeSingle();
     const { data: contacts } = await db.from("conversations").select("customer_phone,last_inbound_at").eq("company_id", step.company_id).eq("channel", "whatsapp");
-    if (!meta?.access_token || !acc?.phone_number_id) return finish("awaiting_connection", { message: "Aguarda ligação do número WhatsApp Business", contacts: contacts?.length ?? 0 }, content);
+    if (!waToken || !acc?.phone_number_id) return finish("awaiting_connection", { message: "Aguarda ligação do número WhatsApp Business", contacts: contacts?.length ?? 0 }, content);
     let sent = 0, waiting = 0, failed = 0;
     for (const c of contacts ?? []) {
       const { error: dup } = await db.from("campaign_deliveries").insert({ company_id: step.company_id, step_id: step.id, recipient: c.customer_phone });
@@ -71,7 +71,7 @@ async function processStep(db: Db, step: any) {
       if (!c.last_inbound_at || Date.now() - new Date(c.last_inbound_at).getTime() > 86400000) {
         waiting++; await db.from("campaign_deliveries").update({ status: "awaiting_template" }).eq("step_id", step.id).eq("recipient", c.customer_phone); continue;
       }
-      const r = await fetch(`${GRAPH}/${acc.phone_number_id}/messages`, { method: "POST", headers: { Authorization: `Bearer ${meta.access_token}`, "Content-Type": "application/json" }, body: JSON.stringify({ messaging_product: "whatsapp", to: c.customer_phone, type: "text", text: { body: content } }) });
+      const r = await fetch(`${GRAPH}/${acc.phone_number_id}/messages`, { method: "POST", headers: { Authorization: `Bearer ${waToken}`, "Content-Type": "application/json" }, body: JSON.stringify({ messaging_product: "whatsapp", to: c.customer_phone, type: "text", text: { body: content } }) });
       const j = await r.json();
       r.ok ? sent++ : failed++;
       await db.from("campaign_deliveries").update({ status: r.ok ? "sent" : "failed", external_id: j?.messages?.[0]?.id ?? null, error: r.ok ? null : j?.error?.message ?? "erro" }).eq("step_id", step.id).eq("recipient", c.customer_phone);

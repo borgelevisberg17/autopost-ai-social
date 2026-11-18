@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { MetaConnect } from "@/components/admin/MetaConnect";
 import { Switch } from "@/components/ui/switch";
 import { useCompany } from "@/hooks/useCompany";
 import { supabase } from "@/integrations/supabase/client";
@@ -137,6 +138,8 @@ export default function Campaigns() {
 
         <section className="rounded-lg border border-border bg-card p-4 space-y-3">
           <h2 className="font-semibold">Ligação Facebook / Instagram</h2>
+          {company?.id && <MetaConnect companyId={company.id} kind="social" />}
+          <p className="text-xs font-semibold text-muted-foreground pt-2">Ou ligue manualmente:</p>
           <p className="text-sm text-muted-foreground">Guardado cifrado. Sem ligação, as etapas ficam prontas para copiar e publicar manualmente.</p>
           <Input placeholder="ID da Página Facebook" value={social.page_id} onChange={e => setSocial({ ...social, page_id: e.target.value })} />
           <Input placeholder="ID da conta Instagram Business" value={social.ig_user_id} onChange={e => setSocial({ ...social, ig_user_id: e.target.value })} />

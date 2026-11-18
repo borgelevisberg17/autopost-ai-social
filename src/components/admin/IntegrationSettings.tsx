@@ -12,7 +12,7 @@ export function IntegrationSettings({ companyId }: { companyId?: string }) {
   const [status, setStatus] = useState<{ stripe: boolean; meta: boolean; meta_token: boolean; meta_missing: string[]; meta_app: boolean; numbers: { company_id: string; display_phone: string | null; status: string; last_event_at: string | null }[] } | null>(null);
   const [diagnostic, setDiagnostic] = useState("");
   const [stripe, setStripe] = useState("");
-  const [meta, setMeta] = useState({ app_id: "", access_token: "", app_secret: "", verify_token: "" });
+  const [meta, setMeta] = useState({ app_id: "", access_token: "", app_secret: "", verify_token: "", whatsapp_config_id: "", social_config_id: "" });
   const [busy, setBusy] = useState(false);
   const [statusError, setStatusError] = useState("");
   const [whatsapp, setWhatsapp] = useState({ phone_number: "", phone_number_id: "", waba_id: "" });
@@ -37,7 +37,7 @@ export function IntegrationSettings({ companyId }: { companyId?: string }) {
     setBusy(true);
     try {
       await invoke({ action: "save", provider, credentials: provider === "stripe" ? { secret_key: stripe } : meta });
-      setStripe(""); setMeta({ app_id: "", access_token: "", app_secret: "", verify_token: "" });
+      setStripe(""); setMeta({ app_id: "", access_token: "", app_secret: "", verify_token: "", whatsapp_config_id: "", social_config_id: "" });
       setStatus(await invoke({ action: "status" }));
       toast.success("Credenciais guardadas com segurança");
     } catch (e) { toast.error(e instanceof Error ? e.message : "Não foi possível guardar"); }
@@ -108,7 +108,7 @@ export function IntegrationSettings({ companyId }: { companyId?: string }) {
     {!companyId && <form className="space-y-3 border-t border-border pt-4" onSubmit={e => { e.preventDefault(); void save("meta"); }}>
       <h3 className="font-semibold">Meta · {status?.meta ? "Credenciais guardadas" : "Estado não verificado"}</h3>
       <div className="grid gap-3 sm:grid-cols-2">{([
-        ["app_id", "ID da aplicação", "text"], ["access_token", "Token permanente", "password"], ["app_secret", "Segredo da aplicação", "password"], ["verify_token", "Código de verificação do webhook", "password"],
+        ["app_id", "ID da aplicação", "text"], ["access_token", "Token permanente", "password"], ["app_secret", "Segredo da aplicação", "password"], ["verify_token", "Código de verificação do webhook", "password"], ["whatsapp_config_id", "ID de configuração · ligação WhatsApp automática", "text"], ["social_config_id", "ID de configuração · ligação Facebook/Instagram", "text"],
       ] as const).map(([key, label, type]) => <label className="text-sm" key={key}>{label}<Input aria-label={label} autoComplete="off" type={type} value={meta[key]} placeholder={key === "app_id" ? "ID da aplicação Vendora" : "Manter credencial guardada"} onChange={e => setMeta({ ...meta, [key]: e.target.value })} /></label>)}</div>
       <div className="flex flex-wrap gap-2"><Button disabled={busy}>Guardar Meta</Button><Button variant="outline" disabled={busy} type="button" onClick={() => void checkMeta()}>Verificar ligação Meta</Button><Button variant="outline" disabled={busy || !status?.meta_app} type="button" onClick={() => void activate()}>Ativar webhook da Meta</Button></div>
       {diagnostic && <p role="status" className="text-sm border-l-2 border-primary pl-3">{diagnostic}</p>}

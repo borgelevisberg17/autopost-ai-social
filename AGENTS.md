@@ -12,3 +12,4 @@
 - Meta WhatsApp app credentials are shared only in server-side secrets; phone numbers and conversations remain company-scoped, while cross-company metrics require a protected platform-admin role.
 - WhatsApp onboarding verifies the number belongs to the supplied WABA and saves tenant routing before subscribing events; group messages must never enter private customer/order context.
 - WhatsApp connection indicators share the company-scoped account query; contact phone fields and failed/loading reads never determine Business connection status.
+- Shops connect Meta through Vendora's own app (Embedded Signup / Facebook Login for Business); codes are exchanged server-side and per-company tokens are stored encrypted, with the platform token only as fallback — removes manual Meta setup per shop.

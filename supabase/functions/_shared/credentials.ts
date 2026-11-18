@@ -31,3 +31,8 @@ export async function metaCredentials() {
   const defaults = { access_token: Deno.env.get("WHATSAPP_ACCESS_TOKEN") ?? "", app_secret: Deno.env.get("WHATSAPP_APP_SECRET") ?? "", verify_token: Deno.env.get("WHATSAPP_VERIFY_TOKEN") ?? "", app_id: "" };
   return { ...defaults, ...Object.fromEntries(Object.entries(saved ?? {}).filter(([, value]) => value.trim() !== "")) };
 }
+/** Token used to act on a company's WhatsApp number: the one granted by the company via Embedded Signup, else the platform token. */
+export async function companyWhatsAppToken(companyId: string): Promise<string> {
+  const own = await readCredentials(companyId, "whatsapp_business").catch(() => null);
+  return own?.access_token || (await metaCredentials()).access_token;
+}
