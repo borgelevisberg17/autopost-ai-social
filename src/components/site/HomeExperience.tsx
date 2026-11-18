@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  ArrowRight, ArrowUpRight, Check, ChevronDown, ChevronLeft, ChevronRight,
+  ArrowDown, ArrowRight, ArrowUpRight, Check, ChevronDown, ChevronLeft, ChevronRight,
   Instagram, MessageCircle, Package, ShieldCheck, Sparkles, BarChart3,
   ShoppingBag, Globe2, Workflow, Zap, CircleDot, Send, Clock3
 } from "lucide-react";
@@ -14,7 +14,7 @@ const eyebrow = "mb-5 inline-flex items-center gap-2 font-mono text-[10px] font-
 const h2 = "text-balance text-4xl font-semibold leading-[.98] tracking-[-.065em] text-slate-950 sm:text-5xl lg:text-[64px]";
 const muted = "text-[15px] leading-7 text-slate-600 sm:text-base";
 
-function Label({ children }: { children: React.ReactNode }) {
+function Label({ children }: { children: ReactNode }) {
   return <div className={eyebrow}><span className="h-1.5 w-1.5 rounded-full bg-slate-950" />{children}</div>;
 }
 
