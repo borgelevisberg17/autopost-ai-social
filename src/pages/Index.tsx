@@ -35,7 +35,6 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { WaterWakeHero } from "@/components/site/WaterWakeHero";
 import { LusionCursor } from "@/components/lusion/LusionCursor";
-import { useInertiaScroll } from "@/components/lusion/useInertiaScroll";
 import { lusionSound } from "@/components/lusion/LusionAudio";
 import { TactileGrain } from "@/components/lusion/TactileGrain";
 
@@ -1034,7 +1033,7 @@ function ChannelShowcase() {
       id="channels"
       className="border-b border-[#d8d3c8] bg-[#f1eee7] text-[#202522]"
     >
-      <div className="mx-auto max-w-[1240px] px-5 py-24 lg:px-8 lg:py-32">
+      <div className="mx-auto max-w-[1200px] px-5 py-20 sm:py-24 lg:px-8 lg:py-28">
         <div className="max-w-3xl">
           <Eyebrow>Every channel, in its own language</Eyebrow>
           <h2 className="text-5xl font-semibold leading-[0.96] tracking-[-0.07em] sm:text-6xl">
@@ -2257,8 +2256,8 @@ const FAQ_ITEMS = [
 function FAQSection() {
   const [open, setOpen] = useState(0);
   return (
-    <section id="faq" className="border-b border-[#d8d3c8] bg-[#f1eee7]">
-      <div className="mx-auto grid max-w-[1240px] gap-12 px-5 py-24 lg:grid-cols-[0.72fr_1.28fr] lg:px-8 lg:py-32">
+    <section id="faq" className="border-b border-slate-200 bg-[#f8fafc]">
+      <div className="mx-auto grid max-w-[1200px] gap-12 px-5 py-20 sm:py-24 lg:grid-cols-[0.72fr_1.28fr] lg:px-8 lg:py-28">
         <div>
           <Eyebrow>Questions before you connect</Eyebrow>
           <h2 className="max-w-xl text-5xl font-semibold leading-[0.95] tracking-[-0.07em] sm:text-6xl">
@@ -2276,22 +2275,22 @@ function FAQSection() {
             Connect your operation <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
-        <div className="border-t border-[#c8c1b4]">
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_12px_40px_rgba(15,23,42,0.04)]">
           {FAQ_ITEMS.map(([question, answer], index) => (
-            <div key={question} className="border-b border-[#c8c1b4]">
+            <div key={question} className="border-b border-slate-100 last:border-b-0">
               <button
                 type="button"
                 onClick={() => setOpen(open === index ? -1 : index)}
                 aria-expanded={open === index}
-                className="flex w-full items-center justify-between gap-6 py-5 text-left text-base font-semibold text-[#202522] transition hover:text-[#2c6457]"
+                className="flex w-full items-center justify-between gap-6 px-5 py-5 text-left text-sm font-semibold text-slate-900 transition hover:text-emerald-700 sm:px-6"
               >
                 <span>{question}</span>
-                <span className="grid h-7 w-7 shrink-0 place-items-center border border-[#b9b2a5] font-mono text-lg font-normal text-[#2c6457]">
+                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-slate-200 bg-slate-50 font-mono text-lg font-normal text-emerald-700">
                   {open === index ? "-" : "+"}
                 </span>
               </button>
               {open === index && (
-                <div className="max-w-2xl pb-6 pr-10 text-sm leading-6 text-[#6e716b]">
+                <div className="max-w-2xl px-5 pb-6 pr-10 text-sm leading-6 text-slate-600 sm:px-6">
                   {answer}
                 </div>
               )}
@@ -2438,7 +2437,7 @@ function ProcessSection() {
   }, []);
   const current = steps[active];
   return (
-    <section className="overflow-hidden border-b border-[#d8d3c8] bg-[#f6f3ed]">
+    <section className="overflow-hidden border-b border-slate-200 bg-white">
       <div className="mx-auto max-w-[1240px] px-5 py-24 lg:px-8 lg:py-32">
         <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
           <div>
@@ -2470,7 +2469,7 @@ function ProcessSection() {
                 type="button"
                 aria-pressed={active === index}
                 onClick={() => setActive(index)}
-                className={`w-full rounded-2xl border p-5 text-left transition ${active === index ? "border-[#2c6457] bg-[#d9e7de]" : "border-[#d8d3c8] bg-[#fffdf9] hover:border-[#8bad9d]"}`}
+                className={`w-full rounded-2xl border p-5 text-left transition duration-200 ${active === index ? "border-emerald-700/40 bg-emerald-50 shadow-[0_10px_30px_rgba(16,90,65,0.08)]" : "border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm"}`}
               >
                 <div className="flex items-start gap-4">
                   <span
@@ -2494,7 +2493,7 @@ function ProcessSection() {
             ))}
           </div>
           <div
-            className={`min-h-[430px] rounded-2xl ${current.tone} flex flex-col justify-between p-5 sm:p-8`}
+            className={`min-h-[430px] rounded-3xl ${current.tone} flex flex-col justify-between border border-black/5 p-5 shadow-[0_20px_60px_rgba(15,23,42,0.08)] sm:p-8`}
           >
             <div
               className={`flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.16em] ${active === 2 ? "text-white/45" : "text-[#8f8a80]"}`}
@@ -2527,9 +2526,6 @@ export default function Index() {
   const { user } = useAuth();
   const startPath = user ? "/dashboard" : "/signup";
   const [onboardingOpen, setOnboardingOpen] = useState(false);
-
-  // Lusion-grade smooth inertia scroll
-  useInertiaScroll();
 
   return (
     <div className="landing-page min-h-screen overflow-x-hidden bg-slate-50/50 text-slate-900 selection:bg-emerald-500/20 selection:text-emerald-950 relative">
@@ -2786,7 +2782,7 @@ export default function Index() {
 
         {/* Section 10: Control Room */}
         <SectionReveal id="control-room" delay={0.04}>
-          <section className="border-b border-slate-800 bg-slate-900 text-slate-100 py-24 sm:py-32">
+          <section className="border-b border-slate-800 bg-[#101827] text-slate-100 py-20 sm:py-24">
             <div className="mx-auto max-w-[1240px] px-5 lg:px-8">
               <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
                 <div>
@@ -2852,17 +2848,17 @@ export default function Index() {
 
         {/* Section 11: Final Call to Action */}
         <SectionReveal delay={0.04}>
-          <section className="relative overflow-hidden bg-slate-950 text-white py-24 sm:py-32" data-cursor="COMEÇAR">
-            <div className="absolute inset-0 bg-gradient-to-tr from-emerald-950/40 via-slate-900/50 to-indigo-950/40" />
+          <section className="relative overflow-hidden border-t border-slate-200 bg-[#f8fafc] py-20 text-slate-900 sm:py-28" data-cursor="COMEÇAR">
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_15%_20%,rgba(16,185,129,0.10),transparent_42%),radial-gradient(ellipse_at_85%_80%,rgba(59,130,246,0.08),transparent_38%)]" />
             <div className="relative mx-auto grid max-w-[1240px] gap-12 px-5 lg:grid-cols-[0.85fr_1.15fr] lg:items-center lg:px-8">
               <div>
-                <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-400">
+                <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-700">
                   Pronto para começar
                 </div>
-                <h2 className="mt-4 max-w-xl text-5xl font-bold leading-[0.96] tracking-[-0.07em] sm:text-6xl text-white">
+                <h2 className="mt-4 max-w-xl text-5xl font-bold leading-[0.96] tracking-[-0.07em] sm:text-6xl text-slate-950">
                   Opere o momento com inteligência e controle.
                 </h2>
-                <p className="mt-6 max-w-md text-base leading-7 text-slate-300">
+                <p className="mt-6 max-w-md text-base leading-7 text-slate-600">
                   Dê à sua equipe uma plataforma unificada para captar
                   intenções, fechar vendas no WhatsApp e manter seu estoque
                   perfeitamente alinhado.
@@ -2877,14 +2873,14 @@ export default function Index() {
                   </Link>
                 </motion.div>
               </div>
-              <div className="relative overflow-hidden rounded-3xl border border-white/15 bg-white/5 p-2.5 sm:p-3 shadow-2xl backdrop-blur-sm">
+              <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-2.5 shadow-[0_24px_70px_rgba(15,23,42,0.10)] sm:p-3">
                 <img
                   src="/media/optimized/cta-merchant-at-work.webp"
                   alt="Comerciante operando calmamente com o celular"
                   loading="lazy"
                   className="aspect-[3/2] w-full rounded-2xl object-cover"
                 />
-                <div className="flex items-center justify-between px-3 pt-3 font-mono text-[10px] uppercase tracking-wider text-slate-300">
+                <div className="flex items-center justify-between px-3 pt-3 font-mono text-[10px] uppercase tracking-wider text-slate-500">
                   <span>Comércio em Movimento</span>
                   <span className="flex items-center gap-2 text-emerald-400 font-semibold">
                     <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
