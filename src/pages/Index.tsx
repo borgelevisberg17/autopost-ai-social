@@ -169,7 +169,7 @@ function LusionChapterDock() {
               }}
               className={`relative rounded-full px-3 py-1.5 text-[11px] font-medium transition-colors ${
                 isActive
-                  ? "text-slate-950 font-semibold"
+                  ? "text-white font-semibold"
                   : "text-slate-400 hover:text-white"
               }`}
             >
@@ -181,13 +181,13 @@ function LusionChapterDock() {
                     stiffness: 380,
                     damping: 30,
                   }}
-                  className="absolute inset-0 rounded-full bg-white shadow-[0_0_16px_rgba(52,211,153,0.45)]"
+                  className="absolute inset-0 rounded-full bg-slate-950"
                 />
               )}
               <span className="relative z-10 flex items-center gap-1.5">
                 <span
                   className={`font-mono text-[9px] ${
-                    isActive ? "text-slate-900" : "text-slate-500"
+                    isActive ? "text-white" : "text-slate-500"
                   }`}
                 >
                   {chapter.number}
@@ -208,7 +208,7 @@ function LusionChapterDock() {
           smoothScrollToElement(nextChapter.id);
         }}
         title={`Ir para ${nextChapter.label}`}
-        className="flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-slate-200 transition hover:bg-white/20"
+        className="flex items-center gap-1.5 rounded-full bg-slate-950 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-white transition hover:bg-slate-700"
       >
         <span>Seguinte</span>
         <ArrowDown className="h-3 w-3" />
@@ -541,7 +541,7 @@ function ProductFrame() {
                   Loja Online
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-pink-400" />{" "}
+                  <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />{" "}
                   Instagram
                 </div>
                 <div className="flex items-center gap-2">
@@ -1705,7 +1705,7 @@ function InteractiveHeroPrompt() {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               placeholder="Pergunte ao Vendora AI... (ex: estoque Sapato Nike, simular venda WhatsApp)"
-              className="w-full rounded-2xl border border-slate-200 bg-slate-50/60 py-3.5 pl-12 pr-28 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-600 focus:bg-white focus:outline-none focus:ring-4 focus:ring-slate-900/10 transition"
+              className="w-full rounded-2xl border border-slate-200 bg-slate-50/60 py-3.5 pl-12 pr-28 text-sm text-slate-900 placeholder:text-slate-400 focus:border-slate-900 focus:bg-white focus:outline-none focus:ring-4 focus:ring-slate-900/10 transition"
             />
             <button
               type="submit"
@@ -1767,7 +1767,7 @@ function InteractiveHeroPrompt() {
               >
                 <div className="mb-3 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="rounded-md bg-slate-100 px-2 py-0.5 font-mono text-[10px] font-semibold text-emerald-800">
+                    <span className="rounded-md bg-slate-100 px-2 py-0.5 font-mono text-[10px] font-semibold text-slate-700">
                       {current.badge}
                     </span>
                     <span className="text-xs text-slate-500">
@@ -1820,7 +1820,7 @@ function InteractiveHeroPrompt() {
                         </span>
                       </div>
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                        <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-2.5">
+                        <div className="rounded-xl border border-slate-200 bg-slate-50 p-2.5">
                           <div className="text-xs font-medium text-slate-600">
                             Tamanho 39
                           </div>
@@ -1828,17 +1828,17 @@ function InteractiveHeroPrompt() {
                             <span className="text-base font-bold text-slate-900">
                               2 pares
                             </span>
-                            <span className="font-mono text-[9px] font-semibold text-amber-700">
+                            <span className="font-mono text-[9px] font-semibold text-slate-600">
                               Estoque Baixo
                             </span>
                           </div>
                         </div>
-                        <div className="rounded-xl border border-emerald-200 bg-slate-100/60 p-2.5">
+                        <div className="rounded-xl border border-slate-200 bg-slate-100/60 p-2.5">
                           <div className="text-xs font-medium text-slate-600">
                             Tamanho 40
                           </div>
                           <div className="mt-1 flex items-baseline justify-between">
-                            <span className="text-base font-bold text-emerald-950">
+                            <span className="text-base font-bold text-slate-950">
                               6 pares
                             </span>
                             <span className="font-mono text-[9px] font-semibold text-slate-800">
@@ -1854,17 +1854,17 @@ function InteractiveHeroPrompt() {
                             <span className="text-base font-bold text-slate-500">
                               0 pares
                             </span>
-                            <span className="font-mono text-[9px] font-semibold text-rose-700">
+                            <span className="font-mono text-[9px] font-semibold text-slate-600">
                               Esgotado
                             </span>
                           </div>
                         </div>
-                        <div className="rounded-xl border border-emerald-200 bg-slate-100/60 p-2.5">
+                        <div className="rounded-xl border border-slate-200 bg-slate-100/60 p-2.5">
                           <div className="text-xs font-medium text-slate-600">
                             Tamanho 42
                           </div>
                           <div className="mt-1 flex items-baseline justify-between">
-                            <span className="text-base font-bold text-emerald-950">
+                            <span className="text-base font-bold text-slate-950">
                               6 pares
                             </span>
                             <span className="font-mono text-[9px] font-semibold text-slate-800">
@@ -1894,7 +1894,7 @@ function InteractiveHeroPrompt() {
                           </div>
                         </div>
                       </div>
-                      <span className="rounded-full bg-slate-100 px-2 py-0.5 font-mono text-[9px] font-semibold text-emerald-800">
+                      <span className="rounded-full bg-slate-100 px-2 py-0.5 font-mono text-[9px] font-semibold text-slate-700">
                         Atendimento IA Ativo
                       </span>
                     </div>
@@ -1908,11 +1908,11 @@ function InteractiveHeroPrompt() {
                         </div>
                       </div>
                       <div className="flex justify-end">
-                        <div className="max-w-[80%] rounded-2xl rounded-tr-sm bg-emerald-700 p-3 text-xs text-white shadow-sm">
+                        <div className="max-w-[80%] rounded-2xl rounded-tr-sm bg-slate-800 p-3 text-xs text-white shadow-sm">
                           Olá Vitoria! Sim, temos 6 pares do Sapato Nike no
                           tamanho 40 a 3.600 US$. Gostaria de reservar agora com
                           entrega grátis em Luanda?
-                          <span className="mt-1 block text-right font-mono text-[9px] text-emerald-200">
+                          <span className="mt-1 block text-right font-mono text-[9px] text-slate-300">
                             10:14 · IA
                           </span>
                         </div>
@@ -1926,13 +1926,13 @@ function InteractiveHeroPrompt() {
                         </div>
                       </div>
                       <div className="flex justify-end">
-                        <div className="max-w-[80%] rounded-2xl rounded-tr-sm bg-emerald-700 p-3 text-xs text-white shadow-sm">
+                        <div className="max-w-[80%] rounded-2xl rounded-tr-sm bg-slate-800 p-3 text-xs text-white shadow-sm">
                           Perfeito! Já reservei o seu par por 15 min. Pode pagar
                           via Multicaixa Express pelo link seguro abaixo:
-                          <div className="mt-2 rounded-lg bg-emerald-800/80 p-2 font-mono text-[10px] text-emerald-100">
+                          <div className="mt-2 rounded-lg bg-slate-700 p-2 font-mono text-[10px] text-slate-200">
                             🔗 vendora.co/pedidos/D2CC2E82
                           </div>
-                          <span className="mt-1 block text-right font-mono text-[9px] text-emerald-200">
+                          <span className="mt-1 block text-right font-mono text-[9px] text-slate-300">
                             10:15 · IA
                           </span>
                         </div>
@@ -1954,7 +1954,7 @@ function InteractiveHeroPrompt() {
                     <div className="flex flex-col sm:flex-row gap-4">
                       <div className="flex-1 space-y-2.5">
                         <div className="flex items-center gap-2">
-                          <Instagram className="h-4 w-4 text-pink-600" />
+                          <Instagram className="h-4 w-4 text-slate-700" />
                           <span className="text-xs font-bold text-slate-900">
                             Post de Lançamento (Instagram & Facebook)
                           </span>
@@ -2057,7 +2057,7 @@ function InteractiveHeroPrompt() {
                         </div>
                       </div>
                     </div>
-                    <div className="mt-3 rounded-xl border border-emerald-100 bg-slate-100/60 p-3 text-xs text-emerald-900 flex items-center justify-between">
+                    <div className="mt-3 rounded-xl border border-slate-200 bg-slate-100/60 p-3 text-xs text-slate-900 flex items-center justify-between">
                       <span>
                         💡 <strong>Insight da IA:</strong> O Sapato Nike gerou
                         72% das conversões hoje após a publicação programada.
@@ -2469,7 +2469,7 @@ function ProcessSection() {
                 type="button"
                 aria-pressed={active === index}
                 onClick={() => setActive(index)}
-                className={`w-full rounded-2xl border p-5 text-left transition duration-200 ${active === index ? "border-emerald-700/40 bg-slate-100 shadow-[0_10px_30px_rgba(16,90,65,0.08)]" : "border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm"}`}
+                className={`w-full rounded-2xl border p-5 text-left transition duration-200 ${active === index ? "border-emerald-700/40 bg-slate-100 shadow-[0_10px_30px_rgba(15,23,42,0.07)]" : "border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm"}`}
               >
                 <div className="flex items-start gap-4">
                   <span
@@ -2528,7 +2528,7 @@ export default function Index() {
   const [onboardingOpen, setOnboardingOpen] = useState(false);
 
   return (
-    <div className="landing-page min-h-screen overflow-x-hidden bg-slate-50/50 text-slate-900 selection:bg-slate-900/20 selection:text-emerald-950 relative">
+    <div className="landing-page min-h-screen overflow-x-hidden bg-slate-50/50 text-slate-900 selection:bg-slate-900/20 selection:text-slate-950 relative">
       <TactileGrain />
       <LusionCursor />
       <ScrollProgressBar />
@@ -2670,7 +2670,7 @@ export default function Index() {
                             práticas semanais.
                           </div>
                         </div>
-                        <span className="rounded-full border border-white/20 bg-indigo-500/10 px-2.5 py-1 font-mono text-[9px] uppercase tracking-wider text-slate-300 font-semibold">
+                        <span className="rounded-full border border-white/20 bg-white/10 px-2.5 py-1 font-mono text-[9px] uppercase tracking-wider text-slate-300 font-semibold">
                           Pode Ler
                         </span>
                       </div>
@@ -2867,7 +2867,7 @@ export default function Index() {
                   <Link
                     to={startPath}
                     data-cursor="CRIAR CONTA"
-                    className="mt-9 inline-flex items-center gap-2 rounded-full bg-slate-900 px-7 py-3.5 text-sm font-bold text-slate-950 shadow-lg shadow-emerald-500/20 transition hover:bg-white"
+                    className="mt-9 inline-flex items-center gap-2 rounded-full bg-slate-950 px-7 py-3.5 text-sm font-bold text-white shadow-lg shadow-slate-900/10 transition hover:bg-white"
                   >
                     Criar conta grátis <ArrowRight className="h-4 w-4" />
                   </Link>
