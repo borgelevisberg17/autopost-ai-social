@@ -2529,7 +2529,7 @@ export default function Index() {
   const [onboardingOpen, setOnboardingOpen] = useState(false);
 
   return (
-    <div className="landing-page min-h-screen overflow-x-hidden bg-slate-50/50 text-slate-900 selection:bg-slate-900/20 selection:text-slate-950 relative">
+    <div className="landing-page min-h-screen overflow-x-clip bg-slate-50/50 text-slate-900 selection:bg-slate-900/20 selection:text-slate-950 relative">
       <TactileGrain />
       <LusionCursor />
       <ScrollProgressBar />

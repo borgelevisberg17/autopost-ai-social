@@ -68,30 +68,55 @@ function Hero({ startPath, onStart }: { startPath: string; onStart: () => void }
           <div className="mt-7 flex flex-wrap justify-center gap-x-5 gap-y-2 text-[10px] text-slate-400"><span>Sem instalação complexa</span><span>·</span><span>Controlo centralizado</span><span>·</span><span>IA com regras de negócio</span></div>
         </div>
         <div className="mt-16 sm:mt-20"><ProductWindow/></div>
+        <DotBrandWordmark />
       </div>
     </WaterWakeHero>
   </section>;
 }
 
-function DotBrandTransition() {
- return <section aria-label="Vendora" className="relative isolate overflow-hidden bg-white py-7 sm:py-10">
-  <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-1/2 h-px bg-slate-100"/>
-  <div className="relative mx-auto w-full max-w-[1680px] px-1 sm:px-5">
-   <svg aria-hidden="true" className="block h-auto w-full overflow-visible" viewBox="0 0 1600 270" role="presentation">
-    <defs>
-     <pattern id="vendora-dot-field" width="9" height="9" patternUnits="userSpaceOnUse">
-      <circle cx="2.2" cy="2.2" r="1.55" fill="#111827"/>
-     </pattern>
-     <mask id="vendora-dot-wordmark">
-      <rect width="1600" height="270" fill="black"/>
-      <text x="800" y="214" textAnchor="middle" fill="white" fontFamily="Arial, Helvetica, sans-serif" fontSize="246" fontWeight="800" letterSpacing="-17">VENDORA</text>
-     </mask>
-    </defs>
-    <rect width="1600" height="270" fill="url(#vendora-dot-field)" mask="url(#vendora-dot-wordmark)"/>
-   </svg>
-  </div>
-  <div className="mt-1 flex items-center justify-center gap-3 px-5 text-center font-mono text-[9px] uppercase tracking-[.22em] text-slate-400 sm:mt-3"><span className="h-px w-8 bg-slate-200"/><span>Everything connected. One clear view.</span><span className="h-px w-8 bg-slate-200"/></div>
- </section>;
+function DotBrandWordmark() {
+  return (
+    <div className="mx-auto mt-14 w-full max-w-[1680px] px-1 sm:mt-20 sm:px-5" aria-label="Vendora">
+      <svg
+        aria-hidden="true"
+        className="block h-auto w-full overflow-visible"
+        viewBox="0 0 1600 260"
+        role="presentation"
+      >
+        <defs>
+          <pattern id="vendora-dot-pattern" width="9" height="9" patternUnits="userSpaceOnUse">
+            <circle cx="2.25" cy="2.25" r="1.55" fill="#111827" />
+          </pattern>
+          <mask id="vendora-wordmark-mask">
+            <rect width="1600" height="260" fill="black" />
+            <text
+              x="800"
+              y="207"
+              textAnchor="middle"
+              fill="white"
+              fontFamily="Arial, Helvetica, sans-serif"
+              fontSize="238"
+              fontWeight="800"
+              letterSpacing="-15"
+            >
+              VENDORA
+            </text>
+          </mask>
+        </defs>
+        <rect
+          width="1600"
+          height="260"
+          fill="url(#vendora-dot-pattern)"
+          mask="url(#vendora-wordmark-mask)"
+        />
+      </svg>
+      <div className="mt-2 flex items-center justify-center gap-3 text-center font-mono text-[9px] uppercase tracking-[.22em] text-slate-400 sm:mt-4">
+        <span className="h-px w-8 bg-slate-200" />
+        <span>Everything connected. One clear view.</span>
+        <span className="h-px w-8 bg-slate-200" />
+      </div>
+    </div>
+  );
 }
 
 function ValueStory() {
@@ -154,46 +179,212 @@ function AgentStory() {
 }
 
 function AtmosphereStory() {
- const [active,setActive]=useState(0);
- const stepRefs=useRef<(HTMLElement|null)[]>([]);
- const scenes=[
-  {eyebrow:"Menos dispersão",title:"Tudo começa a fazer sentido quando a operação se liga.",text:"Pedidos, conversas e catálogo deixam de competir pela sua atenção. A informação importante passa a estar organizada num só lugar.",image:"/media/optimized/storefront-commerce.webp",alt:"Loja em funcionamento, representando a operação comercial ligada."},
-  {eyebrow:"Mais contexto",title:"Cada conversa continua de onde a anterior terminou.",text:"O histórico acompanha o cliente. A equipa encontra o contexto, consulta o catálogo e responde sem reconstruir a história a cada contacto.",image:"/media/optimized/whatsapp-status-02.webp",alt:"Conversa de atendimento WhatsApp com consulta de informação do catálogo."},
-  {eyebrow:"Mais controlo",title:"A tecnologia trabalha. A equipa mantém a direção.",text:"Automatize tarefas repetitivas sem abdicar de regras, permissões e visibilidade sobre as decisões e os resultados.",image:"/media/optimized/operations-audit.webp",alt:"Painel de operações que representa controlo e acompanhamento."}
- ];
- useEffect(()=>{
-  const nodes=stepRefs.current.filter((node):node is HTMLElement=>Boolean(node));
-  if(!nodes.length) return;
-  // Preload the three chapter visuals so a fast scroll never reveals an empty frame.
-  ["/media/optimized/storefront-commerce.webp","/media/optimized/whatsapp-status-02.webp","/media/optimized/operations-audit.webp"].forEach(src=>{const image=new Image();image.src=src;});
-  if(!("IntersectionObserver" in window)) return;
-  const observer=new IntersectionObserver(entries=>{
-   const visible=entries.filter(entry=>entry.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio);
-   if(!visible.length) return;
-   const index=nodes.indexOf(visible[0].target as HTMLElement);
-   if(index>=0) setActive(index);
-  },{root:null,rootMargin:"-42% 0px -42% 0px",threshold:[0,.1,.25,.5,.75]});
-  nodes.forEach(node=>observer.observe(node));
-  return ()=>observer.disconnect();
- },[]);
- return <section aria-labelledby="atmosphere-title" className="relative bg-[#f4f4f2] py-24 sm:py-32">
-  <div className={wrap}>
-   <div className="mb-14 max-w-3xl sm:mb-20"><Label>Uma forma mais simples de operar</Label><h2 id="atmosphere-title" className={h2}>Menos ruído. <span className="text-slate-400">Mais espaço para fazer crescer.</span></h2><p className="mt-6 max-w-xl text-sm leading-7 text-slate-600">Uma visão contínua do negócio, do primeiro contacto ao acompanhamento — sem saltar entre ferramentas.</p></div>
-   <div className="grid gap-12 lg:grid-cols-[1.08fr_.92fr] lg:gap-16">
-    <div className="lg:sticky lg:top-24 lg:h-[min(70vh,680px)] lg:self-start">
-     <div className="relative h-[52vh] min-h-[340px] max-h-[680px] overflow-hidden rounded-[26px] bg-slate-200 shadow-[0_30px_90px_rgba(15,23,42,.12)] sm:h-[62vh] lg:h-full">
-      {scenes.map((scene,i)=><div key={scene.image} aria-hidden={active!==i} className={`absolute inset-0 transition-[opacity,transform] duration-700 ease-out motion-reduce:transition-none ${active===i?"scale-100 opacity-100":"pointer-events-none scale-[1.035] opacity-0"}`}><img src={scene.image} alt={scene.alt} loading="eager" decoding="async" className="h-full w-full object-cover"/></div>)}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-transparent"/>
-      <div className="absolute inset-x-6 bottom-6 text-white sm:inset-x-8 sm:bottom-8"><div className="flex items-center justify-between gap-4 font-mono text-[9px] uppercase tracking-[.2em] text-white/70"><span>Vendora / Capítulo 0{active+1}</span><span>0{active+1} — 03</span></div><p className="mt-4 max-w-lg text-2xl font-semibold leading-tight tracking-[-.045em] sm:text-3xl">{scenes[active].title}</p><div className="mt-6 flex gap-1.5" aria-label={`Capítulo ${active+1} de 3`}>{scenes.map((scene,i)=><span key={scene.eyebrow} className={`h-1 rounded-full transition-all duration-500 ${active===i?"w-10 bg-white":"w-4 bg-white/35"}`}/>)}</div></div>
-     </div>
-    </div>
-    <div className="relative">{scenes.map((scene,i)=><article key={scene.eyebrow} ref={node=>{stepRefs.current[i]=node;}} data-story-step={i} className="flex min-h-[340px] flex-col justify-center border-b border-slate-300/80 py-14 first:pt-6 last:border-0 sm:min-h-[440px] lg:min-h-[min(70vh,680px)] lg:py-16">
-      <div className="flex items-center gap-3"><span className="font-mono text-[10px] tabular-nums text-slate-400">0{i+1} / 03</span><span className={`h-px w-8 ${active===i?"bg-slate-950":"bg-slate-300"}`}/><span className="font-mono text-[10px] uppercase tracking-[.16em] text-slate-400">{scene.eyebrow}</span></div>
-      <h3 className={`mt-7 max-w-xl text-3xl font-semibold leading-[1.04] tracking-[-.055em] sm:text-4xl ${active===i?"text-slate-950":"text-slate-500"}`}>{scene.title}</h3><p className="mt-6 max-w-lg text-[15px] leading-7 text-slate-600">{scene.text}</p><div className="mt-8 flex items-center gap-2 text-[10px] font-medium text-slate-400"><span className={`h-1.5 w-1.5 rounded-full ${active===i?"bg-slate-950":"bg-slate-300"}`}/>{active===i?"A acompanhar este capítulo":"Continue a percorrer a história"}</div>
-     </article>)}</div>
-   </div>
-  </div>
- </section>;
+  const [active, setActive] = useState(0);
+  const stepRefs = useRef<(HTMLElement | null)[]>([]);
+  const scenes = [
+    {
+      eyebrow: "Menos dispersão",
+      title: "Tudo começa a fazer sentido quando a operação se liga.",
+      text: "Pedidos, conversas e catálogo deixam de competir pela sua atenção. A informação importante passa a estar organizada num só lugar.",
+      image: "/media/optimized/storefront-commerce.webp",
+      alt: "Loja em funcionamento, representando a operação comercial ligada.",
+    },
+    {
+      eyebrow: "Mais contexto",
+      title: "Cada conversa continua de onde a anterior terminou.",
+      text: "O histórico acompanha o cliente. A equipa encontra o contexto, consulta o catálogo e responde sem reconstruir a história a cada contacto.",
+      image: "/media/optimized/whatsapp-status-02.webp",
+      alt: "Conversa de atendimento WhatsApp com consulta de informação do catálogo.",
+    },
+    {
+      eyebrow: "Mais controlo",
+      title: "A tecnologia trabalha. A equipa mantém a direção.",
+      text: "Automatize tarefas repetitivas sem abdicar de regras, permissões e visibilidade sobre as decisões e os resultados.",
+      image: "/media/optimized/operations-audit.webp",
+      alt: "Painel de operações que representa controlo e acompanhamento.",
+    },
+  ];
+
+  useEffect(() => {
+    const nodes = stepRefs.current.filter(
+      (node): node is HTMLElement => node !== null,
+    );
+    if (!nodes.length) return;
+
+    // Load all chapter images before the reader reaches the sticky sequence.
+    scenes.forEach(({ image }) => {
+      const preload = new window.Image();
+      preload.src = image;
+    });
+
+    const setClosestChapter = () => {
+      const viewportCenter = window.innerHeight / 2;
+      let closestIndex = 0;
+      let closestDistance = Number.POSITIVE_INFINITY;
+
+      nodes.forEach((node, index) => {
+        const rect = node.getBoundingClientRect();
+        const distance =
+          viewportCenter < rect.top
+            ? rect.top - viewportCenter
+            : viewportCenter > rect.bottom
+              ? viewportCenter - rect.bottom
+              : 0;
+
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = index;
+        }
+      });
+
+      setActive((current) => (current === closestIndex ? current : closestIndex));
+    };
+
+    if (!("IntersectionObserver" in window)) {
+      setClosestChapter();
+      window.addEventListener("scroll", setClosestChapter, { passive: true });
+      window.addEventListener("resize", setClosestChapter);
+      return () => {
+        window.removeEventListener("scroll", setClosestChapter);
+        window.removeEventListener("resize", setClosestChapter);
+      };
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => {
+            const aRect = a.boundingClientRect;
+            const bRect = b.boundingClientRect;
+            const center = window.innerHeight / 2;
+            const aDistance = Math.abs((aRect.top + aRect.bottom) / 2 - center);
+            const bDistance = Math.abs((bRect.top + bRect.bottom) / 2 - center);
+            return aDistance - bDistance;
+          });
+
+        if (!visible.length) return;
+        const nextIndex = nodes.indexOf(visible[0].target as HTMLElement);
+        if (nextIndex >= 0) {
+          setActive((current) => (current === nextIndex ? current : nextIndex));
+        }
+      },
+      {
+        root: null,
+        rootMargin: "-44% 0px -44% 0px",
+        threshold: 0,
+      },
+    );
+
+    nodes.forEach((node) => observer.observe(node));
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <section
+      aria-labelledby="atmosphere-title"
+      className="relative bg-[#f4f4f2] py-24 sm:py-32"
+    >
+      <div className={wrap}>
+        <div className="mb-14 max-w-3xl sm:mb-20">
+          <Label>Uma forma mais simples de operar</Label>
+          <h2 id="atmosphere-title" className={h2}>
+            Menos ruído.{" "}
+            <span className="text-slate-400">Mais espaço para fazer crescer.</span>
+          </h2>
+          <p className="mt-6 max-w-xl text-sm leading-7 text-slate-600">
+            Uma visão contínua do negócio, do primeiro contacto ao acompanhamento
+            — sem saltar entre ferramentas.
+          </p>
+        </div>
+
+        <div className="grid items-start gap-10 lg:grid-cols-[1.08fr_.92fr] lg:gap-16">
+          <div className="relative lg:sticky lg:top-24 lg:h-[min(72vh,680px)] lg:self-start">
+            <div className="relative h-[420px] overflow-hidden rounded-[26px] bg-slate-200 shadow-[0_30px_90px_rgba(15,23,42,.12)] sm:h-[540px] lg:h-full">
+              {scenes.map((scene, index) => (
+                <div
+                  key={scene.image}
+                  aria-hidden={active !== index}
+                  className={`absolute inset-0 transition-[opacity,transform] duration-700 ease-out motion-reduce:transition-none ${active === index ? "scale-100 opacity-100" : "pointer-events-none scale-[1.035] opacity-0"}`}
+                >
+                  <img
+                    src={scene.image}
+                    alt={scene.alt}
+                    loading="eager"
+                    decoding="async"
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              ))}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+              <div className="absolute inset-x-6 bottom-6 text-white sm:inset-x-8 sm:bottom-8">
+                <div className="flex items-center justify-between gap-4 font-mono text-[9px] uppercase tracking-[.2em] text-white/70">
+                  <span>Vendora / Capítulo 0{active + 1}</span>
+                  <span>0{active + 1} — 03</span>
+                </div>
+                <p className="mt-4 max-w-lg text-2xl font-semibold leading-tight tracking-[-.045em] sm:text-3xl">
+                  {scenes[active].title}
+                </p>
+                <div
+                  className="mt-6 flex gap-1.5"
+                  aria-label={`Capítulo ${active + 1} de 3`}
+                >
+                  {scenes.map((scene, index) => (
+                    <span
+                      key={scene.eyebrow}
+                      className={`h-1 rounded-full transition-all duration-500 ${active === index ? "w-10 bg-white" : "w-4 bg-white/35"}`}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="relative">
+            {scenes.map((scene, index) => (
+              <article
+                key={scene.eyebrow}
+                ref={(node) => {
+                  stepRefs.current[index] = node;
+                }}
+                data-story-step={index}
+                aria-current={active === index ? "step" : undefined}
+                className="flex min-h-0 flex-col justify-center border-b border-slate-300/80 py-12 last:border-0 sm:py-16 lg:min-h-[76vh] lg:py-16"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="font-mono text-[10px] tabular-nums text-slate-400">
+                    0{index + 1} / 03
+                  </span>
+                  <span
+                    className={`h-px w-8 ${active === index ? "bg-slate-950" : "bg-slate-300"}`}
+                  />
+                  <span className="font-mono text-[10px] uppercase tracking-[.16em] text-slate-400">
+                    {scene.eyebrow}
+                  </span>
+                </div>
+                <h3
+                  className={`mt-7 max-w-xl text-3xl font-semibold leading-[1.04] tracking-[-.055em] transition-colors duration-300 sm:text-4xl ${active === index ? "text-slate-950" : "text-slate-400"}`}
+                >
+                  {scene.title}
+                </h3>
+                <p className="mt-6 max-w-lg text-[15px] leading-7 text-slate-600">
+                  {scene.text}
+                </p>
+                <div className="mt-8 flex items-center gap-2 text-[10px] font-medium text-slate-400">
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full ${active === index ? "bg-slate-950" : "bg-slate-300"}`}
+                  />
+                  {active === index
+                    ? "A acompanhar este capítulo"
+                    : "Continue a percorrer a história"}
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 }
 
 function WorkflowStory() {
@@ -225,5 +416,5 @@ function FinalCTA({startPath}:{startPath:string}) {
 }
 
 export function HomeExperience({startPath,onStart}:{startPath:string;onStart:()=>void}) {
- return <><Hero startPath={startPath} onStart={onStart}/><DotBrandTransition/><ValueStory/><WhatsAppStory/><ChannelStory/><AtmosphereStory/><AgentStory/><section id="plans" className="bg-white"><PlansSection/></section><WorkflowStory/><CommandStory startPath={startPath}/><FAQStory/><FinalCTA startPath={startPath}/></>;
+ return <><Hero startPath={startPath} onStart={onStart}/><ValueStory/><WhatsAppStory/><ChannelStory/><AtmosphereStory/><AgentStory/><section id="plans" className="bg-white"><PlansSection/></section><WorkflowStory/><CommandStory startPath={startPath}/><FAQStory/><FinalCTA startPath={startPath}/></>;
 }

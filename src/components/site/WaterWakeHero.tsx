@@ -651,7 +651,7 @@ export const WaterWakeHero: React.FC<WaterWakeHeroProps> = ({
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 z-0 h-full w-full"
       />
-      <div className="relative z-10 pointer-events-none w-full">{children}</div>
+      <div className="relative z-10 w-full">{children}</div>
     </div>
   );
 };
