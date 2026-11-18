@@ -85,6 +85,13 @@
       "when": 1794844724832,
       "tag": "0011_campaigns_pipeline_newsletter",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1795037893445,
+      "tag": "0012_restrict_public_companies_to_active",
+      "breakpoints": true
     }
   ]
 }
