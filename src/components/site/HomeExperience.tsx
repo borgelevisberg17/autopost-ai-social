@@ -146,7 +146,7 @@ function OverflowHoverStory() {
           <span>Uma plataforma. Um negócio inteiro.</span><span className="hidden sm:inline">Vendora / 2026</span>
         </div>
         <div className="max-w-3xl py-20">
-          <Label>Conheça a Vendora</Label>
+          <div className="mb-5 inline-flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[.18em] text-white/65"><span className="h-1.5 w-1.5 rounded-full bg-white" />Conheça a Vendora</div>
           <h2 id="vendora-intro-title" className="max-w-[13ch] text-balance text-4xl font-semibold leading-[.98] tracking-[-.065em] text-white sm:text-6xl lg:text-[clamp(4rem,7vw,6.5rem)]">
             O comércio move-se. <span className="text-white/55">A sua gestão também.</span>
           </h2>
