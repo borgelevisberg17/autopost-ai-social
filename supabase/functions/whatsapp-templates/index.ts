@@ -66,7 +66,7 @@ Deno.serve(async (req) => {
         headers: { Authorization: `Bearer ${token}` },
       });
     } else if (input.action === "create") {
-      const variableCount = [...input.body.matchAll(/\\{\\{\\d+\\}\\}/g)].length;
+      const variableCount = [...input.body.matchAll(/\{\{\d+\}\}/g)].length;
       if (variableCount > 0 && (!input.body_examples || input.body_examples.length !== variableCount)) {
         return json({ error: `Indica ${variableCount} exemplo(s), um para cada variável do corpo.` }, 400);
       }
