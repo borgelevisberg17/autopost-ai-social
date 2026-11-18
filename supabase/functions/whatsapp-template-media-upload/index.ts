@@ -20,6 +20,8 @@ Deno.serve(async (req) => {
   if (req.method !== "POST") return json({ error: "Método não permitido" }, 405);
 
   try {
+    const declaredLength = Number(req.headers.get("content-length") ?? "0");
+    if (declaredLength > 101 * 1024 * 1024) return json({ error: "O upload excede o limite máximo permitido." }, 413);
     const auth = req.headers.get("Authorization");
     if (!auth) return json({ error: "Inicie sessão" }, 401);
     const userDb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!, {
@@ -49,6 +51,14 @@ Deno.serve(async (req) => {
       const maxMb = Math.round(maxSize / 1024 / 1024);
       return json({ error: `O ficheiro excede o limite de ${maxMb} MB para este formato.` }, 413);
     }
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    const startsWith = (...signature: number[]) => signature.every((value, index) => bytes[index] === value);
+    const validSignature = mime === "image/jpeg" ? startsWith(0xff, 0xd8, 0xff)
+      : mime === "image/png" ? startsWith(0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a)
+      : mime === "application/pdf" ? new TextDecoder().decode(bytes.slice(0, 5)) === "%PDF-"
+      : mime === "video/mp4" ? new TextDecoder().decode(bytes.slice(4, 8)) === "ftyp"
+      : false;
+    if (!validSignature) return json({ error: "O conteúdo do ficheiro não corresponde ao formato declarado." }, 415);
 
     const meta = await metaCredentials();
     const appId = meta.app_id;
@@ -80,7 +90,7 @@ Deno.serve(async (req) => {
         "file_offset": "0",
         "Content-Type": "application/octet-stream",
       },
-      body: await file.arrayBuffer(),
+      body: bytes,
     });
     const uploaded = await uploadResponse.json().catch(() => ({}));
     if (!uploadResponse.ok || typeof uploaded.h !== "string" || !uploaded.h) {
