@@ -86,12 +86,6 @@ function DotBrandTransition() {
       <rect width="1600" height="270" fill="black"/>
       <text x="800" y="214" textAnchor="middle" fill="white" fontFamily="Arial, Helvetica, sans-serif" fontSize="246" fontWeight="800" letterSpacing="-17">VENDORA</text>
      </mask>
-     <linearGradient id="vendora-dot-fade" x1="0" x2="1" y1="0" y2="0">
-      <stop offset="0" stopColor="white" stopOpacity=".35"/>
-      <stop offset=".18" stopColor="white"/>
-      <stop offset=".82" stopColor="white"/>
-      <stop offset="1" stopColor="white" stopOpacity=".35"/>
-     </linearGradient>
     </defs>
     <rect width="1600" height="270" fill="url(#vendora-dot-field)" mask="url(#vendora-dot-wordmark)"/>
    </svg>
@@ -171,7 +165,7 @@ function AtmosphereStory() {
   const nodes=stepRefs.current.filter((node):node is HTMLElement=>Boolean(node));
   if(!nodes.length) return;
   // Preload the three chapter visuals so a fast scroll never reveals an empty frame.
-  scenes.forEach(scene=>{const image=new Image();image.src=scene.image;});
+  ["/media/optimized/storefront-commerce.webp","/media/optimized/whatsapp-status-02.webp","/media/optimized/operations-audit.webp"].forEach(src=>{const image=new Image();image.src=src;});
   if(!("IntersectionObserver" in window)) return;
   const observer=new IntersectionObserver(entries=>{
    const visible=entries.filter(entry=>entry.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio);
