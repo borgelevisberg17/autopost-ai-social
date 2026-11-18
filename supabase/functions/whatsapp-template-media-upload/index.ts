@@ -68,12 +68,12 @@ Deno.serve(async (req) => {
       headers: { Authorization: `Bearer ${token}` },
     });
     const session = await sessionResponse.json().catch(() => ({}));
-    if (!sessionResponse.ok || typeof session.id !== "string" || !session.id.startsWith("upload:")) {
+    if (!sessionResponse.ok || typeof session.id !== "string" || !/^upload:[A-Za-z0-9:_-]+$/.test(session.id)) {
       console.error("Meta upload session failed", session?.error?.code ?? sessionResponse.status);
       return json({ error: session?.error?.message ?? "A Meta não conseguiu iniciar o carregamento." }, 502);
     }
 
-    const uploadResponse = await fetch(`${base}/${encodeURIComponent(session.id)}`, {
+    const uploadResponse = await fetch(`${base}/${session.id}`, {
       method: "POST",
       headers: {
         Authorization: `OAuth ${token}`,
