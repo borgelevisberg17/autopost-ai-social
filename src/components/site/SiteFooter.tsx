@@ -17,7 +17,7 @@ export function SiteFooter() {
         </div>
         <nav aria-label="Informações legais" className="flex flex-wrap gap-x-5 gap-y-2 border-t border-slate-100 pt-5">
           {legalLinks.map((item) => (
-            <Link key={item.to} to={item.to} className="transition hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]">
+            <Link key={item.to} to={item.to} className="transition hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#111827]">
               {item.label}
             </Link>
           ))}

@@ -68,13 +68,13 @@ export function LusionCursor() {
           cursorText
             ? "rounded-full bg-slate-950/90 text-white px-3.5 py-1.5 shadow-[0_8px_30px_rgba(0,0,0,0.35)] backdrop-blur-md border border-white/20"
             : isHovering
-            ? "h-8 w-8 rounded-full border border-emerald-500/60 bg-emerald-500/10 backdrop-blur-xs"
-            : "h-3.5 w-3.5 rounded-full bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.7)]"
+            ? "h-8 w-8 rounded-full border border-slate-900/60 bg-slate-900/10 backdrop-blur-xs"
+            : "h-3.5 w-3.5 rounded-full bg-slate-900 shadow-[0_0_12px_rgba(15,23,42,0.22)]"
         }`}
       >
         {cursorText && (
-          <span className="font-mono text-[9px] uppercase tracking-widest font-semibold text-emerald-300 flex items-center gap-1.5 whitespace-nowrap">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />
+          <span className="font-mono text-[9px] uppercase tracking-widest font-semibold text-slate-200 flex items-center gap-1.5 whitespace-nowrap">
+            <span className="h-1.5 w-1.5 rounded-full bg-white animate-ping" />
             {cursorText}
           </span>
         )}

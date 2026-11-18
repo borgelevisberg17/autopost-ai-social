@@ -102,7 +102,7 @@ function ScrollProgressBar() {
 
   return (
     <motion.div
-      className="fixed top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-300 origin-left z-[70] pointer-events-none shadow-[0_0_12px_rgba(16,185,129,0.5)]"
+      className="fixed left-0 right-0 top-0 z-[70] h-[2px] origin-left bg-gradient-to-r from-black via-slate-700 to-slate-300 pointer-events-none"
       style={{ scaleX }}
     />
   );
@@ -155,7 +155,7 @@ function LusionChapterDock() {
   const nextChapter = CHAPTERS[(activeIndex + 1) % CHAPTERS.length];
 
   return (
-    <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 hidden md:flex items-center gap-1.5 rounded-full border border-slate-800/80 bg-slate-950/90 p-1.5 text-white shadow-[0_20px_50px_rgba(15,23,42,0.35)] backdrop-blur-xl">
+    <div className="fixed bottom-5 left-1/2 z-50 hidden -translate-x-1/2 items-center gap-1.5 rounded-full border border-slate-200 bg-white/95 p-1.5 text-slate-900 shadow-[0_12px_40px_rgba(15,23,42,0.12)] backdrop-blur-xl md:flex">
       <div className="flex items-center gap-0.5 px-1">
         {CHAPTERS.map((chapter) => {
           const isActive = chapter.id === activeId;
@@ -169,7 +169,7 @@ function LusionChapterDock() {
               }}
               className={`relative rounded-full px-3 py-1.5 text-[11px] font-medium transition-colors ${
                 isActive
-                  ? "text-slate-950 font-semibold"
+                  ? "text-white font-semibold"
                   : "text-slate-400 hover:text-white"
               }`}
             >
@@ -181,13 +181,13 @@ function LusionChapterDock() {
                     stiffness: 380,
                     damping: 30,
                   }}
-                  className="absolute inset-0 rounded-full bg-emerald-400 shadow-[0_0_16px_rgba(52,211,153,0.45)]"
+                  className="absolute inset-0 rounded-full bg-slate-950"
                 />
               )}
               <span className="relative z-10 flex items-center gap-1.5">
                 <span
                   className={`font-mono text-[9px] ${
-                    isActive ? "text-slate-900" : "text-slate-500"
+                    isActive ? "text-white" : "text-slate-500"
                   }`}
                 >
                   {chapter.number}
@@ -199,7 +199,7 @@ function LusionChapterDock() {
         })}
       </div>
 
-      <div className="h-4 w-[1px] bg-white/15" />
+      <div className="h-4 w-px bg-slate-200" />
 
       <button
         type="button"
@@ -208,7 +208,7 @@ function LusionChapterDock() {
           smoothScrollToElement(nextChapter.id);
         }}
         title={`Ir para ${nextChapter.label}`}
-        className="flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-emerald-300 transition hover:bg-white/20"
+        className="flex items-center gap-1.5 rounded-full bg-slate-950 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-white transition hover:bg-slate-700"
       >
         <span>Seguinte</span>
         <ArrowDown className="h-3 w-3" />
@@ -240,7 +240,7 @@ function SectionBridge({
     >
       <div className="mx-auto flex w-full max-w-[1240px] items-center justify-between lg:px-3">
         <span className="flex items-center gap-2">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+          <span className="h-1.5 w-1.5 rounded-full bg-slate-900" />
           {label}
         </span>
         <button
@@ -254,7 +254,7 @@ function SectionBridge({
           }`}
         >
           <span>Continuar a explorar</span>
-          <ArrowDown className="h-3 w-3 text-slate-400 group-hover:text-emerald-500 transition-transform group-hover:translate-y-0.5" />
+          <ArrowDown className="h-3 w-3 text-slate-400 group-hover:text-slate-900 transition-transform group-hover:translate-y-0.5" />
         </button>
       </div>
     </div>
@@ -314,9 +314,9 @@ function GridCross({
 }) {
   return (
     <div
-      className={`pointer-events-none select-none font-mono text-[10px] text-emerald-600/50 flex items-center gap-1.5 z-20 ${className}`}
+      className={`pointer-events-none select-none font-mono text-[10px] text-slate-800/50 flex items-center gap-1.5 z-20 ${className}`}
     >
-      <span className="text-emerald-500 font-bold">+</span>
+      <span className="text-slate-900 font-bold">+</span>
       {label && (
         <span className="text-[9px] uppercase tracking-wider text-slate-400 font-mono font-medium">
           {label}
@@ -452,12 +452,12 @@ function Eyebrow({ children, light = false }: EyebrowProps) {
     <div
       className={`mb-5 inline-flex items-center gap-2 rounded-full border px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] ${
         light
-          ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-400"
+          ? "border-white/20 bg-white/10 text-white"
           : "border-slate-200/90 bg-white/80 text-slate-700 shadow-[0_1px_2px_rgba(0,0,0,0.02)]"
       }`}
     >
       <span
-        className={`h-1.5 w-1.5 rounded-full ${light ? "bg-emerald-400" : "bg-emerald-500"}`}
+        className={`h-1.5 w-1.5 rounded-full ${light ? "bg-white" : "bg-slate-900"}`}
       />
       {children}
     </div>
@@ -481,7 +481,7 @@ function Metric({
         <span className="font-mono text-[10px] uppercase tracking-wider text-slate-500">
           {label}
         </span>
-        <Icon className="h-4 w-4 text-emerald-600" />
+        <Icon className="h-4 w-4 text-slate-800" />
       </div>
       <div className="mt-3 text-2xl font-bold tracking-tight text-slate-900">
         {value}
@@ -509,7 +509,7 @@ function ProductFrame() {
         <div className="grid min-h-[420px] md:grid-cols-[180px_1fr]">
           <aside className="hidden border-r border-slate-800 bg-slate-950 p-4 text-slate-100 md:block">
             <div className="mb-8 flex items-center gap-2">
-              <span className="grid h-6 w-6 place-items-center rounded-md bg-emerald-600 text-white">
+              <span className="grid h-6 w-6 place-items-center rounded-md bg-slate-950 text-white">
                 <Circle className="h-2.5 w-2.5 fill-current" />
               </span>
               <span className="text-[12px] font-bold tracking-tight">
@@ -524,7 +524,7 @@ function ProductFrame() {
                     className={`flex items-center gap-2 rounded-lg px-2.5 py-2 text-[11px] font-medium ${i === 0 ? "bg-white/10 text-white" : "text-white/50"}`}
                   >
                     <span
-                      className={`h-1.5 w-1.5 rounded-full ${i === 0 ? "bg-emerald-400" : "bg-white/30"}`}
+                      className={`h-1.5 w-1.5 rounded-full ${i === 0 ? "bg-white" : "bg-white/30"}`}
                     />
                     {item}
                   </div>
@@ -537,15 +537,15 @@ function ProductFrame() {
               </div>
               <div className="mt-3 space-y-2 text-[11px] text-white/60">
                 <div className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />{" "}
+                  <span className="h-1.5 w-1.5 rounded-full bg-white" />{" "}
                   Loja Online
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-pink-400" />{" "}
+                  <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />{" "}
                   Instagram
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />{" "}
+                  <span className="h-1.5 w-1.5 rounded-full bg-slate-900" />{" "}
                   WhatsApp
                 </div>
               </div>
@@ -602,8 +602,8 @@ function ProductFrame() {
                       Receita por dia (US$)
                     </div>
                   </div>
-                  <div className="flex items-center gap-1.5 text-[10px] font-semibold text-emerald-700">
-                    <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                  <div className="flex items-center gap-1.5 text-[10px] font-semibold text-slate-800">
+                    <span className="h-2 w-2 rounded-full bg-slate-900" />
                     Vendas Concluídas
                   </div>
                 </div>
@@ -613,7 +613,7 @@ function ProductFrame() {
                   ].map((height, i) => (
                     <div
                       key={i}
-                      className={`flex-1 rounded-t-full transition hover:opacity-80 ${i === 11 ? "bg-emerald-500" : "bg-slate-300"}`}
+                      className={`flex-1 rounded-t-full transition hover:opacity-80 ${i === 11 ? "bg-slate-900" : "bg-slate-300"}`}
                       style={{ height: `${height}%` }}
                     />
                   ))}
@@ -642,7 +642,7 @@ function ProductFrame() {
                     ],
                   ].map(([title, detail, time]) => (
                     <div key={title} className="flex items-start gap-2.5">
-                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" />
+                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-900" />
                       <div className="min-w-0 flex-1">
                         <div className="flex justify-between gap-2 text-[11px] font-semibold text-slate-900">
                           <span>{title}</span>
@@ -762,16 +762,16 @@ function ProofSection() {
   return (
     <section
       ref={sectionRef}
-      className="reveal-up reveal-delay-2 relative min-h-[650px] overflow-hidden border-b border-[#37423b] bg-[#202522] text-[#f6f3ed] sm:min-h-[800px]"
+      className="reveal-up reveal-delay-2 relative min-h-[650px] overflow-hidden border-b border-[#37423b] bg-[#111827] text-[#f8fafc] sm:min-h-[800px]"
     >
-      <div className="absolute inset-0 bg-[#2c6457]/20" />
+      <div className="absolute inset-0 bg-[#111827]/20" />
       <motion.div
         style={{ rotate: outerRingRotate }}
         className="absolute left-1/2 top-1/2 hidden h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10 sm:block sm:h-[680px] sm:w-[680px]"
       />
       <motion.div
         style={{ rotate: innerRingRotate }}
-        className="absolute left-1/2 top-1/2 hidden h-[300px] w-[300px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#e36c3f]/20 sm:block sm:h-[430px] sm:w-[430px]"
+        className="absolute left-1/2 top-1/2 hidden h-[300px] w-[300px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#111827]/20 sm:block sm:h-[430px] sm:w-[430px]"
       />
       <div className="absolute inset-0 hidden sm:block" aria-hidden="true">
         {profiles.map((profile, index) => (
@@ -787,13 +787,13 @@ function ProofSection() {
                 src={profile.src}
                 alt={`${profile.name} customer profile`}
                 loading="lazy"
-                className={`${profile.size} rounded-full border-4 border-[#29322d] object-cover shadow-[0_20px_50px_rgba(0,0,0,0.3)]`}
+                className={`${profile.size} rounded-full border-4 border-[#1f2937] object-cover shadow-[0_20px_50px_rgba(0,0,0,0.3)]`}
               />
-              <span className="absolute -right-1 top-1 grid h-6 w-6 place-items-center rounded-full border-2 border-[#29322d] bg-[#e36c3f] text-[9px] font-bold text-white">
+              <span className="absolute -right-1 top-1 grid h-6 w-6 place-items-center rounded-full border-2 border-[#1f2937] bg-[#111827] text-[9px] font-bold text-white">
                 {index + 1}
               </span>
             </span>
-            <span className="pointer-events-none absolute left-1/2 top-full mt-3 -translate-x-1/2 whitespace-nowrap border border-white/15 bg-[#29322d] px-3 py-1.5 text-[10px] font-medium text-white opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100">
+            <span className="pointer-events-none absolute left-1/2 top-full mt-3 -translate-x-1/2 whitespace-nowrap border border-white/15 bg-[#1f2937] px-3 py-1.5 text-[10px] font-medium text-white opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100">
               {profile.name} · {profile.channel}
             </span>
           </button>
@@ -833,7 +833,7 @@ function ProofSection() {
                 playTactileFeedback();
                 smoothScrollToElement("process");
               }}
-              className="inline-flex items-center gap-2 rounded-full bg-[#e36c3f] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#f08055]"
+              className="inline-flex items-center gap-2 rounded-full bg-[#111827] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#374151]"
             >
               See how it works <ArrowRight className="h-4 w-4" />
             </button>
@@ -904,13 +904,13 @@ function WhatsAppFlow() {
   const [src, label, detail, story, time] = states[active];
   return (
     <div className="relative mx-auto max-w-[500px]">
-      <div className="mb-4 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.16em] text-[#5f625d]">
+      <div className="mb-4 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.16em] text-[#64748b]">
         <span>WhatsApp Status</span>
-        <span className="text-[#2c6457]">
+        <span className="text-[#111827]">
           Live sequence · {active + 1}/{states.length}
         </span>
       </div>
-      <LusionTiltCard className="relative mx-auto max-w-[370px] overflow-hidden rounded-[30px] border-[10px] border-[#202522] bg-[#202522] shadow-[0_24px_60px_rgba(32,37,34,0.22)]">
+      <LusionTiltCard className="relative mx-auto max-w-[370px] overflow-hidden rounded-[30px] border-[10px] border-[#111827] bg-[#111827] shadow-[0_24px_60px_rgba(32,37,34,0.22)]">
         <div className="absolute inset-x-3 top-3 z-20 flex gap-1">
           {states.map((_, index) => (
             <span
@@ -929,7 +929,7 @@ function WhatsAppFlow() {
           className="aspect-[9/16] w-full object-cover"
           loading="lazy"
         />
-        <div className="absolute inset-x-0 bottom-0 border-t border-white/15 bg-[#202522]/90 p-4 text-white">
+        <div className="absolute inset-x-0 bottom-0 border-t border-white/15 bg-[#111827]/90 p-4 text-white">
           <div className="flex items-center gap-2">
             <span className="h-8 w-8 overflow-hidden rounded-full border border-white/40">
               <img
@@ -947,7 +947,7 @@ function WhatsAppFlow() {
               </div>
             </div>
           </div>
-          <div className="mt-4 font-mono text-[9px] uppercase tracking-[0.14em] text-[#e36c3f]">
+          <div className="mt-4 font-mono text-[9px] uppercase tracking-[0.14em] text-[#111827]">
             {label}
           </div>
           <div className="mt-1 text-sm font-semibold">{detail}</div>
@@ -962,7 +962,7 @@ function WhatsAppFlow() {
               (current) => (current - 1 + states.length) % states.length
             )
           }
-          className="grid h-9 w-9 place-items-center border border-[#b9cabe] bg-[#d9e7de] text-[#2c6457] transition hover:bg-[#fffdf9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+          className="grid h-9 w-9 place-items-center border border-[#d1d5db] bg-[#f1f3f5] text-[#111827] transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#111827]"
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
@@ -973,14 +973,14 @@ function WhatsAppFlow() {
             aria-label={`Show ${item[1]} status`}
             aria-pressed={index === active}
             onClick={() => setActive(index)}
-            className={`h-2.5 w-2.5 rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f] ${index === active ? "bg-[#e36c3f]" : "bg-[#8bad9d]"}`}
+            className={`h-2.5 w-2.5 rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#111827] ${index === active ? "bg-[#111827]" : "bg-[#9ca3af]"}`}
           />
         ))}
         <button
           type="button"
           aria-label="Next WhatsApp status"
           onClick={() => setActive((current) => (current + 1) % states.length)}
-          className="grid h-9 w-9 place-items-center border border-[#b9cabe] bg-[#d9e7de] text-[#2c6457] transition hover:bg-[#fffdf9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+          className="grid h-9 w-9 place-items-center border border-[#d1d5db] bg-[#f1f3f5] text-[#111827] transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#111827]"
         >
           <ChevronRight className="h-4 w-4" />
         </button>
@@ -1007,7 +1007,7 @@ function ChannelShowcase() {
         "Facebook customer-favourite campaign print",
         "Facebook community campaign print",
       ],
-      tone: "bg-[#27352e]",
+      tone: "bg-[#111827]",
     },
     {
       name: "Instagram",
@@ -1025,13 +1025,13 @@ function ChannelShowcase() {
         "Instagram made-to-move campaign print",
         "Instagram carousel product campaign print",
       ],
-      tone: "bg-[#d9e7de]",
+      tone: "bg-[#f1f3f5]",
     },
   ];
   return (
     <section
       id="channels"
-      className="border-b border-[#d8d3c8] bg-[#f1eee7] text-[#202522]"
+      className="border-b border-[#e5e7eb] bg-white text-[#111827]"
     >
       <div className="mx-auto max-w-[1200px] px-5 py-20 sm:py-24 lg:px-8 lg:py-28">
         <div className="max-w-3xl">
@@ -1039,7 +1039,7 @@ function ChannelShowcase() {
           <h2 className="text-5xl font-semibold leading-[0.96] tracking-[-0.07em] sm:text-6xl">
             The sale changes shape. Your operation stays clear.
           </h2>
-          <p className="mt-6 max-w-xl text-base leading-7 text-[#5f625d]">
+          <p className="mt-6 max-w-xl text-base leading-7 text-[#64748b]">
             Facebook and Instagram each get their own space, their own visual
             rhythm and their own campaign story – without making the operator
             switch modes to understand the system.
@@ -1049,12 +1049,12 @@ function ChannelShowcase() {
           {channels.map((channel, channelIndex) => (
             <article
               key={channel.name}
-              className={`${channel.tone} overflow-hidden rounded-2xl p-5 sm:p-7 ${channelIndex === 1 ? "text-[#202522]" : "text-white"}`}
+              className={`${channel.tone} overflow-hidden rounded-2xl p-5 sm:p-7 ${channelIndex === 1 ? "text-[#111827]" : "text-white"}`}
             >
               <div className="grid gap-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-center">
                 <div>
                   <div
-                    className={`font-mono text-[10px] uppercase tracking-[0.16em] ${channelIndex === 1 ? "text-[#2c6457]" : "text-[#e36c3f]"}`}
+                    className={`font-mono text-[10px] uppercase tracking-[0.16em] ${channelIndex === 1 ? "text-[#111827]" : "text-[#111827]"}`}
                   >
                     {channel.name} · {channel.eyebrow}
                   </div>
@@ -1062,12 +1062,12 @@ function ChannelShowcase() {
                     {channel.title}
                   </h3>
                   <p
-                    className={`mt-5 max-w-sm text-sm leading-6 ${channelIndex === 1 ? "text-[#5f625d]" : "text-white/60"}`}
+                    className={`mt-5 max-w-sm text-sm leading-6 ${channelIndex === 1 ? "text-[#64748b]" : "text-white/60"}`}
                   >
                     {channel.detail}
                   </p>
                   <div
-                    className={`mt-7 flex items-center gap-3 border-t pt-4 font-mono text-[9px] uppercase tracking-[0.15em] ${channelIndex === 1 ? "border-[#8bad9d] text-[#5f625d]" : "border-white/15 text-white/45"}`}
+                    className={`mt-7 flex items-center gap-3 border-t pt-4 font-mono text-[9px] uppercase tracking-[0.15em] ${channelIndex === 1 ? "border-[#9ca3af] text-[#64748b]" : "border-white/15 text-white/45"}`}
                   >
                     <span>3 campaign pieces</span>
                     <span>·</span>
@@ -1075,23 +1075,23 @@ function ChannelShowcase() {
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-[1fr_0.3fr] gap-3">
-                  <div className="overflow-hidden rounded-xl border border-white/20 bg-[#f6f3ed] p-2 sm:p-3">
+                  <div className="overflow-hidden rounded-xl border border-white/20 bg-[#f8fafc] p-2 sm:p-3">
                     <img
                       src={channel.assets[0]}
                       alt={channel.alt[0]}
                       loading="lazy"
                       className={`w-full object-cover ${channelIndex === 0 ? "aspect-[16/9]" : "aspect-[4/5]"}`}
                     />
-                    <div className="flex items-center justify-between px-1 pt-3 font-mono text-[9px] uppercase tracking-[0.14em] text-[#8f8a80]">
+                    <div className="flex items-center justify-between px-1 pt-3 font-mono text-[9px] uppercase tracking-[0.14em] text-[#94a3b8]">
                       <span>{channel.name} campaign</span>
-                      <span className="text-[#2c6457]">Ready to publish</span>
+                      <span className="text-[#111827]">Ready to publish</span>
                     </div>
                   </div>
                   <div className="flex flex-col gap-3">
                     {channel.assets.slice(1).map((asset, index) => (
                       <div
                         key={asset}
-                        className="overflow-hidden rounded-xl border border-white/20 bg-[#29322d] p-1"
+                        className="overflow-hidden rounded-xl border border-white/20 bg-[#1f2937] p-1"
                       >
                         <img
                           src={asset}
@@ -1204,7 +1204,7 @@ function CaseStudiesSection() {
   return (
     <section
       id="proof-cases"
-      className="overflow-hidden bg-[#e6d4aa] text-[#202522]"
+      className="overflow-hidden bg-[#e5e7eb] text-[#111827]"
     >
       <div className="mx-auto max-w-[1240px] px-5 py-24 lg:px-8 lg:py-32">
         <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
@@ -1228,11 +1228,11 @@ function CaseStudiesSection() {
                     (index - 1 + CASE_STUDIES.length) % CASE_STUDIES.length
                 )
               }
-              className="grid h-11 w-11 place-items-center rounded-full border border-[#a9976c]/70 bg-[#fffdf9]/50 text-[#2c6457] transition hover:border-[#e36c3f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+              className="grid h-11 w-11 place-items-center rounded-full border border-[#a9976c]/70 bg-white/50 text-[#111827] transition hover:border-[#111827] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#111827]"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
-            <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#8b6b36]">
+            <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#475569]">
               0{active + 1} / 0{CASE_STUDIES.length}
             </div>
             <button
@@ -1241,7 +1241,7 @@ function CaseStudiesSection() {
               onClick={() =>
                 setActive((index) => (index + 1) % CASE_STUDIES.length)
               }
-              className="grid h-11 w-11 place-items-center rounded-full border border-[#a9976c]/70 bg-[#fffdf9]/50 text-[#2c6457] transition hover:border-[#e36c3f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e36c3f]"
+              className="grid h-11 w-11 place-items-center rounded-full border border-[#a9976c]/70 bg-white/50 text-[#111827] transition hover:border-[#111827] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#111827]"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
@@ -1250,11 +1250,11 @@ function CaseStudiesSection() {
         <div className="mt-12 grid gap-4 lg:grid-cols-2">
           <article
             aria-live="polite"
-            className="flex min-h-[420px] flex-col justify-between rounded-2xl bg-[#202522] p-6 text-[#f6f3ed] shadow-[0_18px_48px_rgba(32,37,34,0.12)] sm:p-9"
+            className="flex min-h-[420px] flex-col justify-between rounded-2xl bg-[#111827] p-6 text-[#f8fafc] shadow-[0_18px_48px_rgba(32,37,34,0.12)] sm:p-9"
           >
             <div>
               <div className="flex items-center gap-3">
-                <span className="grid h-12 w-12 place-items-center rounded-full bg-[#f6f3ed] p-2">
+                <span className="grid h-12 w-12 place-items-center rounded-full bg-[#f8fafc] p-2">
                   <img
                     src={current.logo}
                     alt={`${current.company} logo`}
@@ -1279,13 +1279,13 @@ function CaseStudiesSection() {
               <div className="mt-1 text-xs text-white/50">{current.role}</div>
             </div>
           </article>
-          <article className="flex min-h-[420px] flex-col justify-between rounded-2xl bg-[#fffdf9] p-6 shadow-[0_18px_48px_rgba(32,37,34,0.07)] sm:p-9">
+          <article className="flex min-h-[420px] flex-col justify-between rounded-2xl bg-white p-6 shadow-[0_18px_48px_rgba(32,37,34,0.07)] sm:p-9">
             <div>
               <div className="flex items-center justify-between">
-                <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#2c6457]">
+                <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#111827]">
                   Case study / {current.company}
                 </div>
-                <span className="h-2 w-2 rounded-full bg-[#e36c3f]" />
+                <span className="h-2 w-2 rounded-full bg-[#111827]" />
               </div>
               <div className="mt-12 grid gap-6 sm:grid-cols-[1fr_0.7fr] sm:items-end">
                 <div>
@@ -1297,10 +1297,10 @@ function CaseStudiesSection() {
                   </p>
                 </div>
                 <div className="border-t border-[#c8c1b4] pt-4 sm:border-l sm:border-t-0 sm:pl-6">
-                  <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#8f8a80]">
+                  <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#94a3b8]">
                     Outcome
                   </div>
-                  <div className="mt-2 text-5xl font-semibold tracking-[-0.08em] text-[#2c6457]">
+                  <div className="mt-2 text-5xl font-semibold tracking-[-0.08em] text-[#111827]">
                     {current.result}
                   </div>
                   <div className="mt-1 text-sm text-[#6e716b]">
@@ -1309,15 +1309,15 @@ function CaseStudiesSection() {
                 </div>
               </div>
             </div>
-            <div className="border-t border-[#d8d3c8] pt-4">
-              <div className="flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.14em] text-[#8f8a80]">
+            <div className="border-t border-[#e5e7eb] pt-4">
+              <div className="flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.14em] text-[#94a3b8]">
                 <span>Customer story</span>
                 <span>Auto-advances</span>
               </div>
-              <div className="mt-3 h-1 overflow-hidden rounded-full bg-[#d8d3c8]">
+              <div className="mt-3 h-1 overflow-hidden rounded-full bg-[#e5e7eb]">
                 <div
                   key={active}
-                  className="case-study-progress h-full origin-left rounded-full bg-[#e36c3f]"
+                  className="case-study-progress h-full origin-left rounded-full bg-[#111827]"
                   style={{
                     animation: "case-study-progress 5.6s linear forwards",
                   }}
@@ -1329,7 +1329,7 @@ function CaseStudiesSection() {
         <div className="mt-12">
           <h3
             id="company-marquee-title"
-            className="mb-4 font-mono text-[10px] uppercase tracking-[0.16em] text-[#8b6b36]"
+            className="mb-4 font-mono text-[10px] uppercase tracking-[0.16em] text-[#475569]"
           >
             Teams already moving with Vendora
           </h3>
@@ -1354,7 +1354,7 @@ function CaseStudiesSection() {
                         loading="lazy"
                         className="company-marquee__logo"
                       />
-                      <span className="whitespace-nowrap text-[14px] font-semibold tracking-[-0.02em] text-[#202522] sm:text-[15px]">
+                      <span className="whitespace-nowrap text-[14px] font-semibold tracking-[-0.02em] text-[#111827] sm:text-[15px]">
                         {name}
                       </span>
                     </li>
@@ -1405,7 +1405,7 @@ function OnboardingModal({
   const destination = `${startPath}?goal=${encodeURIComponent(goal.toLowerCase().replace(/ /g, "-"))}&channels=${encodeURIComponent(channels.join(",").toLowerCase())}`;
   return (
     <div
-      className="fixed inset-0 z-[70] flex items-end justify-center bg-[#202522]/65 p-0 backdrop-blur-sm sm:items-center sm:p-5"
+      className="fixed inset-0 z-[70] flex items-end justify-center bg-[#111827]/65 p-0 backdrop-blur-sm sm:items-center sm:p-5"
       role="presentation"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose();
@@ -1415,30 +1415,30 @@ function OnboardingModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="onboarding-title"
-        className="max-h-[92vh] w-full overflow-y-auto rounded-t-3xl border border-[#d8d3c8] bg-[#fffdf9] shadow-[0_30px_100px_rgba(32,37,34,0.28)] sm:max-w-[560px] sm:rounded-3xl"
+        className="max-h-[92vh] w-full overflow-y-auto rounded-t-3xl border border-[#e5e7eb] bg-white shadow-[0_30px_100px_rgba(32,37,34,0.28)] sm:max-w-[560px] sm:rounded-3xl"
       >
         <div className="flex items-center justify-between border-b border-[#e2ded5] px-5 py-4 sm:px-7">
-          <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#2c6457]">
+          <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#111827]">
             Vendora / setup
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close onboarding"
-            className="grid h-8 w-8 place-items-center rounded-full text-2xl text-[#8f8a80] transition hover:bg-[#f1eee7] hover:text-[#202522]"
+            className="grid h-8 w-8 place-items-center rounded-full text-2xl text-[#94a3b8] transition hover:bg-white hover:text-[#111827]"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
         <div className="p-5 sm:p-7">
-          <div className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.14em] text-[#8f8a80]">
-            <span className={step >= 1 ? "text-[#2c6457]" : ""}>01 Goal</span>
+          <div className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.14em] text-[#94a3b8]">
+            <span className={step >= 1 ? "text-[#111827]" : ""}>01 Goal</span>
             <span>/</span>
-            <span className={step >= 2 ? "text-[#2c6457]" : ""}>
+            <span className={step >= 2 ? "text-[#111827]" : ""}>
               02 Channels
             </span>
             <span>/</span>
-            <span className={step >= 3 ? "text-[#2c6457]" : ""}>03 Plan</span>
+            <span className={step >= 3 ? "text-[#111827]" : ""}>03 Plan</span>
           </div>
           {step === 1 && (
             <div className="mt-8">
@@ -1462,11 +1462,11 @@ function OnboardingModal({
                     key={item}
                     type="button"
                     onClick={() => setGoal(item)}
-                    className={`flex items-center justify-between rounded-xl border p-4 text-left text-sm font-semibold transition ${goal === item ? "border-[#2c6457] bg-[#d9e7de] text-[#202522]" : "border-[#d8d3c8] hover:border-[#8bad9d]"}`}
+                    className={`flex items-center justify-between rounded-xl border p-4 text-left text-sm font-semibold transition ${goal === item ? "border-[#111827] bg-[#f1f3f5] text-[#111827]" : "border-[#e5e7eb] hover:border-[#9ca3af]"}`}
                   >
                     <span>{item}</span>
                     <span
-                      className={`h-3 w-3 rounded-full border ${goal === item ? "border-[#2c6457] bg-[#2c6457]" : "border-[#b9b2a5]"}`}
+                      className={`h-3 w-3 rounded-full border ${goal === item ? "border-[#111827] bg-[#111827]" : "border-[#b9b2a5]"}`}
                     />
                   </button>
                 ))}
@@ -1474,7 +1474,7 @@ function OnboardingModal({
               <button
                 type="button"
                 onClick={() => setStep(2)}
-                className="mt-7 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#202522] text-sm font-semibold text-white transition hover:bg-[#2c6457]"
+                className="mt-7 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#111827] text-sm font-semibold text-white transition hover:bg-[#111827]"
               >
                 Continue <ArrowRight className="h-4 w-4" />
               </button>
@@ -1499,12 +1499,12 @@ function OnboardingModal({
                       key={item}
                       type="button"
                       onClick={() => toggleChannel(item)}
-                      className={`rounded-xl border p-4 text-left text-sm font-semibold transition ${channels.includes(item) ? "border-[#2c6457] bg-[#d9e7de]" : "border-[#d8d3c8] hover:border-[#8bad9d]"}`}
+                      className={`rounded-xl border p-4 text-left text-sm font-semibold transition ${channels.includes(item) ? "border-[#111827] bg-[#f1f3f5]" : "border-[#e5e7eb] hover:border-[#9ca3af]"}`}
                     >
                       <span className="flex items-center justify-between gap-2">
                         <span>{item}</span>
                         <span
-                          className={`h-3 w-3 rounded-full border ${channels.includes(item) ? "border-[#2c6457] bg-[#2c6457]" : "border-[#b9b2a5]"}`}
+                          className={`h-3 w-3 rounded-full border ${channels.includes(item) ? "border-[#111827] bg-[#111827]" : "border-[#b9b2a5]"}`}
                         />
                       </span>
                     </button>
@@ -1515,7 +1515,7 @@ function OnboardingModal({
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="h-12 flex-1 rounded-full border border-[#d8d3c8] text-sm font-semibold text-[#5f625d]"
+                  className="h-12 flex-1 rounded-full border border-[#e5e7eb] text-sm font-semibold text-[#64748b]"
                 >
                   Back
                 </button>
@@ -1523,7 +1523,7 @@ function OnboardingModal({
                   type="button"
                   disabled={!channels.length}
                   onClick={() => setStep(3)}
-                  className="h-12 flex-[2] rounded-full bg-[#202522] text-sm font-semibold text-white transition hover:bg-[#2c6457] disabled:cursor-not-allowed disabled:opacity-40"
+                  className="h-12 flex-[2] rounded-full bg-[#111827] text-sm font-semibold text-white transition hover:bg-[#111827] disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Review setup <ArrowRight className="ml-1 inline h-4 w-4" />
                 </button>
@@ -1542,15 +1542,15 @@ function OnboardingModal({
                 A focused start means you can see value before you connect
                 everything.
               </p>
-              <div className="mt-7 divide-y divide-[#d8d3c8] border-y border-[#d8d3c8]">
+              <div className="mt-7 divide-y divide-[#e5e7eb] border-y border-[#e5e7eb]">
                 <div className="flex items-center justify-between gap-4 py-4">
-                  <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#8f8a80]">
+                  <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#94a3b8]">
                     Primary goal
                   </span>
                   <span className="text-sm font-semibold">{goal}</span>
                 </div>
                 <div className="flex items-center justify-between gap-4 py-4">
-                  <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#8f8a80]">
+                  <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#94a3b8]">
                     Channels
                   </span>
                   <span className="max-w-[230px] text-right text-sm font-semibold">
@@ -1559,11 +1559,11 @@ function OnboardingModal({
                 </div>
               </div>
               <div className="mt-7 grid grid-cols-3 gap-2 text-center font-mono text-[9px] uppercase tracking-[0.12em] text-[#6e716b]">
-                <div className="rounded-xl bg-[#f1eee7] px-2 py-3">No card</div>
-                <div className="rounded-xl bg-[#f1eee7] px-2 py-3">
+                <div className="rounded-xl bg-white px-2 py-3">No card</div>
+                <div className="rounded-xl bg-white px-2 py-3">
                   Guided setup
                 </div>
-                <div className="rounded-xl bg-[#f1eee7] px-2 py-3">
+                <div className="rounded-xl bg-white px-2 py-3">
                   Add CRM later
                 </div>
               </div>
@@ -1571,14 +1571,14 @@ function OnboardingModal({
                 <button
                   type="button"
                   onClick={() => setStep(2)}
-                  className="h-12 flex-1 rounded-full border border-[#d8d3c8] text-sm font-semibold text-[#5f625d]"
+                  className="h-12 flex-1 rounded-full border border-[#e5e7eb] text-sm font-semibold text-[#64748b]"
                 >
                   Back
                 </button>
                 <Link
                   to={destination}
                   onClick={onClose}
-                  className="inline-flex h-12 flex-[2] items-center justify-center gap-2 rounded-full bg-[#e36c3f] text-sm font-semibold text-white transition hover:bg-[#c95735]"
+                  className="inline-flex h-12 flex-[2] items-center justify-center gap-2 rounded-full bg-[#111827] text-sm font-semibold text-white transition hover:bg-[#c95735]"
                 >
                   Start free <ArrowRight className="h-4 w-4" />
                 </Link>
@@ -1692,20 +1692,20 @@ function InteractiveHeroPrompt() {
           <div className="flex items-center gap-2 font-mono text-[10px] text-slate-400">
             <span>Latência: 42ms</span>
             <span className="text-slate-300">/</span>
-            <span className="text-emerald-600 font-medium">● Conectado</span>
+            <span className="text-slate-800 font-medium">● Conectado</span>
           </div>
         </div>
 
         {/* Input Bar */}
         <form onSubmit={handleSubmit} className="p-4 sm:p-6 pb-3">
           <div className="relative flex items-center">
-            <Sparkles className="absolute left-4 h-5 w-5 text-emerald-600 shrink-0 pointer-events-none" />
+            <Sparkles className="absolute left-4 h-5 w-5 text-slate-800 shrink-0 pointer-events-none" />
             <input
               type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               placeholder="Pergunte ao Vendora AI... (ex: estoque Sapato Nike, simular venda WhatsApp)"
-              className="w-full rounded-2xl border border-slate-200 bg-slate-50/60 py-3.5 pl-12 pr-28 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-600 focus:bg-white focus:outline-none focus:ring-4 focus:ring-emerald-500/10 transition"
+              className="w-full rounded-2xl border border-slate-200 bg-slate-50/60 py-3.5 pl-12 pr-28 text-sm text-slate-900 placeholder:text-slate-400 focus:border-slate-900 focus:bg-white focus:outline-none focus:ring-4 focus:ring-slate-900/10 transition"
             />
             <button
               type="submit"
@@ -1752,7 +1752,7 @@ function InteractiveHeroPrompt() {
                 exit={{ opacity: 0 }}
                 className="flex h-32 items-center justify-center gap-3 text-slate-500"
               >
-                <RefreshCw className="h-4 w-4 animate-spin text-emerald-600" />
+                <RefreshCw className="h-4 w-4 animate-spin text-slate-800" />
                 <span className="font-mono text-xs">
                   Consultando banco de dados e agentes...
                 </span>
@@ -1767,7 +1767,7 @@ function InteractiveHeroPrompt() {
               >
                 <div className="mb-3 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="rounded-md bg-emerald-100 px-2 py-0.5 font-mono text-[10px] font-semibold text-emerald-800">
+                    <span className="rounded-md bg-slate-100 px-2 py-0.5 font-mono text-[10px] font-semibold text-slate-700">
                       {current.badge}
                     </span>
                     <span className="text-xs text-slate-500">
@@ -1815,12 +1815,12 @@ function InteractiveHeroPrompt() {
                           Disponibilidade por Tamanho (14 pares em estoque
                           total)
                         </span>
-                        <span className="text-emerald-700">
+                        <span className="text-slate-800">
                           ● Conexão Atômica com Pedidos
                         </span>
                       </div>
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                        <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-2.5">
+                        <div className="rounded-xl border border-slate-200 bg-slate-50 p-2.5">
                           <div className="text-xs font-medium text-slate-600">
                             Tamanho 39
                           </div>
@@ -1828,20 +1828,20 @@ function InteractiveHeroPrompt() {
                             <span className="text-base font-bold text-slate-900">
                               2 pares
                             </span>
-                            <span className="font-mono text-[9px] font-semibold text-amber-700">
+                            <span className="font-mono text-[9px] font-semibold text-slate-600">
                               Estoque Baixo
                             </span>
                           </div>
                         </div>
-                        <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 p-2.5">
+                        <div className="rounded-xl border border-slate-200 bg-slate-100/60 p-2.5">
                           <div className="text-xs font-medium text-slate-600">
                             Tamanho 40
                           </div>
                           <div className="mt-1 flex items-baseline justify-between">
-                            <span className="text-base font-bold text-emerald-950">
+                            <span className="text-base font-bold text-slate-950">
                               6 pares
                             </span>
-                            <span className="font-mono text-[9px] font-semibold text-emerald-700">
+                            <span className="font-mono text-[9px] font-semibold text-slate-800">
                               Disponível
                             </span>
                           </div>
@@ -1854,20 +1854,20 @@ function InteractiveHeroPrompt() {
                             <span className="text-base font-bold text-slate-500">
                               0 pares
                             </span>
-                            <span className="font-mono text-[9px] font-semibold text-rose-700">
+                            <span className="font-mono text-[9px] font-semibold text-slate-600">
                               Esgotado
                             </span>
                           </div>
                         </div>
-                        <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 p-2.5">
+                        <div className="rounded-xl border border-slate-200 bg-slate-100/60 p-2.5">
                           <div className="text-xs font-medium text-slate-600">
                             Tamanho 42
                           </div>
                           <div className="mt-1 flex items-baseline justify-between">
-                            <span className="text-base font-bold text-emerald-950">
+                            <span className="text-base font-bold text-slate-950">
                               6 pares
                             </span>
-                            <span className="font-mono text-[9px] font-semibold text-emerald-700">
+                            <span className="font-mono text-[9px] font-semibold text-slate-800">
                               Disponível
                             </span>
                           </div>
@@ -1882,19 +1882,19 @@ function InteractiveHeroPrompt() {
                   <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm">
                     <div className="mb-3 flex items-center justify-between border-b border-slate-100 pb-2.5">
                       <div className="flex items-center gap-2">
-                        <span className="grid h-7 w-7 place-items-center rounded-full bg-emerald-500 text-xs text-white">
+                        <span className="grid h-7 w-7 place-items-center rounded-full bg-slate-900 text-xs text-white">
                           V
                         </span>
                         <div>
                           <div className="text-xs font-bold text-slate-900">
                             Vitoria Catchiluvia
                           </div>
-                          <div className="text-[10px] text-emerald-600">
+                          <div className="text-[10px] text-slate-800">
                             WhatsApp oficial · +244 936 370 703
                           </div>
                         </div>
                       </div>
-                      <span className="rounded-full bg-emerald-100 px-2 py-0.5 font-mono text-[9px] font-semibold text-emerald-800">
+                      <span className="rounded-full bg-slate-100 px-2 py-0.5 font-mono text-[9px] font-semibold text-slate-700">
                         Atendimento IA Ativo
                       </span>
                     </div>
@@ -1908,11 +1908,11 @@ function InteractiveHeroPrompt() {
                         </div>
                       </div>
                       <div className="flex justify-end">
-                        <div className="max-w-[80%] rounded-2xl rounded-tr-sm bg-emerald-700 p-3 text-xs text-white shadow-sm">
+                        <div className="max-w-[80%] rounded-2xl rounded-tr-sm bg-slate-800 p-3 text-xs text-white shadow-sm">
                           Olá Vitoria! Sim, temos 6 pares do Sapato Nike no
                           tamanho 40 a 3.600 US$. Gostaria de reservar agora com
                           entrega grátis em Luanda?
-                          <span className="mt-1 block text-right font-mono text-[9px] text-emerald-200">
+                          <span className="mt-1 block text-right font-mono text-[9px] text-slate-300">
                             10:14 · IA
                           </span>
                         </div>
@@ -1926,21 +1926,21 @@ function InteractiveHeroPrompt() {
                         </div>
                       </div>
                       <div className="flex justify-end">
-                        <div className="max-w-[80%] rounded-2xl rounded-tr-sm bg-emerald-700 p-3 text-xs text-white shadow-sm">
+                        <div className="max-w-[80%] rounded-2xl rounded-tr-sm bg-slate-800 p-3 text-xs text-white shadow-sm">
                           Perfeito! Já reservei o seu par por 15 min. Pode pagar
                           via Multicaixa Express pelo link seguro abaixo:
-                          <div className="mt-2 rounded-lg bg-emerald-800/80 p-2 font-mono text-[10px] text-emerald-100">
+                          <div className="mt-2 rounded-lg bg-slate-700 p-2 font-mono text-[10px] text-slate-200">
                             🔗 vendora.co/pedidos/D2CC2E82
                           </div>
-                          <span className="mt-1 block text-right font-mono text-[9px] text-emerald-200">
+                          <span className="mt-1 block text-right font-mono text-[9px] text-slate-300">
                             10:15 · IA
                           </span>
                         </div>
                       </div>
                     </div>
-                    <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-3 text-xs text-emerald-700 font-medium">
+                    <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-3 text-xs text-slate-800 font-medium">
                       <span className="flex items-center gap-1.5">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+                        <CheckCircle2 className="h-3.5 w-3.5 text-slate-800" />
                         Pedido #D2CC2E82 criado e estoque atualizado
                         atomicamente
                       </span>
@@ -1954,7 +1954,7 @@ function InteractiveHeroPrompt() {
                     <div className="flex flex-col sm:flex-row gap-4">
                       <div className="flex-1 space-y-2.5">
                         <div className="flex items-center gap-2">
-                          <Instagram className="h-4 w-4 text-pink-600" />
+                          <Instagram className="h-4 w-4 text-slate-700" />
                           <span className="text-xs font-bold text-slate-900">
                             Post de Lançamento (Instagram & Facebook)
                           </span>
@@ -1970,7 +1970,7 @@ function InteractiveHeroPrompt() {
                             disponível com estoque limitado nos tamanhos 39 a 42
                             por 3.600 US$.
                           </p>
-                          <p className="font-mono text-[11px] text-emerald-700">
+                          <p className="font-mono text-[11px] text-slate-800">
                             👉 Compre direto no link da bio ou chame no WhatsApp
                             para atendimento imediato com entrega em Luanda!
                           </p>
@@ -1987,20 +1987,20 @@ function InteractiveHeroPrompt() {
                           </div>
                           <div className="mt-2 space-y-1.5 text-xs text-slate-700">
                             <div className="flex items-center gap-1.5">
-                              <Check className="h-3 w-3 text-emerald-600" />{" "}
+                              <Check className="h-3 w-3 text-slate-800" />{" "}
                               Feed Instagram
                             </div>
                             <div className="flex items-center gap-1.5">
-                              <Check className="h-3 w-3 text-emerald-600" />{" "}
+                              <Check className="h-3 w-3 text-slate-800" />{" "}
                               Stories Instagram
                             </div>
                             <div className="flex items-center gap-1.5">
-                              <Check className="h-3 w-3 text-emerald-600" />{" "}
+                              <Check className="h-3 w-3 text-slate-800" />{" "}
                               Página Facebook
                             </div>
                           </div>
                         </div>
-                        <div className="mt-3 rounded-lg bg-emerald-600 text-white text-center py-1.5 text-xs font-semibold">
+                        <div className="mt-3 rounded-lg bg-slate-950 text-white text-center py-1.5 text-xs font-semibold">
                           Agendar Post
                         </div>
                       </div>
@@ -2019,7 +2019,7 @@ function InteractiveHeroPrompt() {
                         <div className="mt-1 text-xl font-bold text-slate-900">
                           3.600 US$
                         </div>
-                        <div className="mt-1 font-mono text-[10px] font-semibold text-emerald-700">
+                        <div className="mt-1 font-mono text-[10px] font-semibold text-slate-800">
                           ↑ +24% vs ontem
                         </div>
                       </div>
@@ -2038,7 +2038,7 @@ function InteractiveHeroPrompt() {
                         <div className="text-xs text-slate-500">
                           Canal Líder
                         </div>
-                        <div className="mt-1 text-xl font-bold text-emerald-700">
+                        <div className="mt-1 text-xl font-bold text-slate-800">
                           WhatsApp
                         </div>
                         <div className="mt-1 font-mono text-[10px] text-slate-500">
@@ -2052,17 +2052,17 @@ function InteractiveHeroPrompt() {
                         <div className="mt-1 text-xl font-bold text-slate-900">
                           1.2s
                         </div>
-                        <div className="mt-1 font-mono text-[10px] text-emerald-700">
+                        <div className="mt-1 font-mono text-[10px] text-slate-800">
                           100% por IA
                         </div>
                       </div>
                     </div>
-                    <div className="mt-3 rounded-xl border border-emerald-100 bg-emerald-50/60 p-3 text-xs text-emerald-900 flex items-center justify-between">
+                    <div className="mt-3 rounded-xl border border-slate-200 bg-slate-100/60 p-3 text-xs text-slate-900 flex items-center justify-between">
                       <span>
                         💡 <strong>Insight da IA:</strong> O Sapato Nike gerou
                         72% das conversões hoje após a publicação programada.
                       </span>
-                      <ArrowRight className="h-4 w-4 text-emerald-600 shrink-0" />
+                      <ArrowRight className="h-4 w-4 text-slate-800 shrink-0" />
                     </div>
                   </div>
                 )}
@@ -2106,7 +2106,7 @@ function HeroSection({
     <section
       id="hero-stage"
       ref={heroRef}
-      className="relative overflow-hidden border-b border-slate-200/80 bg-[#fcfdfd] cursor-default"
+      className="relative cursor-default overflow-hidden border-b border-slate-200 bg-white"
     >
       {/* Architectural Grid Crosses */}
       <GridCross
@@ -2120,18 +2120,18 @@ function HeroSection({
       <WaterWakeHero
         damping={0.991}
         dropRadius={0.024}
-        className="pb-24 pt-16 sm:pb-32 sm:pt-24 min-h-[960px] flex flex-col justify-center"
+        className="flex min-h-[900px] flex-col justify-center pb-20 pt-20 sm:min-h-[940px] sm:pb-28 sm:pt-24"
       >
         {/* Transição suave para a secção clara do preview, mantendo o fundo branco. */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-slate-50 via-slate-50/70 to-transparent z-10" />
 
-        <div className="relative z-20 mx-auto max-w-[1240px] px-5 lg:px-8">
+        <div className="relative z-20 mx-auto max-w-[1200px] px-5 lg:px-8">
           <motion.div
             style={{ y: headlineY }}
             className="mx-auto max-w-4xl text-center"
           >
             <div className="pointer-events-auto mb-8 inline-flex items-center gap-2.5 rounded-full border border-slate-200/80 bg-white/90 px-4 py-1.5 shadow-[0_1px_3px_rgba(0,0,0,0.03)] backdrop-blur-md">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              <span className="h-1.5 w-1.5 rounded-full bg-slate-900" />
               <span className="font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-slate-700">
                 Operating System para Comércio
               </span>
@@ -2210,7 +2210,7 @@ function HeroSection({
           >
             <div className="mb-8 flex flex-col items-center justify-center text-center">
               <div className="inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/90 px-3.5 py-1 mb-2.5 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-slate-700 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                <span className="h-1.5 w-1.5 rounded-full bg-slate-900" />
                 Plataforma em Tempo Real · Visão Unificada
               </div>
               <p className="mt-1 max-w-lg text-sm text-slate-500 font-normal">
@@ -2270,7 +2270,7 @@ function FAQSection() {
           </p>
           <Link
             to="/signup"
-            className="mt-9 inline-flex items-center gap-2 bg-[#202522] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#2c6457]"
+            className="mt-9 inline-flex items-center gap-2 bg-[#111827] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#111827]"
           >
             Connect your operation <ArrowRight className="h-4 w-4" />
           </Link>
@@ -2282,10 +2282,10 @@ function FAQSection() {
                 type="button"
                 onClick={() => setOpen(open === index ? -1 : index)}
                 aria-expanded={open === index}
-                className="flex w-full items-center justify-between gap-6 px-5 py-5 text-left text-sm font-semibold text-slate-900 transition hover:text-emerald-700 sm:px-6"
+                className="flex w-full items-center justify-between gap-6 px-5 py-5 text-left text-sm font-semibold text-slate-900 transition hover:text-slate-800 sm:px-6"
               >
                 <span>{question}</span>
-                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-slate-200 bg-slate-50 font-mono text-lg font-normal text-emerald-700">
+                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-slate-200 bg-slate-50 font-mono text-lg font-normal text-slate-800">
                   {open === index ? "-" : "+"}
                 </span>
               </button>
@@ -2313,25 +2313,25 @@ function ProcessSection() {
       detail:
         "A customer asks about the olive linen shirt in WhatsApp. No new inbox. No context lost.",
       status: "Incoming intent",
-      tone: "bg-[#d9e7de]",
+      tone: "bg-[#f1f3f5]",
       visual: (
-        <div className="mx-auto max-w-[360px] rounded-2xl border border-[#b9cabe] bg-[#fffdf9] p-4 shadow-[0_16px_40px_rgba(44,100,87,0.12)]">
-          <div className="flex items-center gap-3 border-b border-[#d8e3da] pb-3">
-            <span className="grid h-8 w-8 place-items-center rounded-full bg-[#2c6457] text-white">
+        <div className="mx-auto max-w-[360px] rounded-2xl border border-[#d1d5db] bg-white p-4 shadow-[0_16px_40px_rgba(44,100,87,0.12)]">
+          <div className="flex items-center gap-3 border-b border-[#e5e7eb] pb-3">
+            <span className="grid h-8 w-8 place-items-center rounded-full bg-[#111827] text-white">
               <MessageCircle className="h-4 w-4" />
             </span>
             <div>
               <div className="text-xs font-semibold">Amina's store</div>
-              <div className="font-mono text-[9px] text-[#8f8a80]">
+              <div className="font-mono text-[9px] text-[#94a3b8]">
                 WhatsApp · 09:41
               </div>
             </div>
           </div>
-          <div className="mt-5 ml-auto max-w-[250px] bg-[#d9e7de] p-3 text-sm leading-5 text-[#202522]">
+          <div className="mt-5 ml-auto max-w-[250px] bg-[#f1f3f5] p-3 text-sm leading-5 text-[#111827]">
             Hi – is the linen shirt available in olive?
           </div>
-          <div className="mt-4 flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.14em] text-[#2c6457]">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#e36c3f]" />
+          <div className="mt-4 flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.14em] text-[#111827]">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#111827]" />
             Intent detected
           </div>
         </div>
@@ -2344,14 +2344,14 @@ function ProcessSection() {
       detail:
         "Sales AI checks the catalogue, stock, price and customer context before it writes a reply.",
       status: "Guardrails active",
-      tone: "bg-[#e6d4aa]",
+      tone: "bg-[#e5e7eb]",
       visual: (
-        <div className="mx-auto max-w-[390px] rounded-2xl border border-[#c9b57e] bg-[#fffdf9] p-5 shadow-[0_16px_40px_rgba(139,107,54,0.12)]">
+        <div className="mx-auto max-w-[390px] rounded-2xl border border-[#cbd5e1] bg-white p-5 shadow-[0_16px_40px_rgba(139,107,54,0.12)]">
           <div className="flex items-center justify-between">
-            <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#8b6b36]">
+            <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#475569]">
               Sales AI / verification
             </div>
-            <span className="h-2 w-2 rounded-full bg-[#e36c3f]" />
+            <span className="h-2 w-2 rounded-full bg-[#111827]" />
           </div>
           <div className="mt-5 space-y-3">
             {[
@@ -2362,19 +2362,19 @@ function ProcessSection() {
             ].map(([label, value]) => (
               <div
                 key={String(label)}
-                className="flex items-center justify-between gap-4 border-b border-[#eee5d0] pb-3 text-sm"
+                className="flex items-center justify-between gap-4 border-b border-[#e5e7eb] pb-3 text-sm"
               >
-                <span className="flex items-center gap-2 text-[#5f625d]">
-                  <Check className="h-3.5 w-3.5 text-[#2c6457]" />
+                <span className="flex items-center gap-2 text-[#64748b]">
+                  <Check className="h-3.5 w-3.5 text-[#111827]" />
                   {String(label)}
                 </span>
-                <span className="font-mono text-[10px] text-[#202522]">
+                <span className="font-mono text-[10px] text-[#111827]">
                   {String(value)}
                 </span>
               </div>
             ))}
           </div>
-          <div className="mt-5 border border-[#b9cabe] bg-[#d9e7de] px-3 py-2 text-center font-mono text-[9px] uppercase tracking-[0.14em] text-[#2c6457]">
+          <div className="mt-5 border border-[#d1d5db] bg-[#f1f3f5] px-3 py-2 text-center font-mono text-[9px] uppercase tracking-[0.14em] text-[#111827]">
             Safe to answer
           </div>
         </div>
@@ -2387,19 +2387,19 @@ function ProcessSection() {
       detail:
         "The order is created, inventory is reserved and the customer gets a clear confirmation – without a handoff hunt.",
       status: "Outcome recorded",
-      tone: "bg-[#202522]",
+      tone: "bg-[#111827]",
       visual: (
-        <div className="mx-auto max-w-[390px] rounded-2xl border border-white/15 bg-[#151a17] p-5 text-[#f6f3ed] shadow-[0_16px_40px_rgba(32,37,34,0.2)]">
+        <div className="mx-auto max-w-[390px] rounded-2xl border border-white/15 bg-slate-950 p-5 text-[#f8fafc] shadow-[0_16px_40px_rgba(32,37,34,0.2)]">
           <div className="flex items-center justify-between">
-            <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#e36c3f]">
+            <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#111827]">
               Order closed / #VD-1048
             </div>
-            <span className="border border-[#8bad9d]/50 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-[#b9cabe]">
+            <span className="border border-[#9ca3af]/50 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-[#d1d5db]">
               Reserved
             </span>
           </div>
           <div className="mt-6 flex items-center gap-3 border-b border-white/10 pb-5">
-            <span className="grid h-10 w-10 place-items-center bg-[#e36c3f] text-white">
+            <span className="grid h-10 w-10 place-items-center bg-[#111827] text-white">
               <Package className="h-4 w-4" />
             </span>
             <div>
@@ -2411,15 +2411,15 @@ function ProcessSection() {
           </div>
           <div className="mt-5 space-y-3 text-xs text-white/65">
             <div className="flex items-center gap-2">
-              <Check className="h-3.5 w-3.5 text-[#b9cabe]" />
+              <Check className="h-3.5 w-3.5 text-[#d1d5db]" />
               Inventory reserved
             </div>
             <div className="flex items-center gap-2">
-              <Check className="h-3.5 w-3.5 text-[#b9cabe]" />
+              <Check className="h-3.5 w-3.5 text-[#d1d5db]" />
               Customer notified
             </div>
             <div className="flex items-center gap-2">
-              <Check className="h-3.5 w-3.5 text-[#b9cabe]" />
+              <Check className="h-3.5 w-3.5 text-[#d1d5db]" />
               CRM event ready
             </div>
           </div>
@@ -2451,8 +2451,8 @@ function ProcessSection() {
               clean, traceable outcome.
             </p>
           </div>
-          <div className="flex items-center gap-2 border-t border-[#d8d3c8] pt-5 font-mono text-[9px] uppercase tracking-[0.14em] text-[#8f8a80] lg:justify-end lg:border-t-0 lg:pt-0">
-            <span className="text-[#2c6457]">Question</span>
+          <div className="flex items-center gap-2 border-t border-[#e5e7eb] pt-5 font-mono text-[9px] uppercase tracking-[0.14em] text-[#94a3b8] lg:justify-end lg:border-t-0 lg:pt-0">
+            <span className="text-[#111827]">Question</span>
             <ArrowRight className="h-3.5 w-3.5" />
             <span>Context</span>
             <ArrowRight className="h-3.5 w-3.5" />
@@ -2469,24 +2469,24 @@ function ProcessSection() {
                 type="button"
                 aria-pressed={active === index}
                 onClick={() => setActive(index)}
-                className={`w-full rounded-2xl border p-5 text-left transition duration-200 ${active === index ? "border-emerald-700/40 bg-emerald-50 shadow-[0_10px_30px_rgba(16,90,65,0.08)]" : "border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm"}`}
+                className={`w-full rounded-2xl border p-5 text-left transition duration-200 ${active === index ? "border-slate-900/30 bg-slate-100 shadow-[0_10px_30px_rgba(15,23,42,0.07)]" : "border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm"}`}
               >
                 <div className="flex items-start gap-4">
                   <span
-                    className={`font-mono text-[10px] ${active === index ? "text-[#e36c3f]" : "text-[#8f8a80]"}`}
+                    className={`font-mono text-[10px] ${active === index ? "text-[#111827]" : "text-[#94a3b8]"}`}
                   >
                     {step.number}
                   </span>
                   <span className="min-w-0">
-                    <span className="block font-mono text-[9px] uppercase tracking-[0.14em] text-[#8f8a80]">
+                    <span className="block font-mono text-[9px] uppercase tracking-[0.14em] text-[#94a3b8]">
                       {step.label}
                     </span>
-                    <span className="mt-2 block text-base font-semibold leading-5 tracking-[-0.03em] text-[#202522]">
+                    <span className="mt-2 block text-base font-semibold leading-5 tracking-[-0.03em] text-[#111827]">
                       {step.title}
                     </span>
                   </span>
                   <span
-                    className={`ml-auto mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${active === index ? "bg-[#e36c3f]" : "bg-[#d8d3c8]"}`}
+                    className={`ml-auto mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${active === index ? "bg-[#111827]" : "bg-[#e5e7eb]"}`}
                   />
                 </div>
               </button>
@@ -2496,11 +2496,11 @@ function ProcessSection() {
             className={`min-h-[430px] rounded-3xl ${current.tone} flex flex-col justify-between border border-black/5 p-5 shadow-[0_20px_60px_rgba(15,23,42,0.08)] sm:p-8`}
           >
             <div
-              className={`flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.16em] ${active === 2 ? "text-white/45" : "text-[#8f8a80]"}`}
+              className={`flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.16em] ${active === 2 ? "text-white/45" : "text-[#94a3b8]"}`}
             >
               <span>Live operation / 0{active + 1}</span>
               <span
-                className={active === 2 ? "text-[#e36c3f]" : "text-[#2c6457]"}
+                className={active === 2 ? "text-[#111827]" : "text-[#111827]"}
               >
                 {current.status}
               </span>
@@ -2513,7 +2513,7 @@ function ProcessSection() {
             </div>
           </div>
         </div>
-        <div className="mt-7 flex items-center justify-between border-t border-[#d8d3c8] pt-5 font-mono text-[9px] uppercase tracking-[0.14em] text-[#8f8a80]">
+        <div className="mt-7 flex items-center justify-between border-t border-[#e5e7eb] pt-5 font-mono text-[9px] uppercase tracking-[0.14em] text-[#94a3b8]">
           <span>Click a step to inspect the handoff</span>
           <span>Auto-advances</span>
         </div>
@@ -2528,7 +2528,7 @@ export default function Index() {
   const [onboardingOpen, setOnboardingOpen] = useState(false);
 
   return (
-    <div className="landing-page min-h-screen overflow-x-hidden bg-slate-50/50 text-slate-900 selection:bg-emerald-500/20 selection:text-emerald-950 relative">
+    <div className="landing-page min-h-screen overflow-x-hidden bg-slate-50/50 text-slate-900 selection:bg-slate-900/20 selection:text-slate-950 relative">
       <TactileGrain />
       <LusionCursor />
       <ScrollProgressBar />
@@ -2576,15 +2576,15 @@ export default function Index() {
                 </p>
                 <div className="mt-9 space-y-4 border-t border-slate-200/80 pt-6 text-sm text-slate-700">
                   <div className="flex items-center gap-3">
-                    <MessageCircle className="h-4 w-4 text-emerald-600" />
+                    <MessageCircle className="h-4 w-4 text-slate-800" />
                     Conversas naturais com contexto de catálogo
                   </div>
                   <div className="flex items-center gap-3">
-                    <Check className="h-4 w-4 text-emerald-600" />
+                    <Check className="h-4 w-4 text-slate-800" />
                     Estoque conferido antes de qualquer confirmação
                   </div>
                   <div className="flex items-center gap-3">
-                    <Check className="h-4 w-4 text-emerald-600" />
+                    <Check className="h-4 w-4 text-slate-800" />
                     Pedidos e pagamentos sincronizados com o painel central
                   </div>
                 </div>
@@ -2611,10 +2611,10 @@ export default function Index() {
         <SectionReveal id="agents" delay={0.04} className="relative">
           <GridCross
             label="SYS // 04.AGENT_GOVERNANCE"
-            className="absolute top-4 right-6 hidden sm:flex text-emerald-400/50"
+            className="absolute top-4 right-6 hidden sm:flex text-white/50"
           />
           <section className="overflow-hidden border-b border-slate-800 bg-slate-950 text-slate-100 py-24 sm:py-32">
-            <div className="mx-auto max-w-[1240px] px-5 lg:px-8">
+            <div className="mx-auto max-w-[1200px] px-5 lg:px-8">
               <div className="grid gap-14 lg:grid-cols-[0.78fr_1.22fr] lg:items-start">
                 <div>
                   <Eyebrow light>Inteligência com Governança</Eyebrow>
@@ -2638,7 +2638,7 @@ export default function Index() {
                             (Feed, Stories, Reels).
                           </div>
                         </div>
-                        <span className="rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-1 font-mono text-[9px] uppercase tracking-wider text-emerald-400 font-semibold">
+                        <span className="rounded-full border border-slate-900/40 bg-slate-900/10 px-2.5 py-1 font-mono text-[9px] uppercase tracking-wider text-white font-semibold">
                           Pode Publicar
                         </span>
                       </div>
@@ -2654,7 +2654,7 @@ export default function Index() {
                             pagamentos seguros.
                           </div>
                         </div>
-                        <span className="rounded-full border border-teal-500/40 bg-teal-500/10 px-2.5 py-1 font-mono text-[9px] uppercase tracking-wider text-teal-400 font-semibold">
+                        <span className="rounded-full border border-white/25 bg-white/10 px-2.5 py-1 font-mono text-[9px] uppercase tracking-wider text-slate-200 font-semibold">
                           Pode Consultar
                         </span>
                       </div>
@@ -2670,7 +2670,7 @@ export default function Index() {
                             práticas semanais.
                           </div>
                         </div>
-                        <span className="rounded-full border border-indigo-500/40 bg-indigo-500/10 px-2.5 py-1 font-mono text-[9px] uppercase tracking-wider text-indigo-400 font-semibold">
+                        <span className="rounded-full border border-white/20 bg-white/10 px-2.5 py-1 font-mono text-[9px] uppercase tracking-wider text-slate-300 font-semibold">
                           Pode Ler
                         </span>
                       </div>
@@ -2690,14 +2690,14 @@ export default function Index() {
                     />
                     <div className="flex flex-wrap items-center justify-between gap-3 px-3 pt-3 font-mono text-[10px] uppercase tracking-wider text-slate-400">
                       <span>Sistema de Agentes / Mapa Ativo</span>
-                      <span className="text-emerald-400 font-semibold">
+                      <span className="text-white font-semibold">
                         ● Controlado por Regras RLS
                       </span>
                     </div>
                   </div>
                   <div className="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-3">
                     <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-3.5">
-                      <div className="font-mono text-[10px] uppercase tracking-wider text-emerald-400 font-semibold">
+                      <div className="font-mono text-[10px] uppercase tracking-wider text-white font-semibold">
                         Canais
                       </div>
                       <div className="mt-1.5 text-base font-bold text-white">
@@ -2705,7 +2705,7 @@ export default function Index() {
                       </div>
                     </div>
                     <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-3.5">
-                      <div className="font-mono text-[10px] uppercase tracking-wider text-emerald-400 font-semibold">
+                      <div className="font-mono text-[10px] uppercase tracking-wider text-white font-semibold">
                         Agentes
                       </div>
                       <div className="mt-1.5 text-base font-bold text-white">
@@ -2713,7 +2713,7 @@ export default function Index() {
                       </div>
                     </div>
                     <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-3.5">
-                      <div className="font-mono text-[10px] uppercase tracking-wider text-emerald-400 font-semibold">
+                      <div className="font-mono text-[10px] uppercase tracking-wider text-white font-semibold">
                         Fonte Única
                       </div>
                       <div className="mt-1.5 text-base font-bold text-white">
@@ -2726,7 +2726,7 @@ export default function Index() {
               <div className="mt-14 border-t border-white/10 pt-8">
                 <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                   <div>
-                    <div className="font-mono text-[10px] uppercase tracking-wider text-emerald-400 font-semibold">
+                    <div className="font-mono text-[10px] uppercase tracking-wider text-white font-semibold">
                       Guardrails Antes de Qualquer Ação
                     </div>
                     <div className="mt-1 text-xl font-bold tracking-tight text-white">
@@ -2746,7 +2746,7 @@ export default function Index() {
                           {step}
                         </span>
                         {index < 4 && (
-                          <ArrowRight className="h-3.5 w-3.5 text-emerald-400" />
+                          <ArrowRight className="h-3.5 w-3.5 text-white" />
                         )}
                       </span>
                     ))}
@@ -2783,7 +2783,7 @@ export default function Index() {
         {/* Section 10: Control Room */}
         <SectionReveal id="control-room" delay={0.04}>
           <section className="border-b border-slate-800 bg-[#101827] text-slate-100 py-20 sm:py-24">
-            <div className="mx-auto max-w-[1240px] px-5 lg:px-8">
+            <div className="mx-auto max-w-[1200px] px-5 lg:px-8">
               <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
                 <div>
                   <Eyebrow light>Visão de Comando</Eyebrow>
@@ -2813,7 +2813,7 @@ export default function Index() {
                   />
                   <div className="flex flex-wrap items-center justify-between gap-3 px-3 pt-3 font-mono text-[10px] uppercase tracking-wider text-slate-400">
                     <span>Operações em Tempo Real</span>
-                    <span className="text-emerald-400 font-semibold">
+                    <span className="text-white font-semibold">
                       ● Auditoria Conectada
                     </span>
                   </div>
@@ -2827,14 +2827,14 @@ export default function Index() {
                   />
                   <div className="flex flex-wrap items-center justify-between gap-3 px-3 pt-3 font-mono text-[10px] uppercase tracking-wider text-slate-400">
                     <span>Fonte do Catálogo</span>
-                    <span className="text-emerald-400 font-semibold">
+                    <span className="text-white font-semibold">
                       ● Sincronização 100%
                     </span>
                   </div>
                 </LusionTiltCard>
               </div>
               <div className="mt-8 flex flex-wrap items-center gap-3 border-t border-white/10 pt-6 font-mono text-[10px] uppercase tracking-wider text-slate-400 font-medium">
-                <span className="text-emerald-400 font-bold">Pedidos</span>
+                <span className="text-white font-bold">Pedidos</span>
                 <span>·</span>
                 <span>Estoque Atômico</span>
                 <span>·</span>
@@ -2852,7 +2852,7 @@ export default function Index() {
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_15%_20%,rgba(16,185,129,0.10),transparent_42%),radial-gradient(ellipse_at_85%_80%,rgba(59,130,246,0.08),transparent_38%)]" />
             <div className="relative mx-auto grid max-w-[1240px] gap-12 px-5 lg:grid-cols-[0.85fr_1.15fr] lg:items-center lg:px-8">
               <div>
-                <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-700">
+                <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-800">
                   Pronto para começar
                 </div>
                 <h2 className="mt-4 max-w-xl text-5xl font-bold leading-[0.96] tracking-[-0.07em] sm:text-6xl text-slate-950">
@@ -2867,7 +2867,7 @@ export default function Index() {
                   <Link
                     to={startPath}
                     data-cursor="CRIAR CONTA"
-                    className="mt-9 inline-flex items-center gap-2 rounded-full bg-emerald-500 px-7 py-3.5 text-sm font-bold text-slate-950 shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-400"
+                    className="mt-9 inline-flex items-center gap-2 rounded-full bg-slate-950 px-7 py-3.5 text-sm font-bold text-white shadow-lg shadow-slate-900/10 transition hover:bg-white"
                   >
                     Criar conta grátis <ArrowRight className="h-4 w-4" />
                   </Link>
@@ -2882,8 +2882,8 @@ export default function Index() {
                 />
                 <div className="flex items-center justify-between px-3 pt-3 font-mono text-[10px] uppercase tracking-wider text-slate-500">
                   <span>Comércio em Movimento</span>
-                  <span className="flex items-center gap-2 text-emerald-400 font-semibold">
-                    <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="flex items-center gap-2 text-white font-semibold">
+                    <span className="h-2 w-2 rounded-full bg-white animate-pulse" />
                     Controle Total
                   </span>
                 </div>
