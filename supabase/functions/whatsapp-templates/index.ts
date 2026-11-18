@@ -10,6 +10,9 @@ const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...cors, "Content-Type": "application/json" } });
 const GRAPH_VERSION = "v25.0";
 
+const Component = z.object({
+  type: z.enum(["HEADER", "BODY", "FOOTER", "BUTTONS"]),
+}).passthrough();
 const Body = z.discriminatedUnion("action", [
   z.object({ action: z.literal("list"), company_id: z.string().uuid() }),
   z.object({
@@ -18,8 +21,7 @@ const Body = z.discriminatedUnion("action", [
     name: z.string().regex(/^[a-z0-9_]{1,512}$/),
     language: z.string().regex(/^[a-z]{2,3}_[A-Z]{2}$/),
     category: z.enum(["UTILITY", "MARKETING", "AUTHENTICATION"]),
-    body: z.string().min(1).max(1024),
-    body_examples: z.array(z.string().min(1).max(256)).max(10).optional(),
+    components: z.array(Component).min(1).max(4),
     allow_category_change: z.boolean().default(true),
   }),
   z.object({ action: z.literal("delete"), company_id: z.string().uuid(), name: z.string().regex(/^[a-z0-9_]{1,512}$/) }),
@@ -66,9 +68,26 @@ Deno.serve(async (req) => {
         headers: { Authorization: `Bearer ${token}` },
       });
     } else if (input.action === "create") {
-      const variableCount = [...input.body.matchAll(/\{\{\d+\}\}/g)].length;
-      if (variableCount > 0 && (!input.body_examples || input.body_examples.length !== variableCount)) {
-        return json({ error: `Indica ${variableCount} exemplo(s), um para cada variável do corpo.` }, 400);
+      const bodyComponent = input.components.find(c => c.type === "BODY");
+      if (!bodyComponent || typeof bodyComponent.text !== "string" || !bodyComponent.text.trim()) {
+        return json({ error: "O modelo precisa de um componente BODY com texto." }, 400);
+      }
+      const bodyText = bodyComponent.text as string;
+      const variables = [...bodyText.matchAll(/\{\{(\d+)\}\}/g)].map(m => Number(m[1]));
+      if (variables.length) {
+        const expected = Array.from({ length: variables.length }, (_, i) => i + 1);
+        if (JSON.stringify([...new Set(variables)].sort((a,b)=>a-b)) !== JSON.stringify(expected)) {
+          return json({ error: "As variáveis devem ser sequenciais: {{1}}, {{2}}, {{3}}..." }, 400);
+        }
+        const examples = (bodyComponent.example as { body_text?: string[][] } | undefined)?.body_text?.[0];
+        if (!examples || examples.length !== variables.length || examples.some(v => !v?.trim())) {
+          return json({ error: "Indica um exemplo para cada variável do corpo." }, 400);
+        }
+      }
+      const header = input.components.find(c => c.type === "HEADER");
+      if (header && ["IMAGE", "VIDEO", "DOCUMENT"].includes(String(header.format))) {
+        const handle = (header.example as { header_handle?: string[] } | undefined)?.header_handle?.[0];
+        if (!handle) return json({ error: "O cabeçalho multimédia precisa de um media handle válido da Meta." }, 400);
       }
       response = await fetch(endpoint, {
         method: "POST",
@@ -78,7 +97,7 @@ Deno.serve(async (req) => {
           language: input.language,
           category: input.category,
           allow_category_change: input.allow_category_change,
-          components: [{ type: "BODY", text: input.body, ...(variableCount ? { example: { body_text: [input.body_examples] } } : {}) }],
+          components: input.components,
         }),
       });
     } else {
