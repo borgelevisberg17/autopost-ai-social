@@ -1062,7 +1062,7 @@ html {
     isolation: isolate;
     box-shadow: 0 -18px 42px rgba(15, 23, 42, 0.045);
   }
-  .vendora-scroll-stack > section:not(:last-child) { z-index: 1; }
+  .vendora-scroll-stack > section { z-index: 1; }
 }
 @supports (animation-timeline: view()) and (animation-range: exit 0% exit 100%) {
   @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
