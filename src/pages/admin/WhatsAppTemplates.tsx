@@ -24,7 +24,8 @@ export default function WhatsAppTemplates() {
   const [name, setName] = useState("confirmacao_pedido");
   const [language, setLanguage] = useState("pt_PT");
   const [category, setCategory] = useState<Category>("UTILITY");
-  const [body, setBody] = useState("Olá {{1}}! O teu pedido {{2}} foi recebido com sucesso. Obrigado por comprares connosco!");
+  const [body, setBody] = useState("Olá! O teu pedido foi recebido com sucesso. Obrigado por comprares connosco!");
+  const [bodyExamples, setBodyExamples] = useState("");
 
   const invoke = useCallback(async (payload: Record<string, unknown>) => {
     const { data, error } = await supabase.functions.invoke("whatsapp-templates", { body: { ...payload, company_id: company?.id } });
@@ -54,7 +55,7 @@ export default function WhatsAppTemplates() {
     event.preventDefault();
     setSaving(true);
     try {
-      const result = await invoke({ action: "create", name: name.trim().toLowerCase(), language, category, body, allow_category_change: true });
+      const result = await invoke({ action: "create", name: name.trim().toLowerCase(), language, category, body, body_examples: bodyExamples.split("|").map(value => value.trim()).filter(Boolean), allow_category_change: true });
       toast.success(`Modelo submetido à Meta. Estado inicial: ${result.status ?? "PENDING"}`);
       setShowForm(false);
       await load();
@@ -88,7 +89,8 @@ export default function WhatsAppTemplates() {
           <div className="space-y-2"><Label htmlFor="template-name">Nome técnico</Label><Input id="template-name" value={name} onChange={e => setName(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, "_"))} pattern="[a-z0-9_]+" maxLength={512} required /><p className="text-xs text-muted-foreground">Use letras minúsculas, números e underscore.</p></div>
           <div className="space-y-2"><Label>Idioma</Label><Select value={language} onValueChange={setLanguage}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="pt_PT">Português (Portugal)</SelectItem><SelectItem value="pt_BR">Português (Brasil)</SelectItem><SelectItem value="en_US">English (US)</SelectItem><SelectItem value="es_ES">Español</SelectItem></SelectContent></Select></div>
           <div className="space-y-2"><Label>Categoria</Label><Select value={category} onValueChange={v => setCategory(v as Category)}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="UTILITY">Utility · Transacional</SelectItem><SelectItem value="MARKETING">Marketing · Promoções</SelectItem><SelectItem value="AUTHENTICATION">Authentication · Códigos</SelectItem></SelectContent></Select></div>
-          <div className="space-y-2 md:col-span-2"><Label htmlFor="template-body">Corpo da mensagem</Label><Textarea id="template-body" value={body} onChange={e => setBody(e.target.value)} rows={5} maxLength={1024} required /><p className="text-xs text-muted-foreground">Variáveis posicionais: {"{{1}}"}, {"{{2}}"}, etc. A Meta pode exigir exemplos para modelos com variáveis.</p></div>
+          <div className="space-y-2 md:col-span-2"><Label htmlFor="template-body">Corpo da mensagem</Label><Textarea id="template-body" value={body} onChange={e => setBody(e.target.value)} rows={5} maxLength={1024} required /><p className="text-xs text-muted-foreground">Variáveis posicionais: {"{{1}}"}, {"{{2}}"}, etc.</p></div>
+          {body.match(/\\{\\{\\d+\\}\\}/g)?.length ? <div className="space-y-2 md:col-span-2"><Label htmlFor="template-examples">Exemplos das variáveis (separados por |)</Label><Input id="template-examples" value={bodyExamples} onChange={e => setBodyExamples(e.target.value)} placeholder="Ana | PED-0001" required /><p className="text-xs text-muted-foreground">A Meta exige um exemplo para cada variável, na mesma ordem.</p></div> : null}
           <div className="flex flex-wrap gap-2 md:col-span-2"><Button type="submit" disabled={saving || !body.trim()}>{saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}Submeter à Meta</Button><Button type="button" variant="outline" onClick={() => setShowForm(false)}>Cancelar</Button></div>
         </form>
       </CardContent></Card>}
