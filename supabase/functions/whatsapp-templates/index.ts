@@ -19,6 +19,7 @@ const Body = z.discriminatedUnion("action", [
     language: z.string().regex(/^[a-z]{2,3}_[A-Z]{2}$/),
     category: z.enum(["UTILITY", "MARKETING", "AUTHENTICATION"]),
     body: z.string().min(1).max(1024),
+    body_examples: z.array(z.string().min(1).max(256)).max(10).optional(),
     allow_category_change: z.boolean().default(true),
   }),
   z.object({ action: z.literal("delete"), company_id: z.string().uuid(), name: z.string().regex(/^[a-z0-9_]{1,512}$/) }),
@@ -65,6 +66,10 @@ Deno.serve(async (req) => {
         headers: { Authorization: `Bearer ${token}` },
       });
     } else if (input.action === "create") {
+      const variableCount = [...input.body.matchAll(/\\{\\{\\d+\\}\\}/g)].length;
+      if (variableCount > 0 && (!input.body_examples || input.body_examples.length !== variableCount)) {
+        return json({ error: `Indica ${variableCount} exemplo(s), um para cada variável do corpo.` }, 400);
+      }
       response = await fetch(endpoint, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
@@ -73,7 +78,7 @@ Deno.serve(async (req) => {
           language: input.language,
           category: input.category,
           allow_category_change: input.allow_category_change,
-          components: [{ type: "BODY", text: input.body }],
+          components: [{ type: "BODY", text: input.body, ...(variableCount ? { example: { body_text: [input.body_examples] } } : {}) }],
         }),
       });
     } else {
