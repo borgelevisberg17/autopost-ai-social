@@ -153,7 +153,7 @@ function VendoraParallaxStory() {
           <p className="mt-7 max-w-xl text-sm leading-7 text-white/75 sm:text-base sm:leading-8">
             A Vendora liga pessoas, canais e operações numa experiência contínua. Menos fragmentação para a equipa. Mais clareza para fazer o negócio crescer.
           </p>
-          <a href="#whatsapp" className="mt-9 inline-flex items-center gap-3 border-b border-white/45 pb-2 text-xs font-semibold text-white transition-colors duration-300 hover:border-white">
+          <a href="#whatsapp" className="group mt-9 inline-flex items-center gap-3 border-b border-white/45 pb-2 text-xs font-semibold text-white transition-colors duration-300 hover:border-white">
             Descobrir como funciona
             <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
           </a>
@@ -455,6 +455,33 @@ function FinalCTA({startPath}:{startPath:string}) {
 }
 
 export function HomeExperience({startPath,onStart}:{startPath:string;onStart:()=>void}) {
+ useEffect(() => {
+   const panels = Array.from(
+     document.querySelectorAll<HTMLElement>(".vendora-scroll-stack > section"),
+   );
+   if (!panels.length) return;
+
+   const measurePanels = () => {
+     const viewportHeight = window.innerHeight;
+     panels.forEach((panel) => {
+       panel.dataset.scrollFit =
+         panel.scrollHeight > viewportHeight + 24 ? "tall" : "fit";
+     });
+   };
+
+   measurePanels();
+   const observer = typeof ResizeObserver !== "undefined"
+     ? new ResizeObserver(measurePanels)
+     : null;
+   panels.forEach((panel) => observer?.observe(panel));
+   window.addEventListener("resize", measurePanels, { passive: true });
+
+   return () => {
+     observer?.disconnect();
+     window.removeEventListener("resize", measurePanels);
+   };
+ }, []);
+
  return (
     <>
       <Hero startPath={startPath} onStart={onStart} />
