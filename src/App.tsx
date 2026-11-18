@@ -38,6 +38,7 @@ const Content = lazy(() => import("./pages/admin/Content"));
 const Automations = lazy(() => import("./pages/admin/Automations"));
 const Payments = lazy(() => import("./pages/admin/Payments"));
 const Conversations = lazy(() => import("./pages/admin/Conversations"));
+const WhatsAppTemplates = lazy(() => import("./pages/admin/WhatsAppTemplates"));
 const Campaigns = lazy(() => import("./pages/admin/Campaigns"));
 const Platform = lazy(() => import("./pages/admin/Platform"));
 const Store = lazy(() => import("./pages/store/Store"));
@@ -217,6 +218,7 @@ const App = () => (
                 <Route path="/admin/automacoes" element={<P><PlanRoute><Automations /></PlanRoute></P>} />
                 <Route path="/admin/pagamentos" element={<P><Payments /></P>} />
                 <Route path="/admin/conversas" element={<P><PlanRoute><Conversations /></PlanRoute></P>} />
+                <Route path="/admin/modelos-whatsapp" element={<P><WhatsAppTemplates /></P>} />
                 <Route path="/plataforma" element={<P><Platform /></P>} />
 
                 <Route path="*" element={<NotFound />} />
