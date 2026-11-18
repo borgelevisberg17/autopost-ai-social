@@ -74,9 +74,29 @@ function Hero({ startPath, onStart }: { startPath: string; onStart: () => void }
 }
 
 function DotBrandTransition() {
- return <section aria-label="Vendora" className="relative overflow-hidden border-y border-slate-200 bg-white py-8 sm:py-12">
-  <div className="mx-auto max-w-[1600px] px-2 sm:px-6"><div aria-hidden="true" className="select-none text-center text-[clamp(4.2rem,19vw,18rem)] font-semibold leading-[.78] tracking-[-.105em] text-transparent" style={{backgroundImage:"radial-gradient(circle, #111827 1.05px, transparent 1.35px)",backgroundSize:"7px 7px",backgroundPosition:"center",WebkitBackgroundClip:"text",backgroundClip:"text"}}>VENDORA</div></div>
-  <div className="mt-5 flex items-center justify-center gap-3 px-5 text-center font-mono text-[9px] uppercase tracking-[.2em] text-slate-400 sm:mt-8"><span className="h-px w-8 bg-slate-200"/><span>Everything connected. One clear view.</span><span className="h-px w-8 bg-slate-200"/></div>
+ return <section aria-label="Vendora" className="relative isolate overflow-hidden bg-white py-7 sm:py-10">
+  <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-1/2 h-px bg-slate-100"/>
+  <div className="relative mx-auto w-full max-w-[1680px] px-1 sm:px-5">
+   <svg aria-hidden="true" className="block h-auto w-full overflow-visible" viewBox="0 0 1600 270" role="presentation">
+    <defs>
+     <pattern id="vendora-dot-field" width="9" height="9" patternUnits="userSpaceOnUse">
+      <circle cx="2.2" cy="2.2" r="1.55" fill="#111827"/>
+     </pattern>
+     <mask id="vendora-dot-wordmark">
+      <rect width="1600" height="270" fill="black"/>
+      <text x="800" y="214" textAnchor="middle" fill="white" fontFamily="Arial, Helvetica, sans-serif" fontSize="246" fontWeight="800" letterSpacing="-17">VENDORA</text>
+     </mask>
+     <linearGradient id="vendora-dot-fade" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stopColor="white" stopOpacity=".35"/>
+      <stop offset=".18" stopColor="white"/>
+      <stop offset=".82" stopColor="white"/>
+      <stop offset="1" stopColor="white" stopOpacity=".35"/>
+     </linearGradient>
+    </defs>
+    <rect width="1600" height="270" fill="url(#vendora-dot-field)" mask="url(#vendora-dot-wordmark)"/>
+   </svg>
+  </div>
+  <div className="mt-1 flex items-center justify-center gap-3 px-5 text-center font-mono text-[9px] uppercase tracking-[.22em] text-slate-400 sm:mt-3"><span className="h-px w-8 bg-slate-200"/><span>Everything connected. One clear view.</span><span className="h-px w-8 bg-slate-200"/></div>
  </section>;
 }
 
@@ -150,12 +170,15 @@ function AtmosphereStory() {
  useEffect(()=>{
   const nodes=stepRefs.current.filter((node):node is HTMLElement=>Boolean(node));
   if(!nodes.length) return;
+  // Preload the three chapter visuals so a fast scroll never reveals an empty frame.
+  scenes.forEach(scene=>{const image=new Image();image.src=scene.image;});
+  if(!("IntersectionObserver" in window)) return;
   const observer=new IntersectionObserver(entries=>{
    const visible=entries.filter(entry=>entry.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio);
    if(!visible.length) return;
    const index=nodes.indexOf(visible[0].target as HTMLElement);
    if(index>=0) setActive(index);
-  },{root:null,rootMargin:"-35% 0px -35% 0px",threshold:[0,.15,.35,.6]});
+  },{root:null,rootMargin:"-42% 0px -42% 0px",threshold:[0,.1,.25,.5,.75]});
   nodes.forEach(node=>observer.observe(node));
   return ()=>observer.disconnect();
  },[]);
@@ -165,9 +188,9 @@ function AtmosphereStory() {
    <div className="grid gap-12 lg:grid-cols-[1.08fr_.92fr] lg:gap-16">
     <div className="lg:sticky lg:top-24 lg:h-[min(70vh,680px)] lg:self-start">
      <div className="relative h-[52vh] min-h-[340px] max-h-[680px] overflow-hidden rounded-[26px] bg-slate-200 shadow-[0_30px_90px_rgba(15,23,42,.12)] sm:h-[62vh] lg:h-full">
-      {scenes.map((scene,i)=><div key={scene.image} aria-hidden={active!==i} className={`absolute inset-0 transition-opacity duration-700 motion-reduce:transition-none ${active===i?"opacity-100":"pointer-events-none opacity-0"}`}><img src={scene.image} alt={scene.alt} loading={i===0?"eager":"lazy"} className="h-full w-full object-cover"/></div>)}
+      {scenes.map((scene,i)=><div key={scene.image} aria-hidden={active!==i} className={`absolute inset-0 transition-[opacity,transform] duration-700 ease-out motion-reduce:transition-none ${active===i?"scale-100 opacity-100":"pointer-events-none scale-[1.035] opacity-0"}`}><img src={scene.image} alt={scene.alt} loading="eager" decoding="async" className="h-full w-full object-cover"/></div>)}
       <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-transparent"/>
-      <div className="absolute inset-x-6 bottom-6 text-white sm:inset-x-8 sm:bottom-8"><div className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-[.2em] text-white/65"><span className="h-1.5 w-1.5 rounded-full bg-white"/>{scenes[active].eyebrow}</div><p className="mt-3 max-w-lg text-2xl font-semibold leading-tight tracking-[-.045em] sm:text-3xl">O comércio em movimento. <span className="text-white/65">Com tudo no seu lugar.</span></p><div className="mt-6 flex gap-1.5" aria-label={`Capítulo ${active+1} de 3`}>{scenes.map((scene,i)=><span key={scene.eyebrow} className={`h-1 rounded-full transition-all duration-500 ${active===i?"w-9 bg-white":"w-4 bg-white/35"}`}/>)}</div></div>
+      <div className="absolute inset-x-6 bottom-6 text-white sm:inset-x-8 sm:bottom-8"><div className="flex items-center justify-between gap-4 font-mono text-[9px] uppercase tracking-[.2em] text-white/70"><span>Vendora / Capítulo 0{active+1}</span><span>0{active+1} — 03</span></div><p className="mt-4 max-w-lg text-2xl font-semibold leading-tight tracking-[-.045em] sm:text-3xl">{scenes[active].title}</p><div className="mt-6 flex gap-1.5" aria-label={`Capítulo ${active+1} de 3`}>{scenes.map((scene,i)=><span key={scene.eyebrow} className={`h-1 rounded-full transition-all duration-500 ${active===i?"w-10 bg-white":"w-4 bg-white/35"}`}/>)}</div></div>
      </div>
     </div>
     <div className="relative">{scenes.map((scene,i)=><article key={scene.eyebrow} ref={node=>{stepRefs.current[i]=node;}} data-story-step={i} className="flex min-h-[340px] flex-col justify-center border-b border-slate-300/80 py-14 first:pt-6 last:border-0 sm:min-h-[440px] lg:min-h-[min(70vh,680px)] lg:py-16">
