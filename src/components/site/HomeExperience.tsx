@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowDown, ArrowRight, ArrowUpRight, Check, ChevronDown, ChevronLeft, ChevronRight,
@@ -73,6 +73,13 @@ function Hero({ startPath, onStart }: { startPath: string; onStart: () => void }
   </section>;
 }
 
+function DotBrandTransition() {
+ return <section aria-label="Vendora" className="relative overflow-hidden border-y border-slate-200 bg-white py-8 sm:py-12">
+  <div className="mx-auto max-w-[1600px] px-2 sm:px-6"><div aria-hidden="true" className="select-none text-center text-[clamp(4.2rem,19vw,18rem)] font-semibold leading-[.78] tracking-[-.105em] text-transparent" style={{backgroundImage:"radial-gradient(circle, #111827 1.05px, transparent 1.35px)",backgroundSize:"7px 7px",backgroundPosition:"center",WebkitBackgroundClip:"text",backgroundClip:"text"}}>VENDORA</div></div>
+  <div className="mt-5 flex items-center justify-center gap-3 px-5 text-center font-mono text-[9px] uppercase tracking-[.2em] text-slate-400 sm:mt-8"><span className="h-px w-8 bg-slate-200"/><span>Everything connected. One clear view.</span><span className="h-px w-8 bg-slate-200"/></div>
+ </section>;
+}
+
 function ValueStory() {
  const items=[{n:"01",icon:Globe2,title:"Todos os canais, uma operação",text:"WhatsApp, Instagram, Facebook e loja online ligados ao mesmo catálogo e contexto."},{n:"02",icon:Workflow,title:"Menos tarefas repetidas",text:"Automatize respostas, publicação e acompanhamento sem perder o controlo."},{n:"03",icon:ShieldCheck,title:"Cada ação com contexto",text:"A IA consulta dados e respeita permissões antes de agir."}];
  return <section id="proof" className="border-y border-slate-200 bg-[#f8fafc] py-20 sm:py-28"><div className={wrap}>
@@ -133,29 +140,40 @@ function AgentStory() {
 }
 
 function AtmosphereStory() {
- const chapters=[
-  {eyebrow:"Menos dispersão",title:"Uma visão mais calma do que acontece no negócio.",text:"Pedidos, conversas e catálogo deixam de competir pela sua atenção. A informação importante passa a estar organizada num só lugar."},
-  {eyebrow:"Mais contexto",title:"Cada conversa continua de onde a anterior terminou.",text:"A equipa não precisa reconstruir o histórico a cada contacto. O contexto acompanha o cliente e ajuda a dar respostas consistentes."},
-  {eyebrow:"Mais controlo",title:"A tecnologia trabalha. A equipa mantém a direção.",text:"Automatize tarefas repetitivas sem abdicar de regras, permissões e visibilidade sobre as decisões."}
+ const [active,setActive]=useState(0);
+ const stepRefs=useRef<(HTMLElement|null)[]>([]);
+ const scenes=[
+  {eyebrow:"Menos dispersão",title:"Tudo começa a fazer sentido quando a operação se liga.",text:"Pedidos, conversas e catálogo deixam de competir pela sua atenção. A informação importante passa a estar organizada num só lugar.",image:"/media/optimized/storefront-commerce.webp",alt:"Loja em funcionamento, representando a operação comercial ligada."},
+  {eyebrow:"Mais contexto",title:"Cada conversa continua de onde a anterior terminou.",text:"O histórico acompanha o cliente. A equipa encontra o contexto, consulta o catálogo e responde sem reconstruir a história a cada contacto.",image:"/media/optimized/whatsapp-status-02.webp",alt:"Conversa de atendimento WhatsApp com consulta de informação do catálogo."},
+  {eyebrow:"Mais controlo",title:"A tecnologia trabalha. A equipa mantém a direção.",text:"Automatize tarefas repetitivas sem abdicar de regras, permissões e visibilidade sobre as decisões e os resultados.",image:"/media/optimized/operations-audit.webp",alt:"Painel de operações que representa controlo e acompanhamento."}
  ];
- return <section className="bg-[#f5f5f4] py-20 sm:py-28">
+ useEffect(()=>{
+  const nodes=stepRefs.current.filter((node):node is HTMLElement=>Boolean(node));
+  if(!nodes.length) return;
+  const observer=new IntersectionObserver(entries=>{
+   const visible=entries.filter(entry=>entry.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio);
+   if(!visible.length) return;
+   const index=nodes.indexOf(visible[0].target as HTMLElement);
+   if(index>=0) setActive(index);
+  },{root:null,rootMargin:"-35% 0px -35% 0px",threshold:[0,.15,.35,.6]});
+  nodes.forEach(node=>observer.observe(node));
+  return ()=>observer.disconnect();
+ },[]);
+ return <section aria-labelledby="atmosphere-title" className="relative bg-[#f4f4f2] py-24 sm:py-32">
   <div className={wrap}>
-   <div className="mb-12 max-w-2xl"><Label>Uma forma mais simples de operar</Label><h2 className={h2}>Menos ruído. <span className="text-slate-400">Mais espaço para fazer crescer.</span></h2></div>
-   <div className="grid gap-10 lg:grid-cols-[1.05fr_.95fr] lg:items-start">
-    <div className="lg:sticky lg:top-24">
-     <div className="relative min-h-[420px] overflow-hidden rounded-[24px] bg-slate-300 sm:min-h-[620px]">
-      <img src="/media/optimized/storefront-commerce.webp" alt="Ambiente de comércio e operação de uma loja" loading="lazy" className="absolute inset-0 h-full w-full object-cover"/>
-      <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/5 to-transparent"/>
-      <div className="absolute bottom-6 left-6 right-6 text-white"><span className="font-mono text-[9px] uppercase tracking-[.18em] text-white/70">Vendora / Everyday commerce</span><p className="mt-2 max-w-md text-2xl font-semibold leading-tight tracking-[-.04em]">O trabalho flui melhor quando tudo está ligado.</p></div>
+   <div className="mb-14 max-w-3xl sm:mb-20"><Label>Uma forma mais simples de operar</Label><h2 id="atmosphere-title" className={h2}>Menos ruído. <span className="text-slate-400">Mais espaço para fazer crescer.</span></h2><p className="mt-6 max-w-xl text-sm leading-7 text-slate-600">Uma visão contínua do negócio, do primeiro contacto ao acompanhamento — sem saltar entre ferramentas.</p></div>
+   <div className="grid gap-12 lg:grid-cols-[1.08fr_.92fr] lg:gap-16">
+    <div className="lg:sticky lg:top-24 lg:h-[min(70vh,680px)] lg:self-start">
+     <div className="relative h-[52vh] min-h-[340px] max-h-[680px] overflow-hidden rounded-[26px] bg-slate-200 shadow-[0_30px_90px_rgba(15,23,42,.12)] sm:h-[62vh] lg:h-full">
+      {scenes.map((scene,i)=><div key={scene.image} aria-hidden={active!==i} className={`absolute inset-0 transition-opacity duration-700 motion-reduce:transition-none ${active===i?"opacity-100":"pointer-events-none opacity-0"}`}><img src={scene.image} alt={scene.alt} loading={i===0?"eager":"lazy"} className="h-full w-full object-cover"/></div>)}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-transparent"/>
+      <div className="absolute inset-x-6 bottom-6 text-white sm:inset-x-8 sm:bottom-8"><div className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-[.2em] text-white/65"><span className="h-1.5 w-1.5 rounded-full bg-white"/>{scenes[active].eyebrow}</div><p className="mt-3 max-w-lg text-2xl font-semibold leading-tight tracking-[-.045em] sm:text-3xl">O comércio em movimento. <span className="text-white/65">Com tudo no seu lugar.</span></p><div className="mt-6 flex gap-1.5" aria-label={`Capítulo ${active+1} de 3`}>{scenes.map((scene,i)=><span key={scene.eyebrow} className={`h-1 rounded-full transition-all duration-500 ${active===i?"w-9 bg-white":"w-4 bg-white/35"}`}/>)}</div></div>
      </div>
     </div>
-    <div className="space-y-0">
-     {chapters.map((chapter,i)=><article key={chapter.eyebrow} className="flex min-h-[300px] flex-col justify-center border-b border-slate-300/80 py-12 first:pt-4 last:border-0 sm:min-h-[390px]">
-      <span className="font-mono text-[10px] uppercase tracking-[.16em] text-slate-400">0{i+1} / {chapter.eyebrow}</span>
-      <h3 className="mt-5 max-w-lg text-3xl font-semibold leading-[1.02] tracking-[-.055em] text-slate-950 sm:text-4xl">{chapter.title}</h3>
-      <p className="mt-5 max-w-md text-sm leading-7 text-slate-600">{chapter.text}</p>
-     </article>)}
-    </div>
+    <div className="relative">{scenes.map((scene,i)=><article key={scene.eyebrow} ref={node=>{stepRefs.current[i]=node;}} data-story-step={i} className="flex min-h-[340px] flex-col justify-center border-b border-slate-300/80 py-14 first:pt-6 last:border-0 sm:min-h-[440px] lg:min-h-[min(70vh,680px)] lg:py-16">
+      <div className="flex items-center gap-3"><span className="font-mono text-[10px] tabular-nums text-slate-400">0{i+1} / 03</span><span className={`h-px w-8 ${active===i?"bg-slate-950":"bg-slate-300"}`}/><span className="font-mono text-[10px] uppercase tracking-[.16em] text-slate-400">{scene.eyebrow}</span></div>
+      <h3 className={`mt-7 max-w-xl text-3xl font-semibold leading-[1.04] tracking-[-.055em] sm:text-4xl ${active===i?"text-slate-950":"text-slate-500"}`}>{scene.title}</h3><p className="mt-6 max-w-lg text-[15px] leading-7 text-slate-600">{scene.text}</p><div className="mt-8 flex items-center gap-2 text-[10px] font-medium text-slate-400"><span className={`h-1.5 w-1.5 rounded-full ${active===i?"bg-slate-950":"bg-slate-300"}`}/>{active===i?"A acompanhar este capítulo":"Continue a percorrer a história"}</div>
+     </article>)}</div>
    </div>
   </div>
  </section>;
@@ -190,5 +208,5 @@ function FinalCTA({startPath}:{startPath:string}) {
 }
 
 export function HomeExperience({startPath,onStart}:{startPath:string;onStart:()=>void}) {
- return <><Hero startPath={startPath} onStart={onStart}/><ValueStory/><WhatsAppStory/><ChannelStory/><AtmosphereStory/><AgentStory/><section id="plans" className="bg-white"><PlansSection/></section><WorkflowStory/><CommandStory startPath={startPath}/><FAQStory/><FinalCTA startPath={startPath}/></>;
+ return <><Hero startPath={startPath} onStart={onStart}/><DotBrandTransition/><ValueStory/><WhatsAppStory/><ChannelStory/><AtmosphereStory/><AgentStory/><section id="plans" className="bg-white"><PlansSection/></section><WorkflowStory/><CommandStory startPath={startPath}/><FAQStory/><FinalCTA startPath={startPath}/></>;
 }
