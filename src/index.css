@@ -1053,16 +1053,22 @@ html {
   .product-detail-footer { align-items: flex-start; flex-direction: column; padding: 14px 16px; }
 }
 
-/* Editorial page stack: panels keep their natural content height before the next panel covers them. */
+/* Editorial page stack: only panels that fit are pinned; tall panels scroll fully in normal flow. */
+.vendora-scroll-stack > section { position: relative; min-height: 100svh; height: auto; }
 @media (min-width: 1024px) {
-  .vendora-scroll-stack > section {
+  .vendora-scroll-stack > section[data-scroll-fit="fit"] {
     position: sticky;
     top: 0;
     min-height: 100svh;
-    height: auto;
     z-index: 1;
     isolation: isolate;
     box-shadow: 0 -14px 38px rgba(15, 23, 42, 0.035);
+  }
+  .vendora-scroll-stack > section[data-scroll-fit="tall"] {
+    position: relative;
+    min-height: 100svh;
+    z-index: 1;
+    box-shadow: none;
   }
 }
 @media (max-width: 1023px) {
