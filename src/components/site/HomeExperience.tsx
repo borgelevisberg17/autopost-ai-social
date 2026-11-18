@@ -11,7 +11,7 @@ import { PlansSection } from "@/components/site/PlansSection";
 
 const wrap = "mx-auto w-full max-w-[1240px] px-5 sm:px-7 lg:px-8";
 const eyebrow = "mb-5 inline-flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[.18em] text-slate-500";
-const h2 = "text-balance text-4xl font-semibold leading-[.98] tracking-[-.065em] text-slate-950 sm:text-5xl lg:text-[64px]";
+const h2 = "text-balance text-3xl font-semibold leading-[1.02] tracking-[-.06em] text-slate-950 sm:text-4xl lg:text-[clamp(2.75rem,4.1vw,3.5rem)]";
 const muted = "text-[15px] leading-7 text-slate-600 sm:text-base";
 
 function Label({ children }: { children: ReactNode }) {
@@ -125,6 +125,46 @@ function ValueStory() {
    <div className="grid gap-10 lg:grid-cols-[.85fr_1.15fr] lg:items-end"><div><Label>Uma operação, não mais ferramentas</Label><h2 className={h2}>O comércio acontece em vários lugares. <span className="text-slate-400">A gestão não devia estar fragmentada.</span></h2></div><p className={`${muted} max-w-lg lg:justify-self-end`}>A Vendora organiza os pontos de contacto do seu negócio para que a equipa tenha a mesma informação, o mesmo contexto e uma visão clara do que precisa de acontecer.</p></div>
    <div className="mt-14 grid gap-3 md:grid-cols-3">{items.map(({n,icon:Icon,title,text})=><article key={n} className="group rounded-2xl border border-slate-200 bg-white p-6 transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_45px_rgba(15,23,42,.07)] sm:p-7"><div className="flex items-center justify-between"><span className="font-mono text-[10px] text-slate-400">{n} / 03</span><Icon className="h-5 w-5 text-slate-500 transition group-hover:text-slate-950"/></div><h3 className="mt-12 text-xl font-semibold tracking-tight text-slate-950">{title}</h3><p className="mt-3 text-sm leading-6 text-slate-500">{text}</p></article>)}</div>
  </div></section>;
+}
+
+
+function OverflowHoverStory() {
+  return (
+    <section aria-labelledby="vendora-intro-title" className="group relative isolate min-h-[72svh] overflow-hidden bg-slate-950 text-white sm:min-h-[82svh]" data-cursor="SOBRE A VENDORA">
+      <img
+        src="/media/optimized/auth-human-commerce.webp"
+        alt="Empreendedor a trabalhar no seu negócio, representando o comércio ligado pela Vendora."
+        loading="lazy"
+        decoding="async"
+        className="absolute inset-0 -z-20 h-full w-full object-cover object-center transition-transform duration-[1400ms] ease-out group-hover:scale-[1.045] motion-reduce:transform-none"
+      />
+      <div className="absolute inset-0 -z-10 bg-black/55 transition-colors duration-700 group-hover:bg-black/40" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-black/85 via-black/45 to-black/10" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-t from-black/45 via-transparent to-black/15" />
+      <div className={`${wrap} relative flex min-h-[72svh] flex-col justify-between py-12 sm:min-h-[82svh] sm:py-16 lg:py-20`}>
+        <div className="flex items-center justify-between gap-4 font-mono text-[9px] uppercase tracking-[.2em] text-white/65">
+          <span>Uma plataforma. Um negócio inteiro.</span><span className="hidden sm:inline">Vendora / 2026</span>
+        </div>
+        <div className="max-w-3xl py-20">
+          <div className="mb-5 inline-flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[.18em] text-white/65"><span className="h-1.5 w-1.5 rounded-full bg-white" />Conheça a Vendora</div>
+          <h2 id="vendora-intro-title" className="max-w-[13ch] text-balance text-4xl font-semibold leading-[.98] tracking-[-.065em] text-white sm:text-6xl lg:text-[clamp(4rem,7vw,6.5rem)]">
+            O comércio move-se. <span className="text-white/55">A sua gestão também.</span>
+          </h2>
+          <p className="mt-7 max-w-xl text-sm leading-7 text-white/75 sm:text-base sm:leading-8">
+            A Vendora liga pessoas, canais e operações numa experiência contínua. Menos fragmentação para a equipa. Mais clareza para fazer o negócio crescer.
+          </p>
+          <a href="#whatsapp" className="mt-9 inline-flex items-center gap-3 border-b border-white/45 pb-2 text-xs font-semibold text-white transition-colors duration-300 hover:border-white">
+            Descobrir como funciona
+            <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+          </a>
+        </div>
+        <div className="flex items-end justify-between gap-6">
+          <span className="font-mono text-[9px] uppercase tracking-[.18em] text-white/55">Tudo conectado. Uma visão clara.</span>
+          <span aria-hidden="true" className="text-[clamp(4rem,12vw,10rem)] font-semibold leading-[.7] tracking-[-.1em] text-white/20 transition-all duration-700 group-hover:translate-y-[-5px] group-hover:text-white/35">V.</span>
+        </div>
+      </div>
+    </section>
+  );
 }
 
 function WhatsAppStory() {
@@ -271,7 +311,7 @@ function AtmosphereStory() {
       },
       {
         root: null,
-        rootMargin: "-44% 0px -44% 0px",
+        rootMargin: "-36% 0px -36% 0px",
         threshold: 0,
       },
     );
@@ -283,10 +323,10 @@ function AtmosphereStory() {
   return (
     <section
       aria-labelledby="atmosphere-title"
-      className="relative bg-[#f4f4f2] py-24 sm:py-32"
+      className="relative bg-[#f4f4f2] py-16 sm:py-20"
     >
       <div className={wrap}>
-        <div className="mb-14 max-w-3xl sm:mb-20">
+        <div className="mb-10 max-w-3xl sm:mb-12">
           <Label>Uma forma mais simples de operar</Label>
           <h2 id="atmosphere-title" className={h2}>
             Menos ruído.{" "}
@@ -298,14 +338,14 @@ function AtmosphereStory() {
           </p>
         </div>
 
-        <div className="grid items-start gap-10 lg:grid-cols-[1.08fr_.92fr] lg:gap-16">
-          <div className="relative lg:sticky lg:top-24 lg:h-[min(72vh,680px)] lg:self-start">
+        <div className="grid items-start gap-8 lg:grid-cols-[1.08fr_.92fr] lg:gap-12">
+          <div className="relative lg:sticky lg:top-28 lg:h-[min(64vh,600px)] lg:self-start">
             <div className="relative h-[420px] overflow-hidden rounded-[26px] bg-slate-200 shadow-[0_30px_90px_rgba(15,23,42,.12)] sm:h-[540px] lg:h-full">
               {scenes.map((scene, index) => (
                 <div
                   key={scene.image}
                   aria-hidden={active !== index}
-                  className={`absolute inset-0 transition-[opacity,transform] duration-700 ease-out motion-reduce:transition-none ${active === index ? "scale-100 opacity-100" : "pointer-events-none scale-[1.035] opacity-0"}`}
+                  className={`absolute inset-0 transition-[opacity,transform] duration-500 ease-out motion-reduce:transition-none ${active === index ? "scale-100 opacity-100" : "pointer-events-none scale-[1.015] opacity-0"}`}
                 >
                   <img
                     src={scene.image}
@@ -349,7 +389,7 @@ function AtmosphereStory() {
                 }}
                 data-story-step={index}
                 aria-current={active === index ? "step" : undefined}
-                className="flex min-h-0 flex-col justify-center border-b border-slate-300/80 py-12 last:border-0 sm:py-16 lg:min-h-[76vh] lg:py-16"
+                className="flex min-h-0 flex-col justify-center border-b border-slate-300/80 py-12 last:border-0 sm:py-16 lg:min-h-[62vh] lg:py-12"
               >
                 <div className="flex items-center gap-3">
                   <span className="font-mono text-[10px] tabular-nums text-slate-400">
@@ -416,5 +456,22 @@ function FinalCTA({startPath}:{startPath:string}) {
 }
 
 export function HomeExperience({startPath,onStart}:{startPath:string;onStart:()=>void}) {
- return <><Hero startPath={startPath} onStart={onStart}/><ValueStory/><WhatsAppStory/><ChannelStory/><AtmosphereStory/><AgentStory/><section id="plans" className="bg-white"><PlansSection/></section><WorkflowStory/><CommandStory startPath={startPath}/><FAQStory/><FinalCTA startPath={startPath}/></>;
+ return (
+    <>
+      <Hero startPath={startPath} onStart={onStart} />
+      <div className="vendora-scroll-stack"><ValueStory /></div>
+      <OverflowHoverStory />
+      <div className="vendora-scroll-stack">
+        <WhatsAppStory />
+        <ChannelStory />
+        <AtmosphereStory />
+        <AgentStory />
+        <section id="plans" className="bg-white"><PlansSection /></section>
+        <WorkflowStory />
+        <CommandStory startPath={startPath} />
+        <FAQStory />
+        <FinalCTA startPath={startPath} />
+      </div>
+    </>
+  );
 }

@@ -1052,3 +1052,40 @@ html {
   .product-related-card__image { aspect-ratio: 1 / .86; }
   .product-detail-footer { align-items: flex-start; flex-direction: column; padding: 14px 16px; }
 }
+
+/* Vendora editorial stack: each chapter naturally rises over the previous one. */
+@media (min-width: 1024px) {
+  .vendora-scroll-stack > section {
+    position: sticky;
+    top: 76px;
+    min-height: calc(100svh - 76px);
+    isolation: isolate;
+    box-shadow: 0 -18px 42px rgba(15, 23, 42, 0.045);
+  }
+  .vendora-scroll-stack > section { z-index: 1; }
+}
+@supports (animation-timeline: view()) and (animation-range: exit 0% exit 100%) {
+  @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+    @keyframes vendora-stack-under {
+      from { transform: translateY(0) scale(1); opacity: 1; }
+      to { transform: translateY(-0.35rem) scale(0.985); opacity: 0.94; }
+    }
+    .vendora-scroll-stack > section:not(:last-child) {
+      animation: vendora-stack-under linear both;
+      animation-timeline: view();
+      animation-range: exit 0% exit 100%;
+      transform-origin: center top;
+    }
+  }
+}
+@media (max-width: 1023px) {
+  .vendora-scroll-stack > section { position: relative; min-height: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vendora-scroll-stack > section {
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+
