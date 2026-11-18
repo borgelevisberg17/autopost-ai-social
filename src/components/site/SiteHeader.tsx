@@ -38,7 +38,7 @@ function NavLinkItem({
         lusionSound.playHover();
       }}
       onClick={() => lusionSound.playClick()}
-      className={`relative whitespace-nowrap py-2 text-[14px] font-medium transition hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-4 ${
+      className={`relative whitespace-nowrap py-2 text-[14px] font-medium transition hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-4 ${
         active || item.emphasis
           ? "font-semibold text-slate-900"
           : "text-slate-600"
@@ -119,7 +119,7 @@ export function SiteHeader({ ctaHref, onCtaClick }: SiteHeaderProps) {
               {!authenticated && (
                 <Link
                   to="/login"
-                  className="hidden min-h-10 items-center px-4 text-[14px] font-semibold text-slate-600 transition hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 lg:inline-flex"
+                  className="hidden min-h-10 items-center px-4 text-[14px] font-semibold text-slate-600 transition hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 lg:inline-flex"
                 >
                   Entrar
                 </Link>
@@ -152,7 +152,7 @@ export function SiteHeader({ ctaHref, onCtaClick }: SiteHeaderProps) {
             aria-expanded={menuOpen}
             aria-controls="mobile-site-menu"
             onClick={() => setMenuOpen((open) => !open)}
-            className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 lg:hidden shadow-xs"
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 lg:hidden shadow-xs"
           >
             {menuOpen ? (
               <X aria-hidden="true" className="h-4 w-4" />
@@ -176,7 +176,7 @@ export function SiteHeader({ ctaHref, onCtaClick }: SiteHeaderProps) {
                 to={item.href}
                 tabIndex={menuOpen ? 0 : -1}
                 aria-current={isActive(item.href) ? "page" : undefined}
-                className={`rounded-xl px-3 py-3 text-[14px] font-medium transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500 ${
+                className={`rounded-xl px-3 py-3 text-[14px] font-medium transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-slate-900 ${
                   item.emphasis
                     ? "font-semibold text-slate-900 bg-slate-50"
                     : "text-slate-600"
@@ -189,7 +189,7 @@ export function SiteHeader({ ctaHref, onCtaClick }: SiteHeaderProps) {
               <Link
                 to={authenticated ? "/dashboard" : "/login"}
                 tabIndex={menuOpen ? 0 : -1}
-                className="col-span-2 mt-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-center text-[14px] font-semibold text-slate-900 transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                className="col-span-2 mt-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-center text-[14px] font-semibold text-slate-900 transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900"
               >
                 {authenticated ? "Abrir painel" : "Aceder à conta"}
               </Link>
