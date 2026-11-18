@@ -2469,7 +2469,7 @@ function ProcessSection() {
                 type="button"
                 aria-pressed={active === index}
                 onClick={() => setActive(index)}
-                className={`w-full rounded-2xl border p-5 text-left transition duration-200 ${active === index ? "border-emerald-700/40 bg-slate-100 shadow-[0_10px_30px_rgba(15,23,42,0.07)]" : "border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm"}`}
+                className={`w-full rounded-2xl border p-5 text-left transition duration-200 ${active === index ? "border-slate-900/30 bg-slate-100 shadow-[0_10px_30px_rgba(15,23,42,0.07)]" : "border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm"}`}
               >
                 <div className="flex items-start gap-4">
                   <span
