@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ArrowLeft, ChevronRight, FileText, Image as ImageIcon, Loader2, MessageSquare, Pencil, Plus, RefreshCw, Send, Trash2 } from "lucide-react";
+import { ArrowLeft, ChevronRight, FileText, Image as ImageIcon, Loader2, MessageSquare, Pencil, Plus, RefreshCw, Send, Trash2, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { useCompany } from "@/hooks/useCompany";
@@ -20,6 +20,7 @@ type Screen = "list" | "detail" | "editor";
 
 const statusText: Record<string, string> = { APPROVED: "Aprovado", PENDING: "Em análise", REJECTED: "Rejeitado", PAUSED: "Em pausa", DISABLED: "Desativado", IN_APPEAL: "Em recurso" };
 const statusVariant = (status: string) => status === "APPROVED" ? "default" : status === "REJECTED" ? "destructive" : "secondary";
+const mediaAccept: Record<string, string> = { IMAGE: "image/jpeg,image/png", VIDEO: "video/mp4", DOCUMENT: "application/pdf" };
 
 function MessagePreview({ components = [], name }: { components?: Component[]; name?: string }) {
   const header = components.find(c => c.type === "HEADER");
@@ -48,6 +49,8 @@ export default function WhatsAppTemplates() {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [mediaName, setMediaName] = useState("");
   const [screen, setScreen] = useState<Screen>("list");
   const [selected, setSelected] = useState<Template | null>(null);
   const [search, setSearch] = useState("");
@@ -77,6 +80,27 @@ export default function WhatsAppTemplates() {
     return data;
   }, [company?.id]);
 
+  const uploadMedia = async (file?: File) => {
+    if (!file || !company?.id) return;
+    setUploading(true);
+    try {
+      const form = new FormData();
+      form.append("company_id", company.id);
+      form.append("file", file);
+      const { data, error } = await supabase.functions.invoke("whatsapp-template-media-upload", { body: form });
+      if (error) {
+        const context = (error as { context?: Response }).context;
+        const details = context ? await context.json().catch(() => null) : null;
+        throw new Error(details?.error ?? "Não foi possível carregar o ficheiro");
+      }
+      if (!data?.header_handle) throw new Error(data?.error ?? "A Meta não devolveu o identificador do ficheiro");
+      setHeaderHandle(data.header_handle);
+      setMediaName(file.name);
+      toast.success("Ficheiro carregado para a Meta");
+    } catch (error) { toast.error(error instanceof Error ? error.message : "Falha no upload"); }
+    finally { setUploading(false); }
+  };
+
   const load = useCallback(async () => {
     if (!company?.id) return;
     setLoading(true);
@@ -90,7 +114,7 @@ export default function WhatsAppTemplates() {
   const counts = useMemo(() => ({ all: templates.length, approved: templates.filter(t => t.status === "APPROVED").length, pending: templates.filter(t => t.status === "PENDING").length, rejected: templates.filter(t => t.status === "REJECTED").length }), [templates]);
 
   function openCreate() {
-    setSelected(null); setName("novo_modelo"); setLanguage("pt_PT"); setCategory("UTILITY"); setHeaderType("NONE"); setHeaderText(""); setHeaderHandle(""); setBody("Olá {{1}}! Temos uma atualização sobre o teu pedido {{2}}."); setBodyExamples("Ana | PED-0001"); setFooter(""); setButtonType("NONE"); setScreen("editor");
+    setSelected(null); setName("novo_modelo"); setLanguage("pt_PT"); setCategory("UTILITY"); setHeaderType("NONE"); setHeaderText(""); setHeaderHandle(""); setMediaName(""); setBody("Olá {{1}}! Temos uma atualização sobre o teu pedido {{2}}."); setBodyExamples("Ana | PED-0001"); setFooter(""); setButtonType("NONE"); setScreen("editor");
   }
   function openDetail(template: Template) { setSelected(template); setScreen("detail"); }
   function startEdit(template: Template) {
@@ -98,7 +122,7 @@ export default function WhatsAppTemplates() {
     const components = template.components ?? [];
     const h = components.find(c => c.type === "HEADER");
     setName(`${template.name}_v2`); setLanguage(template.language); setCategory(template.category as Category);
-    setHeaderType(h?.format ?? "NONE"); setHeaderText(h?.text ?? ""); setHeaderHandle(h?.example?.header_handle?.[0] ?? "");
+    setHeaderType(h?.format ?? "NONE"); setHeaderText(h?.text ?? ""); setHeaderHandle(h?.example?.header_handle?.[0] ?? ""); setMediaName("");
     setBody(components.find(c => c.type === "BODY")?.text ?? "");
     setBodyExamples(""); setFooter(components.find(c => c.type === "FOOTER")?.text ?? "");
     const buttons = components.find(c => c.type === "BUTTONS")?.buttons ?? [];
@@ -160,11 +184,11 @@ export default function WhatsAppTemplates() {
 
       {screen === "editor" && <><div><p className="text-xs font-semibold uppercase tracking-wider text-emerald-700">Editor de modelos</p><h1 className="mt-1 text-2xl font-bold">{selected ? "Criar nova versão" : "Criar modelo"}</h1><p className="mt-1 text-sm text-muted-foreground">Configura cada componente e acompanha a pré-visualização antes de submeter à Meta.</p></div><form onSubmit={submit}><div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_360px]"><div className="space-y-5">
           <Card><CardHeader><CardTitle>1. Identificação</CardTitle></CardHeader><CardContent className="grid gap-4 sm:grid-cols-2"><div className="space-y-2"><Label>Nome técnico</Label><Input value={name} onChange={e=>setName(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g,"_"))} pattern="[a-z0-9_]+" maxLength={512} required /><p className="text-xs text-muted-foreground">Minúsculas, números e underscore.</p></div><div className="space-y-2"><Label>Idioma</Label><Select value={language} onValueChange={setLanguage}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="pt_PT">Português (Portugal)</SelectItem><SelectItem value="pt_BR">Português (Brasil)</SelectItem><SelectItem value="en_US">English (US)</SelectItem><SelectItem value="es_ES">Español</SelectItem></SelectContent></Select></div><div className="space-y-2 sm:col-span-2"><Label>Categoria</Label><Select value={category} onValueChange={v=>setCategory(v as Category)}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="UTILITY">Utility · Transacional</SelectItem><SelectItem value="MARKETING">Marketing · Promoções</SelectItem><SelectItem value="AUTHENTICATION">Authentication · Códigos</SelectItem></SelectContent></Select></div></CardContent></Card>
-          <Card><CardHeader><CardTitle>2. Cabeçalho (opcional)</CardTitle></CardHeader><CardContent className="space-y-4"><div className="space-y-2"><Label>Tipo de cabeçalho</Label><Select value={headerType} onValueChange={setHeaderType}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="NONE">Sem cabeçalho</SelectItem><SelectItem value="TEXT">Texto</SelectItem><SelectItem value="IMAGE">Imagem</SelectItem><SelectItem value="VIDEO">Vídeo</SelectItem><SelectItem value="DOCUMENT">Documento</SelectItem></SelectContent></Select></div>{headerType==="TEXT" && <div className="space-y-2"><Label>Texto do cabeçalho</Label><Input value={headerText} onChange={e=>setHeaderText(e.target.value)} maxLength={60} placeholder="Ex.: Atualização do pedido" /></div>}{["IMAGE","VIDEO","DOCUMENT"].includes(headerType) && <div className="space-y-2"><Label>Media handle da Meta</Label><Input value={headerHandle} onChange={e=>setHeaderHandle(e.target.value)} placeholder="4::..." required /><p className="text-xs text-muted-foreground">A Meta exige um media handle de exemplo carregado previamente. O URL público do ficheiro não substitui este identificador.</p></div>}</CardContent></Card>
+          <Card><CardHeader><CardTitle>2. Cabeçalho (opcional)</CardTitle></CardHeader><CardContent className="space-y-4"><div className="space-y-2"><Label>Tipo de cabeçalho</Label><Select value={headerType} onValueChange={setHeaderType}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="NONE">Sem cabeçalho</SelectItem><SelectItem value="TEXT">Texto</SelectItem><SelectItem value="IMAGE">Imagem</SelectItem><SelectItem value="VIDEO">Vídeo</SelectItem><SelectItem value="DOCUMENT">Documento</SelectItem></SelectContent></Select></div>{headerType==="TEXT" && <div className="space-y-2"><Label>Texto do cabeçalho</Label><Input value={headerText} onChange={e=>setHeaderText(e.target.value)} maxLength={60} placeholder="Ex.: Atualização do pedido" /></div>}{["IMAGE","VIDEO","DOCUMENT"].includes(headerType) && <div className="space-y-3 rounded-lg border border-dashed p-4"><div className="flex items-center gap-2"><Upload className="h-4 w-4 text-muted-foreground" /><Label>Ficheiro de exemplo</Label></div><Input type="file" accept={mediaAccept[headerType]} disabled={uploading} onChange={e=>{void uploadMedia(e.target.files?.[0]);e.currentTarget.value="";}} />{uploading && <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" />A carregar ficheiro para a Meta...</div>}{headerHandle && <div className="flex items-center justify-between gap-3 rounded-md bg-emerald-50 p-3 text-sm text-emerald-800"><div className="min-w-0"><p className="font-medium">Ficheiro carregado</p><p className="truncate text-xs">{mediaName || "Media handle existente"}</p></div><Button type="button" variant="ghost" size="icon" onClick={()=>{setHeaderHandle("");setMediaName("");}} aria-label="Remover ficheiro"><X className="h-4 w-4" /></Button></div>}<p className="text-xs text-muted-foreground">JPG/PNG até 5 MB, MP4 até 16 MB e PDF até 100 MB. O ficheiro é enviado diretamente para a Meta; a Vendora guarda apenas o identificador.</p></div>}</CardContent></Card>
           <Card><CardHeader><CardTitle>3. Corpo da mensagem</CardTitle></CardHeader><CardContent className="space-y-3"><Textarea value={body} onChange={e=>setBody(e.target.value)} rows={6} maxLength={1024} required /><div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground"><span>Variáveis posicionais: {"{{1}}"}, {"{{2}}"}…</span><span>{body.length}/1024</span></div>{/\{\{\d+\}\}/.test(body) && <div className="space-y-2"><Label>Exemplos das variáveis (separados por |)</Label><Input value={bodyExamples} onChange={e=>setBodyExamples(e.target.value)} placeholder="Ana | PED-0001" /><p className="text-xs text-muted-foreground">Um exemplo para cada variável, pela ordem em que aparecem.</p></div>}</CardContent></Card>
           <Card><CardHeader><CardTitle>4. Rodapé (opcional)</CardTitle></CardHeader><CardContent><Input value={footer} onChange={e=>setFooter(e.target.value)} maxLength={60} placeholder="Ex.: Vendora · Estamos aqui para ajudar" /></CardContent></Card>
           <Card><CardHeader><CardTitle>5. Botão (opcional)</CardTitle></CardHeader><CardContent className="space-y-4"><Select value={buttonType} onValueChange={setButtonType}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="NONE">Sem botão</SelectItem><SelectItem value="QUICK_REPLY">Resposta rápida</SelectItem><SelectItem value="URL">Abrir website (URL)</SelectItem><SelectItem value="PHONE_NUMBER">Ligar (telefone)</SelectItem></SelectContent></Select>{buttonType!=="NONE" && <><div className="space-y-2"><Label>Texto do botão</Label><Input value={buttonText} onChange={e=>setButtonText(e.target.value)} maxLength={25} required /></div>{buttonType==="URL" && <div className="space-y-2"><Label>URL de destino</Label><Input type="url" value={buttonUrl} onChange={e=>setButtonUrl(e.target.value)} placeholder="https://..." required /></div>}{buttonType==="PHONE_NUMBER" && <div className="space-y-2"><Label>Número internacional</Label><Input value={buttonPhone} onChange={e=>setButtonPhone(e.target.value)} placeholder="+244..." required /></div>}</>}</CardContent></Card>
-          <div className="flex flex-wrap gap-2"><Button type="submit" disabled={saving || !body.trim()}>{saving?<Loader2 className="mr-2 h-4 w-4 animate-spin"/>:<Send className="mr-2 h-4 w-4"/>}Submeter à Meta</Button><Button type="button" variant="outline" onClick={()=>setScreen(selected?"detail":"list")}>Cancelar</Button></div>
+          <div className="flex flex-wrap gap-2"><Button type="submit" disabled={saving || uploading || !body.trim() || (["IMAGE","VIDEO","DOCUMENT"].includes(headerType) && !headerHandle)}>{saving?<Loader2 className="mr-2 h-4 w-4 animate-spin"/>:<Send className="mr-2 h-4 w-4"/>}Submeter à Meta</Button><Button type="button" variant="outline" onClick={()=>setScreen(selected?"detail":"list")}>Cancelar</Button></div>
         </div><div className="space-y-4 xl:sticky xl:top-20"><Card><CardHeader><CardTitle>Pré-visualização em tempo real</CardTitle><p className="text-xs text-muted-foreground">Representação aproximada da mensagem no WhatsApp.</p></CardHeader><CardContent><MessagePreview components={editorComponents} name={name} /></CardContent></Card><div className="rounded-xl border bg-muted/30 p-4 text-xs text-muted-foreground"><p className="font-semibold text-foreground">Antes de submeter</p><ul className="mt-2 list-disc space-y-1 pl-4"><li>A Meta analisa todos os modelos.</li><li>O cabeçalho multimédia requer um media handle válido.</li><li>Botões e variáveis têm limites e regras próprias.</li><li>Editar um modelo existente pode exigir uma nova submissão; esta ação cria um novo modelo.</li></ul></div></div></div></form></>}
     </div>
   </AdminLayout>;
