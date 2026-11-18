@@ -46,7 +46,7 @@ export function PlansSection() {
       <div className="mx-auto max-w-6xl px-5 sm:px-6">
         <div className="mx-auto max-w-3xl text-center mb-12">
           <div className="inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/90 px-3.5 py-1 text-[11px] font-mono uppercase tracking-[0.18em] text-slate-700 mb-4 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            <span className="h-1.5 w-1.5 rounded-full bg-slate-900" />
             Planos & Escalabilidade
           </div>
           <h2 className="text-3xl sm:text-5xl font-bold tracking-[-0.04em] text-slate-950">
@@ -81,7 +81,7 @@ export function PlansSection() {
               )}
             >
               Anual
-              <span className="rounded-full bg-emerald-100 px-1.5 py-0.2 text-[10px] font-bold text-emerald-800">
+              <span className="rounded-full bg-slate-100 px-1.5 py-0.2 text-[10px] font-bold text-emerald-800">
                 −20%
               </span>
             </button>
@@ -113,12 +113,12 @@ export function PlansSection() {
                 className={cn(
                   "relative flex flex-col justify-between rounded-3xl border bg-white p-7 transition shadow-xs hover:shadow-xl",
                   isPopular
-                    ? "border-emerald-500/80 ring-2 ring-emerald-500/20 shadow-md lg:-translate-y-2"
+                    ? "border-slate-900/80 ring-2 ring-slate-900/10 shadow-md lg:-translate-y-2"
                     : "border-slate-200/80 hover:border-slate-300"
                 )}
               >
                 {isPopular && (
-                  <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-emerald-600 px-3.5 py-1 text-[11px] font-bold uppercase tracking-wider text-white shadow-xs">
+                  <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-slate-950 px-3.5 py-1 text-[11px] font-bold uppercase tracking-wider text-white shadow-xs">
                     Mais Popular
                   </span>
                 )}
@@ -144,20 +144,20 @@ export function PlansSection() {
 
                   <ul className="space-y-3 text-xs sm:text-sm text-slate-700">
                     <li className="flex items-center gap-2.5">
-                      <div className="grid h-5 w-5 place-items-center rounded-full bg-emerald-50 text-emerald-600 shrink-0">
+                      <div className="grid h-5 w-5 place-items-center rounded-full bg-slate-100 text-slate-800 shrink-0">
                         <Check className="h-3.5 w-3.5" />
                       </div>
                       <span>Até <strong>{plan.product_limit}</strong> produtos sincronizados</span>
                     </li>
                     <li className="flex items-center gap-2.5">
-                      <div className="grid h-5 w-5 place-items-center rounded-full bg-emerald-50 text-emerald-600 shrink-0">
+                      <div className="grid h-5 w-5 place-items-center rounded-full bg-slate-100 text-slate-800 shrink-0">
                         <Check className="h-3.5 w-3.5" />
                       </div>
                       <span><strong>{plan.monthly_ai_limit}</strong> pedidos de IA por mês</span>
                     </li>
                     {plan.features.map((f) => (
                       <li className="flex items-center gap-2.5" key={f}>
-                        <div className="grid h-5 w-5 place-items-center rounded-full bg-emerald-50 text-emerald-600 shrink-0">
+                        <div className="grid h-5 w-5 place-items-center rounded-full bg-slate-100 text-slate-800 shrink-0">
                           <Check className="h-3.5 w-3.5" />
                         </div>
                         <span>{names[f] ?? f}</span>
