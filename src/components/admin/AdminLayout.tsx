@@ -23,6 +23,7 @@ import {
   LogOut,
   Package,
   FileClock,
+  FileText,
   ListChecks,
   Megaphone,
   CreditCard,
@@ -105,6 +106,11 @@ const navSections = [
         icon: MessageCircle,
         label: "Conversas WhatsApp",
         isWhatsApp: true,
+      },
+      {
+        to: "/admin/modelos-whatsapp",
+        icon: FileText,
+        label: "Modelos WhatsApp",
       },
       {
         to: "/admin/canais",
