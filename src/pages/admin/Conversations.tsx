@@ -831,15 +831,19 @@ export default function Conversations() {
                         <Button variant="outline" size="sm" onClick={() => setStatus("handoff")} className="h-9 rounded-lg border-sky-200 px-2.5 text-[11px] font-semibold text-sky-700 hover:bg-sky-50 sm:px-3">
                           <UserRound className="mr-1.5 h-3.5 w-3.5" /><span className="hidden sm:inline">Assumir</span>
                         </Button>
-                      ) : (
+                      ) : convo.status === "handoff" ? (
                         <Button variant="outline" size="sm" onClick={() => setStatus("open")} className="h-9 rounded-lg border-violet-200 px-2.5 text-[11px] font-semibold text-violet-700 hover:bg-violet-50 sm:px-3">
                           <Bot className="mr-1.5 h-3.5 w-3.5" /><span className="hidden sm:inline">Devolver à IA</span>
                         </Button>
-                      )}
+                      ) : null}
                       {convo.status !== "closed" ? (
-                        <Button variant="outline" size="sm" onClick={() => setStatus("closed")} className="hidden h-9 rounded-lg border-slate-200 px-3 text-[11px] font-semibold text-slate-600 hover:border-red-200 hover:bg-red-50 hover:text-red-700 sm:inline-flex">Encerrar</Button>
+                        <Button variant="outline" size="sm" onClick={() => setStatus("closed")} className="h-9 rounded-lg border-slate-200 px-2.5 text-[11px] font-semibold text-slate-600 hover:border-red-200 hover:bg-red-50 hover:text-red-700 sm:px-3">
+                          <X className="h-3.5 w-3.5 sm:mr-1.5" /><span className="hidden sm:inline">Encerrar</span>
+                        </Button>
                       ) : (
-                        <Button variant="outline" size="sm" onClick={() => setStatus("open")} className="hidden h-9 rounded-lg border-emerald-200 px-3 text-[11px] font-semibold text-emerald-700 sm:inline-flex">Reabrir</Button>
+                        <Button variant="outline" size="sm" onClick={() => setStatus("open")} className="h-9 rounded-lg border-emerald-200 px-2.5 text-[11px] font-semibold text-emerald-700 sm:px-3">
+                          <RefreshCw className="h-3.5 w-3.5 sm:mr-1.5" /><span className="hidden sm:inline">Reabrir</span>
+                        </Button>
                       )}
                       <button type="button" onClick={() => setInfoOpen((v) => !v)} aria-label="Mostrar dados do cliente" aria-pressed={infoOpen} className={`grid h-9 w-9 place-items-center rounded-lg transition ${infoOpen ? "bg-slate-100 text-slate-950" : "text-slate-500 hover:bg-slate-100"}`}>
                         <Info className="h-4 w-4" />
