@@ -30,8 +30,8 @@ function NavLinkItem({
   const { displayText, scramble } = useTextScramble(item.label);
 
   return (
-    <Link
-      to={item.href}
+    <a
+      href={item.href}
       aria-current={active ? "page" : undefined}
       onMouseEnter={() => {
         scramble();
@@ -45,7 +45,7 @@ function NavLinkItem({
       } ${active ? "after:absolute after:inset-x-0 after:-bottom-[10px] after:h-0.5 after:bg-slate-900" : ""}`}
     >
       {displayText}
-    </Link>
+    </a>
   );
 }
 
@@ -171,11 +171,12 @@ export function SiteHeader({ ctaHref, onCtaClick }: SiteHeaderProps) {
         <nav aria-label="Navegação móvel" className="min-h-0 overflow-hidden">
           <div className="mx-auto grid max-w-[1240px] grid-cols-2 gap-2 px-4 py-3 sm:px-6">
             {navItems.map((item) => (
-              <Link
+              <a
                 key={item.href}
-                to={item.href}
+                href={item.href}
                 tabIndex={menuOpen ? 0 : -1}
                 aria-current={isActive(item.href) ? "page" : undefined}
+                onClick={() => { setMenuOpen(false); lusionSound.playClick(); }}
                 className={`rounded-xl px-3 py-3 text-[14px] font-medium transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-slate-900 ${
                   item.emphasis
                     ? "font-semibold text-slate-900 bg-slate-50"
@@ -183,7 +184,7 @@ export function SiteHeader({ ctaHref, onCtaClick }: SiteHeaderProps) {
                 }`}
               >
                 {item.label}
-              </Link>
+              </a>
             ))}
             {!authLoading && (
               <Link
