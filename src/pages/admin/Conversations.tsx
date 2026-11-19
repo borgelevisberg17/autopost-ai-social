@@ -279,10 +279,12 @@ export default function Conversations() {
   }, [company]);
 
   // Load messages for active conversation
-  const loadMsgs = useCallback(async (id: string) => {
+  const loadMsgs = useCallback(async (id: string, showInitialLoading = false) => {
     const requestId = ++messagesRequestRef.current;
-    setMessagesLoading(true);
-    setMsgs([]);
+    if (showInitialLoading) {
+      setMessagesLoading(true);
+      setMsgs([]);
+    }
     try {
       const { data, error } = await db
         .from("messages")
@@ -307,7 +309,7 @@ export default function Conversations() {
 
   useEffect(() => {
     if (active) {
-      void loadMsgs(active);
+      void loadMsgs(active, true);
     }
   }, [active, loadMsgs]);
 
