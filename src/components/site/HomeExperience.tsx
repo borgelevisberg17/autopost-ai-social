@@ -440,7 +440,7 @@ const demoTestimonials = [
   { quote: "Antes, perdíamos tempo a responder às mesmas perguntas. Agora temos as conversas e os pedidos muito mais organizados.", name: "Marta Silva", role: "Gestora de loja · Moda", initials: "MS", tone: "bg-stone-200" },
   { quote: "A visão centralizada ajuda a equipa a perceber o que está pendente e a dar seguimento sem perder o contexto.", name: "Edson Manuel", role: "Empreendedor · Retalho", initials: "EM", tone: "bg-slate-200" },
   { quote: "Conseguir acompanhar mensagens, catálogo e atividade no mesmo espaço torna a rotina comercial mais simples.", name: "Carla Domingos", role: "Responsável de vendas", initials: "CD", tone: "bg-zinc-200" },
-  { quote: "A automatização faz mais sentido quando continua a respeitar as regras do negócio. É esse controlo que procuramos.", name: "Paulo André", role: " gestor operacional", initials: "PA", tone: "bg-neutral-200" },
+  { quote: "A automatização faz mais sentido quando continua a respeitar as regras do negócio. É esse controlo que procuramos.", name: "Paulo André", role: "Gestor operacional", initials: "PA", tone: "bg-neutral-200" },
   { quote: "Ter os passos do atendimento mais claros facilita a colaboração e reduz esquecimentos no acompanhamento.", name: "Inês Joaquim", role: "Coordenadora de equipa", initials: "IJ", tone: "bg-stone-300" },
   { quote: "Uma plataforma que reúne os canais pode ajudar pequenos negócios a trabalhar com mais consistência.", name: "Rui Francisco", role: "Fundador · Comércio digital", initials: "RF", tone: "bg-slate-300" },
 ];
@@ -449,10 +449,7 @@ function TestimonialCard({ item }: { item: (typeof demoTestimonials)[number] }) 
   return (
     <article className="flex w-[290px] shrink-0 flex-col justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_8px_30px_rgba(15,23,42,.035)] sm:w-[350px] sm:p-6">
       <div>
-        <div className="mb-4 flex items-center gap-1 text-slate-300" aria-label="Testemunho ilustrativo">
-          {[0, 1, 2, 3, 4].map((star) => <span key={star} aria-hidden="true" className="text-sm">✳</span>)}
-          <span className="ml-2 font-mono text-[8px] uppercase tracking-[.12em] text-slate-400">Demonstração</span>
-        </div>
+        <div className="mb-4"><span className="font-mono text-[8px] uppercase tracking-[.12em] text-slate-400">Voz ilustrativa · Demonstração</span></div>
         <p className="text-[13px] leading-6 text-slate-700 sm:text-sm">“{item.quote}”</p>
       </div>
       <div className="mt-6 flex items-center gap-3 border-t border-slate-100 pt-4">
