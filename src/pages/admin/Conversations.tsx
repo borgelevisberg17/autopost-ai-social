@@ -193,6 +193,7 @@ export default function Conversations() {
   const [latestMsgs, setLatestMsgs] = useState<Record<string, Msg>>({});
   const [active, setActive] = useState<string | null>(null);
   const [msgs, setMsgs] = useState<Msg[]>([]);
+  const [messagesLoading, setMessagesLoading] = useState(false);
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -218,6 +219,7 @@ export default function Conversations() {
   const [savingAccount, setSavingAccount] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesRequestRef = useRef(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Sync setup form
@@ -270,13 +272,25 @@ export default function Conversations() {
 
   // Load messages for active conversation
   const loadMsgs = useCallback(async (id: string) => {
-    const { data } = await db
-      .from("messages")
-      .select("*")
-      .eq("conversation_id", id)
-      .order("created_at")
-      .limit(300);
-    setMsgs((data ?? []) as Msg[]);
+    const requestId = ++messagesRequestRef.current;
+    setMessagesLoading(true);
+    setMsgs([]);
+    try {
+      const { data, error } = await db
+        .from("messages")
+        .select("*")
+        .eq("conversation_id", id)
+        .order("created_at")
+        .limit(300);
+      if (error) throw error;
+      if (requestId === messagesRequestRef.current) setMsgs((data ?? []) as Msg[]);
+    } catch {
+      if (requestId === messagesRequestRef.current) {
+        toast.error("Não foi possível carregar o histórico desta conversa.");
+      }
+    } finally {
+      if (requestId === messagesRequestRef.current) setMessagesLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -754,28 +768,24 @@ export default function Conversations() {
                     return (
                       <tr
                         key={c.id}
-                        role="button"
-                        tabIndex={0}
                         onClick={() => { setActive(c.id); setInfoOpen(false); }}
-                        onKeyDown={(event) => {
-                          if (event.key === "Enter" || event.key === " ") {
-                            event.preventDefault();
-                            setActive(c.id);
-                            setInfoOpen(false);
-                          }
-                        }}
-                        className="group cursor-pointer outline-none transition hover:bg-slate-50 focus-visible:bg-emerald-50/60"
+                        className="group cursor-pointer outline-none transition hover:bg-slate-50"
                       >
                         <td className="px-5 py-3.5">
-                          <div className="flex min-w-0 items-center gap-3">
-                            <div className={`grid h-10 w-10 shrink-0 place-items-center rounded-full text-xs font-bold ${avatar.bg} ${avatar.text}`}>
+                          <button
+                            type="button"
+                            onClick={() => { setActive(c.id); setInfoOpen(false); }}
+                            aria-label={`Abrir conversa com ${name}`}
+                            className="flex w-full min-w-0 items-center gap-3 rounded-md text-left outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500"
+                          >
+                            <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-full text-xs font-bold ${avatar.bg} ${avatar.text}`}>
                               {name.charAt(0).toUpperCase()}
-                            </div>
-                            <div className="min-w-0">
-                              <p className="truncate text-xs font-bold text-slate-900 group-hover:text-emerald-800">{name}</p>
-                              <p className="mt-0.5 text-[10px] text-slate-500">+{c.customer_phone.replace(/^\+/, "")}</p>
-                            </div>
-                          </div>
+                            </span>
+                            <span className="min-w-0">
+                              <span className="block truncate text-xs font-bold text-slate-900 group-hover:text-emerald-800">{name}</span>
+                              <span className="mt-0.5 block text-[10px] text-slate-500">+{c.customer_phone.replace(/^\+/, "")}</span>
+                            </span>
+                          </button>
                         </td>
                         <td className="max-w-[360px] px-4 py-3.5">
                           <div className="flex min-w-0 items-center gap-1.5">
@@ -796,7 +806,7 @@ export default function Conversations() {
                           {waiting && <span className="ml-1.5 inline-block h-1.5 w-1.5 rounded-full bg-amber-500 align-middle" title="Mensagem recebida recentemente" />}
                         </td>
                         <td className="px-5 py-3.5 text-right">
-                          <span className="text-[11px] font-medium text-slate-500">{formatChatDateBadge(c.last_message_at)}</span>
+                          <span title={new Date(c.last_message_at).toLocaleString("pt-PT")} className="text-[11px] font-medium text-slate-500">{formatChatDateBadge(c.last_message_at)}</span>
                           <span className="mt-0.5 block text-[10px] text-slate-400">{formatChatTime(c.last_message_at)}</span>
                         </td>
                       </tr>
@@ -890,7 +900,13 @@ export default function Conversations() {
                           <span>A janela de 24 horas da Meta expirou. Para retomar o contacto, poderá ser necessário utilizar um modelo de mensagem aprovado.</span>
                         </div>
                       )}
-                      {msgs.length === 0 ? (
+                      {messagesLoading ? (
+                        <div className="m-auto w-full max-w-xl space-y-4 py-10" aria-label="A carregar mensagens">
+                          <div className="h-14 w-3/5 animate-pulse rounded-2xl bg-slate-200/70" />
+                          <div className="ml-auto h-16 w-2/3 animate-pulse rounded-2xl bg-emerald-100" />
+                          <div className="h-12 w-1/2 animate-pulse rounded-2xl bg-slate-200/70" />
+                        </div>
+                      ) : msgs.length === 0 ? (
                         <div className="m-auto max-w-sm py-12 text-center">
                           <div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl border border-slate-200 bg-white text-slate-400 shadow-sm"><MessageCircle className="h-5 w-5" /></div>
                           <p className="mt-3 text-sm font-semibold text-slate-800">Início da conversa</p>
