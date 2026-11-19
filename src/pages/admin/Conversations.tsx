@@ -380,7 +380,7 @@ export default function Conversations() {
 
       if (filter === "unread") {
         const lastMsg = latestMsgs[c.id];
-        return lastMsg && lastMsg.direction === "in";
+        return c.status !== "closed" && lastMsg && lastMsg.direction === "in";
       }
       if (filter === "agent") return c.status === "open";
       if (filter === "staff") return c.status === "handoff";
@@ -614,7 +614,7 @@ export default function Conversations() {
             <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
               <p className="text-[11px] font-medium text-slate-500">A aguardar resposta</p>
               <p className="mt-1 text-2xl font-bold tracking-tight text-amber-600">
-                {convos.filter((c) => latestMsgs[c.id]?.direction === "in").length}
+                {convos.filter((c) => c.status !== "closed" && latestMsgs[c.id]?.direction === "in").length}
               </p>
             </div>
             <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
@@ -653,7 +653,7 @@ export default function Conversations() {
                   variant="outline"
                   size="sm"
                   disabled={refreshing}
-                  onClick={() => { setRefreshing(true); void load(); }}
+                  onClick={() => { setRefreshing(true); void load(); if (active) void loadMsgs(active); }}
                   className="h-10 rounded-lg border-slate-200 px-3 text-xs font-semibold"
                 >
                   <RefreshCw className={`mr-1.5 h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`} />
@@ -720,7 +720,7 @@ export default function Conversations() {
                     </tr>
                   ) : filteredConvos.map((c) => {
                     const last = latestMsgs[c.id];
-                    const waiting = last?.direction === "in";
+                    const waiting = c.status !== "closed" && last?.direction === "in";
                     const name = c.customer_name || `+${c.customer_phone}`;
                     const avatar = getAvatarColor(c.customer_phone || c.id);
                     return (
