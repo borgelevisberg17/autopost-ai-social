@@ -130,7 +130,7 @@ function ValueStory() {
 
 function VendoraParallaxStory() {
   return (
-    <section aria-labelledby="vendora-intro-title" className="relative isolate min-h-[76svh] overflow-hidden bg-slate-950 text-white sm:min-h-[88svh]">
+    <section aria-labelledby="vendora-intro-title" className="vendora-parallax-section relative isolate min-h-[76svh] overflow-hidden bg-slate-950 text-white sm:min-h-[88svh]">
       <div className="absolute inset-0 -z-20 overflow-hidden">
         <img
           src="/media/optimized/storefront-commerce.webp"
@@ -501,9 +501,7 @@ export function HomeExperience({startPath,onStart}:{startPath:string;onStart:()=
       <Hero startPath={startPath} onStart={onStart} />
       <ScrollStack>
         <ValueStory />
-      </ScrollStack>
-      <VendoraParallaxStory />
-      <ScrollStack>
+        <VendoraParallaxStory />
         <WhatsAppStory />
         <ChannelStory />
         <AtmosphereStory />
