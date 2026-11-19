@@ -736,9 +736,9 @@ export default function Conversations() {
               </div>
             </div>
 
-            <div className="min-h-0 flex-1 overflow-auto">
+            <div className="w-full overflow-x-auto">
               <table className="w-full min-w-[760px] border-collapse text-left">
-                <thead className="sticky top-0 z-10 bg-slate-50">
+                <thead className="bg-slate-50/75">
                   <tr className="border-b border-slate-200/80 text-[10px] font-bold uppercase tracking-[0.09em] text-slate-500">
                     <th className="px-6 py-4">Contacto</th>
                     <th className="px-5 py-4">Última mensagem</th>
