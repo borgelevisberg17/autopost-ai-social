@@ -472,7 +472,7 @@ function ScrollStack({ children }: { children: ReactNode }) {
       const availableHeight = window.innerHeight * 0.88;
 
       panels.forEach((panel, index) => {
-        const canStack = desktop && panel.scrollHeight <= availableHeight;
+        const canStack = desktop && !panel.classList.contains("vendora-parallax-section") && panel.scrollHeight <= availableHeight;
         panel.classList.toggle("is-stackable", canStack);
         panel.style.setProperty("--stack-order", String(index + 1));
       });
