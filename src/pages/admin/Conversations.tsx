@@ -183,6 +183,14 @@ function isSameDay(d1: string, d2: string) {
   );
 }
 
+function normalizeSearch(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase("pt-PT")
+    .trim();
+}
+
 export default function Conversations() {
   const { company } = useCompany();
   const accountQuery = useWhatsAppAccount(company?.id);
@@ -193,6 +201,7 @@ export default function Conversations() {
   const [latestMsgs, setLatestMsgs] = useState<Record<string, Msg>>({});
   const [active, setActive] = useState<string | null>(null);
   const [msgs, setMsgs] = useState<Msg[]>([]);
+  const [messagesLoading, setMessagesLoading] = useState(false);
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -218,6 +227,7 @@ export default function Conversations() {
   const [savingAccount, setSavingAccount] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesRequestRef = useRef(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Sync setup form
@@ -269,14 +279,28 @@ export default function Conversations() {
   }, [company]);
 
   // Load messages for active conversation
-  const loadMsgs = useCallback(async (id: string) => {
-    const { data } = await db
-      .from("messages")
-      .select("*")
-      .eq("conversation_id", id)
-      .order("created_at")
-      .limit(300);
-    setMsgs((data ?? []) as Msg[]);
+  const loadMsgs = useCallback(async (id: string, showInitialLoading = false) => {
+    const requestId = ++messagesRequestRef.current;
+    if (showInitialLoading) {
+      setMessagesLoading(true);
+      setMsgs([]);
+    }
+    try {
+      const { data, error } = await db
+        .from("messages")
+        .select("*")
+        .eq("conversation_id", id)
+        .order("created_at")
+        .limit(300);
+      if (error) throw error;
+      if (requestId === messagesRequestRef.current) setMsgs((data ?? []) as Msg[]);
+    } catch {
+      if (requestId === messagesRequestRef.current) {
+        toast.error("Não foi possível carregar o histórico desta conversa.");
+      }
+    } finally {
+      if (requestId === messagesRequestRef.current) setMessagesLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -285,7 +309,7 @@ export default function Conversations() {
 
   useEffect(() => {
     if (active) {
-      void loadMsgs(active);
+      void loadMsgs(active, true);
     }
   }, [active, loadMsgs]);
 
@@ -368,26 +392,46 @@ export default function Conversations() {
 
   // Filter list
   const filteredConvos = useMemo(() => {
+    const searchTerms = normalizeSearch(search);
+    const numericSearch = search.replace(/\D/g, "");
     return convos.filter((c) => {
-      const searchTerms = search.toLowerCase().trim();
       const matchesSearch =
         !searchTerms ||
-        (c.customer_name && c.customer_name.toLowerCase().includes(searchTerms)) ||
-        c.customer_phone.includes(searchTerms) ||
-        (latestMsgs[c.id]?.body && latestMsgs[c.id].body.toLowerCase().includes(searchTerms));
+        normalizeSearch(c.customer_name ?? "").includes(searchTerms) ||
+        (numericSearch.length > 0 && c.customer_phone.replace(/\D/g, "").includes(numericSearch)) ||
+        normalizeSearch(latestMsgs[c.id]?.body ?? "").includes(searchTerms);
 
       if (!matchesSearch) return false;
-
-      if (filter === "unread") {
-        const lastMsg = latestMsgs[c.id];
-        return c.status !== "closed" && lastMsg && lastMsg.direction === "in";
-      }
+      if (filter === "unread") return c.status !== "closed" && latestMsgs[c.id]?.direction === "in";
       if (filter === "agent") return c.status === "open";
       if (filter === "staff") return c.status === "handoff";
       if (filter === "closed") return c.status === "closed";
       return true;
     });
   }, [convos, latestMsgs, search, filter]);
+
+  const [sortBy, setSortBy] = useState<"recent" | "oldest" | "name">("recent");
+  const sortedConvos = useMemo(() => {
+    return [...filteredConvos].sort((a, b) => {
+      if (sortBy === "name") {
+        return (a.customer_name || a.customer_phone).localeCompare(
+          b.customer_name || b.customer_phone,
+          "pt-PT",
+          { sensitivity: "base" },
+        );
+      }
+      const delta = new Date(b.last_message_at).getTime() - new Date(a.last_message_at).getTime();
+      return sortBy === "recent" ? delta : -delta;
+    });
+  }, [filteredConvos, sortBy]);
+
+  const filterCounts = useMemo(() => ({
+    all: convos.length,
+    unread: convos.filter((c) => c.status !== "closed" && latestMsgs[c.id]?.direction === "in").length,
+    agent: convos.filter((c) => c.status === "open").length,
+    staff: convos.filter((c) => c.status === "handoff").length,
+    closed: convos.filter((c) => c.status === "closed").length,
+  }), [convos, latestMsgs]);
 
   // Actions
   const setStatus = async (status: "open" | "handoff" | "closed") => {
@@ -614,7 +658,7 @@ export default function Conversations() {
             <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
               <p className="text-[11px] font-medium text-slate-500">A aguardar resposta</p>
               <p className="mt-1 text-2xl font-bold tracking-tight text-amber-600">
-                {convos.filter((c) => c.status !== "closed" && latestMsgs[c.id]?.direction === "in").length}
+                {filterCounts.unread}
               </p>
             </div>
             <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
@@ -665,7 +709,7 @@ export default function Conversations() {
             <div className="flex shrink-0 flex-wrap items-center gap-1.5 border-b border-slate-100 px-4 py-3 sm:px-5">
               {([
                 ["all", "Todas"],
-                ["unread", "A aguardar resposta"],
+                ["unread", "A aguardar"],
                 ["agent", "Agente IA"],
                 ["staff", "Equipa"],
                 ["closed", "Encerradas"],
@@ -674,13 +718,22 @@ export default function Conversations() {
                   key={value}
                   type="button"
                   onClick={() => setFilter(value)}
-                  className={`rounded-lg px-3 py-2 text-[11px] font-semibold transition ${filter === value ? "bg-slate-950 text-white shadow-sm" : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"}`}
+                  aria-pressed={filter === value}
+                  className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-[11px] font-semibold transition ${filter === value ? "bg-slate-950 text-white shadow-sm" : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"}`}
                 >
                   {label}
-                  {value === "all" && <span className={`ml-1.5 ${filter === value ? "text-slate-300" : "text-slate-400"}`}>{convos.length}</span>}
+                  <span className={`text-[10px] tabular-nums ${filter === value ? "text-slate-300" : "text-slate-400"}`}>{filterCounts[value]}</span>
                 </button>
               ))}
-              <span className="ml-auto hidden text-[11px] text-slate-400 sm:inline">{filteredConvos.length} resultado(s)</span>
+              <div className="ml-auto flex items-center gap-2">
+                <label htmlFor="conversation-sort" className="hidden text-[10px] font-medium text-slate-400 sm:inline">Ordenar</label>
+                <select id="conversation-sort" value={sortBy} onChange={(event) => setSortBy(event.target.value as typeof sortBy)} className="h-8 rounded-md border border-slate-200 bg-white px-2 text-[10px] font-semibold text-slate-600 outline-none focus:border-emerald-500">
+                  <option value="recent">Mais recentes</option>
+                  <option value="oldest">Mais antigas</option>
+                  <option value="name">Nome A–Z</option>
+                </select>
+                <span className="hidden text-[10px] text-slate-400 lg:inline">{sortedConvos.length} registo(s)</span>
+              </div>
             </div>
 
             <div className="min-h-0 flex-1 overflow-auto">
@@ -718,7 +771,7 @@ export default function Conversations() {
                         </div>
                       </td>
                     </tr>
-                  ) : filteredConvos.map((c) => {
+                  ) : sortedConvos.map((c) => {
                     const last = latestMsgs[c.id];
                     const waiting = c.status !== "closed" && last?.direction === "in";
                     const name = c.customer_name || `+${c.customer_phone}`;
@@ -726,28 +779,24 @@ export default function Conversations() {
                     return (
                       <tr
                         key={c.id}
-                        role="button"
-                        tabIndex={0}
                         onClick={() => { setActive(c.id); setInfoOpen(false); }}
-                        onKeyDown={(event) => {
-                          if (event.key === "Enter" || event.key === " ") {
-                            event.preventDefault();
-                            setActive(c.id);
-                            setInfoOpen(false);
-                          }
-                        }}
-                        className="group cursor-pointer outline-none transition hover:bg-slate-50 focus-visible:bg-emerald-50/60"
+                        className="group cursor-pointer outline-none transition hover:bg-slate-50"
                       >
                         <td className="px-5 py-3.5">
-                          <div className="flex min-w-0 items-center gap-3">
-                            <div className={`grid h-10 w-10 shrink-0 place-items-center rounded-full text-xs font-bold ${avatar.bg} ${avatar.text}`}>
+                          <button
+                            type="button"
+                            onClick={() => { setActive(c.id); setInfoOpen(false); }}
+                            aria-label={`Abrir conversa com ${name}`}
+                            className="flex w-full min-w-0 items-center gap-3 rounded-md text-left outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500"
+                          >
+                            <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-full text-xs font-bold ${avatar.bg} ${avatar.text}`}>
                               {name.charAt(0).toUpperCase()}
-                            </div>
-                            <div className="min-w-0">
-                              <p className="truncate text-xs font-bold text-slate-900 group-hover:text-emerald-800">{name}</p>
-                              <p className="mt-0.5 text-[10px] text-slate-500">+{c.customer_phone.replace(/^\+/, "")}</p>
-                            </div>
-                          </div>
+                            </span>
+                            <span className="min-w-0">
+                              <span className="block truncate text-xs font-bold text-slate-900 group-hover:text-emerald-800">{name}</span>
+                              <span className="mt-0.5 block text-[10px] text-slate-500">+{c.customer_phone.replace(/^\+/, "")}</span>
+                            </span>
+                          </button>
                         </td>
                         <td className="max-w-[360px] px-4 py-3.5">
                           <div className="flex min-w-0 items-center gap-1.5">
@@ -768,7 +817,7 @@ export default function Conversations() {
                           {waiting && <span className="ml-1.5 inline-block h-1.5 w-1.5 rounded-full bg-amber-500 align-middle" title="Mensagem recebida recentemente" />}
                         </td>
                         <td className="px-5 py-3.5 text-right">
-                          <span className="text-[11px] font-medium text-slate-500">{formatChatDateBadge(c.last_message_at)}</span>
+                          <span title={new Date(c.last_message_at).toLocaleString("pt-PT")} className="text-[11px] font-medium text-slate-500">{formatChatDateBadge(c.last_message_at)}</span>
                           <span className="mt-0.5 block text-[10px] text-slate-400">{formatChatTime(c.last_message_at)}</span>
                         </td>
                       </tr>
@@ -862,7 +911,13 @@ export default function Conversations() {
                           <span>A janela de 24 horas da Meta expirou. Para retomar o contacto, poderá ser necessário utilizar um modelo de mensagem aprovado.</span>
                         </div>
                       )}
-                      {msgs.length === 0 ? (
+                      {messagesLoading ? (
+                        <div className="m-auto w-full max-w-xl space-y-4 py-10" aria-label="A carregar mensagens">
+                          <div className="h-14 w-3/5 animate-pulse rounded-2xl bg-slate-200/70" />
+                          <div className="ml-auto h-16 w-2/3 animate-pulse rounded-2xl bg-emerald-100" />
+                          <div className="h-12 w-1/2 animate-pulse rounded-2xl bg-slate-200/70" />
+                        </div>
+                      ) : msgs.length === 0 ? (
                         <div className="m-auto max-w-sm py-12 text-center">
                           <div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl border border-slate-200 bg-white text-slate-400 shadow-sm"><MessageCircle className="h-5 w-5" /></div>
                           <p className="mt-3 text-sm font-semibold text-slate-800">Início da conversa</p>
@@ -945,7 +1000,7 @@ export default function Conversations() {
                 </div>
 
                 {infoOpen && (
-                  <aside className="absolute inset-y-0 right-0 z-20 flex w-full flex-col border-l border-slate-200 bg-white shadow-2xl sm:w-[360px]">
+                  <aside className="absolute inset-y-0 right-0 z-20 flex w-full flex-col border-l border-slate-200 bg-white shadow-2xl sm:relative sm:inset-auto sm:w-[340px] sm:shrink-0 sm:shadow-none">
                     <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4">
                       <div>
                         <h3 className="text-sm font-bold text-slate-950">Perfil do contacto</h3>
