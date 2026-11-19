@@ -592,10 +592,10 @@ export default function Conversations() {
   const isConnected = connectionState === "active";
 
   return (
-    <AdminLayout title="Conversas" fullBleed>
-      <div className="relative flex h-full min-h-0 w-full flex-col overflow-hidden bg-slate-50 text-slate-900">
-        <header className="shrink-0 border-b border-slate-200/80 bg-white px-4 py-5 sm:px-6 lg:px-8">
-          <section className="flex flex-col gap-4 pb-1 lg:flex-row lg:items-end lg:justify-between">
+    <AdminLayout title="Conversas">
+      <div className="relative flex min-h-[680px] w-full flex-col gap-6 bg-transparent text-slate-900">
+        <header className="flex shrink-0 flex-col gap-4 pb-1 lg:flex-row lg:items-end lg:justify-between">
+          <section className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div className="min-w-0">
               <span className="mb-2 inline-flex items-center gap-1.5 rounded-md border border-emerald-200/80 bg-emerald-50 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-emerald-800">
                 Atendimento omnicanal
@@ -649,7 +649,7 @@ export default function Conversations() {
           </section>
         </header>
 
-        <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4 sm:p-6 lg:px-8">
+        <div className="flex flex-col gap-6">
           <div className="grid shrink-0 grid-cols-2 gap-3 xl:grid-cols-4">
             <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
               <p className="text-[11px] font-medium text-slate-500">Total de conversas</p>
@@ -671,7 +671,7 @@ export default function Conversations() {
             </div>
           </div>
 
-          <section className="flex min-h-[420px] flex-1 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_2px_8px_rgba(15,23,42,0.035)]">
+          <section className="flex min-h-[560px] flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xs">
             <div className="flex flex-col gap-3 border-b border-slate-200 px-4 py-4 sm:px-5 lg:flex-row lg:items-center lg:justify-between">
               <div>
                 <h2 className="text-sm font-bold text-slate-950">Caixa de entrada</h2>
@@ -736,15 +736,15 @@ export default function Conversations() {
               </div>
             </div>
 
-            <div className="min-h-0 flex-1 overflow-auto">
+            <div className="w-full overflow-x-auto">
               <table className="w-full min-w-[760px] border-collapse text-left">
-                <thead className="sticky top-0 z-10 bg-slate-50">
-                  <tr className="border-b border-slate-200 text-[10px] font-bold uppercase tracking-[0.09em] text-slate-500">
-                    <th className="px-5 py-3">Contacto</th>
-                    <th className="px-4 py-3">Última mensagem</th>
-                    <th className="px-4 py-3">Responsável</th>
-                    <th className="px-4 py-3">Estado</th>
-                    <th className="px-5 py-3 text-right">Última atividade</th>
+                <thead className="bg-slate-50/75">
+                  <tr className="border-b border-slate-200/80 text-[10px] font-bold uppercase tracking-[0.09em] text-slate-500">
+                    <th className="px-6 py-4">Contacto</th>
+                    <th className="px-5 py-4">Última mensagem</th>
+                    <th className="px-5 py-4">Responsável</th>
+                    <th className="px-5 py-4">Estado</th>
+                    <th className="px-6 py-4 text-right">Última atividade</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -782,7 +782,7 @@ export default function Conversations() {
                         onClick={() => { setActive(c.id); setInfoOpen(false); }}
                         className="group cursor-pointer outline-none transition hover:bg-slate-50"
                       >
-                        <td className="px-5 py-3.5">
+                        <td className="px-6 py-4">
                           <button
                             type="button"
                             onClick={() => { setActive(c.id); setInfoOpen(false); }}
@@ -798,13 +798,13 @@ export default function Conversations() {
                             </span>
                           </button>
                         </td>
-                        <td className="max-w-[360px] px-4 py-3.5">
+                        <td className="max-w-[360px] px-5 py-4">
                           <div className="flex min-w-0 items-center gap-1.5">
                             {last?.direction === "out" && <CheckCheck className="h-3.5 w-3.5 shrink-0 text-slate-400" />}
                             <span className={`truncate text-xs ${waiting ? "font-semibold text-slate-900" : "text-slate-600"}`}>{last?.body || "Conversa iniciada"}</span>
                           </div>
                         </td>
-                        <td className="px-4 py-3.5">
+                        <td className="px-5 py-4">
                           <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-slate-600">
                             {c.status === "open" ? <Bot className="h-3.5 w-3.5 text-violet-600" /> : c.status === "handoff" ? <UserRound className="h-3.5 w-3.5 text-sky-600" /> : <User className="h-3.5 w-3.5 text-slate-400" />}
                             {c.status === "open" ? "Agente IA" : c.status === "handoff" ? "Equipa" : "—"}
@@ -816,7 +816,7 @@ export default function Conversations() {
                           </span>
                           {waiting && <span className="ml-1.5 inline-block h-1.5 w-1.5 rounded-full bg-amber-500 align-middle" title="Mensagem recebida recentemente" />}
                         </td>
-                        <td className="px-5 py-3.5 text-right">
+                        <td className="px-6 py-4 text-right">
                           <span title={new Date(c.last_message_at).toLocaleString("pt-PT")} className="text-[11px] font-medium text-slate-500">{formatChatDateBadge(c.last_message_at)}</span>
                           <span className="mt-0.5 block text-[10px] text-slate-400">{formatChatTime(c.last_message_at)}</span>
                         </td>
