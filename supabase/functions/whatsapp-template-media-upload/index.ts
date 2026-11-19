@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
     });
     const session = await sessionResponse.json().catch(() => ({}));
     const uploadId = session?.id;
-    const validUploadId = typeof uploadId === "string" && /^upload:[A-Za-z0-9:_-]+(?:\\?sig=[A-Za-z0-9._~+\\/=:-]+)?$/.test(uploadId);
+    const validUploadId = typeof uploadId === "string" && /^upload:[A-Za-z0-9:_-]+(?:\?sig=[A-Za-z0-9._~+=:-]+)?$/.test(uploadId);
     if (!sessionResponse.ok || !validUploadId) {
       console.error("Meta upload session failed", session?.error?.code ?? sessionResponse.status);
       return json({ error: session?.error?.message ?? "A Meta não conseguiu iniciar o carregamento.", meta_code: session?.error?.code ?? null, meta_subcode: session?.error?.error_subcode ?? null, meta_type: session?.error?.type ?? null }, 502);
