@@ -21,6 +21,7 @@ type Screen = "list" | "detail" | "editor";
 const statusText: Record<string, string> = { APPROVED: "Aprovado", PENDING: "Em análise", REJECTED: "Rejeitado", PAUSED: "Em pausa", DISABLED: "Desativado", IN_APPEAL: "Em recurso" };
 const statusVariant = (status: string) => status === "APPROVED" ? "default" : status === "REJECTED" ? "destructive" : "secondary";
 const mediaAccept: Record<string, string> = { IMAGE: "image/jpeg,image/png", VIDEO: "video/mp4", DOCUMENT: "application/pdf" };
+const getVariableIndexes = (value: string) => [...new Set([...value.matchAll(/\{\{(\d+)\}\}/g)].map(match => Number(match[1])))].sort((a, b) => a - b);
 
 function MessagePreview({ components = [], name, mediaPreviewUrl, mediaName, variableExamples = "" }: { components?: Component[]; name?: string; mediaPreviewUrl?: string; mediaName?: string; variableExamples?: string }) {
   const header = components.find(c => c.type === "HEADER");
@@ -142,8 +143,17 @@ export default function WhatsAppTemplates() {
         if (headerType === "TEXT") components.push({ type: "HEADER", format: "TEXT", text: headerText });
         else components.push({ type: "HEADER", format: headerType, example: { header_handle: [headerHandle.trim()] } });
       }
-      const variables = [...body.matchAll(/\{\{(\d+)\}\}/g)].map(m => Number(m[1]));
-      const examples = bodyExamples.split("|").map(v => v.trim()).filter(Boolean);
+      const variables = getVariableIndexes(body);
+      const examples = bodyExamples.split("|").map(value => value.trim());
+      if (variables.length) {
+        const maxVariable = variables[variables.length - 1];
+        if (variables.length !== maxVariable || variables.some((value, index) => value !== index + 1)) {
+          throw new Error("As variáveis devem ser sequenciais e começar em {{1}}, sem saltos. Podes repetir uma variável no texto.");
+        }
+        if (examples.length !== maxVariable || examples.some(value => !value)) {
+          throw new Error(`Indica exactamente ${maxVariable} exemplo(s), um por variável, separados por |.`);
+        }
+      }
       const bodyComponent: Component = { type: "BODY", text: body };
       if (variables.length) bodyComponent.example = { body_text: [examples] };
       components.push(bodyComponent);

@@ -78,12 +78,16 @@ Deno.serve(async (req) => {
       headers: { Authorization: `Bearer ${token}` },
     });
     const session = await sessionResponse.json().catch(() => ({}));
-    if (!sessionResponse.ok || typeof session.id !== "string" || !/^upload:[A-Za-z0-9:_-]+$/.test(session.id)) {
+    const uploadId = session?.id;
+    const validUploadId = typeof uploadId === "string" && /^upload:[A-Za-z0-9:_=-]+(?:\?sig=[A-Za-z0-9._~+=:-]+)?$/.test(uploadId);
+    if (!sessionResponse.ok || !validUploadId) {
       console.error("Meta upload session failed", session?.error?.code ?? sessionResponse.status);
-      return json({ error: session?.error?.message ?? "A Meta não conseguiu iniciar o carregamento." }, 502);
+      return json({ error: session?.error?.message ?? "A Meta não conseguiu iniciar o carregamento.", meta_code: session?.error?.code ?? null, meta_subcode: session?.error?.error_subcode ?? null, meta_type: session?.error?.type ?? null }, 502);
     }
 
-    const uploadResponse = await fetch(`${base}/${session.id}`, {
+    // Preserve the optional signature query string returned with the Meta upload session.
+    const uploadUrl = new URL(`${base}/${uploadId}`);
+    const uploadResponse = await fetch(uploadUrl, {
       method: "POST",
       headers: {
         Authorization: `OAuth ${token}`,
@@ -95,7 +99,7 @@ Deno.serve(async (req) => {
     const uploaded = await uploadResponse.json().catch(() => ({}));
     if (!uploadResponse.ok || typeof uploaded.h !== "string" || !uploaded.h) {
       console.error("Meta media transfer failed", uploaded?.error?.code ?? uploadResponse.status);
-      return json({ error: uploaded?.error?.message ?? "A Meta não concluiu o carregamento do ficheiro." }, 502);
+      return json({ error: uploaded?.error?.message ?? "A Meta não concluiu o carregamento do ficheiro.", meta_code: uploaded?.error?.code ?? null, meta_subcode: uploaded?.error?.error_subcode ?? null, meta_type: uploaded?.error?.type ?? null }, 502);
     }
 
     return json({ ok: true, header_handle: uploaded.h, file_name: safeName, mime_type: mime, size: file.size });
