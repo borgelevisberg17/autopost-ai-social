@@ -2530,6 +2530,29 @@ function ProcessSection() {
   );
 }
 
+
+function WhatsAppSupportButton() {
+  return (
+    <a
+      href="https://wa.me/244936370703?text=Ol%C3%A1%2C%20preciso%20de%20apoio%20com%20a%20Vendora."
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Falar com o suporte da Vendora pelo WhatsApp"
+      title="Suporte via WhatsApp"
+      className="group fixed bottom-6 right-5 z-[65] inline-flex h-14 items-center gap-3 rounded-full bg-[#25D366] px-4 text-white shadow-[0_12px_35px_rgba(37,211,102,.32)] transition duration-300 hover:-translate-y-1 hover:bg-[#20bd5a] hover:shadow-[0_16px_42px_rgba(37,211,102,.42)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#25D366]/35 sm:bottom-7 sm:right-7"
+    >
+      <svg viewBox="0 0 32 32" aria-hidden="true" className="h-7 w-7 shrink-0 fill-current">
+        <path d="M16.04 3C8.87 3 3.04 8.78 3.04 15.9c0 2.27.6 4.49 1.74 6.45L3 29l6.84-1.78a13.1 13.1 0 0 0 6.2 1.56h.01c7.17 0 13-5.78 13-12.9 0-3.45-1.36-6.69-3.83-9.12A12.95 12.95 0 0 0 16.04 3Zm0 23.6h-.01a10.9 10.9 0 0 1-5.55-1.51l-.4-.24-4.06 1.06 1.08-3.93-.26-.41a10.66 10.66 0 0 1-1.67-5.67c0-5.98 4.89-10.84 10.9-10.84 2.91 0 5.65 1.13 7.7 3.17a10.73 10.73 0 0 1 3.2 7.67c0 5.98-4.9 10.84-10.93 10.84Zm5.98-8.12c-.33-.16-1.94-.95-2.24-1.06-.3-.11-.52-.16-.74.16-.22.32-.85 1.06-1.04 1.28-.19.22-.38.24-.71.08-.33-.16-1.39-.51-2.65-1.63-.98-.86-1.64-1.92-1.83-2.25-.19-.32-.02-.5.14-.66.15-.14.33-.38.49-.57.16-.19.22-.32.33-.54.11-.22.06-.41-.03-.57-.08-.16-.74-1.77-1.01-2.42-.27-.64-.54-.55-.74-.56h-.63c-.22 0-.57.08-.87.41-.3.32-1.14 1.11-1.14 2.71s1.17 3.15 1.33 3.37c.16.22 2.3 3.5 5.57 4.9.78.34 1.39.55 1.86.7.78.25 1.49.22 2.05.13.63-.09 1.94-.79 2.22-1.55.27-.76.27-1.41.19-1.55-.08-.14-.3-.22-.63-.38Z"/>
+      </svg>
+      <span className="pr-1 text-left leading-tight">
+        <span className="block text-[10px] font-medium text-white/85">Precisa de ajuda?</span>
+        <span className="block text-sm font-semibold">Falar no WhatsApp</span>
+      </span>
+      <span className="sr-only">Suporte: +244 936 370 703</span>
+    </a>
+  );
+}
+
 export default function Index() {
   const { user } = useAuth();
   const startPath = user ? "/dashboard" : "/signup";
@@ -2555,6 +2578,7 @@ export default function Index() {
         startPath={startPath}
       />
       <SiteFooter />
+      <WhatsAppSupportButton />
     </div>
   );
 }
