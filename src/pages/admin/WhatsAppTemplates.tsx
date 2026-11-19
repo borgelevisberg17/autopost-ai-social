@@ -21,6 +21,7 @@ type Screen = "list" | "detail" | "editor";
 const statusText: Record<string, string> = { APPROVED: "Aprovado", PENDING: "Em análise", REJECTED: "Rejeitado", PAUSED: "Em pausa", DISABLED: "Desativado", IN_APPEAL: "Em recurso" };
 const statusVariant = (status: string) => status === "APPROVED" ? "default" : status === "REJECTED" ? "destructive" : "secondary";
 const mediaAccept: Record<string, string> = { IMAGE: "image/jpeg,image/png", VIDEO: "video/mp4", DOCUMENT: "application/pdf" };
+const getVariableIndexes = (value: string) => [...new Set([...value.matchAll(/\\{\\{(\\d+)\\}\\}/g)].map(match => Number(match[1])))].sort((a, b) => a - b);
 
 function MessagePreview({ components = [], name, mediaPreviewUrl, mediaName, variableExamples = "" }: { components?: Component[]; name?: string; mediaPreviewUrl?: string; mediaName?: string; variableExamples?: string }) {
   const header = components.find(c => c.type === "HEADER");
