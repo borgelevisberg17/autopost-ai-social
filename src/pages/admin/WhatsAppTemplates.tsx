@@ -143,8 +143,17 @@ export default function WhatsAppTemplates() {
         if (headerType === "TEXT") components.push({ type: "HEADER", format: "TEXT", text: headerText });
         else components.push({ type: "HEADER", format: headerType, example: { header_handle: [headerHandle.trim()] } });
       }
-      const variables = [...body.matchAll(/\{\{(\d+)\}\}/g)].map(m => Number(m[1]));
-      const examples = bodyExamples.split("|").map(v => v.trim()).filter(Boolean);
+      const variables = getVariableIndexes(body);
+      const examples = bodyExamples.split("|").map(value => value.trim());
+      if (variables.length) {
+        const maxVariable = variables[variables.length - 1];
+        if (variables.length !== maxVariable || variables.some((value, index) => value !== index + 1)) {
+          throw new Error("As variáveis devem ser sequenciais e começar em {{1}}, sem saltos. Podes repetir uma variável no texto.");
+        }
+        if (examples.length !== maxVariable || examples.some(value => !value)) {
+          throw new Error(`Indica exactamente ${maxVariable} exemplo(s), um por variável, separados por |.`);
+        }
+      }
       const bodyComponent: Component = { type: "BODY", text: body };
       if (variables.length) bodyComponent.example = { body_text: [examples] };
       components.push(bodyComponent);
