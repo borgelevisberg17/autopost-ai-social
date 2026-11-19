@@ -435,6 +435,75 @@ function WorkflowStory() {
  return <section id="process" className="bg-white py-20 sm:py-28"><div className={wrap}><div className="grid gap-10 lg:grid-cols-[.8fr_1.2fr]"><div><Label>Como funciona</Label><h2 className={h2}>Da mensagem <span className="text-slate-400">à ação.</span></h2><p className={`${muted} mt-6 max-w-md`}>A automação não é uma caixa-preta. Cada etapa tem uma origem, uma validação e um resultado que a equipa consegue acompanhar.</p></div><div className="rounded-2xl border border-slate-200 bg-[#f8fafc] p-5 sm:p-7"><div className="flex items-center justify-between"><span className="font-mono text-[9px] uppercase tracking-[.16em] text-slate-400">Fluxo operacional</span><span className="text-[10px] text-slate-500">0{active+1} / 04</span></div><div className="mt-7 grid grid-cols-4 gap-1">{steps.map((s,i)=><button key={s.n} onClick={()=>setActive(i)} aria-label={`Etapa ${s.n}`} className={`h-1.5 rounded-full transition ${i<=active?"bg-slate-950":"bg-slate-200"}`}/>)}</div><AnimatePresence mode="wait"><motion.div key={active} initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-8}} className="py-12"><div className="grid h-14 w-14 place-items-center rounded-2xl bg-slate-950 text-white"><Icon className="h-6 w-6"/></div><div className="mt-8 font-mono text-[10px] text-slate-400">{current.n} / PROCESSO</div><h3 className="mt-2 max-w-lg text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">{current.title}</h3><p className="mt-3 max-w-lg text-sm leading-6 text-slate-500">{current.desc}</p></motion.div></AnimatePresence><div className="flex justify-between border-t border-slate-200 pt-4"><button onClick={()=>setActive((active+3)%4)} className="text-xs font-medium text-slate-500 hover:text-slate-950">← Anterior</button><button onClick={()=>setActive((active+1)%4)} className="inline-flex items-center gap-2 text-xs font-semibold text-slate-950">Próxima etapa <ArrowRight className="h-3.5 w-3.5"/></button></div></div></div></div></section>;
 }
 
+
+const demoTestimonials = [
+  { quote: "Antes, perdíamos tempo a responder às mesmas perguntas. Agora temos as conversas e os pedidos muito mais organizados.", name: "Marta Silva", role: "Gestora de loja · Moda", initials: "MS", tone: "bg-stone-200" },
+  { quote: "A visão centralizada ajuda a equipa a perceber o que está pendente e a dar seguimento sem perder o contexto.", name: "Edson Manuel", role: "Empreendedor · Retalho", initials: "EM", tone: "bg-slate-200" },
+  { quote: "Conseguir acompanhar mensagens, catálogo e atividade no mesmo espaço torna a rotina comercial mais simples.", name: "Carla Domingos", role: "Responsável de vendas", initials: "CD", tone: "bg-zinc-200" },
+  { quote: "A automatização faz mais sentido quando continua a respeitar as regras do negócio. É esse controlo que procuramos.", name: "Paulo André", role: " gestor operacional", initials: "PA", tone: "bg-neutral-200" },
+  { quote: "Ter os passos do atendimento mais claros facilita a colaboração e reduz esquecimentos no acompanhamento.", name: "Inês Joaquim", role: "Coordenadora de equipa", initials: "IJ", tone: "bg-stone-300" },
+  { quote: "Uma plataforma que reúne os canais pode ajudar pequenos negócios a trabalhar com mais consistência.", name: "Rui Francisco", role: "Fundador · Comércio digital", initials: "RF", tone: "bg-slate-300" },
+];
+
+function TestimonialCard({ item }: { item: (typeof demoTestimonials)[number] }) {
+  return (
+    <article className="flex w-[290px] shrink-0 flex-col justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_8px_30px_rgba(15,23,42,.035)] sm:w-[350px] sm:p-6">
+      <div>
+        <div className="mb-4 flex items-center gap-1 text-slate-300" aria-label="Testemunho ilustrativo">
+          {[0, 1, 2, 3, 4].map((star) => <span key={star} aria-hidden="true" className="text-sm">✳</span>)}
+          <span className="ml-2 font-mono text-[8px] uppercase tracking-[.12em] text-slate-400">Demonstração</span>
+        </div>
+        <p className="text-[13px] leading-6 text-slate-700 sm:text-sm">“{item.quote}”</p>
+      </div>
+      <div className="mt-6 flex items-center gap-3 border-t border-slate-100 pt-4">
+        <div aria-hidden="true" className={`grid h-10 w-10 shrink-0 place-items-center rounded-full ${item.tone} text-[10px] font-semibold text-slate-600`}>{item.initials}</div>
+        <div className="min-w-0">
+          <p className="truncate text-xs font-semibold text-slate-900">{item.name}</p>
+          <p className="mt-0.5 truncate text-[10px] text-slate-500">{item.role}</p>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function TestimonialsStory() {
+  const firstRow = demoTestimonials.slice(0, 3);
+  const secondRow = demoTestimonials.slice(3, 6);
+  return (
+    <section id="testimonials" aria-labelledby="testimonials-title" className="overflow-hidden border-y border-slate-200 bg-[#f8fafc] py-20 sm:py-28">
+      <style>{`
+        @keyframes vendora-testimonials-left { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        @keyframes vendora-testimonials-right { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+        .vendora-testimonials-track { display: flex; width: max-content; gap: 12px; }
+        .vendora-testimonials-left { animation: vendora-testimonials-left 48s linear infinite; }
+        .vendora-testimonials-right { animation: vendora-testimonials-right 54s linear infinite; }
+        .vendora-testimonials-marquee:hover .vendora-testimonials-track,
+        .vendora-testimonials-marquee:focus-within .vendora-testimonials-track { animation-play-state: paused; }
+        @media (prefers-reduced-motion: reduce) {
+          .vendora-testimonials-track { animation: none !important; transform: none !important; }
+          .vendora-testimonials-marquee { overflow-x: auto; }
+        }
+      `}</style>
+      <div className={wrap}>
+        <div className="mx-auto max-w-2xl text-center">
+          <Label>O que dizem sobre a experiência</Label>
+          <h2 id="testimonials-title" className={`${h2} mx-auto`}>Uma operação mais simples. <span className="text-slate-400">Mais espaço para crescer.</span></h2>
+          <p className="mx-auto mt-5 max-w-xl text-sm leading-6 text-slate-500">Exemplos ilustrativos de como uma experiência de gestão conectada pode ser percebida por diferentes perfis de negócio.</p>
+          <span className="mt-4 inline-flex rounded-full border border-slate-200 bg-white px-3 py-1.5 font-mono text-[9px] uppercase tracking-[.14em] text-slate-500">Conteúdo provisório · Não são clientes reais</span>
+        </div>
+      </div>
+      <div className="vendora-testimonials-marquee mt-12 space-y-3 overflow-hidden sm:mt-14">
+        <div className="vendora-testimonials-track vendora-testimonials-left">
+          {[...firstRow, ...firstRow].map((item, index) => <TestimonialCard key={`top-${index}`} item={item} />)}
+        </div>
+        <div className="vendora-testimonials-track vendora-testimonials-right">
+          {[...secondRow, ...secondRow].map((item, index) => <TestimonialCard key={`bottom-${index}`} item={item} />)}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function CommandStory({startPath}:{startPath:string}) {
  return <section id="control-room" className="border-y border-slate-200 bg-[#f8fafc] py-20 sm:py-28"><div className={wrap}><div className="grid gap-10 lg:grid-cols-[.75fr_1.25fr] lg:items-center"><div><Label>Visão de comando</Label><h2 className={h2}>O negócio <span className="text-slate-400">num só painel.</span></h2><p className={`${muted} mt-6 max-w-md`}>Pedidos, catálogo, conversas, campanhas e indicadores deixam de viver em ferramentas isoladas.</p><Link to={startPath} className="mt-8 inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-xs font-semibold text-white transition hover:bg-slate-700">Explorar a plataforma <ArrowRight className="h-4 w-4"/></Link></div><div className="overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-[0_25px_70px_rgba(15,23,42,.08)] sm:p-3"><img src="/media/optimized/operations-audit.webp" alt="Painel de operações da Vendora" loading="lazy" className="w-full rounded-xl object-cover"/><div className="flex flex-wrap items-center justify-between gap-2 px-2 py-3 text-[9px] font-mono uppercase tracking-wider text-slate-400"><span>Workspace Vendora</span><span className="flex items-center gap-2 text-slate-600"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500"/>Dados centralizados</span></div></div></div></div></section>;
 }
@@ -508,6 +577,7 @@ export function HomeExperience({startPath,onStart}:{startPath:string;onStart:()=
         <AgentStory />
         <section id="plans" className="bg-white"><PlansSection /></section>
         <WorkflowStory />
+        <TestimonialsStory />
         <CommandStory startPath={startPath} />
         <FAQStory />
         <FinalCTA startPath={startPath} />
