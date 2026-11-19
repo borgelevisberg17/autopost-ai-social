@@ -68,29 +68,17 @@ function playTactileFeedback() {
  * Scroll suave com curva de inércia (estilo Lusion / Lenis) para navegação entre secções.
  */
 function smoothScrollToElement(targetId: string) {
-  const el = document.getElementById(targetId);
-  if (!el) return;
-  const headerOffset = 74;
-  const startY = window.scrollY;
-  const targetY =
-    el.getBoundingClientRect().top + window.scrollY - headerOffset;
-  const distance = targetY - startY;
-  const duration = Math.min(1100, Math.max(550, Math.abs(distance) * 0.45));
-  const startTime = performance.now();
+  const element = document.getElementById(targetId);
+  if (!element) return;
 
-  const easeOutQuint = (t: number) => 1 - Math.pow(1 - t, 5);
+  const reduceMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  ).matches;
 
-  const step = (now: number) => {
-    const elapsed = now - startTime;
-    const progress = Math.min(elapsed / duration, 1);
-    const eased = easeOutQuint(progress);
-    window.scrollTo(0, startY + distance * eased);
-    if (progress < 1) {
-      window.requestAnimationFrame(step);
-    }
-  };
-
-  window.requestAnimationFrame(step);
+  element.scrollIntoView({
+    behavior: reduceMotion ? "auto" : "smooth",
+    block: "start",
+  });
 }
 
 function ScrollProgressBar() {
@@ -129,24 +117,43 @@ function LusionChapterDock() {
   const [activeId, setActiveId] = useState<string>("hero-stage");
 
   useEffect(() => {
-    const handleScroll = () => {
-      const viewportMiddle = window.scrollY + window.innerHeight * 0.38;
-      let current: string = CHAPTERS[0].id;
-      for (const ch of CHAPTERS) {
-        const el = document.getElementById(ch.id);
-        if (el) {
-          const top = el.offsetTop;
-          if (viewportMiddle >= top) {
-            current = ch.id;
-          }
+    let frame = 0;
+    let currentActive = CHAPTERS[0].id;
+
+    const updateActiveChapter = () => {
+      frame = 0;
+      const viewportMarker = window.innerHeight * 0.38;
+      let nextActive = CHAPTERS[0].id;
+
+      for (const chapter of CHAPTERS) {
+        const element = document.getElementById(chapter.id);
+        if (!element) continue;
+
+        if (element.getBoundingClientRect().top <= viewportMarker) {
+          nextActive = chapter.id;
         }
       }
-      setActiveId(current);
+
+      if (nextActive !== currentActive) {
+        currentActive = nextActive;
+        setActiveId(nextActive);
+      }
     };
 
-    handleScroll();
+    const handleScroll = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(updateActiveChapter);
+    };
+
+    updateActiveChapter();
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("resize", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
   }, []);
 
   const activeIndex = Math.max(

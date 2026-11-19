@@ -1105,3 +1105,16 @@ html {
     opacity: 1 !important;
   }
 }
+
+
+/* Consistent anchor navigation beneath the fixed site header. */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 92px;
+}
+.landing-page [id] {
+  scroll-margin-top: 92px;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
