@@ -21,7 +21,7 @@ const legalLinks = [
 ];
 
 const linkClass =
-  "group inline-flex w-fit items-center gap-2 text-[13px] text-white/55 transition-colors duration-200 hover:text-white";
+  "group inline-flex w-fit items-center gap-2 text-left text-[13px] text-white/55 transition-all duration-200 hover:-translate-y-0.5 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-4 focus-visible:ring-offset-[#090a0b]";
 
 export function SiteFooter() {
   return (
