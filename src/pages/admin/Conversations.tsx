@@ -840,20 +840,14 @@ export default function Conversations() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.16 }}
-              className="fixed inset-0 z-[70] bg-slate-950/45 p-0 backdrop-blur-[3px] sm:p-3 lg:p-5"
-              onMouseDown={(event) => {
-                if (event.target === event.currentTarget) {
-                  setActive(null);
-                  setInfoOpen(false);
-                }
-              }}
+              className="pointer-events-none fixed inset-0 z-[70]"
             >
               <motion.section
                 initial={{ y: 14, scale: 0.99 }}
                 animate={{ y: 0, scale: 1 }}
                 exit={{ y: 10, scale: 0.99 }}
                 transition={{ type: "spring", damping: 28, stiffness: 280 }}
-                className="relative mx-auto flex h-full min-h-0 w-full max-w-[1500px] min-w-0 overflow-hidden rounded-none border border-slate-200 bg-white shadow-2xl sm:rounded-2xl"
+                className="pointer-events-auto fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] right-2 flex h-[min(680px,calc(100dvh-6rem))] w-[calc(100vw-1rem)] min-h-0 min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_18px_60px_rgba(15,23,42,0.24)] sm:bottom-4 sm:right-4 sm:h-[min(680px,calc(100dvh-2rem))] sm:w-[min(760px,calc(100vw-2rem))] sm:rounded-2xl"
                 aria-label="Mensageiro da conversa"
               >
                 <div className="flex min-w-0 flex-1 flex-col">
