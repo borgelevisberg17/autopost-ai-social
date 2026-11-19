@@ -368,26 +368,45 @@ export default function Conversations() {
 
   // Filter list
   const filteredConvos = useMemo(() => {
+    const searchTerms = search.toLocaleLowerCase("pt-PT").trim();
     return convos.filter((c) => {
-      const searchTerms = search.toLowerCase().trim();
       const matchesSearch =
         !searchTerms ||
-        (c.customer_name && c.customer_name.toLowerCase().includes(searchTerms)) ||
-        c.customer_phone.includes(searchTerms) ||
-        (latestMsgs[c.id]?.body && latestMsgs[c.id].body.toLowerCase().includes(searchTerms));
+        (c.customer_name ?? "").toLocaleLowerCase("pt-PT").includes(searchTerms) ||
+        c.customer_phone.replace(/\D/g, "").includes(searchTerms.replace(/\D/g, "")) ||
+        (latestMsgs[c.id]?.body ?? "").toLocaleLowerCase("pt-PT").includes(searchTerms);
 
       if (!matchesSearch) return false;
-
-      if (filter === "unread") {
-        const lastMsg = latestMsgs[c.id];
-        return c.status !== "closed" && lastMsg && lastMsg.direction === "in";
-      }
+      if (filter === "unread") return c.status !== "closed" && latestMsgs[c.id]?.direction === "in";
       if (filter === "agent") return c.status === "open";
       if (filter === "staff") return c.status === "handoff";
       if (filter === "closed") return c.status === "closed";
       return true;
     });
   }, [convos, latestMsgs, search, filter]);
+
+  const [sortBy, setSortBy] = useState<"recent" | "oldest" | "name">("recent");
+  const sortedConvos = useMemo(() => {
+    return [...filteredConvos].sort((a, b) => {
+      if (sortBy === "name") {
+        return (a.customer_name || a.customer_phone).localeCompare(
+          b.customer_name || b.customer_phone,
+          "pt-PT",
+          { sensitivity: "base" },
+        );
+      }
+      const delta = new Date(b.last_message_at).getTime() - new Date(a.last_message_at).getTime();
+      return sortBy === "recent" ? delta : -delta;
+    });
+  }, [filteredConvos, sortBy]);
+
+  const filterCounts = useMemo(() => ({
+    all: convos.length,
+    unread: convos.filter((c) => c.status !== "closed" && latestMsgs[c.id]?.direction === "in").length,
+    agent: convos.filter((c) => c.status === "open").length,
+    staff: convos.filter((c) => c.status === "handoff").length,
+    closed: convos.filter((c) => c.status === "closed").length,
+  }), [convos, latestMsgs]);
 
   // Actions
   const setStatus = async (status: "open" | "handoff" | "closed") => {
@@ -614,7 +633,7 @@ export default function Conversations() {
             <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
               <p className="text-[11px] font-medium text-slate-500">A aguardar resposta</p>
               <p className="mt-1 text-2xl font-bold tracking-tight text-amber-600">
-                {convos.filter((c) => c.status !== "closed" && latestMsgs[c.id]?.direction === "in").length}
+                {filterCounts.unread}
               </p>
             </div>
             <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
@@ -665,7 +684,7 @@ export default function Conversations() {
             <div className="flex shrink-0 flex-wrap items-center gap-1.5 border-b border-slate-100 px-4 py-3 sm:px-5">
               {([
                 ["all", "Todas"],
-                ["unread", "A aguardar resposta"],
+                ["unread", "A aguardar"],
                 ["agent", "Agente IA"],
                 ["staff", "Equipa"],
                 ["closed", "Encerradas"],
@@ -674,13 +693,22 @@ export default function Conversations() {
                   key={value}
                   type="button"
                   onClick={() => setFilter(value)}
-                  className={`rounded-lg px-3 py-2 text-[11px] font-semibold transition ${filter === value ? "bg-slate-950 text-white shadow-sm" : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"}`}
+                  aria-pressed={filter === value}
+                  className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-[11px] font-semibold transition ${filter === value ? "bg-slate-950 text-white shadow-sm" : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"}`}
                 >
                   {label}
-                  {value === "all" && <span className={`ml-1.5 ${filter === value ? "text-slate-300" : "text-slate-400"}`}>{convos.length}</span>}
+                  <span className={`text-[10px] tabular-nums ${filter === value ? "text-slate-300" : "text-slate-400"}`}>{filterCounts[value]}</span>
                 </button>
               ))}
-              <span className="ml-auto hidden text-[11px] text-slate-400 sm:inline">{filteredConvos.length} resultado(s)</span>
+              <div className="ml-auto flex items-center gap-2">
+                <label htmlFor="conversation-sort" className="hidden text-[10px] font-medium text-slate-400 sm:inline">Ordenar</label>
+                <select id="conversation-sort" value={sortBy} onChange={(event) => setSortBy(event.target.value as typeof sortBy)} className="h-8 rounded-md border border-slate-200 bg-white px-2 text-[10px] font-semibold text-slate-600 outline-none focus:border-emerald-500">
+                  <option value="recent">Mais recentes</option>
+                  <option value="oldest">Mais antigas</option>
+                  <option value="name">Nome A–Z</option>
+                </select>
+                <span className="hidden text-[10px] text-slate-400 lg:inline">{sortedConvos.length} registo(s)</span>
+              </div>
             </div>
 
             <div className="min-h-0 flex-1 overflow-auto">
@@ -718,7 +746,7 @@ export default function Conversations() {
                         </div>
                       </td>
                     </tr>
-                  ) : filteredConvos.map((c) => {
+                  ) : sortedConvos.map((c) => {
                     const last = latestMsgs[c.id];
                     const waiting = c.status !== "closed" && last?.direction === "in";
                     const name = c.customer_name || `+${c.customer_phone}`;
@@ -945,7 +973,7 @@ export default function Conversations() {
                 </div>
 
                 {infoOpen && (
-                  <aside className="absolute inset-y-0 right-0 z-20 flex w-full flex-col border-l border-slate-200 bg-white shadow-2xl sm:w-[360px]">
+                  <aside className="absolute inset-y-0 right-0 z-20 flex w-full flex-col border-l border-slate-200 bg-white shadow-2xl sm:relative sm:inset-auto sm:w-[340px] sm:shrink-0 sm:shadow-none">
                     <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4">
                       <div>
                         <h3 className="text-sm font-bold text-slate-950">Perfil do contacto</h3>
