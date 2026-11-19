@@ -2,16 +2,16 @@ import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const productLinks = [
-  { href: "#whatsapp", label: "WhatsApp IA" },
-  { href: "#channels", label: "Publicação multicanal" },
-  { href: "#agents", label: "Agentes especializados" },
-  { href: "#plans", label: "Planos" },
+  { href: "/#whatsapp", label: "WhatsApp IA" },
+  { href: "/#channels", label: "Publicação multicanal" },
+  { href: "/#agents", label: "Agentes especializados" },
+  { href: "/#plans", label: "Planos" },
 ];
 
 const companyLinks = [
-  { href: "#proof", label: "A plataforma" },
-  { href: "#process", label: "Como funciona" },
-  { href: "#faq", label: "Perguntas frequentes" },
+  { href: "/#proof", label: "A plataforma" },
+  { href: "/#process", label: "Como funciona" },
+  { href: "/#faq", label: "Perguntas frequentes" },
 ];
 
 const legalLinks = [
@@ -107,13 +107,13 @@ export function SiteFooter() {
         <div className="mt-16 flex flex-col gap-4 text-[10px] text-white/35 sm:flex-row sm:items-center sm:justify-between">
           <span>© {new Date().getFullYear()} Vendora. Todos os direitos reservados.</span>
           <a
-            href="#hero-stage"
+            href="/#hero-stage"
             className="inline-flex w-fit items-center gap-2 font-medium text-white/55 transition hover:text-white"
           >
             Voltar ao início
             <ArrowUpRight className="h-3.5 w-3.5" />
           </a>
-          <span className="text-white/30">Feito para o comércio em movimento.</span>
+          <a href="https://cachiluvia.com" target="_blank" rel="noreferrer" className="text-white/45 transition hover:text-white">Desenvolvido por <span className="font-semibold text-white/75">Cachiluvia Soluções</span></a>
         </div>
       </div>
     </footer>
