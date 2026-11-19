@@ -11,7 +11,7 @@ import { PlansSection } from "@/components/site/PlansSection";
 
 const wrap = "mx-auto w-full max-w-[1240px] px-5 sm:px-7 lg:px-8";
 const eyebrow = "mb-5 inline-flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[.18em] text-slate-500";
-const h2 = "text-balance text-3xl font-semibold leading-[1.02] tracking-[-.06em] text-slate-950 sm:text-4xl lg:text-[clamp(2.75rem,4.1vw,3.5rem)]";
+const h2 = "max-w-[20ch] text-balance text-[1.8rem] font-semibold leading-[1.12] tracking-[-.035em] text-slate-950 sm:text-3xl lg:text-[clamp(2.25rem,3.2vw,2.8rem)]";
 const muted = "text-[15px] leading-7 text-slate-600 sm:text-base";
 
 function Label({ children }: { children: ReactNode }) {
@@ -122,45 +122,46 @@ function DotBrandWordmark() {
 function ValueStory() {
  const items=[{n:"01",icon:Globe2,title:"Todos os canais, uma operação",text:"WhatsApp, Instagram, Facebook e loja online ligados ao mesmo catálogo e contexto."},{n:"02",icon:Workflow,title:"Menos tarefas repetidas",text:"Automatize respostas, publicação e acompanhamento sem perder o controlo."},{n:"03",icon:ShieldCheck,title:"Cada ação com contexto",text:"A IA consulta dados e respeita permissões antes de agir."}];
  return <section id="proof" className="border-y border-slate-200 bg-[#f8fafc] py-20 sm:py-28"><div className={wrap}>
-   <div className="grid gap-10 lg:grid-cols-[.85fr_1.15fr] lg:items-end"><div><Label>Uma operação, não mais ferramentas</Label><h2 className={h2}>O comércio acontece em vários lugares. <span className="text-slate-400">A gestão não devia estar fragmentada.</span></h2></div><p className={`${muted} max-w-lg lg:justify-self-end`}>A Vendora organiza os pontos de contacto do seu negócio para que a equipa tenha a mesma informação, o mesmo contexto e uma visão clara do que precisa de acontecer.</p></div>
+   <div className="grid gap-10 lg:grid-cols-[.85fr_1.15fr] lg:items-end"><div><Label>Uma operação, não mais ferramentas</Label><h2 className={h2}>Tudo ligado. <span className="text-slate-400">A mesma operação.</span></h2></div><p className={`${muted} max-w-lg lg:justify-self-end`}>A Vendora organiza os pontos de contacto do seu negócio para que a equipa tenha a mesma informação, o mesmo contexto e uma visão clara do que precisa de acontecer.</p></div>
    <div className="mt-14 grid gap-3 md:grid-cols-3">{items.map(({n,icon:Icon,title,text})=><article key={n} className="group rounded-2xl border border-slate-200 bg-white p-6 transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_45px_rgba(15,23,42,.07)] sm:p-7"><div className="flex items-center justify-between"><span className="font-mono text-[10px] text-slate-400">{n} / 03</span><Icon className="h-5 w-5 text-slate-500 transition group-hover:text-slate-950"/></div><h3 className="mt-12 text-xl font-semibold tracking-tight text-slate-950">{title}</h3><p className="mt-3 text-sm leading-6 text-slate-500">{text}</p></article>)}</div>
  </div></section>;
 }
 
 
-function OverflowHoverStory() {
+function VendoraParallaxStory() {
   return (
-    <section aria-labelledby="vendora-intro-title" className="group relative isolate min-h-[72svh] overflow-hidden bg-slate-950 text-white sm:min-h-[82svh]" data-cursor="SOBRE A VENDORA">
-      <img
-        src="/media/optimized/auth-human-commerce.webp"
-        alt="Empreendedor a trabalhar no seu negócio, representando o comércio ligado pela Vendora."
-        loading="lazy"
-        decoding="async"
-        className="absolute inset-0 -z-20 h-full w-full object-cover object-center transition-transform duration-[1400ms] ease-out group-hover:scale-[1.045] motion-reduce:transform-none"
-      />
-      <div className="absolute inset-0 -z-10 bg-black/55 transition-colors duration-700 group-hover:bg-black/40" />
-      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-black/85 via-black/45 to-black/10" />
-      <div className="absolute inset-0 -z-10 bg-gradient-to-t from-black/45 via-transparent to-black/15" />
-      <div className={`${wrap} relative flex min-h-[72svh] flex-col justify-between py-12 sm:min-h-[82svh] sm:py-16 lg:py-20`}>
-        <div className="flex items-center justify-between gap-4 font-mono text-[9px] uppercase tracking-[.2em] text-white/65">
-          <span>Uma plataforma. Um negócio inteiro.</span><span className="hidden sm:inline">Vendora / 2026</span>
+    <section aria-labelledby="vendora-intro-title" className="vendora-parallax-section relative isolate min-h-[76svh] overflow-hidden bg-slate-950 text-white sm:min-h-[88svh]">
+      <div className="absolute inset-0 -z-20 overflow-hidden">
+        <img
+          src="/media/optimized/storefront-commerce.webp"
+          alt="Espaço comercial que representa os negócios que a Vendora ajuda a organizar."
+          loading="lazy"
+          decoding="async"
+          className="vendora-parallax-image absolute inset-x-0 -top-[14%] h-[128%] w-full object-cover object-center"
+        />
+      </div>
+      <div className="absolute inset-0 -z-10 bg-black/45" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-black/80 via-black/40 to-black/10" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-t from-black/55 via-transparent to-black/10" />
+      <div className={`${wrap} relative flex min-h-[76svh] flex-col justify-between py-12 sm:min-h-[88svh] sm:py-16 lg:py-20`}>
+        <div className="flex items-center justify-between gap-4 font-mono text-[9px] uppercase tracking-[.2em] text-white/70">
+          <span>Conheça a Vendora</span><span className="hidden sm:inline">Comércio conectado / 2026</span>
         </div>
-        <div className="max-w-3xl py-20">
-          <div className="mb-5 inline-flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[.18em] text-white/65"><span className="h-1.5 w-1.5 rounded-full bg-white" />Conheça a Vendora</div>
-          <h2 id="vendora-intro-title" className="max-w-[13ch] text-balance text-4xl font-semibold leading-[.98] tracking-[-.065em] text-white sm:text-6xl lg:text-[clamp(4rem,7vw,6.5rem)]">
-            O comércio move-se. <span className="text-white/55">A sua gestão também.</span>
+        <div className="max-w-2xl py-16 sm:py-20">
+          <h2 id="vendora-intro-title" className="max-w-[12ch] text-balance text-4xl font-semibold leading-[1.08] tracking-[-.045em] text-white sm:text-6xl lg:text-[clamp(3.5rem,6vw,5.5rem)]">
+            O seu negócio. <span className="text-white/60">Em movimento.</span>
           </h2>
-          <p className="mt-7 max-w-xl text-sm leading-7 text-white/75 sm:text-base sm:leading-8">
-            A Vendora liga pessoas, canais e operações numa experiência contínua. Menos fragmentação para a equipa. Mais clareza para fazer o negócio crescer.
+          <p className="mt-6 max-w-lg text-sm leading-7 text-white/80 sm:text-base sm:leading-8">
+            A Vendora aproxima clientes, canais e operações para que possa gerir
+            melhor cada etapa do seu negócio, a partir de um só lugar.
           </p>
-          <a href="#whatsapp" className="mt-9 inline-flex items-center gap-3 border-b border-white/45 pb-2 text-xs font-semibold text-white transition-colors duration-300 hover:border-white">
-            Descobrir como funciona
-            <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+          <a href="#whatsapp" className="mt-8 inline-flex items-center gap-3 border-b border-white/55 pb-2 text-xs font-semibold text-white transition-colors hover:border-white">
+            Explorar a plataforma <ArrowUpRight className="h-4 w-4" />
           </a>
         </div>
         <div className="flex items-end justify-between gap-6">
-          <span className="font-mono text-[9px] uppercase tracking-[.18em] text-white/55">Tudo conectado. Uma visão clara.</span>
-          <span aria-hidden="true" className="text-[clamp(4rem,12vw,10rem)] font-semibold leading-[.7] tracking-[-.1em] text-white/20 transition-all duration-700 group-hover:translate-y-[-5px] group-hover:text-white/35">V.</span>
+          <span className="font-mono text-[9px] uppercase tracking-[.18em] text-white/60">Uma visão. Toda a operação.</span>
+          <span aria-hidden="true" className="text-[clamp(4rem,12vw,10rem)] font-semibold leading-[.7] tracking-[-.1em] text-white/25">V.</span>
         </div>
       </div>
     </section>
@@ -171,7 +172,7 @@ function WhatsAppStory() {
  const [active,setActive]=useState(0);
  const states=[{title:"A conversa começa",text:"O cliente pergunta por um produto no WhatsApp.",image:"/media/optimized/whatsapp-status-01.webp",message:"Olá! Ainda têm este modelo disponível?"},{title:"A Vendora consulta",text:"A IA verifica catálogo, preço e disponibilidade antes de responder.",image:"/media/optimized/whatsapp-status-02.webp",message:"Temos sim. Vou confirmar as opções disponíveis para si."},{title:"O pedido fica organizado",text:"A intenção transforma-se num pedido acompanhado pela equipa.",image:"/media/optimized/whatsapp-status-03.webp",message:"Perfeito. O seu pedido foi registado. Já partilhamos os próximos passos."}];
  return <section id="whatsapp" className="overflow-hidden bg-white py-20 sm:py-28"><div className={wrap}>
-   <div className="grid gap-12 lg:grid-cols-[.8fr_1.2fr] lg:items-center"><div><Label>WhatsApp com contexto</Label><h2 className={h2}>A conversa deixa de ser uma caixa de entrada. <span className="text-slate-400">Passa a fazer parte da operação.</span></h2><p className={`${muted} mt-6 max-w-md`}>Respostas ligadas ao catálogo, disponibilidade consultada e pedidos acompanhados sem obrigar a equipa a saltar entre ferramentas.</p>
+   <div className="grid gap-12 lg:grid-cols-[.8fr_1.2fr] lg:items-center"><div><Label>WhatsApp com contexto</Label><h2 className={h2}>Atendimento com contexto. <span className="text-slate-400">Do primeiro contacto ao pedido.</span></h2><p className={`${muted} mt-6 max-w-md`}>Respostas ligadas ao catálogo, disponibilidade consultada e pedidos acompanhados sem obrigar a equipa a saltar entre ferramentas.</p>
     <div className="mt-9 space-y-2">{states.map((s,i)=><button key={s.title} onClick={()=>setActive(i)} className={`flex w-full items-start gap-4 rounded-xl border p-4 text-left transition ${active===i?"border-slate-900 bg-slate-50":"border-slate-200 bg-white hover:border-slate-300"}`}><span className={`mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full text-xs font-semibold ${active===i?"bg-slate-950 text-white":"bg-slate-100 text-slate-500"}`}>0{i+1}</span><span><span className="block text-sm font-semibold text-slate-900">{s.title}</span><span className="mt-1 block text-xs leading-5 text-slate-500">{s.text}</span></span></button>)}</div>
    </div><div className="relative mx-auto w-full max-w-[580px]"><div className="absolute -inset-8 rounded-full bg-slate-100 blur-3xl"/><div className="relative grid gap-4 sm:grid-cols-[.8fr_1.2fr] sm:items-center"><div className="order-2 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-2 sm:order-1"><img src={states[active].image} alt="Demonstração de conversa WhatsApp" className="aspect-[4/5] w-full rounded-xl object-cover transition" loading="lazy"/><div className="flex items-center justify-between px-2 py-2 text-[9px] text-slate-400"><span>Fluxo ilustrativo</span><span>0{active+1} / 03</span></div></div><div className="order-1 rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_25px_65px_rgba(15,23,42,.10)] sm:order-2"><div className="flex items-center gap-2 border-b border-slate-100 pb-3"><div className="grid h-8 w-8 place-items-center rounded-full bg-slate-950 text-white"><MessageCircle className="h-4 w-4"/></div><div><div className="text-xs font-semibold text-slate-900">Atendimento Vendora</div><div className="text-[9px] text-slate-400">Demonstração de fluxo</div></div><span className="ml-auto h-2 w-2 rounded-full bg-emerald-500"/></div><div className="mt-5 space-y-3"><div className="ml-auto max-w-[90%] rounded-2xl rounded-tr-sm bg-slate-100 p-3 text-xs leading-5 text-slate-700">{states[active].message}</div><div className="max-w-[90%] rounded-2xl rounded-tl-sm bg-slate-950 p-3 text-xs leading-5 text-white">{active===0?"Olá! Posso ajudar a encontrar o produto certo.":active===1?"Consultei o catálogo. O produto está disponível e o preço está confirmado.":"Pedido registado. A equipa já tem o contexto da conversa."}</div></div><div className="mt-5 flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-[10px] text-slate-400"><span>Escrever mensagem…</span><Send className="ml-auto h-3.5 w-3.5"/></div></div></div><div className="relative mt-5 flex items-center justify-between"><span className="text-[10px] text-slate-400">Explore o fluxo</span><div className="flex gap-2"><button aria-label="Etapa anterior" onClick={()=>setActive((active+2)%3)} className="grid h-9 w-9 place-items-center rounded-full border border-slate-200 hover:bg-slate-50"><ChevronLeft className="h-4 w-4"/></button><button aria-label="Próxima etapa" onClick={()=>setActive((active+1)%3)} className="grid h-9 w-9 place-items-center rounded-full bg-slate-950 text-white hover:bg-slate-700"><ChevronRight className="h-4 w-4"/></button></div></div></div></div>
  </div></section>;
@@ -182,7 +183,7 @@ function ChannelStory() {
  const channels=[{name:"Instagram",desc:"Transforme produtos em conteúdo que desperta interesse.",images:["/media/optimized/instagram-campaign-01.webp","/media/optimized/instagram-campaign-02.webp","/media/optimized/instagram-campaign-03.webp"]},{name:"Facebook",desc:"Mantenha a comunidade informada e leve cada publicação até à venda.",images:["/media/optimized/facebook-campaign-01.webp","/media/optimized/facebook-campaign-02.webp","/media/optimized/facebook-campaign-03.webp"]}];
  const current=channels[active];
  return <section id="channels" className="border-y border-slate-200 bg-[#f8fafc] py-20 sm:py-28"><div className={wrap}>
-  <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between"><div className="max-w-2xl"><Label>Publicação multicanal</Label><h2 className={h2}>Uma marca consistente. <span className="text-slate-400">Cada canal com a sua linguagem.</span></h2></div><div className="inline-flex rounded-full border border-slate-200 bg-white p-1">{channels.map((c,i)=><button key={c.name} onClick={()=>setActive(i)} className={`rounded-full px-4 py-2 text-xs font-semibold transition ${active===i?"bg-slate-950 text-white":"text-slate-500 hover:text-slate-900"}`}>{c.name}</button>)}</div></div>
+  <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between"><div className="max-w-2xl"><Label>Publicação multicanal</Label><h2 className={h2}>Uma marca. <span className="text-slate-400">Todos os canais.</span></h2></div><div className="inline-flex rounded-full border border-slate-200 bg-white p-1">{channels.map((c,i)=><button key={c.name} onClick={()=>setActive(i)} className={`rounded-full px-4 py-2 text-xs font-semibold transition ${active===i?"bg-slate-950 text-white":"text-slate-500 hover:text-slate-900"}`}>{c.name}</button>)}</div></div>
   <div className="mt-12 grid gap-8 rounded-[24px] border border-slate-200 bg-white p-4 sm:p-7 lg:grid-cols-[.72fr_1.28fr] lg:items-center"><div className="p-2 sm:p-5"><div className="font-mono text-[10px] uppercase tracking-[.16em] text-slate-400">Canal 0{active+1}</div><h3 className="mt-4 text-3xl font-semibold tracking-[-.05em] text-slate-950 sm:text-4xl">{current.name}</h3><p className="mt-4 max-w-sm text-sm leading-6 text-slate-500">{current.desc}</p><ul className="mt-8 space-y-3 text-xs text-slate-600"><li className="flex gap-2"><Check className="h-4 w-4 text-slate-900"/>Conteúdo preparado a partir do catálogo</li><li className="flex gap-2"><Check className="h-4 w-4 text-slate-900"/>Identidade visual coerente</li><li className="flex gap-2"><Check className="h-4 w-4 text-slate-900"/>Publicação e acompanhamento centralizados</li></ul></div><div className="grid grid-cols-3 gap-2 sm:gap-3">{current.images.map((src,i)=><div key={src} className={`overflow-hidden rounded-xl border border-slate-100 bg-slate-50 ${i===1?"mt-7":"mb-7"}`}><img src={src} alt={`${current.name} exemplo visual ${i+1}`} loading="lazy" className="aspect-[4/5] h-full w-full object-cover transition duration-700 hover:scale-105"/></div>)}</div></div>
  </div></section>;
 }
@@ -197,7 +198,7 @@ function AgentStory() {
  const current=agents[active];
  return <section id="agents" className="overflow-hidden bg-white py-24 sm:py-32">
   <div className={wrap}>
-   <div className="mb-12 max-w-3xl"><Label>Especialistas Vendora</Label><h2 className={h2}>Uma equipa digital. <span className="text-slate-400">Cada especialista sabe o que fazer.</span></h2></div>
+   <div className="mb-12 max-w-3xl"><Label>Especialistas Vendora</Label><h2 className={h2}>Uma equipa digital. <span className="text-slate-400">Três especialistas.</span></h2></div>
    <div className="grid gap-10 lg:grid-cols-[1.15fr_.85fr] lg:items-center">
     <div className="overflow-hidden rounded-[24px] bg-slate-950 p-2 shadow-[0_28px_80px_rgba(15,23,42,.14)]">
      <video className="aspect-video w-full rounded-[18px] bg-black object-cover" src="/media/agent-architecture.mp4" autoPlay muted loop playsInline preload="metadata" aria-label="Demonstração visual da arquitetura de agentes especializados da Vendora" />
@@ -330,7 +331,7 @@ function AtmosphereStory() {
           <Label>Uma forma mais simples de operar</Label>
           <h2 id="atmosphere-title" className={h2}>
             Menos ruído.{" "}
-            <span className="text-slate-400">Mais espaço para fazer crescer.</span>
+            <span className="text-slate-400">Mais controlo.</span>
           </h2>
           <p className="mt-6 max-w-xl text-sm leading-7 text-slate-600">
             Uma visão contínua do negócio, do primeiro contacto ao acompanhamento
@@ -431,17 +432,17 @@ function WorkflowStory() {
  const [active,setActive]=useState(0);
  const steps=[{n:"01",title:"O cliente demonstra intenção",desc:"Uma mensagem, comentário ou visita inicia a jornada.",icon:MessageCircle},{n:"02",title:"A Vendora consulta o contexto",desc:"Catálogo, preço, disponibilidade e regras são verificados.",icon:Package},{n:"03",title:"A ação é executada ou encaminhada",desc:"A resposta, publicação ou pedido segue o fluxo autorizado.",icon:Zap},{n:"04",title:"A equipa acompanha o resultado",desc:"Tudo fica organizado para análise e continuidade.",icon:BarChart3}];
  const current=steps[active];const Icon=current.icon;
- return <section id="process" className="bg-white py-20 sm:py-28"><div className={wrap}><div className="grid gap-10 lg:grid-cols-[.8fr_1.2fr]"><div><Label>Como funciona</Label><h2 className={h2}>Da primeira mensagem <span className="text-slate-400">à operação concluída.</span></h2><p className={`${muted} mt-6 max-w-md`}>A automação não é uma caixa-preta. Cada etapa tem uma origem, uma validação e um resultado que a equipa consegue acompanhar.</p></div><div className="rounded-2xl border border-slate-200 bg-[#f8fafc] p-5 sm:p-7"><div className="flex items-center justify-between"><span className="font-mono text-[9px] uppercase tracking-[.16em] text-slate-400">Fluxo operacional</span><span className="text-[10px] text-slate-500">0{active+1} / 04</span></div><div className="mt-7 grid grid-cols-4 gap-1">{steps.map((s,i)=><button key={s.n} onClick={()=>setActive(i)} aria-label={`Etapa ${s.n}`} className={`h-1.5 rounded-full transition ${i<=active?"bg-slate-950":"bg-slate-200"}`}/>)}</div><AnimatePresence mode="wait"><motion.div key={active} initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-8}} className="py-12"><div className="grid h-14 w-14 place-items-center rounded-2xl bg-slate-950 text-white"><Icon className="h-6 w-6"/></div><div className="mt-8 font-mono text-[10px] text-slate-400">{current.n} / PROCESSO</div><h3 className="mt-2 max-w-lg text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">{current.title}</h3><p className="mt-3 max-w-lg text-sm leading-6 text-slate-500">{current.desc}</p></motion.div></AnimatePresence><div className="flex justify-between border-t border-slate-200 pt-4"><button onClick={()=>setActive((active+3)%4)} className="text-xs font-medium text-slate-500 hover:text-slate-950">← Anterior</button><button onClick={()=>setActive((active+1)%4)} className="inline-flex items-center gap-2 text-xs font-semibold text-slate-950">Próxima etapa <ArrowRight className="h-3.5 w-3.5"/></button></div></div></div></div></section>;
+ return <section id="process" className="bg-white py-20 sm:py-28"><div className={wrap}><div className="grid gap-10 lg:grid-cols-[.8fr_1.2fr]"><div><Label>Como funciona</Label><h2 className={h2}>Da mensagem <span className="text-slate-400">à ação.</span></h2><p className={`${muted} mt-6 max-w-md`}>A automação não é uma caixa-preta. Cada etapa tem uma origem, uma validação e um resultado que a equipa consegue acompanhar.</p></div><div className="rounded-2xl border border-slate-200 bg-[#f8fafc] p-5 sm:p-7"><div className="flex items-center justify-between"><span className="font-mono text-[9px] uppercase tracking-[.16em] text-slate-400">Fluxo operacional</span><span className="text-[10px] text-slate-500">0{active+1} / 04</span></div><div className="mt-7 grid grid-cols-4 gap-1">{steps.map((s,i)=><button key={s.n} onClick={()=>setActive(i)} aria-label={`Etapa ${s.n}`} className={`h-1.5 rounded-full transition ${i<=active?"bg-slate-950":"bg-slate-200"}`}/>)}</div><AnimatePresence mode="wait"><motion.div key={active} initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-8}} className="py-12"><div className="grid h-14 w-14 place-items-center rounded-2xl bg-slate-950 text-white"><Icon className="h-6 w-6"/></div><div className="mt-8 font-mono text-[10px] text-slate-400">{current.n} / PROCESSO</div><h3 className="mt-2 max-w-lg text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">{current.title}</h3><p className="mt-3 max-w-lg text-sm leading-6 text-slate-500">{current.desc}</p></motion.div></AnimatePresence><div className="flex justify-between border-t border-slate-200 pt-4"><button onClick={()=>setActive((active+3)%4)} className="text-xs font-medium text-slate-500 hover:text-slate-950">← Anterior</button><button onClick={()=>setActive((active+1)%4)} className="inline-flex items-center gap-2 text-xs font-semibold text-slate-950">Próxima etapa <ArrowRight className="h-3.5 w-3.5"/></button></div></div></div></div></section>;
 }
 
 function CommandStory({startPath}:{startPath:string}) {
- return <section id="control-room" className="border-y border-slate-200 bg-[#f8fafc] py-20 sm:py-28"><div className={wrap}><div className="grid gap-10 lg:grid-cols-[.75fr_1.25fr] lg:items-center"><div><Label>Visão de comando</Label><h2 className={h2}>Tudo o que move o negócio. <span className="text-slate-400">Num só painel.</span></h2><p className={`${muted} mt-6 max-w-md`}>Pedidos, catálogo, conversas, campanhas e indicadores deixam de viver em ferramentas isoladas.</p><Link to={startPath} className="mt-8 inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-xs font-semibold text-white transition hover:bg-slate-700">Explorar a plataforma <ArrowRight className="h-4 w-4"/></Link></div><div className="overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-[0_25px_70px_rgba(15,23,42,.08)] sm:p-3"><img src="/media/optimized/operations-audit.webp" alt="Painel de operações da Vendora" loading="lazy" className="w-full rounded-xl object-cover"/><div className="flex flex-wrap items-center justify-between gap-2 px-2 py-3 text-[9px] font-mono uppercase tracking-wider text-slate-400"><span>Workspace Vendora</span><span className="flex items-center gap-2 text-slate-600"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500"/>Dados centralizados</span></div></div></div></div></section>;
+ return <section id="control-room" className="border-y border-slate-200 bg-[#f8fafc] py-20 sm:py-28"><div className={wrap}><div className="grid gap-10 lg:grid-cols-[.75fr_1.25fr] lg:items-center"><div><Label>Visão de comando</Label><h2 className={h2}>O negócio <span className="text-slate-400">num só painel.</span></h2><p className={`${muted} mt-6 max-w-md`}>Pedidos, catálogo, conversas, campanhas e indicadores deixam de viver em ferramentas isoladas.</p><Link to={startPath} className="mt-8 inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-xs font-semibold text-white transition hover:bg-slate-700">Explorar a plataforma <ArrowRight className="h-4 w-4"/></Link></div><div className="overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-[0_25px_70px_rgba(15,23,42,.08)] sm:p-3"><img src="/media/optimized/operations-audit.webp" alt="Painel de operações da Vendora" loading="lazy" className="w-full rounded-xl object-cover"/><div className="flex flex-wrap items-center justify-between gap-2 px-2 py-3 text-[9px] font-mono uppercase tracking-wider text-slate-400"><span>Workspace Vendora</span><span className="flex items-center gap-2 text-slate-600"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500"/>Dados centralizados</span></div></div></div></div></section>;
 }
 
 const faq=[["A IA pode inventar preços ou disponibilidade?","A Vendora foi concebida para consultar os dados do catálogo antes de responder. Quando a informação não está disponível, a resposta deve ser encaminhada ou apresentada como indisponível."],["Preciso de abandonar as ferramentas que já utilizo?","Não necessariamente. A proposta é centralizar a operação e ligar os canais suportados, sem obrigar a substituir todos os sistemas existentes."],["Posso controlar o que cada agente faz?","Sim. Os agentes devem operar dentro das permissões, regras e integrações configuradas para a empresa."],["A Vendora serve apenas para lojas online?","Não. A plataforma destina-se a operações comerciais que precisam de gerir catálogo, conversas, pedidos e canais digitais num fluxo coordenado."],["Como começo?","Crie a sua conta, configure a empresa e ligue os canais e dados necessários. A disponibilidade de cada integração depende das permissões e dos requisitos do respetivo fornecedor."]];
 function FAQStory() {
  const [open,setOpen]=useState<number|null>(0);
- return <section id="faq" className="bg-white py-20 sm:py-28"><div className={wrap}><div className="grid gap-10 lg:grid-cols-[.7fr_1.3fr]"><div><Label>Perguntas frequentes</Label><h2 className={h2}>Clareza antes de começar.</h2><p className={`${muted} mt-6 max-w-sm`}>As respostas essenciais para perceber como a Vendora se integra no dia a dia do seu negócio.</p></div><div className="overflow-hidden rounded-2xl border border-slate-200">{faq.map(([q,a],i)=><div key={q} className="border-b border-slate-200 last:border-0"><button onClick={()=>setOpen(open===i?null:i)} aria-expanded={open===i} className="flex w-full items-center justify-between gap-4 px-5 py-5 text-left sm:px-6"><span className="text-sm font-semibold text-slate-900">{q}</span><span className={`grid h-7 w-7 shrink-0 place-items-center rounded-full border border-slate-200 transition ${open===i?"rotate-180 bg-slate-950 text-white":"text-slate-500"}`}><ChevronDown className="h-4 w-4"/></span></button><AnimatePresence initial={false}>{open===i&&<motion.div initial={{height:0,opacity:0}} animate={{height:"auto",opacity:1}} exit={{height:0,opacity:0}} className="overflow-hidden"><p className="max-w-2xl px-5 pb-6 text-sm leading-6 text-slate-500 sm:px-6">{a}</p></motion.div>}</AnimatePresence></div>)}</div></div></div></section>;
+ return <section id="faq" className="bg-white py-20 sm:py-28"><div className={wrap}><div className="grid gap-10 lg:grid-cols-[.7fr_1.3fr]"><div><Label>Perguntas frequentes</Label><h2 className={h2}>Respostas claras.</h2><p className={`${muted} mt-6 max-w-sm`}>As respostas essenciais para perceber como a Vendora se integra no dia a dia do seu negócio.</p></div><div className="overflow-hidden rounded-2xl border border-slate-200">{faq.map(([q,a],i)=><div key={q} className="border-b border-slate-200 last:border-0"><button onClick={()=>setOpen(open===i?null:i)} aria-expanded={open===i} className="flex w-full items-center justify-between gap-4 px-5 py-5 text-left sm:px-6"><span className="text-sm font-semibold text-slate-900">{q}</span><span className={`grid h-7 w-7 shrink-0 place-items-center rounded-full border border-slate-200 transition ${open===i?"rotate-180 bg-slate-950 text-white":"text-slate-500"}`}><ChevronDown className="h-4 w-4"/></span></button><AnimatePresence initial={false}>{open===i&&<motion.div initial={{height:0,opacity:0}} animate={{height:"auto",opacity:1}} exit={{height:0,opacity:0}} className="overflow-hidden"><p className="max-w-2xl px-5 pb-6 text-sm leading-6 text-slate-500 sm:px-6">{a}</p></motion.div>}</AnimatePresence></div>)}</div></div></div></section>;
 }
 
 function FinalCTA({startPath}:{startPath:string}) {
@@ -450,18 +451,57 @@ function FinalCTA({startPath}:{startPath:string}) {
   <div className="absolute inset-0 -z-10 bg-gradient-to-r from-black/90 via-black/75 to-black/35"/>
   <div className="absolute inset-0 -z-10 bg-gradient-to-t from-black/35 via-transparent to-black/15"/>
   <div className={`${wrap} relative`}>
-   <div className="max-w-3xl"><span className="font-mono text-[10px] uppercase tracking-[.2em] text-white/65">O próximo passo começa aqui</span><h2 className="mt-6 text-balance text-5xl font-semibold leading-[.96] tracking-[-.07em] sm:text-7xl">Dê ao seu negócio <span className="text-white/55">uma forma melhor de trabalhar.</span></h2><p className="mt-7 max-w-xl text-base leading-7 text-white/75">Ligue os seus canais, organize a operação e deixe a Vendora tratar do trabalho repetitivo — com a sua equipa sempre no controlo.</p><Link to={startPath} className="mt-10 inline-flex h-12 items-center gap-3 rounded-full bg-white px-7 text-sm font-semibold text-slate-950 transition hover:bg-slate-200">Começar gratuitamente <ArrowUpRight className="h-4 w-4"/></Link></div>
+   <div className="max-w-3xl"><span className="font-mono text-[10px] uppercase tracking-[.2em] text-white/65">O próximo passo começa aqui</span><h2 className="mt-6 text-balance text-5xl font-semibold leading-[.96] tracking-[-.07em] sm:text-7xl">Trabalhe melhor. <span className="text-white/55">Com menos esforço.</span></h2><p className="mt-7 max-w-xl text-base leading-7 text-white/75">Ligue os seus canais, organize a operação e deixe a Vendora tratar do trabalho repetitivo — com a sua equipa sempre no controlo.</p><Link to={startPath} className="mt-10 inline-flex h-12 items-center gap-3 rounded-full bg-white px-7 text-sm font-semibold text-slate-950 transition hover:bg-slate-200">Começar gratuitamente <ArrowUpRight className="h-4 w-4"/></Link></div>
   </div>
  </section>;
+}
+
+function ScrollStack({ children }: { children: ReactNode }) {
+  const stackRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const root = stackRef.current;
+    if (!root) return;
+
+    const panels = Array.from(root.children).filter(
+      (node): node is HTMLElement => node instanceof HTMLElement && node.tagName === "SECTION",
+    );
+
+    const measure = () => {
+      const desktop = window.matchMedia("(min-width: 1024px)").matches;
+      const availableHeight = window.innerHeight * 0.88;
+
+      panels.forEach((panel, index) => {
+        const canStack = desktop && !panel.classList.contains("vendora-parallax-section") && panel.scrollHeight <= availableHeight;
+        panel.classList.toggle("is-stackable", canStack);
+        panel.style.setProperty("--stack-order", String(index + 1));
+      });
+    };
+
+    const observer = typeof ResizeObserver !== "undefined"
+      ? new ResizeObserver(measure)
+      : null;
+
+    panels.forEach((panel) => observer?.observe(panel));
+    window.addEventListener("resize", measure, { passive: true });
+    measure();
+
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, []);
+
+  return <div ref={stackRef} className="vendora-scroll-stack">{children}</div>;
 }
 
 export function HomeExperience({startPath,onStart}:{startPath:string;onStart:()=>void}) {
  return (
     <>
       <Hero startPath={startPath} onStart={onStart} />
-      <div className="vendora-scroll-stack"><ValueStory /></div>
-      <OverflowHoverStory />
-      <div className="vendora-scroll-stack">
+      <ScrollStack>
+        <ValueStory />
+        <VendoraParallaxStory />
         <WhatsAppStory />
         <ChannelStory />
         <AtmosphereStory />
@@ -471,7 +511,7 @@ export function HomeExperience({startPath,onStart}:{startPath:string;onStart:()=
         <CommandStory startPath={startPath} />
         <FAQStory />
         <FinalCTA startPath={startPath} />
-      </div>
+      </ScrollStack>
     </>
   );
 }

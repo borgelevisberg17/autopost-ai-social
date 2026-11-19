@@ -1053,24 +1053,27 @@ html {
   .product-detail-footer { align-items: flex-start; flex-direction: column; padding: 14px 16px; }
 }
 
-/* Vendora editorial stack: each chapter naturally rises over the previous one. */
+
+/* Editorial page stack: only panels that fit the viewport become sticky. */
+.vendora-scroll-stack > section {
+  position: relative;
+  z-index: var(--stack-order, 1);
+}
 @media (min-width: 1024px) {
-  .vendora-scroll-stack > section {
+  .vendora-scroll-stack > section.is-stackable {
     position: sticky;
     top: 76px;
-    min-height: calc(100svh - 76px);
     isolation: isolate;
     box-shadow: 0 -18px 42px rgba(15, 23, 42, 0.045);
   }
-  .vendora-scroll-stack > section { z-index: 1; }
 }
 @supports (animation-timeline: view()) and (animation-range: exit 0% exit 100%) {
   @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
     @keyframes vendora-stack-under {
       from { transform: translateY(0) scale(1); opacity: 1; }
-      to { transform: translateY(-0.35rem) scale(0.985); opacity: 0.94; }
+      to { transform: translateY(-0.25rem) scale(0.99); opacity: 0.97; }
     }
-    .vendora-scroll-stack > section:not(:last-child) {
+    .vendora-scroll-stack > section.is-stackable:not(:last-child) {
       animation: vendora-stack-under linear both;
       animation-timeline: view();
       animation-range: exit 0% exit 100%;
@@ -1078,14 +1081,27 @@ html {
     }
   }
 }
-@media (max-width: 1023px) {
-  .vendora-scroll-stack > section { position: relative; min-height: 0; }
+
+/* Scroll-driven parallax, independent of pointer hover. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes vendora-image-parallax {
+      from { transform: translate3d(0, 7%, 0) scale(1.04); }
+      to { transform: translate3d(0, -7%, 0) scale(1.04); }
+    }
+    .vendora-parallax-image {
+      animation: vendora-image-parallax linear both;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+      will-change: transform;
+    }
+  }
 }
 @media (prefers-reduced-motion: reduce) {
-  .vendora-scroll-stack > section {
+  .vendora-scroll-stack > section,
+  .vendora-parallax-image {
     animation: none !important;
     transform: none !important;
     opacity: 1 !important;
   }
 }
-
