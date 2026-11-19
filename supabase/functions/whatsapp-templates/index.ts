@@ -110,9 +110,9 @@ Deno.serve(async (req) => {
 
     const result = await response.json().catch(() => ({}));
     if (!response.ok) {
-      const message = result?.error?.message ?? "A Meta recusou a operação de gestão de modelos";
-      const code = result?.error?.code;
-      return json({ error: message, meta_code: code ?? null }, response.status >= 400 && response.status < 500 ? 400 : 502);
+      const metaError = result?.error ?? {};
+      const message = metaError.message ?? "A Meta recusou a operação de gestão de modelos";
+      return json({ error: message, meta_code: metaError.code ?? null, meta_subcode: metaError.error_subcode ?? null, meta_type: metaError.type ?? null, meta_user_title: metaError.error_user_title ?? null, meta_user_message: metaError.error_user_msg ?? null }, response.status >= 400 && response.status < 500 ? 400 : 502);
     }
     return json({ ok: true, ...result });
   } catch (error) {
