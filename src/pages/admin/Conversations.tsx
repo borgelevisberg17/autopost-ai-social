@@ -594,30 +594,29 @@ export default function Conversations() {
   return (
     <AdminLayout title="Conversas" fullBleed>
       <div className="relative flex h-full min-h-0 w-full flex-col overflow-hidden bg-slate-50 text-slate-900">
-        <header className="flex shrink-0 flex-col gap-4 border-b border-slate-200 bg-white px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+        <section className="flex shrink-0 flex-col gap-4 px-4 pt-5 pb-4 sm:px-6 lg:flex-row lg:items-end lg:justify-between lg:px-8">
           <div className="min-w-0">
-            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-700">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            <span className="mb-2 inline-flex items-center gap-1.5 rounded-md border border-emerald-200/80 bg-emerald-50 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-emerald-800">
               Atendimento omnicanal
-            </div>
-            <div className="mt-1 flex flex-wrap items-end gap-x-3 gap-y-1">
-              <h1 className="text-xl font-bold tracking-tight text-slate-950 sm:text-2xl">Conversas</h1>
-              <span className="pb-0.5 text-xs text-slate-500">Gerencie mensagens e acompanhe os atendimentos da sua loja.</span>
-            </div>
+            </span>
+            <h1 className="font-sans text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+              Conversas
+            </h1>
+            <p className="mt-1 text-xs text-slate-500 sm:text-sm">
+              Gerencie mensagens e acompanhe os atendimentos da sua loja.
+            </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="mr-1 flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <div className="inline-flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-xs shadow-2xs">
               <span className={`h-2 w-2 rounded-full ${isConnected ? "bg-emerald-500" : "bg-amber-500"}`} />
-              <div className="min-w-0">
-                <p className="text-[11px] font-semibold leading-tight text-slate-800">WhatsApp Business</p>
-                <p className="max-w-[150px] truncate text-[10px] text-slate-500">
-                  {account?.display_phone || whatsappConnectionLabel(connectionState)}
-                </p>
-              </div>
+              <span className="font-semibold text-slate-700">WhatsApp</span>
+              <span className="max-w-[150px] truncate text-slate-500">
+                {account?.display_phone || whatsappConnectionLabel(connectionState)}
+              </span>
             </div>
             {account && (
-              <div className="flex h-10 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3">
+              <div className="flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3">
                 <Bot className="h-4 w-4 text-violet-600" />
                 <span className="text-xs font-semibold text-slate-700">Agente IA</span>
                 <Switch
@@ -632,7 +631,7 @@ export default function Conversations() {
               variant="outline"
               size="sm"
               onClick={() => setSetupOpen(true)}
-              className="h-10 rounded-lg border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700"
+              className="h-9 rounded-lg border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700"
             >
               <Settings className="mr-1.5 h-3.5 w-3.5" />
               <span className="hidden sm:inline">Canal</span>
@@ -641,13 +640,13 @@ export default function Conversations() {
             <Button
               size="sm"
               onClick={() => setNewChatOpen(true)}
-              className="h-10 rounded-lg bg-slate-950 px-3.5 text-xs font-semibold text-white shadow-sm hover:bg-slate-800"
+              className="h-9 rounded-lg bg-slate-900 px-4 text-xs font-bold text-white shadow-xs hover:bg-slate-800"
             >
               <MessageSquarePlus className="mr-1.5 h-3.5 w-3.5" />
               Nova conversa
             </Button>
           </div>
-        </header>
+        </section>
 
         <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4 sm:p-6 lg:px-8">
           <div className="grid shrink-0 grid-cols-2 gap-3 xl:grid-cols-4">
