@@ -73,7 +73,7 @@ Deno.serve(async (req) => {
         return json({ error: "O modelo precisa de um componente BODY com texto." }, 400);
       }
       const bodyText = bodyComponent.text as string;
-      const variables = [...new Set([...bodyText.matchAll(/\{\{(\\d+)\}\}/g)].map(match => Number(match[1])))].sort((a, b) => a - b);
+      const variables = [...new Set([...bodyText.matchAll(/\{\{(\d+)\}\}/g)].map(match => Number(match[1])))].sort((a, b) => a - b);
       if (variables.length) {
         const maxVariable = variables[variables.length - 1];
         const expected = Array.from({ length: maxVariable }, (_, index) => index + 1);
