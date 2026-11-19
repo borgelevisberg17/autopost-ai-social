@@ -73,15 +73,16 @@ Deno.serve(async (req) => {
         return json({ error: "O modelo precisa de um componente BODY com texto." }, 400);
       }
       const bodyText = bodyComponent.text as string;
-      const variables = [...bodyText.matchAll(/\{\{(\d+)\}\}/g)].map(m => Number(m[1]));
+      const variables = [...new Set([...bodyText.matchAll(/\\{\\{(\\d+)\\}\\}/g)].map(match => Number(match[1])))].sort((a, b) => a - b);
       if (variables.length) {
-        const expected = Array.from({ length: variables.length }, (_, i) => i + 1);
-        if (JSON.stringify([...new Set(variables)].sort((a,b)=>a-b)) !== JSON.stringify(expected)) {
-          return json({ error: "As variáveis devem ser sequenciais: {{1}}, {{2}}, {{3}}..." }, 400);
+        const maxVariable = variables[variables.length - 1];
+        const expected = Array.from({ length: maxVariable }, (_, index) => index + 1);
+        if (JSON.stringify(variables) !== JSON.stringify(expected)) {
+          return json({ error: "As variáveis devem ser sequenciais e começar em {{1}}. Podes repetir uma variável no texto." }, 400);
         }
         const examples = (bodyComponent.example as { body_text?: string[][] } | undefined)?.body_text?.[0];
-        if (!examples || examples.length !== variables.length || examples.some(v => !v?.trim())) {
-          return json({ error: "Indica um exemplo para cada variável do corpo." }, 400);
+        if (!examples || examples.length !== maxVariable || examples.some(value => typeof value !== "string" || !value.trim())) {
+          return json({ error: `Indica exactamente ${maxVariable} exemplo(s), um por variável do corpo.` }, 400);
         }
       }
       const header = input.components.find(c => c.type === "HEADER");
