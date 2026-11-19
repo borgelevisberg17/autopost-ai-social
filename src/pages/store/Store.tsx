@@ -39,6 +39,7 @@ import { MyOrders } from "@/components/store/MyOrders";
 import { StoreFooter } from "@/components/store/StoreFooter";
 import { StoreFAQ } from "@/components/store/StoreFAQ";
 import { NewsletterSignup } from "@/components/store/NewsletterSignup";
+import { useStoreTheme } from "@/hooks/useStoreTheme";
 
 type Company = {
   id: string;
@@ -80,6 +81,10 @@ export default function Store() {
     Company | null | undefined
   >(undefined);
 
+  const theme = useStoreTheme(slug);
+  const sectionOrder = (id: string) => { const i = theme.sections?.findIndex(x => x.id === id) ?? -1; return i < 0 ? 99 : i; };
+  const sectionVisible = (id: string) => theme.sections?.find(x => x.id === id)?.visible ?? true;
+  const sectionStyle = (id: string) => ({ order: sectionOrder(id), display: sectionVisible(id) ? undefined : "none" });
   const [products, setProducts] = useState<Product[]>([]);
   const [storeLoaded, setStoreLoaded] = useState(false);
 
@@ -562,7 +567,7 @@ export default function Store() {
 
   const currentHeroIndex = Math.min(heroIndex, Math.max(featuredProducts.length - 1, 0));
   const heroProduct = featuredProducts[currentHeroIndex];
-  const heroImage = heroProduct?.images?.[0];
+  const heroImage = theme.hero.imageUrl || heroProduct?.images?.[0];
   const changeHero = (direction: number) => {
     if (featuredProducts.length < 2) return;
     setHeroIndex((current) => (current + direction + featuredProducts.length) % featuredProducts.length);
@@ -571,15 +576,13 @@ export default function Store() {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
   return (
-    <div className="storefront min-h-screen bg-white text-[#111214]">
+    <div className="storefront storefront--themed min-h-screen" style={theme.cssVars}>
       {/* Top Announcement Bar */}
-      <div className="bg-[#0b0c0e] text-white/90 text-xs py-2 px-4 sm:px-8 flex flex-wrap items-center justify-between gap-2 border-b border-white/10">
+      {theme.announcement.enabled && <div className="store-announcement text-xs py-2 px-4 sm:px-8 flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-[11px] sm:text-xs">
           <span className="flex items-center gap-1.5">
-            <Truck className="h-3.5 w-3.5" /> Entrega para todo Angola
+            <Truck className="h-3.5 w-3.5" /> {theme.announcement.text}
           </span>
-          <span className="opacity-40">•</span>
-          <span>Compra segura e confiável</span>
         </div>
         <div className="flex items-center gap-4 text-[11px] sm:text-xs text-white/70">
           <button type="button" onClick={() => scrollTo("sobre")} className="hover:text-white transition">
@@ -594,7 +597,7 @@ export default function Store() {
             Contacto
           </button>
         </div>
-      </div>
+      </div>}
       <header className="store-header">
         <div className="store-header__bar">
           <button
@@ -603,8 +606,8 @@ export default function Store() {
             aria-label={`Ir para o início da loja ${company.name}`}
             className="store-brand"
           >
-            <span className="store-brand__mark">{company.name.charAt(0).toUpperCase()}</span>
-            <span className="store-brand__name">{company.name}</span>
+            {theme.brand.logoUrl ? <img src={theme.brand.logoUrl} alt="" className="store-brand__logo" /> : <span className="store-brand__mark">{(theme.brand.displayName || company.name).charAt(0).toUpperCase()}</span>}
+            <span className="store-brand__name">{theme.brand.displayName || company.name}</span>
           </button>
 
           <nav aria-label="Navegação principal" className="store-nav">
@@ -671,8 +674,8 @@ export default function Store() {
         </nav>
       </header>
 
-      <main>
-        <section id="inicio" className="store-hero" aria-label={`Destaques de ${company.name}`}>
+      <main className="flex flex-col">
+        <section id="inicio" style={sectionStyle("hero")} className="store-hero" aria-label={`Destaques de ${company.name}`}>
           <div className="store-hero__visual" aria-hidden={!heroImage}>
             {heroImage ? (
               <AnimatePresence mode="wait">
@@ -709,15 +712,14 @@ export default function Store() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <span>{company.name}</span><i />
+              <span>{theme.hero.eyebrow || theme.brand.displayName || company.name}</span><i />
             </motion.p>
             <motion.h1
               initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
             >
-              <span className="store-hero__headline-line">Produtos que</span>
-              <span className="store-hero__headline-line store-hero__headline-line--final">fazem sentido</span>
+              {(() => { const w = theme.hero.title.trim().split(/\s+/); const cut = Math.max(1, Math.ceil(w.length / 2)); return <><span className="store-hero__headline-line">{w.slice(0, cut).join(" ")}</span>{w.length > 1 && <span className="store-hero__headline-line store-hero__headline-line--final">{w.slice(cut).join(" ")}</span>}</>; })()}
             </motion.h1>
             <motion.p
               className="store-hero__copy"
@@ -725,8 +727,7 @@ export default function Store() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              {company.description || "Estilo, qualidade e escolhas feitas para si."}
-              <span> Descubra a coleção e encontre os seus favoritos.</span>
+              {theme.hero.subtitle || company.description || "Estilo, qualidade e escolhas feitas para si."}
             </motion.p>
             <motion.div
               className="store-hero__actions"
@@ -735,7 +736,7 @@ export default function Store() {
               transition={{ duration: 0.6, delay: 0.3 }}
             >
               <Button onClick={() => scrollTo("produtos")} className="store-hero__primary">
-                Explorar produtos <ArrowRight className="ml-2 h-[18px] w-[18px]" />
+                {theme.hero.cta || "Explorar produtos"} <ArrowRight className="ml-2 h-[18px] w-[18px]" />
               </Button>
               <button type="button" onClick={() => { setCategory("Todos"); setShowAllProducts(true); scrollTo("produtos"); }} className="store-hero__secondary">
                 <span className="store-hero__play" aria-hidden="true"><Play className="h-4 w-4" fill="currentColor" /></span>
@@ -754,7 +755,7 @@ export default function Store() {
         </section>
 
         {categoryItems.length > 0 && (
-          <section id="categorias" className="store-category-rail" aria-label="Explorar categorias">
+          <section id="categorias" style={sectionStyle("categories")} className="store-category-rail" aria-label="Explorar categorias">
             <div className="store-category-rail__track">
               {categoryItems.map((item) => (
                 <motion.button
@@ -779,7 +780,7 @@ export default function Store() {
 
         <MyOrders slug={slug} />
 
-        <section id="produtos" className="store-products">
+        <section id="produtos" style={sectionStyle("products")} className="store-products">
           <div className="store-products__heading">
             <div>
               <h2><span aria-hidden="true" />{search.trim() ? "Resultados da pesquisa" : category !== "Todos" ? category : showAllProducts ? "Todos os produtos" : "Produtos em Destaque"}</h2>
@@ -969,27 +970,26 @@ export default function Store() {
           )}
         </section>
 
-        <section id="sobre" className="store-marketing-banner" aria-label="Destaque da coleção">
+        <section id="sobre" style={sectionStyle("banner")} className="store-marketing-banner" aria-label="Destaque da coleção">
           <div className="store-marketing-banner__content">
             <h2 className="store-marketing-banner__title">
-              Estilo em<br />
-              cada passo.
+              {theme.banner.title}
             </h2>
             <p className="store-marketing-banner__subtitle">
-              Qualidade, conforto e muito mais.
+              {theme.banner.subtitle}
             </p>
             <button
               type="button"
               onClick={() => scrollTo("produtos")}
               className="store-marketing-banner__cta"
             >
-              Explorar produtos <ArrowRight className="h-4 w-4" />
+              {theme.banner.cta || "Explorar produtos"} <ArrowRight className="h-4 w-4" />
             </button>
           </div>
           <div className="store-marketing-banner__visual">
             <img
               src={
-                heroImage ||
+                theme.banner.imageUrl || heroImage ||
                 "https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=1200&q=80"
               }
               alt={company.name}
@@ -998,11 +998,18 @@ export default function Store() {
           </div>
         </section>
 
-        {/* FAQs */}
+        {theme.testimonials.length > 0 && <section style={sectionStyle("testimonials")} className="store-themed-block" aria-label="Testemunhos">
+          <h2>O que dizem os clientes</h2>
+          <div className="store-themed-block__grid">{theme.testimonials.map((t, i) => <figure key={i}><blockquote>“{t.quote}”</blockquote><figcaption>{t.name}</figcaption></figure>)}</div>
+        </section>}
+        {theme.textBlock.body && <section style={sectionStyle("text")} className="store-themed-block"><h2>{theme.textBlock.title}</h2><p className="whitespace-pre-line">{theme.textBlock.body}</p></section>}
+        <section style={sectionStyle("newsletter")} className="store-themed-block store-themed-block--narrow"><h2>Receba novidades e promoções</h2><NewsletterSignup slug={company.slug} /></section>
+        <div style={sectionStyle("faq")}>
         <StoreFAQ
           company={company}
           onContactClick={() => scrollTo("contacto")}
         />
+        </div>
       </main>
 
       {/* PRODUCT DETAIL */}
@@ -1611,7 +1618,6 @@ export default function Store() {
       </AnimatePresence>
 
       {/* FOOTER */}
-      <section className="mx-auto max-w-xl px-4 py-10 space-y-3"><h2 className="text-lg font-semibold">Receba novidades e promoções</h2><NewsletterSignup slug={company.slug} /></section>
 
       <StoreFooter
         company={company}

@@ -1118,3 +1118,21 @@ html {
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 }
+
+/* Per-store theme (set by the store editor) */
+.storefront--themed { background: var(--store-bg, #fff); color: var(--store-ink); font-family: var(--store-font-body); }
+.storefront--themed h1, .storefront--themed h2, .storefront--themed h3, .storefront--themed .store-brand__name { font-family: var(--store-font-heading); }
+.storefront--themed .store-header { background: var(--store-bg, #fff); }
+.storefront--themed .store-announcement { background: var(--store-accent); color: var(--store-bg); }
+.storefront--themed .store-announcement button { color: inherit; opacity: .8; }
+.storefront--themed .store-brand__logo { height: 36px; width: auto; max-width: 140px; object-fit: contain; }
+.storefront--themed .store-hero__primary, .storefront--themed .store-marketing-banner__cta { background: var(--store-blue); border-radius: var(--store-radius); }
+.storefront--themed .store-product-card, .storefront--themed .store-category-card { border-radius: var(--store-radius); }
+.store-themed-block { width: min(1200px, calc(100% - 32px)); margin: 48px auto; }
+.store-themed-block--narrow { width: min(560px, calc(100% - 32px)); }
+.store-themed-block h2 { font-size: 1.6rem; font-weight: 700; margin-bottom: 16px; }
+.store-themed-block p { color: var(--store-muted); line-height: 1.7; }
+.store-themed-block__grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.store-themed-block figure { border: 1px solid var(--store-line); border-radius: var(--store-radius); padding: 20px; }
+.store-themed-block blockquote { margin-bottom: 12px; }
+.store-themed-block figcaption { color: var(--store-muted); font-size: .875rem; font-weight: 600; }

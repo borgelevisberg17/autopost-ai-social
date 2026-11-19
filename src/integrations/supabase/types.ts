@@ -1614,6 +1614,70 @@ export type Database = {
           },
         ]
       }
+      store_theme_versions: {
+        Row: {
+          company_id: string
+          created_at: string
+          id: string
+          published_by: string | null
+          theme: Json
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          id?: string
+          published_by?: string | null
+          theme: Json
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          id?: string
+          published_by?: string | null
+          theme?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_theme_versions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      store_themes: {
+        Row: {
+          company_id: string
+          draft: Json
+          published: Json | null
+          published_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          draft?: Json
+          published?: Json | null
+          published_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          draft?: Json
+          published?: Json | null
+          published_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_themes_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscription_plans: {
         Row: {
           currency: string
@@ -1954,6 +2018,7 @@ export type Database = {
           total_companies: number
         }[]
       }
+      get_store_theme: { Args: { _slug: string }; Returns: Json }
       has_platform_admin: { Args: { _user: string }; Returns: boolean }
       is_company_admin: {
         Args: { _company: string; _user: string }
@@ -1984,6 +2049,7 @@ export type Database = {
         Returns: undefined
       }
       platform_overview: { Args: never; Returns: Json }
+      publish_store_theme: { Args: { _company: string }; Returns: Json }
       redeem_company_coupon: {
         Args: { _code: string; _company: string }
         Returns: Json
