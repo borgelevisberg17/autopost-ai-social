@@ -183,6 +183,14 @@ function isSameDay(d1: string, d2: string) {
   );
 }
 
+function normalizeSearch(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase("pt-PT")
+    .trim();
+}
+
 export default function Conversations() {
   const { company } = useCompany();
   const accountQuery = useWhatsAppAccount(company?.id);
@@ -382,13 +390,14 @@ export default function Conversations() {
 
   // Filter list
   const filteredConvos = useMemo(() => {
-    const searchTerms = search.toLocaleLowerCase("pt-PT").trim();
+    const searchTerms = normalizeSearch(search);
+    const numericSearch = search.replace(/\D/g, "");
     return convos.filter((c) => {
       const matchesSearch =
         !searchTerms ||
-        (c.customer_name ?? "").toLocaleLowerCase("pt-PT").includes(searchTerms) ||
-        c.customer_phone.replace(/\D/g, "").includes(searchTerms.replace(/\D/g, "")) ||
-        (latestMsgs[c.id]?.body ?? "").toLocaleLowerCase("pt-PT").includes(searchTerms);
+        normalizeSearch(c.customer_name ?? "").includes(searchTerms) ||
+        (numericSearch.length > 0 && c.customer_phone.replace(/\D/g, "").includes(numericSearch)) ||
+        normalizeSearch(latestMsgs[c.id]?.body ?? "").includes(searchTerms);
 
       if (!matchesSearch) return false;
       if (filter === "unread") return c.status !== "closed" && latestMsgs[c.id]?.direction === "in";
