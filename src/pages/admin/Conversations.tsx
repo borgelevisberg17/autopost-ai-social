@@ -592,7 +592,7 @@ export default function Conversations() {
   const isConnected = connectionState === "active";
 
   return (
-    <AdminLayout title="Conversas">
+    <AdminLayout title="Conversas" fullBleed={false}>
       <div className="relative flex min-h-[680px] w-full flex-col gap-6 bg-transparent text-slate-900">
         <header className="flex shrink-0 flex-col gap-4 pb-1 lg:flex-row lg:items-end lg:justify-between">
           <section className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -840,7 +840,7 @@ export default function Conversations() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.16 }}
-              className="absolute inset-0 z-40 bg-slate-950/35 p-0 backdrop-blur-[2px] sm:p-3 lg:p-5"
+              className="fixed inset-0 z-[70] bg-slate-950/45 p-0 backdrop-blur-[3px] sm:p-3 lg:p-5"
               onMouseDown={(event) => {
                 if (event.target === event.currentTarget) {
                   setActive(null);
@@ -853,7 +853,7 @@ export default function Conversations() {
                 animate={{ y: 0, scale: 1 }}
                 exit={{ y: 10, scale: 0.99 }}
                 transition={{ type: "spring", damping: 28, stiffness: 280 }}
-                className="relative mx-auto flex h-full max-w-[1500px] min-w-0 overflow-hidden rounded-none border border-slate-200 bg-white shadow-2xl sm:rounded-2xl"
+                className="relative mx-auto flex h-full min-h-0 w-full max-w-[1500px] min-w-0 overflow-hidden rounded-none border border-slate-200 bg-white shadow-2xl sm:rounded-2xl"
                 aria-label="Mensageiro da conversa"
               >
                 <div className="flex min-w-0 flex-1 flex-col">
