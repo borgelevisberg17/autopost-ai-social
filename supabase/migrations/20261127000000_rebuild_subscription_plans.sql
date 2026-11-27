@@ -28,10 +28,10 @@ VALUES
   (
     'basic',
     'Essencial',
-    19,
+    39,
     'USD',
-    350,
-    300,
+    500,
+    400,
     ARRAY['marketing', 'analytics'],
     true,
     now()
@@ -39,10 +39,10 @@ VALUES
   (
     'pro',
     'Pro Autónoma',
-    49,
+    99,
     'USD',
+    5000,
     3000,
-    2000,
     ARRAY['marketing', 'analytics', 'sales', 'whatsapp'],
     true,
     now()
@@ -53,7 +53,7 @@ VALUES
     NULL,
     'USD',
     25000,
-    10000,
+    15000,
     ARRAY['marketing', 'analytics', 'sales', 'whatsapp'],
     true,
     now()

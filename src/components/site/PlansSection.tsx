@@ -45,7 +45,7 @@ const COMPARISON_ROWS: Array<{
   },
   {
     label: "Motor IA da Loja (Copiloto)",
-    values: { free: "15/mês", basic: "300/mês", pro: "2.000/mês", enterprise: "10.000/mês" },
+    values: { free: "15/mês", basic: "400/mês", pro: "3.000/mês", enterprise: "15.000/mês" },
   },
   {
     label: "Analytics & Relatórios IA",
