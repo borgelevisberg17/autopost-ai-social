@@ -57,6 +57,7 @@ import {
   type EditorNodeId,
 } from "@/components/admin/store-editor/SectionInspector";
 import { TemplateGalleryModal } from "@/components/admin/store-editor/TemplateGalleryModal";
+import { AiStoreCopilot } from "@/components/admin/store-editor/AiStoreCopilot";
 
 type LeftTab = "sections" | "theme" | "versions";
 type Viewport = "desktop" | "tablet" | "mobile";
@@ -106,6 +107,7 @@ export default function StoreEditor() {
   const [viewport, setViewport] = useState<Viewport>("desktop");
   const [previewPage, setPreviewPage] = useState<PreviewPage>("home");
   const [galleryOpen, setGalleryOpen] = useState(false);
+  const [aiOpen, setAiOpen] = useState(false);
   const [mobileView, setMobileView] = useState<"editor" | "preview">("editor");
   const [previewKey, setPreviewKey] = useState(0);
 
@@ -468,6 +470,22 @@ export default function StoreEditor() {
           >
             <Sparkles className="mr-1.5 h-3.5 w-3.5 text-emerald-600" />
             Templates
+          </Button>
+
+          <Button
+            type="button"
+            size="sm"
+            variant={aiOpen ? "default" : "outline"}
+            onClick={() => setAiOpen((v) => !v)}
+            className={cn(
+              "h-8 px-2.5 text-xs font-semibold",
+              aiOpen
+                ? "bg-emerald-600 hover:bg-emerald-500 text-white"
+                : "border-emerald-200 bg-emerald-50/70 text-emerald-800 hover:bg-emerald-100"
+            )}
+          >
+            <Sparkles className="mr-1.5 h-3.5 w-3.5" />
+            Criar com IA
           </Button>
 
           <div className="hidden lg:flex items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 p-1">
@@ -939,15 +957,26 @@ export default function StoreEditor() {
         </main>
 
         {/* Right Contextual Inspector (Desktop xl+) */}
-        <aside className="hidden xl:flex w-[330px] shrink-0 flex-col border-l border-slate-200 bg-white overflow-y-auto p-4">
-          <SectionInspector
-            selected={selectedNode}
-            theme={draft}
-            onChange={updateDraft}
-            canToggleSections={access.sections}
-            companyName={company.name}
-          />
-        </aside>
+        {!aiOpen && (
+          <aside className="hidden xl:flex w-[330px] shrink-0 flex-col border-l border-slate-200 bg-white overflow-y-auto p-4">
+            <SectionInspector
+              selected={selectedNode}
+              theme={draft}
+              onChange={updateDraft}
+              canToggleSections={access.sections}
+              companyName={company.name}
+            />
+          </aside>
+        )}
+
+        <AiStoreCopilot
+          open={aiOpen}
+          onClose={() => setAiOpen(false)}
+          companyId={company.id}
+          companyName={company.name}
+          currentTheme={draft}
+          onApplyTheme={updateDraft}
+        />
       </div>
 
       <TemplateGalleryModal
