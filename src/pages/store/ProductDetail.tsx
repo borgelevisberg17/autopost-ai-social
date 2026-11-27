@@ -27,6 +27,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatMoney } from "@/lib/format";
 import { toast } from "sonner";
 import { StoreFooter } from "@/components/store/StoreFooter";
+import { useStoreTheme } from "@/hooks/useStoreTheme";
 
 type StoreCompany = {
   id: string;
@@ -62,6 +63,7 @@ const readCart = (slug: string): Record<string, number> => {
 export default function ProductDetail() {
   const { slug = "", productId = "" } = useParams();
   const navigate = useNavigate();
+  const theme = useStoreTheme(slug);
   const [company, setCompany] = useState<StoreCompany | null>(null);
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
@@ -258,7 +260,7 @@ export default function ProductDetail() {
   const displayImages = images.length > 0 ? images : [];
 
   return (
-    <div className="storefront product-detail-page bg-white min-h-screen text-[#111214]">
+    <div className="storefront storefront--themed product-detail-page min-h-screen" style={theme.cssVars}>
       {/* 1. TOP ANNOUNCEMENT BAR (matches reference exactly) */}
       <div className="bg-[#0b0c0e] text-white/90 text-xs py-2 px-4 sm:px-8 flex flex-wrap items-center justify-between gap-2 border-b border-white/10">
         <div className="flex items-center gap-2 text-[11px] sm:text-xs">

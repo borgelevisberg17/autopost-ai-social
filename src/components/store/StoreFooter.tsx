@@ -18,9 +18,17 @@ export type StoreFooterCompany = {
   whatsapp?: string | null;
 };
 
+export type StoreFooterTheme = {
+  about?: string;
+  instagram?: string;
+  facebook?: string;
+  tiktok?: string;
+};
+
 interface StoreFooterProps {
   company: StoreFooterCompany;
   categories?: { name: string }[];
+  footerTheme?: StoreFooterTheme;
   onCategoryClick?: (name: string) => void;
   onNavigateSection?: (sectionId: string) => void;
 }
@@ -79,6 +87,7 @@ export function MulticaixaExpressLogo({ className }: { className?: string }) {
 export function StoreFooter({
   company,
   categories = [],
+  footerTheme,
   onCategoryClick,
   onNavigateSection,
 }: StoreFooterProps) {
@@ -190,9 +199,45 @@ export function StoreFooter({
             </div>
 
             <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed max-w-sm">
-              {company.description ||
+              {footerTheme?.about?.trim() ||
+                company.description ||
                 "A sua referência em calçados, sneakers e estilo urbano. Curadoria selecionada para oferecer estilo, durabilidade e conforto em cada passo."}
             </p>
+
+            {(footerTheme?.instagram || footerTheme?.facebook || footerTheme?.tiktok) && (
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                {footerTheme.instagram && (
+                  <a
+                    href={footerTheme.instagram}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[11px] font-medium text-neutral-300 hover:border-white/30 hover:text-white transition"
+                  >
+                    Instagram
+                  </a>
+                )}
+                {footerTheme.facebook && (
+                  <a
+                    href={footerTheme.facebook}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[11px] font-medium text-neutral-300 hover:border-white/30 hover:text-white transition"
+                  >
+                    Facebook
+                  </a>
+                )}
+                {footerTheme.tiktok && (
+                  <a
+                    href={footerTheme.tiktok}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[11px] font-medium text-neutral-300 hover:border-white/30 hover:text-white transition"
+                  >
+                    TikTok
+                  </a>
+                )}
+              </div>
+            )}
 
             <div className="flex items-center gap-2 pt-1 text-xs text-neutral-400">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />

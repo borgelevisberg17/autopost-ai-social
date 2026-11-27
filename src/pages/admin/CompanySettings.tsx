@@ -1754,7 +1754,15 @@ export default function CompanySettings() {
                 ))}
               </nav>
 
-              <div className="mt-6 border-t border-slate-200/80 pt-4">
+              <div className="mt-6 space-y-1 border-t border-slate-200/80 pt-4">
+                <Link
+                  to="/admin/editor-loja"
+                  className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-50"
+                >
+                  <Sparkles className="h-4 w-4 text-emerald-600" />
+                  Editor Visual da Loja
+                  <ArrowUpRight className="ml-auto h-3.5 w-3.5" />
+                </Link>
                 <Link
                   to={`/loja/${company?.slug}`}
                   target="_blank"

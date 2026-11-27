@@ -882,15 +882,23 @@ export default function Channels() {
                       <p className="mt-1 max-w-xl text-xs leading-relaxed text-slate-600">
                         A sua loja opera na infraestrutura de alta disponibilidade da Vendora com catálogo partilhado, checkout nativo e pedidos em tempo real. Não requer configuração adicional.
                       </p>
-                      <a
-                        href={`/loja/${company?.slug ?? ""}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="mt-3.5 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 hover:text-emerald-800"
-                      >
-                        Abrir loja pública{" "}
-                        <ExternalLink className="h-3.5 w-3.5" />
-                      </a>
+                      <div className="mt-3.5 flex flex-wrap items-center gap-4">
+                        <a
+                          href={`/loja/${company?.slug ?? ""}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 hover:text-emerald-800"
+                        >
+                          Abrir loja pública{" "}
+                          <ExternalLink className="h-3.5 w-3.5" />
+                        </a>
+                        <Link
+                          to="/admin/editor-loja"
+                          className="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-800 transition"
+                        >
+                          Personalizar UI da Loja
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 ) : connectionsLoading ? (

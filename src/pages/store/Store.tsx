@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -39,7 +39,7 @@ import { MyOrders } from "@/components/store/MyOrders";
 import { StoreFooter } from "@/components/store/StoreFooter";
 import { StoreFAQ } from "@/components/store/StoreFAQ";
 import { NewsletterSignup } from "@/components/store/NewsletterSignup";
-import { useStoreTheme } from "@/hooks/useStoreTheme";
+import { useStoreTheme, type PreviewPage } from "@/hooks/useStoreTheme";
 
 type Company = {
   id: string;
@@ -81,10 +81,6 @@ export default function Store() {
     Company | null | undefined
   >(undefined);
 
-  const theme = useStoreTheme(slug);
-  const sectionOrder = (id: string) => { const i = theme.sections?.findIndex(x => x.id === id) ?? -1; return i < 0 ? 99 : i; };
-  const sectionVisible = (id: string) => theme.sections?.find(x => x.id === id)?.visible ?? true;
-  const sectionStyle = (id: string) => ({ order: sectionOrder(id), display: sectionVisible(id) ? undefined : "none" });
   const [products, setProducts] = useState<Product[]>([]);
   const [storeLoaded, setStoreLoaded] = useState(false);
 
@@ -120,6 +116,48 @@ export default function Store() {
 
   const [productOpen, setProductOpen] =
     useState<Product | null>(null);
+
+  const handlePreviewPage = useCallback(
+    (page: PreviewPage) => {
+      if (page === "home") {
+        setCartOpen(false);
+        setProductOpen(null);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else if (page === "product") {
+        setCartOpen(false);
+        setProductOpen((prev) => prev ?? products[0] ?? null);
+      } else if (page === "cart") {
+        setProductOpen(null);
+        setCartStep("cart");
+        setCartOpen(true);
+      } else if (page === "checkout") {
+        setProductOpen(null);
+        setCartStep("checkout");
+        setCartOpen(true);
+      } else if (page === "faq") {
+        setCartOpen(false);
+        setProductOpen(null);
+        document.getElementById("faq")?.scrollIntoView({ behavior: "smooth" });
+      }
+    },
+    [products],
+  );
+
+  const theme = useStoreTheme(slug, handlePreviewPage);
+  const sectionOrder = (id: string) => { const i = theme.sections?.findIndex(x => x.id === id) ?? -1; return i < 0 ? 99 : i; };
+  const sectionVisible = (id: string) => theme.sections?.find(x => x.id === id)?.visible ?? true;
+  const sectionStyle = (id: string) => ({ order: sectionOrder(id), display: sectionVisible(id) ? undefined : "none" });
+  const previewProps = (id: string, label: string) =>
+    theme.isPreview
+      ? {
+          "data-preview-section": label,
+          "data-preview-active": theme.activeSection === id ? "true" : undefined,
+          onClickCapture: (e: React.MouseEvent) => {
+            if ((e.target as HTMLElement).closest("button, a, input")) return;
+            theme.notifySelectSection(id);
+          },
+        }
+      : {};
   const [favorites, setFavorites] = useState<string[]>([]);
   const [heroIndex, setHeroIndex] = useState(0);
 
@@ -578,7 +616,7 @@ export default function Store() {
   return (
     <div className="storefront storefront--themed min-h-screen" style={theme.cssVars}>
       {/* Top Announcement Bar */}
-      {theme.announcement.enabled && <div className="store-announcement text-xs py-2 px-4 sm:px-8 flex flex-wrap items-center justify-between gap-2">
+      {theme.announcement.enabled && <div {...previewProps("announcement", "Barra de Anúncios")} className="store-announcement text-xs py-2 px-4 sm:px-8 flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-[11px] sm:text-xs">
           <span className="flex items-center gap-1.5">
             <Truck className="h-3.5 w-3.5" /> {theme.announcement.text}
@@ -675,7 +713,7 @@ export default function Store() {
       </header>
 
       <main className="flex flex-col">
-        <section id="inicio" style={sectionStyle("hero")} className="store-hero" aria-label={`Destaques de ${company.name}`}>
+        <section id="inicio" style={sectionStyle("hero")} {...previewProps("hero", "Banner principal")} className="store-hero" aria-label={`Destaques de ${company.name}`}>
           <div className="store-hero__visual" aria-hidden={!heroImage}>
             {heroImage ? (
               <AnimatePresence mode="wait">
@@ -755,7 +793,7 @@ export default function Store() {
         </section>
 
         {categoryItems.length > 0 && (
-          <section id="categorias" style={sectionStyle("categories")} className="store-category-rail" aria-label="Explorar categorias">
+          <section id="categorias" style={sectionStyle("categories")} {...previewProps("categories", "Categorias")} className="store-category-rail" aria-label="Explorar categorias">
             <div className="store-category-rail__track">
               {categoryItems.map((item) => (
                 <motion.button
@@ -780,7 +818,7 @@ export default function Store() {
 
         <MyOrders slug={slug} />
 
-        <section id="produtos" style={sectionStyle("products")} className="store-products">
+        <section id="produtos" style={sectionStyle("products")} {...previewProps("products", "Produtos")} className="store-products">
           <div className="store-products__heading">
             <div>
               <h2><span aria-hidden="true" />{search.trim() ? "Resultados da pesquisa" : category !== "Todos" ? category : showAllProducts ? "Todos os produtos" : "Produtos em Destaque"}</h2>
@@ -970,7 +1008,7 @@ export default function Store() {
           )}
         </section>
 
-        <section id="sobre" style={sectionStyle("banner")} className="store-marketing-banner" aria-label="Destaque da coleção">
+        <section id="sobre" style={sectionStyle("banner")} {...previewProps("banner", "Promoção / Sobre")} className="store-marketing-banner" aria-label="Destaque da coleção">
           <div className="store-marketing-banner__content">
             <h2 className="store-marketing-banner__title">
               {theme.banner.title}
@@ -998,13 +1036,13 @@ export default function Store() {
           </div>
         </section>
 
-        {theme.testimonials.length > 0 && <section style={sectionStyle("testimonials")} className="store-themed-block" aria-label="Testemunhos">
+        {theme.testimonials.length > 0 && <section id="testemunhos" style={sectionStyle("testimonials")} {...previewProps("testimonials", "Testemunhos")} className="store-themed-block" aria-label="Testemunhos">
           <h2>O que dizem os clientes</h2>
           <div className="store-themed-block__grid">{theme.testimonials.map((t, i) => <figure key={i}><blockquote>“{t.quote}”</blockquote><figcaption>{t.name}</figcaption></figure>)}</div>
         </section>}
-        {theme.textBlock.body && <section style={sectionStyle("text")} className="store-themed-block"><h2>{theme.textBlock.title}</h2><p className="whitespace-pre-line">{theme.textBlock.body}</p></section>}
-        <section style={sectionStyle("newsletter")} className="store-themed-block store-themed-block--narrow"><h2>Receba novidades e promoções</h2><NewsletterSignup slug={company.slug} /></section>
-        <div style={sectionStyle("faq")}>
+        {theme.textBlock.body && <section id="texto" style={sectionStyle("text")} {...previewProps("text", "Texto livre")} className="store-themed-block"><h2>{theme.textBlock.title}</h2><p className="whitespace-pre-line">{theme.textBlock.body}</p></section>}
+        <section id="newsletter" style={sectionStyle("newsletter")} {...previewProps("newsletter", "Newsletter")} className="store-themed-block store-themed-block--narrow"><h2>Receba novidades e promoções</h2><NewsletterSignup slug={company.slug} /></section>
+        <div style={sectionStyle("faq")} {...previewProps("faq", "FAQ")}>
         <StoreFAQ
           company={company}
           onContactClick={() => scrollTo("contacto")}
@@ -1622,6 +1660,7 @@ export default function Store() {
       <StoreFooter
         company={company}
         categories={categoryItems}
+        footerTheme={theme.footer}
         onCategoryClick={(catName) => {
           setCategory(catName);
           scrollTo("produtos");

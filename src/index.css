@@ -1136,3 +1136,23 @@ html {
 .store-themed-block figure { border: 1px solid var(--store-line); border-radius: var(--store-radius); padding: 20px; }
 .store-themed-block blockquote { margin-bottom: 12px; }
 .store-themed-block figcaption { color: var(--store-muted); font-size: .875rem; font-weight: 600; }
+[data-preview-section] { position: relative; transition: outline-color 150ms ease; }
+[data-preview-section]:hover { outline: 2px dashed rgba(37, 99, 235, 0.65); outline-offset: -2px; cursor: pointer; }
+[data-preview-active="true"] { outline: 2px solid #2563eb !important; outline-offset: -2px; }
+[data-preview-section]:hover::before,
+[data-preview-active="true"]::before {
+  content: attr(data-preview-section);
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 40;
+  background: #2563eb;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  pointer-events: none;
+}
