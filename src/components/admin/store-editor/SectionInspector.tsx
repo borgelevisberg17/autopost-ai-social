@@ -1,11 +1,14 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import {
+  ExternalLink,
   Eye,
   EyeOff,
   Image as ImageIcon,
   Layers,
   Plus,
   Trash2,
+  X,
 } from "lucide-react";
 import { SECTION_LABELS, type SectionId, type StoreTheme } from "@/lib/storeTheme";
 import { Input } from "@/components/ui/input";
@@ -21,7 +24,35 @@ interface SectionInspectorProps {
   onChange: (next: StoreTheme) => void;
   canToggleSections: boolean;
   companyName: string;
+  productImages?: string[];
 }
+
+const CURATED_IMAGES = [
+  {
+    label: "Minimalista",
+    url: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1400&q=80",
+  },
+  {
+    label: "Luxo Interiores",
+    url: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1400&q=80",
+  },
+  {
+    label: "Moda & Atelier",
+    url: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1400&q=80",
+  },
+  {
+    label: "Streetwear",
+    url: "https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=1400&q=80",
+  },
+  {
+    label: "Tecnologia",
+    url: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1400&q=80",
+  },
+  {
+    label: "Orgânico",
+    url: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1400&q=80",
+  },
+];
 
 const NODE_META: Record<EditorNodeId, { title: string; subtitle: string }> = {
   announcement: {
@@ -74,19 +105,43 @@ function ImageUrlInput({
   label,
   value,
   onChange,
+  productImages = [],
   placeholder = "https://...",
 }: {
   label: string;
   value: string;
   onChange: (val: string) => void;
+  productImages?: string[];
   placeholder?: string;
 }) {
   const [broken, setBroken] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const validHttps = !value || value.startsWith("https://");
 
   return (
-    <div className="space-y-1.5">
-      <label className="block text-[11px] font-semibold text-slate-700">{label}</label>
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <label className="block text-[11px] font-semibold text-slate-700">{label}</label>
+        <div className="flex items-center gap-2">
+          {value && (
+            <button
+              type="button"
+              onClick={() => onChange("")}
+              className="text-[10px] font-medium text-slate-400 hover:text-rose-600 flex items-center gap-0.5"
+            >
+              <X className="h-3 w-3" /> Limpar
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => setPickerOpen((v) => !v)}
+            className="text-[10px] font-semibold text-emerald-700 hover:text-emerald-800"
+          >
+            {pickerOpen ? "Fechar galeria" : "Escolher imagem"}
+          </button>
+        </div>
+      </div>
+
       <Input
         value={value}
         onChange={(e) => {
@@ -96,11 +151,66 @@ function ImageUrlInput({
         placeholder={placeholder}
         className="h-9 text-xs font-mono"
       />
+
       {!validHttps && (
         <p className="text-[11px] text-rose-600">
           Use um link externo seguro iniciado por https://
         </p>
       )}
+
+      {pickerOpen && (
+        <div className="rounded-xl border border-slate-200 bg-slate-50 p-2.5 space-y-2.5">
+          {productImages.length > 0 && (
+            <div>
+              <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                Dos seus produtos
+              </p>
+              <div className="grid grid-cols-4 gap-1.5">
+                {productImages.slice(0, 8).map((imgUrl, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => {
+                      setBroken(false);
+                      onChange(imgUrl);
+                      setPickerOpen(false);
+                    }}
+                    className="overflow-hidden rounded-lg border border-slate-200 bg-white aspect-square hover:ring-2 hover:ring-slate-900 transition"
+                  >
+                    <img src={imgUrl} alt="" className="h-full w-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div>
+            <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              Galeria curada
+            </p>
+            <div className="grid grid-cols-3 gap-1.5">
+              {CURATED_IMAGES.map((item) => (
+                <button
+                  key={item.url}
+                  type="button"
+                  onClick={() => {
+                    setBroken(false);
+                    onChange(item.url);
+                    setPickerOpen(false);
+                  }}
+                  className="group relative overflow-hidden rounded-lg border border-slate-200 bg-white aspect-[16/10] hover:ring-2 hover:ring-slate-900 transition"
+                >
+                  <img src={item.url} alt={item.label} className="h-full w-full object-cover" />
+                  <span className="absolute inset-x-0 bottom-0 bg-black/60 px-1 py-0.5 text-[9px] font-medium text-white truncate">
+                    {item.label}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {value && validHttps && !broken ? (
         <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-slate-100 aspect-[16/9]">
           <img
@@ -113,7 +223,7 @@ function ImageUrlInput({
       ) : (
         <div className="flex items-center gap-2 rounded-xl border border-dashed border-slate-200 bg-slate-50 px-3 py-2.5 text-[11px] text-slate-400">
           <ImageIcon className="h-4 w-4 shrink-0" />
-          <span>{broken ? "Não foi possível carregar a imagem." : "Cole um link https:// de imagem"}</span>
+          <span>{broken ? "Não foi possível carregar a imagem." : "Cole um link https:// ou escolha na galeria"}</span>
         </div>
       )}
     </div>
@@ -126,6 +236,7 @@ export function SectionInspector({
   onChange,
   canToggleSections,
   companyName,
+  productImages = [],
 }: SectionInspectorProps) {
   const meta = NODE_META[selected];
   const isPageSection = (id: EditorNodeId): id is SectionId =>
@@ -210,6 +321,9 @@ export function SectionInspector({
               placeholder="Entrega rápida · Compra segura e confiável"
               className="h-9 text-xs"
             />
+            <p className="mt-1 text-right text-[10px] text-slate-400">
+              {theme.announcement.text.length}/160
+            </p>
           </div>
         </div>
       )}
@@ -236,6 +350,7 @@ export function SectionInspector({
           <ImageUrlInput
             label="Logótipo (URL https://)"
             value={theme.brand.logoUrl}
+            productImages={productImages}
             onChange={(logoUrl) =>
               onChange({
                 ...theme,
@@ -298,6 +413,9 @@ export function SectionInspector({
               placeholder="Produtos que fazem sentido"
               className="h-9 text-xs"
             />
+            <p className="mt-1 text-right text-[10px] text-slate-400">
+              {theme.hero.title.length}/80
+            </p>
           </div>
           <div>
             <label className="mb-1 block text-[11px] font-semibold text-slate-700">
@@ -316,6 +434,9 @@ export function SectionInspector({
               placeholder="Estilo, qualidade e escolhas feitas para si."
               className="text-xs resize-none"
             />
+            <p className="mt-1 text-right text-[10px] text-slate-400">
+              {theme.hero.subtitle.length}/240
+            </p>
           </div>
           <div>
             <label className="mb-1 block text-[11px] font-semibold text-slate-700">
@@ -337,6 +458,7 @@ export function SectionInspector({
           <ImageUrlInput
             label="Imagem do banner (URL https://)"
             value={theme.hero.imageUrl}
+            productImages={productImages}
             onChange={(imageUrl) =>
               onChange({
                 ...theme,
@@ -401,6 +523,7 @@ export function SectionInspector({
           <ImageUrlInput
             label="Imagem promocional (URL https://)"
             value={theme.banner.imageUrl}
+            productImages={productImages}
             onChange={(imageUrl) =>
               onChange({
                 ...theme,
@@ -538,13 +661,23 @@ export function SectionInspector({
         selected === "products" ||
         selected === "newsletter" ||
         selected === "faq") && (
-        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs leading-relaxed text-slate-600">
-          <div className="mb-2 flex items-center gap-2 font-semibold text-slate-900">
+        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs leading-relaxed text-slate-600 space-y-3">
+          <div className="flex items-center gap-2 font-semibold text-slate-900">
             <Layers className="h-4 w-4 text-emerald-600" />
             Secção dinâmica da loja
           </div>
-          Esta secção sincroniza automaticamente com o seu catálogo e configurações da empresa.
-          Use o ícone de olho acima para mostrar ou ocultar, e as setas na árvore à esquerda para alterar a ordem na página.
+          <p>
+            Esta secção sincroniza automaticamente com o seu catálogo e configurações da empresa.
+            Arraste na árvore à esquerda para alterar a ordem ou clique no ícone de olho para ocultar.
+          </p>
+          {(selected === "categories" || selected === "products") && (
+            <Link
+              to="/admin/produtos"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-semibold text-slate-800 hover:bg-slate-100 transition"
+            >
+              Gerir produtos do catálogo <ExternalLink className="h-3 w-3" />
+            </Link>
+          )}
         </div>
       )}
 

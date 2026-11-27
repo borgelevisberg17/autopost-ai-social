@@ -636,7 +636,7 @@ export default function Store() {
           </button>
         </div>
       </div>}
-      <header className="store-header">
+      <header {...previewProps("brand", "Cabeçalho & Marca")} className="store-header">
         <div className="store-header__bar">
           <button
             type="button"
@@ -1656,17 +1656,18 @@ export default function Store() {
       </AnimatePresence>
 
       {/* FOOTER */}
-
-      <StoreFooter
-        company={company}
-        categories={categoryItems}
-        footerTheme={theme.footer}
-        onCategoryClick={(catName) => {
-          setCategory(catName);
-          scrollTo("produtos");
-        }}
-        onNavigateSection={(sectionId) => scrollTo(sectionId)}
-      />
+      <div {...previewProps("footer", "Rodapé & Redes")}>
+        <StoreFooter
+          company={company}
+          categories={categoryItems}
+          footerTheme={theme.footer}
+          onCategoryClick={(catName) => {
+            setCategory(catName);
+            scrollTo("produtos");
+          }}
+          onNavigateSection={(sectionId) => scrollTo(sectionId)}
+        />
+      </div>
     </div>
   );
 }

@@ -8,6 +8,7 @@ import {
   ExternalLink,
   Eye,
   EyeOff,
+  GripVertical,
   History,
   Layers,
   Loader2,
@@ -98,6 +99,8 @@ export default function StoreEditor() {
   const [publishedJson, setPublishedJson] = useState<string | null>(null);
   const [publishedAt, setPublishedAt] = useState<string | null>(null);
   const [versions, setVersions] = useState<ThemeVersion[]>([]);
+  const [productImages, setProductImages] = useState<string[]>([]);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
 
   const [history, setHistory] = useState<StoreTheme[]>([]);
   const [future, setFuture] = useState<StoreTheme[]>([]);
@@ -141,7 +144,7 @@ export default function StoreEditor() {
   const loadThemeData = useCallback(async (companyId: string) => {
     setLoading(true);
     try {
-      const [{ data: row, error: themeErr }, { data: verRows }] =
+      const [{ data: row, error: themeErr }, { data: verRows }, { data: prodRows }] =
         await Promise.all([
           supabase
             .from("store_themes")
@@ -154,6 +157,12 @@ export default function StoreEditor() {
             .eq("company_id", companyId)
             .order("created_at", { ascending: false })
             .limit(20),
+          supabase
+            .from("products")
+            .select("images")
+            .eq("company_id", companyId)
+            .eq("active", true)
+            .limit(16),
         ]);
 
       if (themeErr) {
@@ -170,6 +179,15 @@ export default function StoreEditor() {
       setPublishedJson(initialPub);
       setPublishedAt(row?.published_at ?? null);
       setVersions((verRows as ThemeVersion[]) ?? []);
+      setProductImages(
+        Array.from(
+          new Set(
+            (prodRows ?? [])
+              .flatMap((p) => (Array.isArray(p.images) ? p.images : []))
+              .filter((u): u is string => typeof u === "string" && u.startsWith("https://"))
+          )
+        )
+      );
       setHistory([]);
       setFuture([]);
     } finally {
@@ -592,7 +610,7 @@ export default function StoreEditor() {
       </header>
 
       {/* Mobile Toggle Bar */}
-      <div className="flex lg:hidden border-b border-slate-200 bg-white px-3 py-1.5 gap-2">
+      <div className="flex lg:hidden items-center border-b border-slate-200 bg-white px-3 py-1.5 gap-2">
         <button
           type="button"
           onClick={() => setMobileView("editor")}
@@ -617,6 +635,20 @@ export default function StoreEditor() {
         >
           Pré-visualizar
         </button>
+        <button
+          type="button"
+          onClick={() => setGalleryOpen(true)}
+          className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700"
+        >
+          Templates
+        </button>
+        <button
+          type="button"
+          onClick={() => setAiOpen((v) => !v)}
+          className="rounded-lg bg-emerald-600 px-2.5 py-1.5 text-xs font-semibold text-white"
+        >
+          IA
+        </button>
       </div>
 
       {/* Main 3-Column Shopify Studio */}
@@ -624,7 +656,7 @@ export default function StoreEditor() {
         {/* Left Sidebar: Structure / Theme / Versions */}
         <aside
           className={cn(
-            "flex w-full lg:w-[290px] shrink-0 flex-col border-r border-slate-200 bg-white",
+            "flex w-full lg:w-[260px] xl:w-[285px] shrink-0 flex-col border-r border-slate-200 bg-white",
             mobileView === "preview" && "hidden lg:flex"
           )}
         >
@@ -721,13 +753,35 @@ export default function StoreEditor() {
                       return (
                         <div
                           key={sec.id}
+                          draggable={access.sections}
+                          onDragStart={() => setDragIndex(idx)}
+                          onDragOver={(e) => {
+                            if (!access.sections || dragIndex === null) return;
+                            e.preventDefault();
+                          }}
+                          onDrop={() => {
+                            if (!access.sections || dragIndex === null || dragIndex === idx) {
+                              setDragIndex(null);
+                              return;
+                            }
+                            const next = [...sectionsList];
+                            const [moved] = next.splice(dragIndex, 1);
+                            next.splice(idx, 0, moved);
+                            updateDraft({ ...draft, sections: next });
+                            setDragIndex(null);
+                          }}
+                          onDragEnd={() => setDragIndex(null)}
                           className={cn(
                             "group flex items-center gap-1 rounded-lg px-2 py-1.5 transition",
                             active
                               ? "bg-slate-900 text-white"
-                              : "text-slate-700 hover:bg-slate-100"
+                              : "text-slate-700 hover:bg-slate-100",
+                            dragIndex === idx && "opacity-40"
                           )}
                         >
+                          {access.sections && (
+                            <GripVertical className="h-3.5 w-3.5 shrink-0 cursor-grab opacity-40 group-hover:opacity-80" />
+                          )}
                           <button
                             type="button"
                             onClick={() => selectSection(sec.id)}
@@ -821,14 +875,15 @@ export default function StoreEditor() {
                   </button>
                 </div>
 
-                {/* Inline Inspector on <xl viewports inside left pane */}
-                <div className="xl:hidden border-t border-slate-200 pt-4 mt-4">
+                {/* Inline Inspector on <lg viewports inside left pane */}
+                <div className="lg:hidden border-t border-slate-200 pt-4 mt-4">
                   <SectionInspector
                     selected={selectedNode}
                     theme={draft}
                     onChange={updateDraft}
                     canToggleSections={access.sections}
                     companyName={company.name}
+                    productImages={productImages}
                   />
                 </div>
               </div>
@@ -942,29 +997,43 @@ export default function StoreEditor() {
 
           <div
             className={cn(
-              "relative flex-1 overflow-hidden rounded-2xl border border-slate-300/90 bg-white shadow-[0_20px_60px_rgba(15,23,42,0.12)] transition-all duration-300",
+              "relative flex flex-1 flex-col overflow-hidden rounded-2xl border border-slate-300/90 bg-white shadow-[0_20px_60px_rgba(15,23,42,0.12)] transition-all duration-300",
               VIEWPORT_WIDTHS[viewport]
             )}
           >
+            <div className="flex h-8 shrink-0 items-center justify-between border-b border-slate-200/80 bg-slate-50 px-3">
+              <div className="flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-slate-300" />
+                <span className="h-2 w-2 rounded-full bg-slate-300" />
+                <span className="h-2 w-2 rounded-full bg-slate-300" />
+              </div>
+              <div className="rounded-md bg-white border border-slate-200/80 px-2.5 py-0.5 text-[10px] font-mono text-slate-500 truncate max-w-[260px]">
+                vendora.cachiluvia.com/loja/{company.slug}
+              </div>
+              <span className="text-[10px] font-semibold text-slate-400">
+                {PREVIEW_PAGES.find((p) => p.id === previewPage)?.label}
+              </span>
+            </div>
             <iframe
               key={previewKey}
               ref={iframeRef}
               title={`Pré-visualização da loja ${company.name}`}
               src={`/loja/${company.slug}?preview=1`}
-              className="h-full w-full border-0"
+              className="flex-1 w-full border-0"
             />
           </div>
         </main>
 
-        {/* Right Contextual Inspector (Desktop xl+) */}
+        {/* Right Contextual Inspector (Desktop lg+) */}
         {!aiOpen && (
-          <aside className="hidden xl:flex w-[330px] shrink-0 flex-col border-l border-slate-200 bg-white overflow-y-auto p-4">
+          <aside className="hidden lg:flex w-[300px] xl:w-[335px] shrink-0 flex-col border-l border-slate-200 bg-white overflow-y-auto p-4">
             <SectionInspector
               selected={selectedNode}
               theme={draft}
               onChange={updateDraft}
               canToggleSections={access.sections}
               companyName={company.name}
+              productImages={productImages}
             />
           </aside>
         )}
