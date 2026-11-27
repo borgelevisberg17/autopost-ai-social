@@ -207,6 +207,12 @@ export default function StoreEditor() {
       if (e.data?.type === `${THEME_PREVIEW_MESSAGE}-ready`) {
         previewReadyRef.current = true;
         postPreviewTheme(draft);
+        if (previewPage !== "home") {
+          iframeRef.current?.contentWindow?.postMessage(
+            { type: THEME_PAGE_MESSAGE, page: previewPage },
+            window.location.origin
+          );
+        }
       }
       if (e.data?.type === THEME_SELECT_MESSAGE && e.data.section) {
         setLeftTab("sections");
@@ -215,7 +221,18 @@ export default function StoreEditor() {
     };
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
-  }, [draft, postPreviewTheme]);
+  }, [draft, postPreviewTheme, previewPage]);
+
+  // Warn before closing tab with unsaved draft changes
+  useEffect(() => {
+    if (!hasUnsavedChanges) return;
+    const onBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [hasUnsavedChanges]);
 
   const switchPreviewPage = (page: PreviewPage) => {
     setPreviewPage(page);

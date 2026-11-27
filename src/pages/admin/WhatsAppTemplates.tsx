@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
-type Component = { type: string; format?: string; text?: string; example?: any; buttons?: { type: string; text: string; url?: string; phone_number?: string }[] };
+type Component = { type: string; format?: string; text?: string; example?: Record<string, unknown>; buttons?: { type: string; text: string; url?: string; phone_number?: string }[] };
 type Template = { id: string; name: string; status: string; category: string; language: string; components?: Component[]; quality_score?: { score?: string } };
 type Category = "UTILITY" | "MARKETING" | "AUTHENTICATION";
 type Screen = "list" | "detail" | "editor";

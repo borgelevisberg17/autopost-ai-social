@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { fontHref, normalizeTheme, themeCssVars, type StoreTheme } from "@/lib/storeTheme";
 
@@ -88,11 +88,14 @@ export function useStoreTheme(
     }
   }, [raw.seo.title, raw.seo.description]);
 
-  const notifySelectSection = (section: string) => {
-    if (!isPreview) return;
-    setActiveSection(section);
-    window.parent.postMessage({ type: THEME_SELECT_MESSAGE, section }, window.location.origin);
-  };
+  const notifySelectSection = useCallback(
+    (section: string) => {
+      if (!isPreview) return;
+      setActiveSection(section);
+      window.parent.postMessage({ type: THEME_SELECT_MESSAGE, section }, window.location.origin);
+    },
+    [isPreview],
+  );
 
   return useMemo(
     () => ({
@@ -102,6 +105,6 @@ export function useStoreTheme(
       activeSection,
       notifySelectSection,
     }),
-    [raw, isPreview, activeSection],
+    [raw, isPreview, activeSection, notifySelectSection],
   );
 }

@@ -10,6 +10,7 @@ const Body = z.object({ action: z.enum(["launch", "pause", "approve", "run_due",
 const GRAPH = "https://graph.facebook.com/v21.0";
 
 // deno-lint-ignore no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Db = any;
 
 async function loadProducts(db: Db, campaign: { company_id: string; product_ids: string[]; auto_products: boolean }) {
@@ -20,6 +21,7 @@ async function loadProducts(db: Db, campaign: { company_id: string; product_ids:
 }
 
 // deno-lint-ignore no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function processStep(db: Db, step: any) {
   const { data: campaign } = await db.from("campaigns").select("*").eq("id", step.campaign_id).single();
   const { data: company } = await db.from("companies").select("id,name,slug,currency,platform_status").eq("id", step.company_id).single();
@@ -73,7 +75,7 @@ async function processStep(db: Db, step: any) {
       }
       const r = await fetch(`${GRAPH}/${acc.phone_number_id}/messages`, { method: "POST", headers: { Authorization: `Bearer ${waToken}`, "Content-Type": "application/json" }, body: JSON.stringify({ messaging_product: "whatsapp", to: c.customer_phone, type: "text", text: { body: content } }) });
       const j = await r.json();
-      r.ok ? sent++ : failed++;
+      if (r.ok) sent++; else failed++;
       await db.from("campaign_deliveries").update({ status: r.ok ? "sent" : "failed", external_id: j?.messages?.[0]?.id ?? null, error: r.ok ? null : j?.error?.message ?? "erro" }).eq("step_id", step.id).eq("recipient", c.customer_phone);
     }
     return finish(failed && !sent ? "failed" : "sent", { message: `Enviadas ${sent}, aguardam modelo aprovado ${waiting}, falhas ${failed}`, sent, waiting, failed }, content);

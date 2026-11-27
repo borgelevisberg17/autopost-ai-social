@@ -2,6 +2,7 @@ export type PlanAccess = { features: string[]; company_status: string };
 export function routeAllowed(path: string, access: PlanAccess | null): boolean {
   const required: Record<string, string[]> = {
     "/admin/conversas": ["whatsapp"],
+    "/admin/modelos-whatsapp": ["whatsapp"],
     "/admin/analytics": ["analytics"],
     "/admin/agentes": ["marketing", "sales"],
     "/admin/conteudo": ["marketing"],

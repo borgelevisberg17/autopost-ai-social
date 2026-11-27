@@ -19,6 +19,7 @@ async function validSignature(raw: string, header: string | null) {
 }
 
 // deno-lint-ignore no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function handleMessage(db: any, account: any, contactName: string | undefined, msg: any) {
   const text: string = msg.type === "text" ? String(msg.text?.body ?? "") :
     msg.type === "button" ? String(msg.button?.text ?? "") :
@@ -116,8 +117,7 @@ Deno.serve(async (req) => {
     }
   })();
   // Answer Meta fast; keep processing in the background.
-  // deno-lint-ignore no-explicit-any
-  const rt = (globalThis as any).EdgeRuntime;
+  const rt = (globalThis as unknown as { EdgeRuntime?: { waitUntil?: (p: Promise<unknown>) => void } }).EdgeRuntime;
   if (rt?.waitUntil) rt.waitUntil(work); else await work;
   return new Response("OK", { status: 200 });
 });

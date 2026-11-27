@@ -1,4 +1,5 @@
 // deno-lint-ignore-file no-explicit-any
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Shared WhatsApp sales agent: answers only from real catalogue/order data.
 type DB = any;
 import { metaCredentials, companyWhatsAppToken } from "./credentials.ts";

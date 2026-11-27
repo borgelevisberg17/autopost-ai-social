@@ -219,7 +219,7 @@ const App = () => (
                 <Route path="/admin/automacoes" element={<P><PlanRoute><Automations /></PlanRoute></P>} />
                 <Route path="/admin/pagamentos" element={<P><Payments /></P>} />
                 <Route path="/admin/conversas" element={<P><PlanRoute><Conversations /></PlanRoute></P>} />
-                <Route path="/admin/modelos-whatsapp" element={<P><WhatsAppTemplates /></P>} />
+                <Route path="/admin/modelos-whatsapp" element={<P><PlanRoute><WhatsAppTemplates /></PlanRoute></P>} />
                 <Route path="/admin/editor-loja" element={<P><StoreEditor /></P>} />
                 <Route path="/plataforma" element={<P><Platform /></P>} />
 
