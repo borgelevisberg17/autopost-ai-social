@@ -1044,7 +1044,9 @@ export default function StoreEditor() {
           companyId={company.id}
           companyName={company.name}
           currentTheme={draft}
+          selectedSection={selectedNode}
           onApplyTheme={updateDraft}
+          onFocusSection={(sec) => selectSection(sec)}
         />
       </div>
 

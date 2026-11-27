@@ -1,16 +1,19 @@
 import { useState } from "react";
-import { Loader2, Send, Sparkles, Wand2, X } from "lucide-react";
+import { Loader2, RotateCcw, Send, Sparkles, Wand2, X } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {
   PRESETS,
+  SECTION_IDS,
   applyPreset,
   normalizeTheme,
+  type SectionId,
   type StoreTheme,
 } from "@/lib/storeTheme";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import type { EditorNodeId } from "./SectionInspector";
 
 interface AiStoreCopilotProps {
   open: boolean;
@@ -18,12 +21,16 @@ interface AiStoreCopilotProps {
   companyId: string;
   companyName: string;
   currentTheme: StoreTheme;
+  selectedSection: EditorNodeId;
   onApplyTheme: (next: StoreTheme) => void;
+  onFocusSection?: (section: EditorNodeId) => void;
 }
 
 type ChatMessage = {
   role: "user" | "assistant";
   text: string;
+  areas?: string[];
+  previousTheme?: StoreTheme;
 };
 
 const QUICK_ACTIONS = [
@@ -31,25 +38,25 @@ const QUICK_ACTIONS = [
     label: "Criar loja completa para o meu negócio",
     mode: "generate" as const,
     prompt:
-      "Cria uma identidade visual completa, textos de destaque, barra de anúncios e SEO perfeitos para os produtos da minha loja.",
+      "Cria uma identidade visual completa, escolhe o melhor template e imagem, escreve textos de destaque, barra de anúncios, testemunhos e SEO perfeitos para os meus produtos.",
+  },
+  {
+    label: "Auditoria UX & Conversão automática",
+    mode: "refine" as const,
+    prompt:
+      "Faz uma auditoria completa à minha loja atual: corrige textos genéricos, melhora o contraste se necessário, ativa secções de confiança e otimiza o SEO para vender mais.",
   },
   {
     label: "Estilo luxo escuro & sofisticado",
     mode: "refine" as const,
     prompt:
-      "Transforma a loja num estilo luxuoso e sofisticado com fundo escuro, detalhes dourados e tipografia editorial.",
+      "Transforma a loja num estilo luxuoso e sofisticado com fundo escuro, detalhes dourados, fotografia adequada e tipografia editorial.",
   },
   {
-    label: "Campanha promocional no banner",
+    label: "Reordenar secções para alta conversão",
     mode: "refine" as const,
     prompt:
-      "Escreve uma campanha atrativa de oferta especial na barra de anúncios e no banner promocional.",
-  },
-  {
-    label: "Otimizar títulos e SEO para Google",
-    mode: "refine" as const,
-    prompt:
-      "Otimiza o título da página, descrição SEO, subtítulo principal e texto do rodapé para converter mais visitantes.",
+      "Reordena as secções da página para máxima conversão: banner principal, produtos em destaque, testemunhos visíveis, banner promocional e FAQ.",
   },
 ];
 
@@ -70,6 +77,7 @@ function mergeThemePatch(
 
   for (const key of [
     "colors",
+    "brand",
     "announcement",
     "hero",
     "banner",
@@ -89,6 +97,36 @@ function mergeThemePatch(
     next.testimonials = patch.testimonials;
   }
 
+  // Reorder & toggle sections if AI requested
+  const baseSections = base.sections ?? SECTION_IDS.map((id) => ({ id, visible: true }));
+  const visibilityMap = new Map(baseSections.map((s) => [s.id, s.visible]));
+
+  if (patch.sections_visibility && typeof patch.sections_visibility === "object") {
+    for (const [k, v] of Object.entries(patch.sections_visibility as Record<string, unknown>)) {
+      if (SECTION_IDS.includes(k as SectionId) && typeof v === "boolean") {
+        visibilityMap.set(k as SectionId, v);
+      }
+    }
+  }
+
+  if (Array.isArray(patch.sections_order) && patch.sections_order.length > 0) {
+    const validOrder = patch.sections_order.filter((id): id is SectionId =>
+      SECTION_IDS.includes(id as SectionId)
+    );
+    const remaining = baseSections
+      .map((s) => s.id)
+      .filter((id) => !validOrder.includes(id));
+    next.sections = [...validOrder, ...remaining].map((id) => ({
+      id,
+      visible: visibilityMap.get(id) ?? true,
+    }));
+  } else if (patch.sections_visibility) {
+    next.sections = baseSections.map((s) => ({
+      id: s.id,
+      visible: visibilityMap.get(s.id) ?? s.visible,
+    }));
+  }
+
   return normalizeTheme(next);
 }
 
@@ -98,7 +136,9 @@ export function AiStoreCopilot({
   companyId,
   companyName,
   currentTheme,
+  selectedSection,
   onApplyTheme,
+  onFocusSection,
 }: AiStoreCopilotProps) {
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
@@ -113,6 +153,7 @@ export function AiStoreCopilot({
     const clean = text.trim();
     if (!clean || loading) return;
 
+    const snapshotBefore = currentTheme;
     setMessages((prev) => [...prev, { role: "user", text: clean }]);
     setPrompt("");
     setLoading(true);
@@ -125,6 +166,7 @@ export function AiStoreCopilot({
             company_id: companyId,
             prompt: clean,
             mode,
+            selected_section: selectedSection,
             current_theme: currentTheme,
           },
         }
@@ -149,11 +191,23 @@ export function AiStoreCopilot({
       );
       onApplyTheme(nextTheme);
 
+      if (data?.focusSection && onFocusSection) {
+        onFocusSection(data.focusSection as EditorNodeId);
+      }
+
       const summary =
         String(data?.summary ?? "").trim() ||
         "Alterações aplicadas ao rascunho da loja!";
 
-      setMessages((prev) => [...prev, { role: "assistant", text: summary }]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          text: summary,
+          areas: Array.isArray(data?.changedAreas) ? data.changedAreas : undefined,
+          previousTheme: snapshotBefore,
+        },
+      ]);
       toast.success("Tema atualizado pela IA!");
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Erro ao contactar a IA.";
@@ -175,9 +229,7 @@ export function AiStoreCopilot({
             <Sparkles className="h-3.5 w-3.5" />
           </div>
           <div>
-            <p className="text-xs font-bold leading-tight">
-              Motor IA da Loja
-            </p>
+            <p className="text-xs font-bold leading-tight">Motor IA da Loja</p>
             <p className="text-[10px] text-slate-300">
               Copiloto de design para {companyName}
             </p>
@@ -204,13 +256,13 @@ export function AiStoreCopilot({
                 Como posso desenhar a sua loja hoje?
               </p>
               <p className="mt-1 text-xs text-slate-500 leading-relaxed">
-                Descreva o estilo, cores, campanha ou público-alvo. A IA lê os seus produtos reais e aplica tudo ao vivo.
+                A IA lê o seu catálogo real, escolhe cores, fontes, fotos, reordena secções e escreve textos persuasivos.
               </p>
             </div>
 
             <div className="space-y-2">
               <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-1">
-                Ações rápidas
+                Superpoderes rápidos
               </p>
               {QUICK_ACTIONS.map((action) => (
                 <button
@@ -232,19 +284,43 @@ export function AiStoreCopilot({
               <div
                 key={i}
                 className={cn(
-                  "rounded-2xl px-3.5 py-2.5 text-xs leading-relaxed",
+                  "rounded-2xl px-3.5 py-2.5 text-xs leading-relaxed space-y-2",
                   msg.role === "user"
                     ? "ml-6 bg-slate-900 text-white"
                     : "mr-4 border border-slate-200 bg-slate-50 text-slate-800"
                 )}
               >
-                {msg.text}
+                <p>{msg.text}</p>
+                {msg.areas && msg.areas.length > 0 && (
+                  <div className="flex flex-wrap gap-1">
+                    {msg.areas.map((area) => (
+                      <span
+                        key={area}
+                        className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800"
+                      >
+                        {area}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                {msg.previousTheme && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onApplyTheme(msg.previousTheme!);
+                      toast.info("Alteração da IA desfeita.");
+                    }}
+                    className="inline-flex items-center gap-1 text-[10px] font-semibold text-slate-500 hover:text-slate-900"
+                  >
+                    <RotateCcw className="h-3 w-3" /> Desfazer esta alteração
+                  </button>
+                )}
               </div>
             ))}
             {loading && (
               <div className="mr-4 flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs text-slate-600">
                 <Loader2 className="h-3.5 w-3.5 animate-spin text-emerald-600" />
-                A gerar design e textos para a sua loja...
+                A orquestrar layout, imagens e textos...
               </div>
             )}
           </div>
@@ -271,12 +347,12 @@ export function AiStoreCopilot({
             }
           }}
           rows={2}
-          placeholder="Ex.: Deixa a loja mais minimalista em tons areia..."
+          placeholder="Ex.: Melhora esta secção ou muda para estilo boutique..."
           className="bg-white text-xs resize-none"
         />
         <div className="flex items-center justify-between">
           <span className="text-[10px] text-slate-400">
-            Ctrl+Z desfaz qualquer ajuste
+            Secção em foco: <strong>{selectedSection}</strong>
           </span>
           <Button
             type="submit"

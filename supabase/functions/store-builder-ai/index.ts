@@ -37,6 +37,32 @@ const VALID_FONTS = [
   "syne-jakarta",
 ];
 
+const VALID_SECTIONS = [
+  "hero",
+  "categories",
+  "products",
+  "banner",
+  "testimonials",
+  "text",
+  "newsletter",
+  "faq",
+];
+
+const CURATED_MEDIA: Record<string, string> = {
+  minimal_retail: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1400&q=80",
+  luxury_interior: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1400&q=80",
+  warm_living: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1400&q=80",
+  architecture_stone: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1400&q=80",
+  fashion_atelier: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1400&q=80",
+  streetwear_sneakers: "https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=1400&q=80",
+  artisan_craft: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&w=1400&q=80",
+  tech_gadgets: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1400&q=80",
+  shopping_promo: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=1400&q=80",
+  desk_workspace: "https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?auto=format&fit=crop&w=1400&q=80",
+  organic_market: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1400&q=80",
+  botanical_beauty: "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=1400&q=80",
+};
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: cors });
 
@@ -56,6 +82,7 @@ Deno.serve(async (req) => {
     const companyId = String(body.company_id ?? "");
     const prompt = String(body.prompt ?? "").trim();
     const mode = body.mode === "generate" ? "generate" : "refine";
+    const selectedSection = body.selected_section ? String(body.selected_section) : null;
     const currentTheme = body.current_theme ?? {};
 
     if (!companyId || !prompt) {
@@ -68,7 +95,6 @@ Deno.serve(async (req) => {
     });
     if (!isMember) return json({ error: "Sem permissão" }, 403);
 
-    // Read company & real catalog through caller session (RLS)
     const [{ data: company }, { data: products }] = await Promise.all([
       userClient
         .from("companies")
@@ -77,7 +103,7 @@ Deno.serve(async (req) => {
         .maybeSingle(),
       userClient
         .from("products")
-        .select("name, category, price, promo_price")
+        .select("name, category, price, promo_price, images")
         .eq("company_id", companyId)
         .eq("active", true)
         .limit(12),
@@ -109,38 +135,61 @@ Deno.serve(async (req) => {
       return json({ error: "IA não configurada" }, 500);
     }
 
+    const productImageUrls = Array.from(
+      new Set(
+        (products ?? [])
+          .flatMap((p) => (Array.isArray(p.images) ? p.images : []))
+          .filter((u): u is string => typeof u === "string" && u.startsWith("https://"))
+      )
+    ).slice(0, 8);
+
     const catalogContext = {
       loja: company.name,
       descricao: company.description,
       moeda: company.currency,
+      secção_selecionada: selectedSection,
       categorias: [...new Set((products ?? []).map((p) => p.category).filter(Boolean))],
       produtos_amostra: (products ?? []).map((p) => ({
         nome: p.name,
         categoria: p.category,
         preco: p.price,
       })),
+      imagens_produtos_reais: productImageUrls,
+      galeria_curada_ids: Object.keys(CURATED_MEDIA),
     };
 
-    const instructions = `És o arquiteto de e-commerce IA da Vendora (inspirado na Aria do Wix e nos temas da Shopify).
-O teu papel é gerar ou refinar a configuração visual e textual de uma loja online em português com base nos dados REAIS da empresa e do catálogo.
+    const instructions = `És o arquiteto-chefe de e-commerce IA da Vendora (ao nível da Aria do Wix e Shopify Magic).
+O teu papel é criar, auditar, reordenar e refinar a loja online em português com base nos dados REAIS da empresa e do catálogo.
+
 Regras estritas:
-- Nunca inventes produtos, preços ou URLs de imagens. NÃO incluas imageUrl nem logoUrl no JSON (mantém as imagens existentes ou do preset).
-- Usa apenas presets válidos: ${VALID_PRESETS.join(", ")}.
-- Usa apenas fontes válidas: ${VALID_FONTS.join(", ")}.
-- Usa apenas radius válidos: "square", "soft", "round".
-- Todas as cores devem ser hexadecimais válidas de 6 dígitos (#RRGGBB) com bom contraste entre "background" e "text".
-- Responde APENAS com um objeto JSON válido com esta estrutura (no modo "refine", inclui apenas as chaves que fazem sentido alterar para o pedido; no modo "generate", preenche todas):
+- Nunca inventes produtos, preços ou URLs externos arbitrários.
+- Para imagens (hero.imageUrl ou banner.imageUrl), podes escolher uma chave de "galeria_curada_ids" (ex: "hero_media_id": "luxury_interior") OU um URL exato de "imagens_produtos_reais".
+- Podes reordenar secções usando "sections_order" (array com subconjunto ou todas de: ${VALID_SECTIONS.join(", ")}) e mostrar/ocultar usando "sections_visibility" (ex: {"testimonials": true, "text": true}).
+- Podes indicar "focus_section" (ex: "hero", "banner", "testimonials", "text", "footer") para focar o editor na secção mais relevante após a alteração.
+- Presets válidos: ${VALID_PRESETS.join(", ")}.
+- Fontes válidas: ${VALID_FONTS.join(", ")}.
+- Radius válidos: "square", "soft", "round".
+- Todas as cores devem ser hexadecimais de 6 dígitos (#RRGGBB) com contraste WCAG legível entre "background" e "text".
+
+Responde APENAS com JSON válido:
 {
-  "summary": "Explicação curta e clara em português do que foi criado ou ajustado",
+  "summary": "Explicação objetiva em português do que foi criado/otimizado",
+  "changed_areas": ["Cores", "Hero", "SEO"],
+  "focus_section": "hero",
   "preset": "minimal",
   "colors": { "primary": "#...", "background": "#...", "text": "#...", "muted": "#...", "accent": "#...", "line": "#..." },
   "fonts": "dm-sans",
   "radius": "soft",
+  "brand": { "displayName": "...", "tagline": "..." },
   "announcement": { "enabled": true, "text": "..." },
-  "hero": { "eyebrow": "...", "title": "...", "subtitle": "...", "cta": "..." },
-  "banner": { "title": "...", "subtitle": "...", "cta": "..." },
+  "hero": { "eyebrow": "...", "title": "...", "subtitle": "...", "cta": "...", "imageUrl": "opcional se for de imagens_produtos_reais" },
+  "hero_media_id": "opcional: chave de galeria_curada_ids",
+  "banner": { "title": "...", "subtitle": "...", "cta": "...", "imageUrl": "opcional se for de imagens_produtos_reais" },
+  "banner_media_id": "opcional: chave de galeria_curada_ids",
   "testimonials": [{ "name": "...", "quote": "..." }],
   "textBlock": { "title": "...", "body": "..." },
+  "sections_order": ["hero", "categories", "products"],
+  "sections_visibility": { "testimonials": true },
   "footer": { "about": "..." },
   "seo": { "title": "...", "description": "..." }
 }`;
@@ -158,12 +207,14 @@ Regras estritas:
         store: false,
         reasoning: { effort: "low" },
         instructions,
-        input: `Modo: ${mode}\nPedido do comerciante: ${prompt}\nContexto real da loja: ${JSON.stringify(catalogContext)}\nTema atual (resumo): ${JSON.stringify({
+        input: `Modo: ${mode}\nPedido: ${prompt}\nContexto: ${JSON.stringify(catalogContext)}\nTema atual: ${JSON.stringify({
           preset: currentTheme?.preset,
           colors: currentTheme?.colors,
           fonts: currentTheme?.fonts,
           radius: currentTheme?.radius,
+          sections: currentTheme?.sections,
           hero: { title: currentTheme?.hero?.title, subtitle: currentTheme?.hero?.subtitle },
+          seo: currentTheme?.seo,
         })}`,
       }),
     });
@@ -199,7 +250,7 @@ Regras estritas:
           const ev = JSON.parse(data);
           if (ev.type === "response.output_text.delta") text += ev.delta ?? "";
         } catch {
-          // ignore partial JSON frames
+          // ignore partial frames
         }
       }
     }
@@ -213,13 +264,38 @@ Regras estritas:
       return json({ error: "A IA devolveu uma resposta inválida. Tente novamente." }, 500);
     }
 
-    const summary = String(
-      parsed.summary ?? "Alterações aplicadas ao tema da loja."
-    );
-    const { summary: _s, ...patch } = parsed;
+    // Resolve curated media IDs safely
+    if (typeof parsed.hero_media_id === "string" && CURATED_MEDIA[parsed.hero_media_id]) {
+      parsed.hero = {
+        ...((parsed.hero as Record<string, unknown>) ?? {}),
+        imageUrl: CURATED_MEDIA[parsed.hero_media_id],
+      };
+    }
+    if (typeof parsed.banner_media_id === "string" && CURATED_MEDIA[parsed.banner_media_id]) {
+      parsed.banner = {
+        ...((parsed.banner as Record<string, unknown>) ?? {}),
+        imageUrl: CURATED_MEDIA[parsed.banner_media_id],
+      };
+    }
+
+    const summary = String(parsed.summary ?? "Alterações aplicadas ao tema da loja.");
+    const changedAreas = Array.isArray(parsed.changed_areas)
+      ? parsed.changed_areas.map(String).slice(0, 6)
+      : [];
+    const focusSection =
+      typeof parsed.focus_section === "string" ? parsed.focus_section : null;
+
+    const {
+      summary: _s,
+      changed_areas: _ca,
+      focus_section: _fs,
+      hero_media_id: _hm,
+      banner_media_id: _bm,
+      ...patch
+    } = parsed;
 
     await logAction("APPLIED", `${prompt} -> ${summary}`);
-    return json({ summary, patch });
+    return json({ summary, changedAreas, focusSection, patch });
   } catch (e) {
     console.error(e);
     return json({ error: e instanceof Error ? e.message : "Erro interno" }, 500);
